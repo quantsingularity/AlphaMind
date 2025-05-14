@@ -1,7 +1,6 @@
-import React from "react";
-import { StyleSheet, View, ScrollView, Text } from "react-native"; // Added Text import
+import React, { useMemo } from "react"; // Added useMemo
+import { StyleSheet, View, ScrollView, Text } from "react-native";
 import {
-  // Surface, // Removed unused import
   Headline,
   Paragraph,
   Card,
@@ -16,28 +15,28 @@ const kpiData = [
     title: "Portfolio Value",
     value: "$1,250,345.67",
     change: "+1.2%",
-    changeColor: "green",
+    changeColor: "green", // This might need theming later if flagged
     icon: "chart-line",
   },
   {
     title: "Daily P&L",
     value: "$15,678.90",
     change: "+0.8%",
-    changeColor: "green",
+    changeColor: "green", // This might need theming later if flagged
     icon: "trending-up",
   },
   {
     title: "Sharpe Ratio",
     value: "2.35",
     change: "-0.05",
-    changeColor: "red",
+    changeColor: "red", // This might need theming later if flagged
     icon: "chart-bell-curve-cumulative",
   },
   {
     title: "Active Strategies",
     value: "12",
     change: "+1",
-    changeColor: "blue",
+    changeColor: "blue", // This might need theming later if flagged
     icon: "robot",
   },
 ];
@@ -45,12 +44,68 @@ const kpiData = [
 export default function HomeScreen() {
   const theme = useTheme();
 
+  // Memoize styles to prevent recreation on every render unless theme changes
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      backgroundColor: theme.colors.background, // Use theme color
+      flexGrow: 1,
+      padding: 16,
+    },
+    infoText: {
+      color: theme.colors.outline, // Use theme color (formerly '#888')
+      marginTop: 16,
+      textAlign: "center",
+    },
+    kpiCard: {
+      marginBottom: 16,
+      width: "48%",
+    },
+    kpiCardContent: {
+      alignItems: "center",
+      paddingHorizontal: 8,
+      paddingVertical: 12,
+    },
+    kpiChange: {
+      fontSize: 12,
+      marginTop: 2,
+    },
+    kpiContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "space-between",
+      marginBottom: 24,
+    },
+    kpiIcon: {
+      marginBottom: 8,
+    },
+    kpiTextContainer: {
+      alignItems: "center",
+    },
+    kpiTitle: {
+      color: theme.colors.onSurfaceVariant, // Use theme color (formerly '#666')
+      fontSize: 12,
+      marginBottom: 2,
+      textAlign: "center",
+    },
+    kpiValue: {
+      fontSize: 16,
+      lineHeight: 20,
+      textAlign: "center",
+    },
+    paragraph: {
+      fontSize: 16,
+      marginBottom: 24,
+      textAlign: "center",
+    },
+    title: {
+      marginBottom: 8,
+      textAlign: "center",
+    },
+  }), [theme]);
+
   return (
     <ScrollView
-      contentContainerStyle={[
-        styles.container,
-        { backgroundColor: theme.colors.background },
-      ]}
+      contentContainerStyle={styles.container} // Use memoized styles
     >
       <Headline style={styles.title}>
         <Text>AlphaMind Dashboard</Text>
@@ -93,59 +148,3 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    padding: 16,
-  },
-  infoText: {
-    color: "#888",
-    marginTop: 16,
-    textAlign: "center",
-  },
-  kpiCard: {
-    marginBottom: 16,
-    width: "48%", // Approximately half width for two columns
-  },
-  kpiCardContent: {
-    alignItems: "center",
-    paddingHorizontal: 8, // Reduce padding for smaller cards
-    paddingVertical: 12,
-  },
-  kpiChange: {
-    fontSize: 12,
-    marginTop: 2,
-  },
-  kpiContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    marginBottom: 24,
-  },
-  kpiIcon: {
-    marginBottom: 8,
-  },
-  kpiTextContainer: {
-    alignItems: "center",
-  },
-  kpiTitle: {
-    color: "#666",
-    fontSize: 12,
-    marginBottom: 2,
-    textAlign: "center",
-  },
-  kpiValue: {
-    fontSize: 16, // Slightly smaller font for values
-    lineHeight: 20,
-    textAlign: "center",
-  },
-  paragraph: {
-    fontSize: 16,
-    marginBottom: 24,
-    textAlign: "center",
-  },
-  title: {
-    marginBottom: 8,
-    textAlign: "center",
-  },
-});

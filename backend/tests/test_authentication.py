@@ -22,8 +22,8 @@ def app_context():
     app.config["TESTING"] = True
     # Use a very short expiration for testing expiration scenarios
     auth = AuthenticationSystem(
-        app, app.config["SECRET_KEY"], token_expiration=1
-    )  # 1 second expiration
+        app, app.config["SECRET_KEY"], token_expiration=(1/3600.0)  # 1 second expiration
+    ) 
 
     # --- Mocking the decorator slightly for testing ---
     # The real decorator might fetch a user object. For testing the flow,
@@ -233,3 +233,4 @@ def test_token_required_decorator_expired(client, auth_system):
     response = client.get("/api/protected_test_unique", headers=headers)
     assert response.status_code == 401
     assert "Token is invalid or expired" in response.json["message"]
+

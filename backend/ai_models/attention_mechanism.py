@@ -95,7 +95,7 @@ class TemporalAttentionBlock(tf.keras.layers.Layer):
 
     def call(self, x, training=True, mask=None):
         # Self attention
-        attn_output = self.mha(x, x, x, mask)  # (batch_size, seq_len, d_model)
+        attn_output = self.mha(v=x, k=x, q=x, mask=mask)  # Pass v, k, q as keyword arguments too for clarity, mask must be keyword
         attn_output = self.dropout1(attn_output, training=training)
         out1 = self.layernorm1(x + attn_output)  # (batch_size, seq_len, d_model)
 
@@ -169,9 +169,10 @@ class FinancialTimeSeriesTransformer(tf.keras.Model):
 
         # Encoder layers
         for i in range(self.num_layers):
-            x = self.enc_layers[i](x, training, mask)
+            x = self.enc_layers[i](x, training=training, mask=mask) # Pass training and mask as keyword arguments
 
         # Final projection to output sequence length
         output = self.final_layer(x)
 
         return output
+

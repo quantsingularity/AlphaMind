@@ -17,11 +17,11 @@ import AppNavigator from "./navigation/AppNavigator";
 export default function App() {
   return (
     <PaperProvider>
-      {" "}
-      // Wrap the app with PaperProvider
+      {/* Wrap the app with PaperProvider */}
       <NavigationContainer>
         <AppNavigator />
       </NavigationContainer>
     </PaperProvider>
   );
 }
+
