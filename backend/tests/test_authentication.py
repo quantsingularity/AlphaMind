@@ -1,6 +1,7 @@
 import json
 import sys
 import time
+import os
 from functools import wraps  # Import wraps
 
 import jwt  # Import jwt for exception handling
@@ -8,9 +9,11 @@ import pytest
 from flask import Flask, jsonify, request  # Added request
 
 # Add the backend directory to the path
-sys.path.append("/home/ubuntu/alphamind_project/backend")
+current_dir = os.path.dirname(os.path.abspath(__file__))
+backend_dir = os.path.dirname(os.path.dirname(current_dir))
+sys.path.append(backend_dir)
 
-from infrastructure.authentication import AuthenticationSystem
+from backend.infrastructure.authentication import AuthenticationSystem
 
 
 # Using a single fixture to create app and auth context to avoid route overwriting
