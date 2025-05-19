@@ -9,7 +9,7 @@
 AlphaMind is an advanced quantitative trading system that combines alternative data sources, machine learning algorithms, and high-frequency execution strategies to deliver institutional-grade trading performance.
 
 <div align="center">
-  <img src="docs/images/alphamind_dashboard.png" alt="AlphaMind Dashboard" width="80%">
+  <img src="docs/images/alphamind_dashboard.bmp" alt="AlphaMind Dashboard" width="80%">
 </div>
 
 > **Note**: This project is currently under active development. Features and functionalities are being added and improved continuously to enhance user experience.
