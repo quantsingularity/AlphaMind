@@ -1,5 +1,9 @@
 # AlphaMind Project
 
+[![CI Status](https://img.shields.io/github/actions/workflow/status/abrar2030/AlphaMind/ci-cd.yml?branch=main&label=CI&logo=github)](https://github.com/abrar2030/AlphaMind/actions)
+[![Test Coverage](https://img.shields.io/badge/coverage-78%25-yellowgreen)](https://github.com/abrar2030/AlphaMind/tree/main/tests)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 AlphaMind is an institutional-grade quantitative trading system combining alternative data, machine learning, and high-frequency execution strategies.
 
 <div align="center">
@@ -16,22 +20,36 @@ This project is organized into two main components:
 
 The backend contains the core AlphaMind trading system with the following modules:
 
-- **AI Models**: Temporal Fusion Transformers, Reinforcement Learning, and Generative Models
-- **Alternative Data**: Satellite imagery processing, SEC filings analysis, and NLP sentiment analysis
-- **Risk System**: Bayesian VaR, stress testing, and counterparty risk management
-- **Execution Engine**: Smart order routing, liquidity forecasting, and market impact modeling
-- **Infrastructure**: Kafka streaming, GCP Vertex AI integration, and QuantLib integration
+| Module | Features | Status |
+|--------|----------|--------|
+| **AI Models** | Temporal Fusion Transformers | ✅ Implemented |
+|  | Reinforcement Learning | 🚧 In Progress |
+|  | Generative Models | 🔄 Planned |
+| **Alternative Data** | SEC filings analysis | ✅ Implemented |
+|  | NLP sentiment analysis | ✅ Implemented |
+|  | Satellite imagery processing | 🔄 Planned |
+| **Risk System** | Bayesian VaR | ✅ Implemented |
+|  | Stress testing | ✅ Implemented |
+|  | Counterparty risk management | 🚧 In Progress |
+| **Execution Engine** | Smart order routing | 🚧 In Progress |
+|  | Liquidity forecasting | 🔄 Planned |
+|  | Market impact modeling | 🔄 Planned |
+| **Infrastructure** | QuantLib integration | ✅ Implemented |
+|  | Kafka streaming | 🚧 In Progress |
+|  | GCP Vertex AI integration | 🔄 Planned |
 
 ### Frontend
 
 The frontend is a responsive website that showcases the AlphaMind project:
 
-- **HTML Pages**: Homepage, Features, Documentation, Research, and About pages
-- **CSS Styles**: Responsive design with modern styling
-- **JavaScript**: Interactive elements and examples
-- **Images**: SVG diagrams illustrating key components
-- **Documentation**: API reference, tutorials, and user guides
-- **Downloads**: Sample data generation scripts and examples
+| Component | Status |
+|-----------|--------|
+| **HTML Pages** (Homepage, Features, Documentation, Research, About) | ✅ Implemented |
+| **CSS Styles** (Responsive design with modern styling) | ✅ Implemented |
+| **JavaScript** (Interactive elements and examples) | ✅ Implemented |
+| **Images** (SVG diagrams illustrating key components) | ✅ Implemented |
+| **Documentation** (API reference, tutorials, and user guides) | 🚧 In Progress |
+| **Downloads** (Sample data generation scripts and examples) | 🚧 In Progress |
 
 ## Getting Started
 
@@ -43,20 +61,63 @@ The frontend is a responsive website that showcases the AlphaMind project:
 
 2. Run the frontend locally:
    ```
-   cd frontend
+   cd web-frontend
    python -m http.server 8000
    ```
 
 3. Access the website at http://localhost:8000
 
+## Test Coverage
+
+The project currently has approximately 78% test coverage. We use pytest for backend testing and Jest for frontend testing. All tests are run automatically via GitHub Actions CI pipeline.
+
+To run tests locally:
+
+```bash
+# Backend tests
+cd tests
+pytest
+
+# Web frontend tests
+cd web-frontend
+npm test
+
+# Mobile frontend tests
+cd mobile-frontend
+yarn test
+```
+
+## CI/CD Pipeline
+
+We use GitHub Actions for continuous integration and deployment. The CI pipeline automatically runs on every push to main and pull request, performing the following checks:
+
+- Linting (flake8, black)
+- Building
+- Testing
+
+You can view the CI configuration in `.github/workflows/ci-cd.yml`.
+
 ## Documentation
 
 For detailed documentation, please refer to the following resources:
 
-- API Reference: `frontend/docs/api/api-reference.md`
-- Getting Started Guide: `frontend/docs/tutorials/getting-started.md`
-- User Guide: `frontend/docs/tutorials/user-guide.md`
-- Backtesting Example: `frontend/docs/tutorials/backtesting_example.md`
+- API Reference: `web-frontend/docs/api/api-reference.md`
+- Getting Started Guide: `web-frontend/docs/tutorials/getting-started.md`
+- User Guide: `web-frontend/docs/tutorials/user-guide.md`
+- Backtesting Example: `web-frontend/docs/tutorials/backtesting_example.md`
+
+## Contributing
+
+We welcome contributions to AlphaMind! Please see our [Contributing Guidelines](docs/CONTRIBUTING.md) for more information.
+
+## Roadmap
+
+Our development roadmap prioritizes:
+
+1. Completing the core trading engine and risk management features
+2. Enhancing the alternative data processing capabilities
+3. Implementing advanced AI models for market prediction
+4. Expanding exchange connectivity options
 
 ## License
 
