@@ -69,7 +69,7 @@ Options:
 ### Building the Project
 
 ```bash
-./scripts/optimized_build.sh [OPTIONS]
+./scripts/build.sh [OPTIONS]
 ```
 
 Options:
