@@ -1,10 +1,8 @@
 # AlphaMind Backend - Comprehensive Documentation
 
-![License](https://img.shields.io/badge/License-QFAL-blue.svg)
 ![Python](https://img.shields.io/badge/Python-3.10+-green.svg)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.8+-orange.svg)
 ![MLflow](https://img.shields.io/badge/MLflow-Enabled-purple.svg)
-![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)
 
 ## 🧠 Institutional-Grade Quantitative AI Trading System Backend
 
