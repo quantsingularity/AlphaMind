@@ -1,0 +1,188 @@
+#!/bin/bash
+# Compliance monitoring script for financial standards
+# Monitors PCI DSS, GDPR, SOX, NIST CSF, and ISO 27001 requirements
+
+# Configuration
+LOG_FILE="/var/log/compliance-monitor.log"
+ALERT_EMAIL="{{ compliance_report_email | default('compliance@company.com') }}"
+HOSTNAME=$(hostname)
+TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+
+# Thresholds
+FAILED_LOGIN_THRESHOLD={{ failed_login_threshold | default(5) }}
+DISK_USAGE_THRESHOLD={{ disk_usage_threshold | default(85) }}
+MEMORY_USAGE_THRESHOLD={{ memory_usage_threshold | default(90) }}
+CPU_USAGE_THRESHOLD={{ cpu_usage_threshold | default(85) }}
+
+# Functions
+log_message() {
+    echo "[$TIMESTAMP] $1" >> "$LOG_FILE"
+}
+
+send_alert() {
+    local subject="$1"
+    local message="$2"
+    echo "$message" | mail -s "$subject" "$ALERT_EMAIL"
+    log_message "ALERT: $subject - $message"
+}
+
+check_failed_logins() {
+    local failed_logins=$(grep "authentication failure" /var/log/auth.log | grep "$(date '+%b %d')" | wc -l)
+    if [ "$failed_logins" -gt "$FAILED_LOGIN_THRESHOLD" ]; then
+        send_alert "Security Alert: Excessive Failed Logins" "Host: $HOSTNAME has $failed_logins failed login attempts today (threshold: $FAILED_LOGIN_THRESHOLD)"
+    fi
+}
+
+check_disk_usage() {
+    local disk_usage=$(df / | awk 'NR==2 {print $5}' | sed 's/%//')
+    if [ "$disk_usage" -gt "$DISK_USAGE_THRESHOLD" ]; then
+        send_alert "Resource Alert: High Disk Usage" "Host: $HOSTNAME disk usage is $disk_usage% (threshold: $DISK_USAGE_THRESHOLD%)"
+    fi
+}
+
+check_memory_usage() {
+    local memory_usage=$(free | awk 'NR==2{printf "%.0f", $3*100/$2}')
+    if [ "$memory_usage" -gt "$MEMORY_USAGE_THRESHOLD" ]; then
+        send_alert "Resource Alert: High Memory Usage" "Host: $HOSTNAME memory usage is $memory_usage% (threshold: $MEMORY_USAGE_THRESHOLD%)"
+    fi
+}
+
+check_cpu_usage() {
+    local cpu_usage=$(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | awk -F'%' '{print $1}')
+    if (( $(echo "$cpu_usage > $CPU_USAGE_THRESHOLD" | bc -l) )); then
+        send_alert "Resource Alert: High CPU Usage" "Host: $HOSTNAME CPU usage is $cpu_usage% (threshold: $CPU_USAGE_THRESHOLD%)"
+    fi
+}
+
+check_audit_daemon() {
+    if ! systemctl is-active --quiet auditd; then
+        send_alert "Compliance Alert: Audit Daemon Down" "Host: $HOSTNAME audit daemon is not running - SOX compliance violation"
+    fi
+}
+
+check_antivirus_status() {
+    if ! systemctl is-active --quiet clamav-daemon; then
+        send_alert "Security Alert: Antivirus Down" "Host: $HOSTNAME antivirus daemon is not running - PCI DSS compliance violation"
+    fi
+}
+
+check_firewall_status() {
+    if ! ufw status | grep -q "Status: active"; then
+        send_alert "Security Alert: Firewall Inactive" "Host: $HOSTNAME firewall is not active - security policy violation"
+    fi
+}
+
+check_ssl_certificates() {
+    local cert_files=$(find /etc/ssl/certs/ -name "*.crt" -o -name "*.pem" 2>/dev/null)
+    for cert in $cert_files; do
+        local expiry_date=$(openssl x509 -in "$cert" -noout -enddate 2>/dev/null | cut -d= -f2)
+        if [ -n "$expiry_date" ]; then
+            local expiry_epoch=$(date -d "$expiry_date" +%s)
+            local current_epoch=$(date +%s)
+            local days_until_expiry=$(( (expiry_epoch - current_epoch) / 86400 ))
+            
+            if [ "$days_until_expiry" -lt 30 ]; then
+                send_alert "Security Alert: SSL Certificate Expiring" "Host: $HOSTNAME certificate $cert expires in $days_until_expiry days"
+            fi
+        fi
+    done
+}
+
+check_log_rotation() {
+    local log_files=("/var/log/auth.log" "/var/log/syslog" "/var/log/audit/audit.log")
+    for log_file in "${log_files[@]}"; do
+        if [ -f "$log_file" ]; then
+            local file_size=$(stat -c%s "$log_file")
+            local max_size=$((100 * 1024 * 1024))  # 100MB
+            if [ "$file_size" -gt "$max_size" ]; then
+                send_alert "Compliance Alert: Log File Too Large" "Host: $HOSTNAME log file $log_file is larger than 100MB - may affect audit trail integrity"
+            fi
+        fi
+    done
+}
+
+check_backup_status() {
+    local backup_log="/var/log/backup.log"
+    if [ -f "$backup_log" ]; then
+        local last_backup=$(tail -1 "$backup_log" | grep "$(date -d '1 day ago' '+%Y-%m-%d')")
+        if [ -z "$last_backup" ]; then
+            send_alert "Compliance Alert: Backup Failure" "Host: $HOSTNAME backup was not completed in the last 24 hours"
+        fi
+    fi
+}
+
+check_intrusion_detection() {
+    local fail2ban_log="/var/log/fail2ban.log"
+    if [ -f "$fail2ban_log" ]; then
+        local recent_bans=$(grep "$(date '+%Y-%m-%d')" "$fail2ban_log" | grep "Ban" | wc -l)
+        if [ "$recent_bans" -gt 10 ]; then
+            send_alert "Security Alert: High Intrusion Activity" "Host: $HOSTNAME has $recent_bans IP bans today - potential attack in progress"
+        fi
+    fi
+}
+
+check_file_integrity() {
+    if [ -f "/var/lib/aide/aide.db" ]; then
+        local aide_output=$(aide --check 2>&1)
+        if echo "$aide_output" | grep -q "found differences"; then
+            send_alert "Security Alert: File Integrity Violation" "Host: $HOSTNAME AIDE detected unauthorized file changes"
+        fi
+    fi
+}
+
+check_vulnerability_scan_results() {
+    local vuln_log="/var/log/vulnerability-scan.log"
+    if [ -f "$vuln_log" ]; then
+        local critical_vulns=$(grep -i "critical\|high" "$vuln_log" | wc -l)
+        if [ "$critical_vulns" -gt 0 ]; then
+            send_alert "Security Alert: Critical Vulnerabilities Found" "Host: $HOSTNAME has $critical_vulns critical/high severity vulnerabilities"
+        fi
+    fi
+}
+
+# Main execution
+log_message "Starting compliance monitoring check"
+
+check_failed_logins
+check_disk_usage
+check_memory_usage
+check_cpu_usage
+check_audit_daemon
+check_antivirus_status
+check_firewall_status
+check_ssl_certificates
+check_log_rotation
+check_backup_status
+check_intrusion_detection
+check_file_integrity
+check_vulnerability_scan_results
+
+log_message "Compliance monitoring check completed"
+
+# Generate compliance status report
+cat << EOF > /tmp/compliance-status.txt
+Compliance Status Report - $HOSTNAME
+Generated: $TIMESTAMP
+
+System Status:
+- Audit Daemon: $(systemctl is-active auditd)
+- Antivirus: $(systemctl is-active clamav-daemon)
+- Firewall: $(ufw status | head -1)
+- Fail2ban: $(systemctl is-active fail2ban)
+
+Resource Usage:
+- Disk Usage: $(df / | awk 'NR==2 {print $5}')
+- Memory Usage: $(free | awk 'NR==2{printf "%.0f%%", $3*100/$2}')
+- CPU Load: $(uptime | awk -F'load average:' '{print $2}')
+
+Security Metrics:
+- Failed Logins Today: $(grep "authentication failure" /var/log/auth.log | grep "$(date '+%b %d')" | wc -l)
+- Active Fail2ban Bans: $(fail2ban-client status | grep -o '[0-9]\+ jail(s)' | grep -o '[0-9]\+')
+- Last Backup: $(ls -la /var/backups/ | tail -1 | awk '{print $6, $7, $8}')
+
+Compliance Status: $([ $? -eq 0 ] && echo "COMPLIANT" || echo "NON-COMPLIANT")
+EOF
+
+# Archive the report
+cp /tmp/compliance-status.txt "/var/log/compliance-reports/compliance-$(date '+%Y%m%d-%H%M%S').txt"
+

@@ -1,0 +1,87 @@
+# Audit daemon configuration for SOX compliance
+# SOX Section 404: Management Assessment of Internal Controls
+
+# Log file location
+log_file = /var/log/audit/audit.log
+
+# Log file format
+log_format = RAW
+
+# Log file permissions
+log_group = adm
+
+# Priority boost for audit daemon
+priority_boost = 4
+
+# Flush audit records to disk
+flush = INCREMENTAL_ASYNC
+
+# Frequency of explicit flushes to disk
+freq = 50
+
+# Number of audit log files to keep
+num_logs = 10
+
+# Dispatcher program
+disp_qos = lossy
+
+# Dispatcher program
+dispatcher = /sbin/audispd
+
+# Name format for computer name in audit records
+name_format = HOSTNAME
+
+# Maximum log file size (MB)
+max_log_file = {{ audit_log_max_size | default('100') | regex_replace('M', '') }}
+
+# Action when log file reaches max size
+max_log_file_action = ROTATE
+
+# Space left on disk (MB)
+space_left = 500
+
+# Action when space left threshold is reached
+space_left_action = SYSLOG
+
+# Space left on disk for admin (MB)
+admin_space_left = 100
+
+# Action when admin space left threshold is reached
+admin_space_left_action = SUSPEND
+
+# Action when disk is full
+disk_full_action = SUSPEND
+
+# Action when disk error occurs
+disk_error_action = SUSPEND
+
+# Use libwrap for TCP connections
+use_libwrap = yes
+
+# TCP listen port
+tcp_listen_port = 60
+
+# TCP listen queue
+tcp_listen_queue = 5
+
+# TCP max connections per IP
+tcp_max_per_addr = 1
+
+# TCP client ports
+tcp_client_ports = 1024-65535
+
+# TCP client max idle time
+tcp_client_max_idle = 0
+
+# Enable kernel audit
+enable_krb5 = no
+
+# Kernel rate limit
+krb5_principal = auditd
+
+# Action on audit failure
+failure_mode = {{ audit_failure_mode | default(1) }}
+
+# Plugin directory
+plugin_dir = /etc/audisp/plugins.d
+

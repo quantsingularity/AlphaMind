@@ -1,0 +1,232 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.appName }}-service-account
+  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+  annotations:
+    description: "Service account for AlphaMind application with minimal required permissions"
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+  name: {{ .Values.appName }}-app-role
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Values.appName }}-app-binding
+  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.appName }}-service-account
+  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+roleRef:
+  kind: Role
+  name: {{ .Values.appName }}-app-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.appName }}-monitoring-sa
+  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+  annotations:
+    description: "Service account for monitoring and observability components"
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+  name: {{ .Values.appName }}-monitoring-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "endpoints"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Values.appName }}-monitoring-binding
+  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.appName }}-monitoring-sa
+  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+roleRef:
+  kind: Role
+  name: {{ .Values.appName }}-monitoring-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.appName }}-backup-sa
+  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+  annotations:
+    description: "Service account for backup operations with restricted database access"
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+  name: {{ .Values.appName }}-backup-role
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get"]
+  resourceNames: ["{{ .Values.appName }}-db-backup-secret"]
+- apiGroups: [""]
+  resources: ["persistentvolumeclaims"]
+  verbs: ["get", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Values.appName }}-backup-binding
+  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.appName }}-backup-sa
+  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+roleRef:
+  kind: Role
+  name: {{ .Values.appName }}-backup-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Cluster-wide roles for security and compliance
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Values.appName }}-security-auditor
+rules:
+- apiGroups: [""]
+  resources: ["nodes", "pods", "services", "events"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets", "statefulsets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["networkpolicies"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["policy"]
+  resources: ["podsecuritypolicies"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["roles", "rolebindings", "clusterroles", "clusterrolebindings"]
+  verbs: ["get", "list", "watch"]
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.appName }}-security-auditor-sa
+  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+  annotations:
+    description: "Service account for security auditing and compliance monitoring"
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Values.appName }}-security-auditor-binding
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.appName }}-security-auditor-sa
+  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+roleRef:
+  kind: ClusterRole
+  name: {{ .Values.appName }}-security-auditor
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Developer role with limited access for non-production environments
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace | default "alphamind-dev" }}
+  name: {{ .Values.appName }}-developer-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods/exec"]
+  verbs: ["create"]
+
+---
+# Production role with read-only access
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+  name: {{ .Values.appName }}-production-viewer-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "events"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets", "statefulsets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get", "list"]
+
+---
+# Emergency access role for incident response
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+  name: {{ .Values.appName }}-emergency-access-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch", "update", "patch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets", "statefulsets"]
+  verbs: ["get", "list", "watch", "update", "patch"]
+- apiGroups: [""]
+  resources: ["pods/exec"]
+  verbs: ["create"]
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get", "list"]
+

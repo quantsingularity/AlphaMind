@@ -1,0 +1,93 @@
+# Fail2Ban configuration for financial compliance
+# PCI DSS Requirement 8: Identify and authenticate access to system components
+
+[DEFAULT]
+# Ban hosts for 1 hour after 5 failed attempts within 10 minutes
+bantime = 3600
+findtime = 600
+maxretry = {{ account_lockout_attempts | default(5) }}
+
+# Email notifications for security incidents
+destemail = {{ incident_response_team | default('security@company.com') }}
+sendername = Fail2Ban-{{ ansible_hostname }}
+mta = sendmail
+action = %(action_mwl)s
+
+# Ignore trusted networks
+ignoreip = 127.0.0.1/8 ::1 {% for network in trusted_networks %}{{ network }} {% endfor %}
+
+[sshd]
+enabled = true
+port = ssh
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 3
+bantime = 7200
+
+[apache-auth]
+enabled = true
+port = http,https
+filter = apache-auth
+logpath = /var/log/apache*/*error.log
+maxretry = 3
+
+[apache-badbots]
+enabled = true
+port = http,https
+filter = apache-badbots
+logpath = /var/log/apache*/*access.log
+maxretry = 2
+
+[apache-noscript]
+enabled = true
+port = http,https
+filter = apache-noscript
+logpath = /var/log/apache*/*access.log
+maxretry = 3
+
+[apache-overflows]
+enabled = true
+port = http,https
+filter = apache-overflows
+logpath = /var/log/apache*/*error.log
+maxretry = 2
+
+[nginx-http-auth]
+enabled = true
+port = http,https
+filter = nginx-http-auth
+logpath = /var/log/nginx/error.log
+maxretry = 3
+
+[nginx-limit-req]
+enabled = true
+port = http,https
+filter = nginx-limit-req
+logpath = /var/log/nginx/error.log
+maxretry = 10
+
+[mysql-auth]
+enabled = true
+port = 3306
+filter = mysql-auth
+logpath = /var/log/mysql/error.log
+maxretry = 3
+bantime = 86400
+
+[postgresql]
+enabled = true
+port = 5432
+filter = postgresql
+logpath = /var/log/postgresql/postgresql*.log
+maxretry = 3
+bantime = 86400
+
+[recidive]
+enabled = true
+filter = recidive
+logpath = /var/log/fail2ban.log
+action = %(action_mwl)s
+bantime = 604800  # 1 week
+findtime = 86400   # 1 day
+maxretry = 5
+

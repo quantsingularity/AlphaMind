@@ -1,0 +1,79 @@
+---
+# Security role default variables
+
+# Network configuration
+management_network: "10.0.0.0/8"
+trusted_networks:
+  - "10.0.0.0/8"
+  - "172.16.0.0/12"
+  - "192.168.0.0/16"
+
+# Security settings
+enable_encryption: true
+enable_backup_encryption: true
+enable_vulnerability_scanning: true
+enable_compliance_monitoring: true
+
+# Password policy
+password_min_length: 12
+password_min_classes: 4
+password_max_repeat: 2
+account_lockout_attempts: 5
+account_lockout_time: 900
+session_timeout: 900
+
+# Audit settings
+audit_log_retention_days: 365
+audit_log_max_size: "100M"
+audit_failure_mode: 1
+
+# Antivirus settings
+clamav_update_frequency: "daily"
+clamav_scan_frequency: "weekly"
+
+# File integrity monitoring
+aide_check_frequency: "daily"
+aide_report_email: "security@company.com"
+
+# Vulnerability scanning
+vuln_scan_frequency: "weekly"
+vuln_scan_email: "security@company.com"
+
+# Compliance reporting
+compliance_report_frequency: "monthly"
+compliance_report_email: "compliance@company.com"
+
+# SIEM configuration
+siem_server: "siem.company.com"
+siem_port: 514
+siem_protocol: "tcp"
+
+# Backup settings
+backup_encryption_key_file: "/etc/security/backup.key"
+backup_retention_days: 2555  # 7 years for financial compliance
+
+# SSL/TLS settings
+ssl_cipher_suite: "ECDHE+AESGCM:ECDHE+CHACHA20:DHE+AESGCM:DHE+CHACHA20:!aNULL:!MD5:!DSS"
+ssl_protocols: "TLSv1.2 TLSv1.3"
+
+# Database security
+db_encryption_at_rest: true
+db_ssl_required: true
+db_audit_enabled: true
+
+# Application security
+app_security_headers: true
+app_csrf_protection: true
+app_xss_protection: true
+app_content_security_policy: true
+
+# Monitoring thresholds
+failed_login_threshold: 5
+disk_usage_threshold: 85
+memory_usage_threshold: 90
+cpu_usage_threshold: 85
+
+# Incident response
+incident_response_team: "security@company.com"
+incident_escalation_time: 30  # minutes
+

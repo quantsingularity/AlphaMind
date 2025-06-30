@@ -1,0 +1,315 @@
+---
+# Security role for financial compliance
+# Implements PCI DSS, GDPR, SOX, NIST CSF, and ISO 27001 requirements
+
+- name: Install security packages
+  package:
+    name:
+      - fail2ban
+      - aide
+      - auditd
+      - rsyslog
+      - logrotate
+      - chrony
+      - clamav
+      - clamav-daemon
+      - rkhunter
+      - chkrootkit
+      - lynis
+      - openssl
+      - ca-certificates
+      - iptables-persistent
+      - ufw
+      - apparmor
+      - apparmor-utils
+    state: present
+
+- name: Configure fail2ban for intrusion detection
+  template:
+    src: jail.local.j2
+    dest: /etc/fail2ban/jail.local
+    backup: yes
+  notify: restart fail2ban
+
+- name: Enable and start fail2ban
+  systemd:
+    name: fail2ban
+    enabled: yes
+    state: started
+
+- name: Configure audit daemon for SOX compliance
+  template:
+    src: auditd.conf.j2
+    dest: /etc/audit/auditd.conf
+    backup: yes
+  notify: restart auditd
+
+- name: Configure audit rules for financial data access
+  template:
+    src: audit.rules.j2
+    dest: /etc/audit/rules.d/financial.rules
+    backup: yes
+  notify: restart auditd
+
+- name: Enable and start auditd
+  systemd:
+    name: auditd
+    enabled: yes
+    state: started
+
+- name: Configure rsyslog for centralized logging
+  template:
+    src: rsyslog.conf.j2
+    dest: /etc/rsyslog.conf
+    backup: yes
+  notify: restart rsyslog
+
+- name: Configure log rotation for compliance
+  template:
+    src: logrotate.conf.j2
+    dest: /etc/logrotate.conf
+    backup: yes
+
+- name: Create log retention policy
+  template:
+    src: log-retention.j2
+    dest: /etc/logrotate.d/financial-logs
+    backup: yes
+
+- name: Configure time synchronization for audit trails
+  template:
+    src: chrony.conf.j2
+    dest: /etc/chrony/chrony.conf
+    backup: yes
+  notify: restart chrony
+
+- name: Enable and start chrony
+  systemd:
+    name: chrony
+    enabled: yes
+    state: started
+
+- name: Configure ClamAV antivirus
+  template:
+    src: clamd.conf.j2
+    dest: /etc/clamav/clamd.conf
+    backup: yes
+  notify: restart clamav-daemon
+
+- name: Update ClamAV virus definitions
+  command: freshclam
+  ignore_errors: yes
+
+- name: Enable and start ClamAV daemon
+  systemd:
+    name: clamav-daemon
+    enabled: yes
+    state: started
+
+- name: Configure file integrity monitoring with AIDE
+  template:
+    src: aide.conf.j2
+    dest: /etc/aide/aide.conf
+    backup: yes
+
+- name: Initialize AIDE database
+  command: aideinit
+  creates: /var/lib/aide/aide.db.new
+
+- name: Move AIDE database to production location
+  command: mv /var/lib/aide/aide.db.new /var/lib/aide/aide.db
+  creates: /var/lib/aide/aide.db
+
+- name: Create AIDE check cron job
+  cron:
+    name: "AIDE integrity check"
+    minute: "0"
+    hour: "2"
+    job: "/usr/bin/aide --check"
+    user: root
+
+- name: Configure UFW firewall rules
+  ufw:
+    rule: "{{ item.rule }}"
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+    src: "{{ item.src | default(omit) }}"
+  loop:
+    - { rule: 'allow', port: '22', proto: 'tcp', src: '{{ management_network }}' }
+    - { rule: 'allow', port: '80', proto: 'tcp' }
+    - { rule: 'allow', port: '443', proto: 'tcp' }
+    - { rule: 'deny', port: '3306', proto: 'tcp' }
+    - { rule: 'deny', port: '5432', proto: 'tcp' }
+    - { rule: 'deny', port: '6379', proto: 'tcp' }
+
+- name: Enable UFW firewall
+  ufw:
+    state: enabled
+    policy: deny
+    direction: incoming
+
+- name: Configure AppArmor profiles
+  command: aa-enforce /etc/apparmor.d/*
+  ignore_errors: yes
+
+- name: Set secure kernel parameters
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+  loop:
+    - { name: 'net.ipv4.ip_forward', value: '0' }
+    - { name: 'net.ipv4.conf.all.send_redirects', value: '0' }
+    - { name: 'net.ipv4.conf.default.send_redirects', value: '0' }
+    - { name: 'net.ipv4.conf.all.accept_source_route', value: '0' }
+    - { name: 'net.ipv4.conf.default.accept_source_route', value: '0' }
+    - { name: 'net.ipv4.conf.all.accept_redirects', value: '0' }
+    - { name: 'net.ipv4.conf.default.accept_redirects', value: '0' }
+    - { name: 'net.ipv4.conf.all.secure_redirects', value: '0' }
+    - { name: 'net.ipv4.conf.default.secure_redirects', value: '0' }
+    - { name: 'net.ipv4.conf.all.log_martians', value: '1' }
+    - { name: 'net.ipv4.conf.default.log_martians', value: '1' }
+    - { name: 'net.ipv4.icmp_echo_ignore_broadcasts', value: '1' }
+    - { name: 'net.ipv4.icmp_ignore_bogus_error_responses', value: '1' }
+    - { name: 'net.ipv4.tcp_syncookies', value: '1' }
+    - { name: 'kernel.randomize_va_space', value: '2' }
+
+- name: Remove unnecessary packages
+  package:
+    name:
+      - telnet
+      - rsh-client
+      - rsh-redone-client
+      - talk
+      - ntalk
+      - ypbind
+      - ypserv
+      - tftp
+      - tftp-server
+      - xinetd
+    state: absent
+
+- name: Disable unnecessary services
+  systemd:
+    name: "{{ item }}"
+    enabled: no
+    state: stopped
+  loop:
+    - avahi-daemon
+    - cups
+    - dhcpcd
+    - slapd
+    - nfs-server
+    - rpcbind
+    - named
+    - vsftpd
+    - httpd
+    - dovecot
+    - smb
+    - squid
+    - snmpd
+  ignore_errors: yes
+
+- name: Set password policy for PCI DSS compliance
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    backup: yes
+  loop:
+    - { regexp: '^minlen', line: 'minlen = 12' }
+    - { regexp: '^minclass', line: 'minclass = 4' }
+    - { regexp: '^maxrepeat', line: 'maxrepeat = 2' }
+    - { regexp: '^dcredit', line: 'dcredit = -1' }
+    - { regexp: '^ucredit', line: 'ucredit = -1' }
+    - { regexp: '^lcredit', line: 'lcredit = -1' }
+    - { regexp: '^ocredit', line: 'ocredit = -1' }
+
+- name: Configure account lockout policy
+  lineinfile:
+    path: /etc/security/faillock.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    backup: yes
+  loop:
+    - { regexp: '^deny', line: 'deny = 5' }
+    - { regexp: '^unlock_time', line: 'unlock_time = 900' }
+    - { regexp: '^fail_interval', line: 'fail_interval = 900' }
+
+- name: Configure session timeout
+  lineinfile:
+    path: /etc/profile
+    line: 'export TMOUT=900'
+    backup: yes
+
+- name: Create compliance monitoring script
+  template:
+    src: compliance-monitor.sh.j2
+    dest: /usr/local/bin/compliance-monitor.sh
+    mode: '0755'
+
+- name: Schedule compliance monitoring
+  cron:
+    name: "Compliance monitoring"
+    minute: "*/15"
+    job: "/usr/local/bin/compliance-monitor.sh"
+    user: root
+
+- name: Create security incident response script
+  template:
+    src: incident-response.sh.j2
+    dest: /usr/local/bin/incident-response.sh
+    mode: '0755'
+
+- name: Configure log forwarding for SIEM
+  template:
+    src: rsyslog-siem.conf.j2
+    dest: /etc/rsyslog.d/50-siem.conf
+    backup: yes
+  notify: restart rsyslog
+
+- name: Create vulnerability scanning script
+  template:
+    src: vuln-scan.sh.j2
+    dest: /usr/local/bin/vuln-scan.sh
+    mode: '0755'
+
+- name: Schedule vulnerability scanning
+  cron:
+    name: "Vulnerability scanning"
+    minute: "0"
+    hour: "3"
+    weekday: "0"
+    job: "/usr/local/bin/vuln-scan.sh"
+    user: root
+
+- name: Configure data encryption at rest
+  include_tasks: encryption.yml
+  when: enable_encryption | default(true)
+
+- name: Configure backup encryption
+  include_tasks: backup-encryption.yml
+  when: enable_backup_encryption | default(true)
+
+- name: Create security baseline documentation
+  template:
+    src: security-baseline.md.j2
+    dest: /etc/security/baseline.md
+    backup: yes
+
+- name: Generate compliance report
+  template:
+    src: compliance-report.sh.j2
+    dest: /usr/local/bin/compliance-report.sh
+    mode: '0755'
+
+- name: Schedule compliance reporting
+  cron:
+    name: "Compliance reporting"
+    minute: "0"
+    hour: "6"
+    day: "1"
+    job: "/usr/local/bin/compliance-report.sh"
+    user: root
+

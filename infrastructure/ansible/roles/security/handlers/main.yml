@@ -1,0 +1,47 @@
+---
+# Security role handlers
+
+- name: restart fail2ban
+  systemd:
+    name: fail2ban
+    state: restarted
+
+- name: restart auditd
+  systemd:
+    name: auditd
+    state: restarted
+
+- name: restart rsyslog
+  systemd:
+    name: rsyslog
+    state: restarted
+
+- name: restart chrony
+  systemd:
+    name: chrony
+    state: restarted
+
+- name: restart clamav-daemon
+  systemd:
+    name: clamav-daemon
+    state: restarted
+
+- name: restart ssh
+  systemd:
+    name: ssh
+    state: restarted
+
+- name: reload ufw
+  ufw:
+    state: reloaded
+
+- name: restart iptables
+  systemd:
+    name: iptables
+    state: restarted
+
+- name: restart apparmor
+  systemd:
+    name: apparmor
+    state: restarted
+
