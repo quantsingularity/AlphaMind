@@ -24,7 +24,6 @@ AlphaMind is an advanced quantitative trading system that combines alternative d
 - [Testing](#testing)
 - [CI/CD Pipeline](#cicd-pipeline)
 - [Documentation](#documentation)
-- [Roadmap](#roadmap)
 - [Contributing](#contributing)
 - [License](#license)
 
