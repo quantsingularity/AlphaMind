@@ -66,65 +66,6 @@ AlphaMind represents the cutting edge of quantitative trading technology, design
 
 The project is organized into two main components:
 
-### Backend
-
-The backend contains the core AlphaMind trading system with the following modules:
-
-| Module | Features | Status |
-|--------|----------|--------|
-| **AI Models** | Temporal Fusion Transformers | ✅ Implemented |
-|  | Reinforcement Learning | 🚧 In Progress |
-|  | Generative Models | 📅 Planned |
-|  | Ensemble Methods | ✅ Implemented |
-|  | Bayesian Optimization | 🚧 In Progress |
-| **Alternative Data** | SEC filings analysis | ✅ Implemented |
-|  | NLP sentiment analysis | ✅ Implemented |
-|  | Satellite imagery processing | 📅 Planned |
-|  | Web scraping pipeline | ✅ Implemented |
-|  | Alternative data fusion | 🚧 In Progress |
-| **Risk System** | Bayesian VaR | ✅ Implemented |
-|  | Stress testing | ✅ Implemented |
-|  | Counterparty risk management | 🚧 In Progress |
-|  | Position sizing optimization | ✅ Implemented |
-|  | Tail risk hedging | 📅 Planned |
-| **Execution Engine** | Smart order routing | 🚧 In Progress |
-|  | Liquidity forecasting | 📅 Planned |
-|  | Market impact modeling | 📅 Planned |
-|  | Adaptive execution algorithms | 🚧 In Progress |
-|  | High-frequency capabilities | 📅 Planned |
-| **Infrastructure** | QuantLib integration | ✅ Implemented |
-|  | Kafka streaming | 🚧 In Progress |
-|  | GCP Vertex AI integration | 📅 Planned |
-|  | Kubernetes orchestration | ✅ Implemented |
-|  | Distributed computing | 🚧 In Progress |
-
-### Frontend
-
-The frontend includes both web and mobile interfaces for interacting with the AlphaMind system:
-
-| Component | Features | Status |
-|-----------|----------|--------|
-| **Web Frontend** | Dashboard | ✅ Implemented |
-|  | Strategy Builder | ✅ Implemented |
-|  | Backtesting Interface | ✅ Implemented |
-|  | Performance Analytics | ✅ Implemented |
-|  | Risk Visualization | 🚧 In Progress |
-| **Mobile Frontend** | Portfolio Monitoring | ✅ Implemented |
-|  | Alert System | ✅ Implemented |
-|  | Trade Execution | 🚧 In Progress |
-|  | Performance Reporting | 🚧 In Progress |
-|  | User Authentication | ✅ Implemented |
-| **Documentation** | API Reference | ✅ Implemented |
-|  | Tutorials | 🚧 In Progress |
-|  | User Guides | 🚧 In Progress |
-|  | Example Notebooks | ✅ Implemented |
-|  | Video Tutorials | 📅 Planned |
-
-**Legend:**
-- ✅ Implemented: Feature is complete and available
-- 🚧 In Progress: Feature is currently being developed
-- 📅 Planned: Feature is planned for future release
-
 ## Technology Stack
 
 ### Backend
@@ -338,35 +279,6 @@ For detailed documentation, please refer to the following resources:
 - **Backtesting Example**: `web-frontend/docs/tutorials/backtesting_example.md`
 - **Architecture Overview**: `docs/architecture.md`
 - **Development Guidelines**: `docs/development.md`
-
-## Roadmap
-
-Our development roadmap prioritizes:
-
-1. **Q2 2025**: Completing the core trading engine and risk management features
-   - Finalize reinforcement learning models
-   - Complete counterparty risk management
-   - Implement initial smart order routing
-
-2. **Q3 2025**: Enhancing the alternative data processing capabilities
-   - Deploy satellite imagery processing
-   - Complete alternative data fusion system
-   - Expand web scraping capabilities
-
-3. **Q4 2025**: Implementing advanced AI models for market prediction
-   - Deploy generative models
-   - Complete Bayesian optimization framework
-   - Implement ensemble method improvements
-
-4. **Q1 2026**: Expanding execution capabilities
-   - Complete liquidity forecasting
-   - Deploy market impact modeling
-   - Implement high-frequency capabilities
-
-5. **Q2 2026**: Infrastructure and scaling
-   - Complete GCP Vertex AI integration
-   - Finalize distributed computing framework
-   - Deploy global infrastructure
 
 ## Contributing
 
