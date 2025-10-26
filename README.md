@@ -1,6 +1,6 @@
 # AlphaMind
 
-[![CI/CD Status](https://img.shields.io/github/actions/workflow/status/abrar2030/AlphaMind/ci-cd.yml?branch=main&label=CI/CD&logo=github)](https://github.com/abrar2030/AlphaMind/actions)
+![CI/CD Status](https://img.shields.io/github/actions/workflow/status/abrar2030/AlphaMind/cicd.yml?branch=main&label=CI/CD&logo=github)
 [![Test Coverage](https://img.shields.io/badge/coverage-78%25-yellowgreen)](https://github.com/abrar2030/AlphaMind/tree/main/tests)
 [![License](https://img.shields.io/github/license/abrar2030/AlphaMind)](https://github.com/abrar2030/AlphaMind/blob/main/LICENSE)
 
