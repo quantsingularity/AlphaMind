@@ -1,0 +1,80 @@
+name: AlphaMind CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  lint-build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # --- Backend Steps ---
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+        cache-dependency-path: backend/requirements.txt
+
+    - name: Install Backend Dependencies (Build Step)
+      run: python -m pip install --upgrade pip && pip install -r backend/requirements.txt
+
+    - name: Lint Backend (Flake8)
+      run: flake8 backend/
+
+    - name: Lint Backend (Black Check)
+      run: black --check backend/
+
+    - name: Test Backend
+      # Run pytest from the tests directory as done locally
+      working-directory: ./tests 
+      run: pytest
+
+    # --- Web Frontend Steps ---
+    - name: Set up Node.js for Web Frontend
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: web-frontend/package-lock.json
+
+    - name: Install Web Frontend Dependencies (Build Step)
+      working-directory: ./web-frontend
+      run: npm ci
+
+    # Add Lint step for Web Frontend if linters are configured
+    # - name: Lint Web Frontend
+    #   working-directory: ./web-frontend
+    #   run: npm run lint
+
+    - name: Test Web Frontend
+      working-directory: ./web-frontend
+      run: npm test
+
+    # --- Mobile Frontend Steps ---
+    - name: Set up Node.js for Mobile Frontend
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'yarn'
+        cache-dependency-path: mobile-frontend/yarn.lock
+
+    - name: Install Mobile Frontend Dependencies (Build Step)
+      working-directory: ./mobile-frontend
+      run: yarn install --frozen-lockfile
+
+    # Add Lint step for Mobile Frontend if linters are configured
+    # - name: Lint Mobile Frontend
+    #   working-directory: ./mobile-frontend
+    #   run: yarn lint
+
+    - name: Test Mobile Frontend
+      working-directory: ./mobile-frontend
+      run: yarn test
+
