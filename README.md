@@ -33,61 +33,56 @@ AlphaMind represents the cutting edge of quantitative trading technology, design
 
 ## Key Features
 
-### Advanced AI Models
-- **Temporal Fusion Transformers**: Multi-horizon forecasting with attention mechanisms
-- **Deep Reinforcement Learning**: Adaptive trading strategies using DDPG and SAC algorithms
-- **Generative Models**: Synthetic data generation for robust backtesting
-- **Ensemble Methods**: Model combination for improved prediction stability
-- **Bayesian Optimization**: Hyperparameter tuning for model performance
-
-### Alternative Data Processing
-- **SEC Filings Analysis**: NLP processing of corporate disclosures
-- **Sentiment Analysis**: Real-time news and social media sentiment extraction
-- **Satellite Imagery**: Geospatial intelligence for commodity markets
-- **Web Scraping Pipeline**: Structured data extraction from unstructured sources
-- **Alternative Data Fusion**: Integration of diverse data sources for signal generation
-
-### Risk Management System
-- **Bayesian Value at Risk**: Probabilistic risk assessment
-- **Stress Testing Framework**: Scenario-based risk evaluation
-- **Counterparty Risk Modeling**: Network analysis of trading counterparties
-- **Position Sizing Optimization**: Kelly criterion and risk parity approaches
-- **Tail Risk Hedging**: Automated protection against extreme market events
-
-### Execution Engine
-- **Smart Order Routing**: Optimal execution across multiple venues
-- **Liquidity Forecasting**: Predictive models for market liquidity
-- **Market Impact Modeling**: Transaction cost analysis and minimization
-- **Adaptive Execution Algorithms**: TWAP, VWAP, and ML-enhanced variants
-- **High-Frequency Capabilities**: Sub-millisecond order management
+| Category | Feature | Description |
+| :--- | :--- | :--- |
+| **Advanced AI Models** | Temporal Fusion Transformers | Multi-horizon forecasting with attention mechanisms |
+| | Deep Reinforcement Learning | Adaptive trading strategies using DDPG and SAC algorithms |
+| | Generative Models | Synthetic data generation for robust backtesting |
+| | Ensemble Methods | Model combination for improved prediction stability |
+| | Bayesian Optimization | Hyperparameter tuning for model performance |
+| **Alternative Data Processing** | SEC Filings Analysis | NLP processing of corporate disclosures |
+| | Sentiment Analysis | Real-time news and social media sentiment extraction |
+| | Satellite Imagery | Geospatial intelligence for commodity markets |
+| | Web Scraping Pipeline | Structured data extraction from unstructured sources |
+| | Alternative Data Fusion | Integration of diverse data sources for signal generation |
+| **Risk Management System** | Bayesian Value at Risk | Probabilistic risk assessment |
+| | Stress Testing Framework | Scenario-based risk evaluation |
+| | Counterparty Risk Modeling | Network analysis of trading counterparties |
+| | Position Sizing Optimization | Kelly criterion and risk parity approaches |
+| | Tail Risk Hedging | Automated protection against extreme market events |
+| **Execution Engine** | Smart Order Routing | Optimal execution across multiple venues |
+| | Liquidity Forecasting | Predictive models for market liquidity |
+| | Market Impact Modeling | Transaction cost analysis and minimization |
+| | Adaptive Execution Algorithms | TWAP, VWAP, and ML-enhanced variants |
+| | High-Frequency Capabilities | Sub-millisecond order management |
 
 ## Project Structure
 
-The project is organized into two main components:
+| Component | Description |
+| :--- | :--- |
+| **Backend** | Core trading logic, AI models, data processing, and execution |
+| **Frontend** | User interfaces for web and mobile, including dashboards and configuration |
 
 ## Technology Stack
 
-### Backend
-- **Languages**: Python 3.10, C++ (for performance-critical components)
-- **ML Frameworks**: PyTorch, TensorFlow, scikit-learn, Ray
-- **Data Processing**: Pandas, NumPy, Dask, Apache Spark
-- **Financial Libraries**: QuantLib, zipline, PyMC3
-- **Streaming**: Kafka, Redis Streams
-- **Databases**: InfluxDB (time series), PostgreSQL (relational)
-
-### Frontend
-- **Web**: React, TypeScript, D3.js, TradingView
-- **Mobile**: React Native, Redux
-- **API**: FastAPI, GraphQL
-- **Authentication**: OAuth2, JWT
-- **Styling**: Tailwind CSS, Styled Components
-
-### DevOps
-- **Containerization**: Docker, Kubernetes
-- **CI/CD**: GitHub Actions
-- **Cloud**: Google Cloud Platform, AWS
-- **Monitoring**: Prometheus, Grafana
-- **Logging**: ELK Stack (Elasticsearch, Logstash, Kibana)
+| Category | Component | Technology | Detail |
+| :--- | :--- | :--- | :--- |
+| **Backend** | Languages | Python, C++ | Python 3.10 for core logic, C++ for performance-critical components |
+| | ML Frameworks | PyTorch, TensorFlow, scikit-learn, Ray | For model training, deployment, and distributed computing |
+| | Data Processing | Pandas, NumPy, Dask, Apache Spark | For data manipulation, numerical computation, and large-scale processing |
+| | Financial Libraries | QuantLib, zipline, PyMC3 | For quantitative finance, backtesting, and probabilistic programming |
+| | Streaming | Kafka, Redis Streams | For real-time data ingestion and inter-service communication |
+| | Databases | InfluxDB, PostgreSQL | InfluxDB for time series data, PostgreSQL for relational data |
+| **Frontend** | Web | React, TypeScript, D3.js, TradingView | For the main web dashboard and visualization |
+| | Mobile | React Native, Redux | For cross-platform mobile application development |
+| | API | FastAPI, GraphQL | For high-performance backend API and flexible data querying |
+| | Authentication | OAuth2, JWT | For secure user authentication and authorization |
+| | Styling | Tailwind CSS, Styled Components | For modern, utility-first and component-based styling |
+| **DevOps** | Containerization | Docker, Kubernetes | For service packaging and container orchestration |
+| | CI/CD | GitHub Actions | For automated build, test, and deployment pipelines |
+| | Cloud | Google Cloud Platform, AWS | Multi-cloud deployment support |
+| | Monitoring | Prometheus, Grafana | For metrics collection, visualization, and alerting |
+| | Logging | ELK Stack | Elasticsearch, Logstash, Kibana for centralized logging and analysis |
 
 ## Architecture
 
@@ -130,11 +125,13 @@ AlphaMind/
 ## Installation and Setup
 
 ### Prerequisites
-- Python 3.10+
-- Node.js 16+
-- Docker and Docker Compose
-- C++ compiler (for QuantLib)
-- CUDA-compatible GPU (recommended for ML training)
+| Requirement | Detail |
+| :--- | :--- |
+| Python | 3.10+ |
+| Node.js | 16+ |
+| Containerization | Docker and Docker Compose |
+| Compilation | C++ compiler (required for QuantLib) |
+| Hardware | CUDA-compatible GPU (recommended for ML training) |
 
 ### Quick Start with Setup Script
 ```bash
@@ -205,25 +202,22 @@ cd AlphaMind
 
 The project currently has approximately 78% test coverage. We use a comprehensive testing strategy to ensure reliability and performance:
 
-### Backend Testing
-- Unit tests with pytest
-- Integration tests for system components
-- Performance benchmarks
-- Data pipeline validation
-- Model validation and backtesting
-
-### Frontend Testing
-- Component tests with Jest and React Testing Library
-- End-to-end tests with Cypress
-- Visual regression tests
-- Accessibility testing
-- Mobile testing with Detox
-
-### Infrastructure Testing
-- Deployment validation
-- Load testing with Locust
-- Failover testing
-- Security scanning
+| Component | Test Type | Detail |
+| :--- | :--- | :--- |
+| **Backend Testing** | Unit tests | With `pytest` for individual functions and modules |
+| | Integration tests | For system components and inter-service communication |
+| | Performance benchmarks | To measure and optimize execution speed |
+| | Data pipeline validation | To ensure data integrity and flow |
+| | Model validation | Backtesting and cross-validation for AI models |
+| **Frontend Testing** | Component tests | With Jest and React Testing Library for UI elements |
+| | End-to-end tests | With Cypress for full user workflows |
+| | Visual regression tests | To catch unintended UI changes |
+| | Accessibility testing | To ensure compliance with accessibility standards |
+| | Mobile testing | With Detox for native mobile components |
+| **Infrastructure Testing** | Deployment validation | To ensure successful and consistent deployments |
+| | Load testing | With Locust to test system capacity and resilience |
+| | Failover testing | To verify high availability and disaster recovery |
+| | Security scanning | For vulnerabilities in code and dependencies |
 
 To run tests locally:
 ```bash
@@ -250,46 +244,45 @@ yarn test
 
 AlphaMind uses GitHub Actions for continuous integration and deployment:
 
-### Continuous Integration
-- Automated testing on each pull request and push to main
-- Code quality checks with flake8, black, and ESLint
-- Test coverage reporting
-- Security scanning for vulnerabilities
-- Performance benchmarking
-
-### Continuous Deployment
-- Automated deployment to staging environment on merge to main
-- Manual promotion to production after approval
-- Docker image building and publishing
-- Infrastructure updates via Terraform
-- Database migration management
-
-Current CI/CD Status:
-- Build: ![Build Status](https://img.shields.io/github/actions/workflow/status/abrar2030/AlphaMind/ci-cd.yml?branch=main&label=build)
-- Test Coverage: ![Coverage](https://img.shields.io/badge/coverage-78%25-yellowgreen)
+| Stage | Task | Detail |
+| :--- | :--- | :--- |
+| **Continuous Integration** | Automated Testing | On each pull request and push to main branch |
+| | Code Quality Checks | With `flake8`, `black`, and `ESLint` |
+| | Test Coverage Reporting | To track and enforce minimum coverage |
+| | Security Scanning | For vulnerabilities in code and dependencies |
+| | Performance Benchmarking | To prevent performance regressions |
+| **Continuous Deployment** | Automated Staging Deployment | On merge to main branch |
+| | Production Promotion | Manual promotion to production after staging approval |
+| | Image Management | Docker image building and publishing to registry |
+| | Infrastructure as Code | Infrastructure updates via Terraform |
+| | Database Management | Automated database migration management |
 
 ## Documentation
 
 For detailed documentation, please refer to the following resources:
 
-- **API Reference**: `web-frontend/docs/api/api-reference.md`
-- **Getting Started Guide**: `web-frontend/docs/tutorials/getting-started.md`
-- **User Guide**: `web-frontend/docs/tutorials/user-guide.md`
-- **Backtesting Example**: `web-frontend/docs/tutorials/backtesting_example.md`
-- **Architecture Overview**: `docs/architecture.md`
-- **Development Guidelines**: `docs/development.md`
+| Document | Path | Description |
+| :--- | :--- | :--- |
+| **API Reference** | `web-frontend/docs/api/api-reference.md` | Detailed documentation for all API endpoints |
+| **Getting Started Guide** | `web-frontend/docs/tutorials/getting-started.md` | Step-by-step guide to setting up the project |
+| **User Guide** | `web-frontend/docs/tutorials/user-guide.md` | Comprehensive guide for end-users of the platform |
+| **Backtesting Example** | `web-frontend/docs/tutorials/backtesting_example.md` | Example of how to run and interpret a backtest |
+| **Architecture Overview** | `docs/architecture.md` | Detailed overview of the microservices architecture |
+| **Development Guidelines** | `docs/development.md` | Guidelines for contributing to the codebase |
 
 ## Contributing
 
 We welcome contributions to AlphaMind! Please see our [Contributing Guidelines](docs/CONTRIBUTING.md) for more information on how to get involved.
 
 ### Development Guidelines
-- Follow PEP 8 style guide for Python code
-- Use ESLint and Prettier for JavaScript/TypeScript code
-- Write unit tests for new features
-- Update documentation for any changes
-- Ensure all tests pass before submitting a pull request
-- Keep pull requests focused on a single feature or fix
+| Guideline | Detail |
+| :--- | :--- |
+| **Code Style (Python)** | Follow PEP 8 style guide |
+| **Code Style (JS/TS)** | Use ESLint and Prettier for formatting and linting |
+| **Testing** | Write unit tests for all new features |
+| **Documentation** | Update documentation for any code changes |
+| **Pull Requests** | Ensure all tests pass before submitting |
+| **Commit Hygiene** | Keep pull requests focused on a single feature or fix |
 
 ## License
 
