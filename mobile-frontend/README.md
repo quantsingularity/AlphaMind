@@ -135,31 +135,3 @@ The APK will be generated at `android/app/build/outputs/apk/release/app-release.
 
 2. Select "Product" > "Archive" from the menu
 3. Follow the Xcode distribution workflow
-
-## Troubleshooting
-
-Common issues and solutions:
-
-- **Metro bundler issues**: Clear cache with `npx react-native start --reset-cache`
-- **Build failures**: Ensure all dependencies are installed and compatible
-- **Device connection issues**: Check USB debugging settings and device drivers
-- **iOS simulator problems**: Update Xcode and CocoaPods
-
-## Contributing
-
-When contributing to the mobile frontend:
-
-1. Follow the React Native best practices
-2. Maintain consistent code style
-3. Write tests for new features
-4. Update documentation for significant changes
-5. Ensure cross-platform compatibility
-
-For more details, see the [Contributing Guidelines](../docs/CONTRIBUTING.md).
-
-## Related Documentation
-
-- [Main README](../README.md) - Project overview
-- [API Documentation](../docs/api-documentation.md) - Backend API reference
-- [Development Guide](../docs/development-guide.md) - Development workflow
-- [Troubleshooting Guide](../docs/troubleshooting.md) - Common issues and solutions
