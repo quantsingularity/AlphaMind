@@ -270,10 +270,6 @@ For detailed documentation, please refer to the following resources:
 | **Architecture Overview** | `docs/architecture.md` | Detailed overview of the microservices architecture |
 | **Development Guidelines** | `docs/development.md` | Guidelines for contributing to the codebase |
 
-## Contributing
-
-We welcome contributions to AlphaMind! Please see our [Contributing Guidelines](docs/CONTRIBUTING.md) for more information on how to get involved.
-
 ### Development Guidelines
 | Guideline | Detail |
 | :--- | :--- |
