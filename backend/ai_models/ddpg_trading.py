@@ -55,9 +55,9 @@ class ReplayBuffer:
         """Flatten dictionary state for neural network input"""
         if isinstance(state, dict):
             # Flatten the dictionary state
-            prices = state['prices'].flatten()
-            volumes = state['volumes']
-            macro = state['macro']
+            prices = np.array(state['prices']).flatten()
+            volumes = np.array(state['volumes']).flatten()
+            macro = np.array(state['macro']).flatten()
             return np.concatenate([prices, volumes, macro])
         return state
     
@@ -245,9 +245,9 @@ class DDPGAgent:
         """Flatten dictionary observation for neural network input"""
         if isinstance(obs, dict):
             # Flatten the dictionary observation
-            prices = obs['prices'].flatten()
-            volumes = obs['volumes']
-            macro = obs['macro']
+            prices = np.array(obs['prices']).flatten()
+            volumes = np.array(obs['volumes']).flatten()
+            macro = np.array(obs['macro']).flatten()
             return np.concatenate([prices, volumes, macro])
         return obs
     

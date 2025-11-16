@@ -14,7 +14,7 @@ from datetime import datetime
 # Add parent directory to path to import modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from backend.ai_models.ddpg_trading import (
+from AlphaMind.backend.ai_models.ddpg_trading import (
     TradingGymEnv, 
     DDPGAgent, 
     HyperparameterTuner,

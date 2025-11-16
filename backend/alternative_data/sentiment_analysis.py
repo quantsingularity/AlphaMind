@@ -1,3 +1,5 @@
+import pickle
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -109,16 +111,12 @@ class MarketSentimentAnalyzer:
         """Save the model and tokenizer"""
         self.model.save(model_path)
 
-        import pickle
-
         with open(tokenizer_path, "wb") as handle:
             pickle.dump(self.tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     def load(self, model_path, tokenizer_path):
         """Load the model and tokenizer"""
         self.model = tf.keras.models.load_model(model_path)
-
-        import pickle
 
         with open(tokenizer_path, "rb") as handle:
             self.tokenizer = pickle.load(handle)

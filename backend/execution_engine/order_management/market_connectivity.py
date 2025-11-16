@@ -14,7 +14,7 @@ import datetime
 from typing import Dict, List, Optional, Tuple, Union, Any, Callable
 from enum import Enum
 
-from .market_connectivity import (
+from AlphaMind.backend.execution_engine.order_management.market_connectivity import (
     VenueAdapter, 
     MarketConnectivityManager, 
     VenueConfig, 

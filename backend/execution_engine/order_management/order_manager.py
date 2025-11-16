@@ -183,7 +183,6 @@ class OrderValidator:
         # Basic field validation
         self.validation_rules.append(self._validate_required_fields)
         self.validation_rules.append(self._validate_price_fields)
-        self.validation_rules.append(self._validate_quantity)
         self.validation_rules.append(self._validate_time_in_force)
         
     def add_validation_rule(self, rule_func) -> None:
@@ -284,28 +283,6 @@ class OrderValidator:
                     field="stop_price"
                 ))
                 
-        return errors
-    
-    def _validate_quantity(self, order: Order) -> List[OrderValidationError]:
-        """Validate quantity is appropriate.
-        
-        Args:
-            order: Order to validate
-            
-        Returns:
-            List of validation errors
-        """
-        errors = []
-        
-        if order.quantity <= 0:
-            errors.append(OrderValidationError(
-                error_code="INVALID_QUANTITY",
-                message="Quantity must be positive",
-                field="quantity"
-            ))
-            
-        # Could add more sophisticated checks here, like lot size validation
-            
         return errors
     
     def _validate_time_in_force(self, order: Order) -> List[OrderValidationError]:
