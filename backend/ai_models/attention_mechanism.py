@@ -1,5 +1,4 @@
 import numpy as np
-
 import tensorflow as tf
 
 
@@ -178,4 +177,3 @@ class FinancialTimeSeriesTransformer(tf.keras.Model):
         output = self.final_layer(x)
 
         return output
-

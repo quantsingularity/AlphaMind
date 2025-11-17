@@ -1,12 +1,15 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import tensorflow as tf
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.ensemble import IsolationForest  # Moved import to top level
 from sklearn.preprocessing import (  # Added MinMaxScaler, RobustScaler
-    MinMaxScaler, RobustScaler, StandardScaler)
+    MinMaxScaler,
+    RobustScaler,
+    StandardScaler,
+)
+import tensorflow as tf
 
 
 class EnhancedDataProcessor:

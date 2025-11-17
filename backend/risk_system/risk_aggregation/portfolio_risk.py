@@ -5,29 +5,32 @@ This module provides functionality for aggregating risk across different positio
 and portfolios, calculating various risk metrics, and monitoring risk limits.
 """
 
-import numpy as np
-import pandas as pd
-from typing import Dict, List, Optional, Tuple, Union
 from dataclasses import dataclass
 import logging
+from typing import Dict, List, Optional, Tuple, Union
+
+import numpy as np
+import pandas as pd
 
 # Configure logging
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class RiskLimit:
     """Risk limit configuration for a portfolio or position."""
+
     metric_name: str
     soft_limit: float
     hard_limit: float
     description: str = ""
-    
+
     def is_breached(self, value: float) -> Tuple[bool, str]:
         """Check if a value breaches the risk limits.
-        
+
         Args:
             value: The risk metric value to check
-            
+
         Returns:
             Tuple of (is_breached, severity) where severity is 'none', 'soft', or 'hard'
         """
@@ -40,10 +43,10 @@ class RiskLimit:
 
 class PositionRisk:
     """Manages risk calculations for individual positions."""
-    
+
     def __init__(self, position_id: str, instrument_type: str):
         """Initialize position risk calculator.
-        
+
         Args:
             position_id: Unique identifier for the position
             instrument_type: Type of financial instrument (e.g., 'equity', 'option', 'future')
@@ -52,11 +55,16 @@ class PositionRisk:
         self.instrument_type = instrument_type
         self.risk_metrics = {}
         self.risk_limits = {}
-        
-    def add_risk_limit(self, metric_name: str, soft_limit: float, hard_limit: float, 
-                      description: str = "") -> None:
+
+    def add_risk_limit(
+        self,
+        metric_name: str,
+        soft_limit: float,
+        hard_limit: float,
+        description: str = "",
+    ) -> None:
         """Add a risk limit for a specific metric.
-        
+
         Args:
             metric_name: Name of the risk metric
             soft_limit: Warning threshold
@@ -67,17 +75,21 @@ class PositionRisk:
             metric_name=metric_name,
             soft_limit=soft_limit,
             hard_limit=hard_limit,
-            description=description
+            description=description,
         )
-        logger.info(f"Added risk limit for {metric_name} on position {self.position_id}")
-        
-    def calculate_var(self, returns: np.ndarray, confidence_level: float = 0.95) -> float:
+        logger.info(
+            f"Added risk limit for {metric_name} on position {self.position_id}"
+        )
+
+    def calculate_var(
+        self, returns: np.ndarray, confidence_level: float = 0.95
+    ) -> float:
         """Calculate Value at Risk for the position.
-        
+
         Args:
             returns: Historical returns for the position
             confidence_level: Confidence level for VaR calculation (default: 0.95)
-            
+
         Returns:
             Value at Risk at the specified confidence level
         """
@@ -86,16 +98,20 @@ class PositionRisk:
             self.risk_metrics["var"] = var
             return var
         except Exception as e:
-            logger.error(f"Error calculating VaR for position {self.position_id}: {str(e)}")
+            logger.error(
+                f"Error calculating VaR for position {self.position_id}: {str(e)}"
+            )
             raise
-    
-    def calculate_expected_shortfall(self, returns: np.ndarray, confidence_level: float = 0.95) -> float:
+
+    def calculate_expected_shortfall(
+        self, returns: np.ndarray, confidence_level: float = 0.95
+    ) -> float:
         """Calculate Expected Shortfall (Conditional VaR) for the position.
-        
+
         Args:
             returns: Historical returns for the position
             confidence_level: Confidence level for ES calculation (default: 0.95)
-            
+
         Returns:
             Expected Shortfall at the specified confidence level
         """
@@ -105,12 +121,14 @@ class PositionRisk:
             self.risk_metrics["expected_shortfall"] = es
             return es
         except Exception as e:
-            logger.error(f"Error calculating Expected Shortfall for position {self.position_id}: {str(e)}")
+            logger.error(
+                f"Error calculating Expected Shortfall for position {self.position_id}: {str(e)}"
+            )
             raise
-    
+
     def check_limits(self) -> Dict[str, Tuple[bool, str]]:
         """Check all risk metrics against their defined limits.
-        
+
         Returns:
             Dictionary mapping metric names to (is_breached, severity) tuples
         """
@@ -119,23 +137,23 @@ class PositionRisk:
             if metric_name in self.risk_limits:
                 is_breached, severity = self.risk_limits[metric_name].is_breached(value)
                 results[metric_name] = (is_breached, severity)
-                
+
                 if is_breached:
                     logger.warning(
                         f"Risk limit breach for {metric_name} on position {self.position_id}: "
                         f"{value} exceeds {severity} limit of "
                         f"{self.risk_limits[metric_name].soft_limit if severity == 'soft' else self.risk_limits[metric_name].hard_limit}"
                     )
-        
+
         return results
 
 
 class PortfolioRiskAggregator:
     """Aggregates risk across multiple positions in a portfolio."""
-    
+
     def __init__(self, portfolio_id: str):
         """Initialize portfolio risk aggregator.
-        
+
         Args:
             portfolio_id: Unique identifier for the portfolio
         """
@@ -143,20 +161,27 @@ class PortfolioRiskAggregator:
         self.positions: Dict[str, PositionRisk] = {}
         self.portfolio_risk_metrics = {}
         self.portfolio_risk_limits = {}
-        
+
     def add_position(self, position: PositionRisk) -> None:
         """Add a position to the portfolio.
-        
+
         Args:
             position: PositionRisk object to add
         """
         self.positions[position.position_id] = position
-        logger.info(f"Added position {position.position_id} to portfolio {self.portfolio_id}")
-        
-    def add_portfolio_risk_limit(self, metric_name: str, soft_limit: float, hard_limit: float, 
-                               description: str = "") -> None:
+        logger.info(
+            f"Added position {position.position_id} to portfolio {self.portfolio_id}"
+        )
+
+    def add_portfolio_risk_limit(
+        self,
+        metric_name: str,
+        soft_limit: float,
+        hard_limit: float,
+        description: str = "",
+    ) -> None:
         """Add a risk limit at the portfolio level.
-        
+
         Args:
             metric_name: Name of the risk metric
             soft_limit: Warning threshold
@@ -167,43 +192,53 @@ class PortfolioRiskAggregator:
             metric_name=metric_name,
             soft_limit=soft_limit,
             hard_limit=hard_limit,
-            description=description
+            description=description,
         )
-        logger.info(f"Added portfolio risk limit for {metric_name} on portfolio {self.portfolio_id}")
-        
-    def calculate_portfolio_var(self, returns_matrix: pd.DataFrame, 
-                              weights: np.ndarray, 
-                              confidence_level: float = 0.95) -> float:
+        logger.info(
+            f"Added portfolio risk limit for {metric_name} on portfolio {self.portfolio_id}"
+        )
+
+    def calculate_portfolio_var(
+        self,
+        returns_matrix: pd.DataFrame,
+        weights: np.ndarray,
+        confidence_level: float = 0.95,
+    ) -> float:
         """Calculate portfolio Value at Risk considering correlations.
-        
+
         Args:
             returns_matrix: DataFrame of historical returns for all positions
             weights: Array of position weights in the portfolio
             confidence_level: Confidence level for VaR calculation (default: 0.95)
-            
+
         Returns:
             Portfolio Value at Risk at the specified confidence level
         """
         try:
             # Calculate portfolio returns
             portfolio_returns = returns_matrix.dot(weights)
-            
+
             # Calculate portfolio VaR
-            portfolio_var = np.percentile(portfolio_returns, 100 * (1 - confidence_level))
+            portfolio_var = np.percentile(
+                portfolio_returns, 100 * (1 - confidence_level)
+            )
             self.portfolio_risk_metrics["var"] = portfolio_var
             return portfolio_var
         except Exception as e:
-            logger.error(f"Error calculating portfolio VaR for {self.portfolio_id}: {str(e)}")
+            logger.error(
+                f"Error calculating portfolio VaR for {self.portfolio_id}: {str(e)}"
+            )
             raise
-    
-    def calculate_diversification_benefit(self, individual_vars: np.ndarray, 
-                                        portfolio_var: float) -> float:
+
+    def calculate_diversification_benefit(
+        self, individual_vars: np.ndarray, portfolio_var: float
+    ) -> float:
         """Calculate diversification benefit.
-        
+
         Args:
             individual_vars: Array of individual position VaRs
             portfolio_var: Portfolio VaR
-            
+
         Returns:
             Diversification benefit as a percentage
         """
@@ -213,33 +248,37 @@ class PortfolioRiskAggregator:
             self.portfolio_risk_metrics["diversification_benefit"] = div_benefit
             return div_benefit
         except Exception as e:
-            logger.error(f"Error calculating diversification benefit for {self.portfolio_id}: {str(e)}")
+            logger.error(
+                f"Error calculating diversification benefit for {self.portfolio_id}: {str(e)}"
+            )
             raise
-    
+
     def check_portfolio_limits(self) -> Dict[str, Tuple[bool, str]]:
         """Check all portfolio risk metrics against their defined limits.
-        
+
         Returns:
             Dictionary mapping metric names to (is_breached, severity) tuples
         """
         results = {}
         for metric_name, value in self.portfolio_risk_metrics.items():
             if metric_name in self.portfolio_risk_limits:
-                is_breached, severity = self.portfolio_risk_limits[metric_name].is_breached(value)
+                is_breached, severity = self.portfolio_risk_limits[
+                    metric_name
+                ].is_breached(value)
                 results[metric_name] = (is_breached, severity)
-                
+
                 if is_breached:
                     logger.warning(
                         f"Portfolio risk limit breach for {metric_name} on portfolio {self.portfolio_id}: "
                         f"{value} exceeds {severity} limit of "
                         f"{self.portfolio_risk_limits[metric_name].soft_limit if severity == 'soft' else self.portfolio_risk_limits[metric_name].hard_limit}"
                     )
-        
+
         return results
-    
+
     def generate_risk_report(self) -> Dict:
         """Generate a comprehensive risk report for the portfolio.
-        
+
         Returns:
             Dictionary containing portfolio and position risk metrics and limit breaches
         """
@@ -247,13 +286,13 @@ class PortfolioRiskAggregator:
             "portfolio_id": self.portfolio_id,
             "portfolio_metrics": self.portfolio_risk_metrics.copy(),
             "portfolio_limit_breaches": self.check_portfolio_limits(),
-            "positions": {}
+            "positions": {},
         }
-        
+
         for position_id, position in self.positions.items():
             report["positions"][position_id] = {
                 "metrics": position.risk_metrics.copy(),
-                "limit_breaches": position.check_limits()
+                "limit_breaches": position.check_limits(),
             }
-        
+
         return report

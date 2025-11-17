@@ -1,11 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from tensorflow.keras.layers import (LSTM, BatchNormalization, Dense, Dropout,
-                                     Input)
+import tensorflow as tf
+from tensorflow.keras.layers import LSTM, BatchNormalization, Dense, Dropout, Input
 from tensorflow.keras.models import Model
 
 

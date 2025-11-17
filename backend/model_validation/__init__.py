@@ -6,29 +6,39 @@ in financial applications, including cross-validation strategies, performance me
 model comparison utilities, and explainability tools.
 """
 
-from .cross_validation import TimeSeriesSplit, BlockingTimeSeriesSplit, PurgedKFold
-from .metrics import (
-    calculate_metrics, 
-    sharpe_ratio, 
-    sortino_ratio, 
-    calmar_ratio, 
-    maximum_drawdown,
-    information_coefficient
-)
 from .comparison import ModelComparison, StatisticalTests
+from .cross_validation import BlockingTimeSeriesSplit, PurgedKFold, TimeSeriesSplit
 from .explainability import (
-    FeatureImportance, 
-    PartialDependence, 
+    FeatureImportance,
+    PartialDependence,
+    PermutationImportance,
     ShapExplainer,
-    PermutationImportance
+)
+from .metrics import (
+    calculate_metrics,
+    calmar_ratio,
+    information_coefficient,
+    maximum_drawdown,
+    sharpe_ratio,
+    sortino_ratio,
 )
 from .validation_report import ValidationReport
 
 __all__ = [
-    'TimeSeriesSplit', 'BlockingTimeSeriesSplit', 'PurgedKFold',
-    'calculate_metrics', 'sharpe_ratio', 'sortino_ratio', 'calmar_ratio', 
-    'maximum_drawdown', 'information_coefficient',
-    'ModelComparison', 'StatisticalTests',
-    'FeatureImportance', 'PartialDependence', 'ShapExplainer', 'PermutationImportance',
-    'ValidationReport'
+    "TimeSeriesSplit",
+    "BlockingTimeSeriesSplit",
+    "PurgedKFold",
+    "calculate_metrics",
+    "sharpe_ratio",
+    "sortino_ratio",
+    "calmar_ratio",
+    "maximum_drawdown",
+    "information_coefficient",
+    "ModelComparison",
+    "StatisticalTests",
+    "FeatureImportance",
+    "PartialDependence",
+    "ShapExplainer",
+    "PermutationImportance",
+    "ValidationReport",
 ]

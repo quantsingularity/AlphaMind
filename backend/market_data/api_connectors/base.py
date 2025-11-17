@@ -5,22 +5,24 @@ This module provides abstract base classes and utility functions
 for implementing API connectors to financial data providers.
 """
 
-import os
-import time
-import uuid
-import logging
-import json
-import requests
-import pandas as pd
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Union, Any, Callable, Tuple
-from enum import Enum
 from datetime import datetime, timedelta
+from enum import Enum
+import json
+import logging
+import os
 import threading
+import time
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+import uuid
+
+import pandas as pd
+import requests
 
 
 class DataFrequency(Enum):
     """Enumeration of data frequencies."""
+
     TICK = "tick"
     SECOND = "1s"
     MINUTE = "1m"
@@ -38,6 +40,7 @@ class DataFrequency(Enum):
 
 class DataCategory(Enum):
     """Enumeration of data categories."""
+
     MARKET_DATA = "market_data"
     FUNDAMENTAL = "fundamental"
     ECONOMIC = "economic"
@@ -49,6 +52,7 @@ class DataCategory(Enum):
 
 class DataFormat(Enum):
     """Enumeration of data formats."""
+
     JSON = "json"
     CSV = "csv"
     XML = "xml"
@@ -61,10 +65,10 @@ class DataFormat(Enum):
 class APICredentials:
     """
     Class for storing API credentials.
-    
+
     This class provides a secure way to store and manage
     API credentials for financial data providers.
-    
+
     Parameters
     ----------
     api_key : str, optional
@@ -80,7 +84,7 @@ class APICredentials:
     additional_params : dict, optional
         Additional authentication parameters.
     """
-    
+
     def __init__(
         self,
         api_key: Optional[str] = None,
@@ -88,7 +92,7 @@ class APICredentials:
         username: Optional[str] = None,
         password: Optional[str] = None,
         token: Optional[str] = None,
-        additional_params: Optional[Dict[str, Any]] = None
+        additional_params: Optional[Dict[str, Any]] = None,
     ):
         self.api_key = api_key
         self.api_secret = api_secret
@@ -96,11 +100,11 @@ class APICredentials:
         self.password = password
         self.token = token
         self.additional_params = additional_params or {}
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """
         Convert credentials to dictionary.
-        
+
         Returns
         -------
         credentials_dict : dict
@@ -112,19 +116,19 @@ class APICredentials:
             "username": self.username,
             "password": self.password,
             "token": self.token,
-            "additional_params": self.additional_params
+            "additional_params": self.additional_params,
         }
-    
+
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'APICredentials':
+    def from_dict(cls, data: Dict[str, Any]) -> "APICredentials":
         """
         Create credentials from dictionary.
-        
+
         Parameters
         ----------
         data : dict
             Dictionary representation of the credentials.
-            
+
         Returns
         -------
         credentials : APICredentials
@@ -136,19 +140,19 @@ class APICredentials:
             username=data.get("username"),
             password=data.get("password"),
             token=data.get("token"),
-            additional_params=data.get("additional_params", {})
+            additional_params=data.get("additional_params", {}),
         )
-    
+
     @classmethod
-    def from_env(cls, prefix: str = "") -> 'APICredentials':
+    def from_env(cls, prefix: str = "") -> "APICredentials":
         """
         Create credentials from environment variables.
-        
+
         Parameters
         ----------
         prefix : str, default=""
             Prefix for environment variables.
-            
+
         Returns
         -------
         credentials : APICredentials
@@ -160,19 +164,21 @@ class APICredentials:
             username=os.environ.get(f"{prefix}USERNAME"),
             password=os.environ.get(f"{prefix}PASSWORD"),
             token=os.environ.get(f"{prefix}TOKEN"),
-            additional_params=json.loads(os.environ.get(f"{prefix}ADDITIONAL_PARAMS", "{}"))
+            additional_params=json.loads(
+                os.environ.get(f"{prefix}ADDITIONAL_PARAMS", "{}")
+            ),
         )
-    
+
     @classmethod
-    def from_file(cls, filepath: str) -> 'APICredentials':
+    def from_file(cls, filepath: str) -> "APICredentials":
         """
         Create credentials from a file.
-        
+
         Parameters
         ----------
         filepath : str
             Path to the credentials file.
-            
+
         Returns
         -------
         credentials : APICredentials
@@ -180,13 +186,13 @@ class APICredentials:
         """
         with open(filepath, "r") as f:
             data = json.load(f)
-        
+
         return cls.from_dict(data)
-    
+
     def save(self, filepath: str) -> None:
         """
         Save credentials to a file.
-        
+
         Parameters
         ----------
         filepath : str
@@ -199,10 +205,10 @@ class APICredentials:
 class DataRequest:
     """
     Class for representing a data request.
-    
+
     This class provides a common structure for data requests
     to financial data providers.
-    
+
     Parameters
     ----------
     provider : str
@@ -222,7 +228,7 @@ class DataRequest:
     format : DataFormat, optional
         Format of the data being requested.
     """
-    
+
     def __init__(
         self,
         provider: str,
@@ -232,7 +238,7 @@ class DataRequest:
         data: Optional[Dict[str, Any]] = None,
         headers: Optional[Dict[str, str]] = None,
         category: Optional[DataCategory] = None,
-        format: Optional[DataFormat] = None
+        format: Optional[DataFormat] = None,
     ):
         self.id = str(uuid.uuid4())
         self.provider = provider
@@ -244,11 +250,11 @@ class DataRequest:
         self.category = category
         self.format = format
         self.timestamp = datetime.now()
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """
         Convert request to dictionary.
-        
+
         Returns
         -------
         request_dict : dict
@@ -264,19 +270,19 @@ class DataRequest:
             "headers": self.headers,
             "category": self.category.value if self.category else None,
             "format": self.format.value if self.format else None,
-            "timestamp": self.timestamp.isoformat()
+            "timestamp": self.timestamp.isoformat(),
         }
-    
+
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'DataRequest':
+    def from_dict(cls, data: Dict[str, Any]) -> "DataRequest":
         """
         Create request from dictionary.
-        
+
         Parameters
         ----------
         data : dict
             Dictionary representation of the request.
-            
+
         Returns
         -------
         request : DataRequest
@@ -288,29 +294,29 @@ class DataRequest:
             method=data["method"],
             params=data.get("params", {}),
             data=data.get("data", {}),
-            headers=data.get("headers", {})
+            headers=data.get("headers", {}),
         )
-        
+
         request.id = data["id"]
-        
+
         if data.get("category"):
             request.category = DataCategory(data["category"])
-        
+
         if data.get("format"):
             request.format = DataFormat(data["format"])
-        
+
         request.timestamp = datetime.fromisoformat(data["timestamp"])
-        
+
         return request
 
 
 class DataResponse:
     """
     Class for representing a data response.
-    
+
     This class provides a common structure for data responses
     from financial data providers.
-    
+
     Parameters
     ----------
     request : DataRequest
@@ -324,14 +330,14 @@ class DataResponse:
     error : str, optional
         Error message if the request failed.
     """
-    
+
     def __init__(
         self,
         request: DataRequest,
         status_code: int,
         data: Any,
         headers: Optional[Dict[str, str]] = None,
-        error: Optional[str] = None
+        error: Optional[str] = None,
     ):
         self.id = str(uuid.uuid4())
         self.request_id = request.id
@@ -342,11 +348,11 @@ class DataResponse:
         self.headers = headers or {}
         self.error = error
         self.timestamp = datetime.now()
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """
         Convert response to dictionary.
-        
+
         Returns
         -------
         response_dict : dict
@@ -361,21 +367,21 @@ class DataResponse:
             "data": self.data,
             "headers": self.headers,
             "error": self.error,
-            "timestamp": self.timestamp.isoformat()
+            "timestamp": self.timestamp.isoformat(),
         }
-    
+
     @classmethod
-    def from_dict(cls, data: Dict[str, Any], request: DataRequest) -> 'DataResponse':
+    def from_dict(cls, data: Dict[str, Any], request: DataRequest) -> "DataResponse":
         """
         Create response from dictionary.
-        
+
         Parameters
         ----------
         data : dict
             Dictionary representation of the response.
         request : DataRequest
             Request that generated this response.
-            
+
         Returns
         -------
         response : DataResponse
@@ -386,29 +392,29 @@ class DataResponse:
             status_code=data["status_code"],
             data=data["data"],
             headers=data.get("headers", {}),
-            error=data.get("error")
+            error=data.get("error"),
         )
-        
+
         response.id = data["id"]
         response.timestamp = datetime.fromisoformat(data["timestamp"])
-        
+
         return response
-    
+
     def is_success(self) -> bool:
         """
         Check if the response was successful.
-        
+
         Returns
         -------
         is_success : bool
             Whether the response was successful.
         """
         return 200 <= self.status_code < 300 and not self.error
-    
+
     def to_dataframe(self) -> pd.DataFrame:
         """
         Convert response data to DataFrame.
-        
+
         Returns
         -------
         df : DataFrame
@@ -416,35 +422,35 @@ class DataResponse:
         """
         if isinstance(self.data, pd.DataFrame):
             return self.data
-        
+
         if isinstance(self.data, list):
             return pd.DataFrame(self.data)
-        
+
         if isinstance(self.data, dict):
             # Try to extract data from common API response formats
             if "data" in self.data:
                 data = self.data["data"]
                 if isinstance(data, list):
                     return pd.DataFrame(data)
-            
+
             if "results" in self.data:
                 results = self.data["results"]
                 if isinstance(results, list):
                     return pd.DataFrame(results)
-            
+
             # Try to convert the entire dictionary to a DataFrame
             return pd.DataFrame([self.data])
-        
+
         raise ValueError("Cannot convert response data to DataFrame")
 
 
 class RateLimiter:
     """
     Class for rate limiting API requests.
-    
+
     This class provides methods for enforcing rate limits
     on API requests to financial data providers.
-    
+
     Parameters
     ----------
     requests_per_second : float, optional
@@ -456,87 +462,76 @@ class RateLimiter:
     requests_per_day : int, optional
         Maximum number of requests per day.
     """
-    
+
     def __init__(
         self,
         requests_per_second: Optional[float] = None,
         requests_per_minute: Optional[int] = None,
         requests_per_hour: Optional[int] = None,
-        requests_per_day: Optional[int] = None
+        requests_per_day: Optional[int] = None,
     ):
         self.requests_per_second = requests_per_second
         self.requests_per_minute = requests_per_minute
         self.requests_per_hour = requests_per_hour
         self.requests_per_day = requests_per_day
-        
+
         self.second_timestamps = []
         self.minute_timestamps = []
         self.hour_timestamps = []
         self.day_timestamps = []
-        
+
         self.lock = threading.Lock()
         self.logger = logging.getLogger(self.__class__.__name__)
-    
+
     def wait(self) -> None:
         """
         Wait until a request can be made without exceeding rate limits.
         """
         with self.lock:
             now = time.time()
-            
+
             # Check and enforce rate limits
             if self.requests_per_second:
                 self._enforce_rate_limit(
-                    self.second_timestamps,
-                    self.requests_per_second,
-                    now - 1.0
+                    self.second_timestamps, self.requests_per_second, now - 1.0
                 )
-            
+
             if self.requests_per_minute:
                 self._enforce_rate_limit(
-                    self.minute_timestamps,
-                    self.requests_per_minute,
-                    now - 60.0
+                    self.minute_timestamps, self.requests_per_minute, now - 60.0
                 )
-            
+
             if self.requests_per_hour:
                 self._enforce_rate_limit(
-                    self.hour_timestamps,
-                    self.requests_per_hour,
-                    now - 3600.0
+                    self.hour_timestamps, self.requests_per_hour, now - 3600.0
                 )
-            
+
             if self.requests_per_day:
                 self._enforce_rate_limit(
-                    self.day_timestamps,
-                    self.requests_per_day,
-                    now - 86400.0
+                    self.day_timestamps, self.requests_per_day, now - 86400.0
                 )
-            
+
             # Record the request
             now = time.time()
-            
+
             if self.requests_per_second:
                 self.second_timestamps.append(now)
-            
+
             if self.requests_per_minute:
                 self.minute_timestamps.append(now)
-            
+
             if self.requests_per_hour:
                 self.hour_timestamps.append(now)
-            
+
             if self.requests_per_day:
                 self.day_timestamps.append(now)
-    
+
     def _enforce_rate_limit(
-        self,
-        timestamps: List[float],
-        limit: Union[int, float],
-        cutoff: float
+        self, timestamps: List[float], limit: Union[int, float], cutoff: float
     ) -> None:
         """
         Enforce a rate limit.
-        
+
         Parameters
         ----------
         timestamps : list
@@ -549,16 +544,18 @@ class RateLimiter:
         # Remove old timestamps
         while timestamps and timestamps[0] < cutoff:
             timestamps.pop(0)
-        
+
         # Check if rate limit is exceeded
         if len(timestamps) >= limit:
             # Calculate wait time
             if timestamps:
                 wait_time = cutoff - timestamps[0] + 0.1
                 if wait_time > 0:
-                    self.logger.debug(f"Rate limit reached. Waiting {wait_time:.2f} seconds")
+                    self.logger.debug(
+                        f"Rate limit reached. Waiting {wait_time:.2f} seconds"
+                    )
                     time.sleep(wait_time)
-                    
+
                     # Remove old timestamps again after waiting
                     now = time.time()
                     cutoff = now - (cutoff - timestamps[0])
@@ -568,6 +565,7 @@ class RateLimiter:
 
 class DataProvider(Enum):
     """Enumeration of supported data providers."""
+
     ALPHA_VANTAGE = "alpha_vantage"
     BLOOMBERG = "bloomberg"
     REFINITIV = "refinitiv"
@@ -583,10 +581,10 @@ class DataProvider(Enum):
 class APIConnector(ABC):
     """
     Abstract base class for API connectors.
-    
+
     This class provides a common interface for all API connectors
     to financial data providers.
-    
+
     Parameters
     ----------
     credentials : APICredentials
@@ -596,44 +594,44 @@ class APIConnector(ABC):
     rate_limiter : RateLimiter, optional
         Rate limiter for enforcing API rate limits.
     """
-    
+
     def __init__(
         self,
         credentials: APICredentials,
         base_url: str,
-        rate_limiter: Optional[RateLimiter] = None
+        rate_limiter: Optional[RateLimiter] = None,
     ):
         self.credentials = credentials
         self.base_url = base_url
         self.rate_limiter = rate_limiter
         self.session = requests.Session()
         self.logger = logging.getLogger(self.__class__.__name__)
-    
+
     @property
     @abstractmethod
     def provider_name(self) -> str:
         """
         Get the name of the data provider.
-        
+
         Returns
         -------
         provider_name : str
             Name of the data provider.
         """
         pass
-    
+
     @abstractmethod
     def authenticate(self) -> bool:
         """
         Authenticate with the API.
-        
+
         Returns
         -------
         success : bool
             Whether authentication was successful.
         """
         pass
-    
+
     def request(
         self,
         endpoint: str,
@@ -642,11 +640,11 @@ class APIConnector(ABC):
         data: Optional[Dict[str, Any]] = None,
         headers: Optional[Dict[str, str]] = None,
         category: Optional[DataCategory] = None,
-        format: Optional[DataFormat] = None
+        format: Optional[DataFormat] = None,
     ) -> DataResponse:
         """
         Make a request to the API.
-        
+
         Parameters
         ----------
         endpoint : str
@@ -663,7 +661,7 @@ class APIConnector(ABC):
             Category of data being requested.
         format : DataFormat, optional
             Format of the data being requested.
-            
+
         Returns
         -------
         response : DataResponse
@@ -678,28 +676,24 @@ class APIConnector(ABC):
             data=data,
             headers=headers,
             category=category,
-            format=format
+            format=format,
         )
-        
+
         # Apply rate limiting if configured
         if self.rate_limiter:
             self.rate_limiter.wait()
-        
+
         # Make the request
         try:
             url = f"{self.base_url.rstrip('/')}/{endpoint.lstrip('/')}"
-            
+
             response = self.session.request(
-                method=method,
-                url=url,
-                params=params,
-                json=data,
-                headers=headers
+                method=method, url=url, params=params, json=data, headers=headers
             )
-            
+
             # Parse response data based on content type
             content_type = response.headers.get("Content-Type", "")
-            
+
             if "application/json" in content_type:
                 response_data = response.json()
             elif "text/csv" in content_type:
@@ -708,34 +702,31 @@ class APIConnector(ABC):
                 response_data = response.text  # XML as string
             else:
                 response_data = response.text
-            
+
             # Create response object
             return DataResponse(
                 request=request,
                 status_code=response.status_code,
                 data=response_data,
-                headers=dict(response.headers)
+                headers=dict(response.headers),
             )
-            
+
         except Exception as e:
             self.logger.error(f"Error making request: {e}")
-            
+
             # Create error response
             return DataResponse(
-                request=request,
-                status_code=500,
-                data=None,
-                error=str(e)
+                request=request, status_code=500, data=None, error=str(e)
             )
-    
+
     def close(self) -> None:
         """Close the API connector."""
         self.session.close()
-    
-    def __enter__(self) -> 'APIConnector':
+
+    def __enter__(self) -> "APIConnector":
         """Enter context manager."""
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         """Exit context manager."""
         self.close()

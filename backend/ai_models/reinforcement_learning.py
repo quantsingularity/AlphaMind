@@ -1,6 +1,6 @@
 import gym
-import numpy as np
 from gym import spaces
+import numpy as np
 from stable_baselines3 import PPO
 
 

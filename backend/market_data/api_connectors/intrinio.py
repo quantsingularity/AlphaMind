@@ -5,30 +5,31 @@ This module provides a connector for accessing financial market data
 from Intrinio, including stock prices, fundamentals, and economic data.
 """
 
-import os
+from datetime import date, datetime, timedelta
 import logging
-from typing import Dict, List, Optional, Union, Any, Tuple
+import os
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 import pandas as pd
-from datetime import datetime, timedelta, date
 
 from .base import (
     APIConnector,
     APICredentials,
-    DataResponse,
     DataCategory,
     DataFormat,
+    DataProvider,
+    DataResponse,
     RateLimiter,
-    DataProvider
 )
 
 
 class IntrinioConnector(APIConnector):
     """
     Connector for Intrinio API.
-    
+
     This class provides methods for accessing financial market data
     from Intrinio, including stock prices, fundamentals, and economic data.
-    
+
     Parameters
     ----------
     api_key : str
@@ -36,53 +37,45 @@ class IntrinioConnector(APIConnector):
     sandbox : bool, default=False
         Whether to use the sandbox environment.
     """
-    
-    def __init__(
-        self,
-        api_key: str,
-        sandbox: bool = False
-    ):
+
+    def __init__(self, api_key: str, sandbox: bool = False):
         # Create credentials
         credentials = APICredentials(api_key=api_key)
-        
+
         # Set base URL based on environment
         if sandbox:
             base_url = "https://sandbox-api.intrinio.com"
         else:
             base_url = "https://api-v2.intrinio.com"
-        
+
         # Create rate limiter
         # Intrinio has different rate limits based on subscription tier
         # Using a conservative limit of 10 requests per minute
-        rate_limiter = RateLimiter(
-            requests_per_minute=10
-        )
-        
+        rate_limiter = RateLimiter(requests_per_minute=10)
+
         super().__init__(
-            credentials=credentials,
-            base_url=base_url,
-            rate_limiter=rate_limiter
+            credentials=credentials, base_url=base_url, rate_limiter=rate_limiter
         )
-        
+
         self.sandbox = sandbox
         self.logger = logging.getLogger(self.__class__.__name__)
-    
+
     @property
     def provider_name(self) -> str:
         """
         Get the name of the data provider.
-        
+
         Returns
         -------
         provider_name : str
             Name of the data provider.
         """
         return DataProvider.INTRINIO.value
-    
+
     def authenticate(self) -> bool:
         """
         Authenticate with the Intrinio API.
-        
+
         Returns
         -------
         success : bool
@@ -91,13 +84,13 @@ class IntrinioConnector(APIConnector):
         # Intrinio uses API key for authentication
         # Test authentication by making a simple request
         response = self.get_company("AAPL")
-        
+
         return response.is_success()
-    
+
     def _prepare_headers(self) -> Dict[str, str]:
         """
         Prepare headers for API requests.
-        
+
         Returns
         -------
         headers : dict
@@ -105,44 +98,38 @@ class IntrinioConnector(APIConnector):
         """
         return {
             "Authorization": f"Bearer {self.credentials.api_key}",
-            "Accept": "application/json"
+            "Accept": "application/json",
         }
-    
-    def get_company(
-        self,
-        identifier: str
-    ) -> DataResponse:
+
+    def get_company(self, identifier: str) -> DataResponse:
         """
         Get company information.
-        
+
         Parameters
         ----------
         identifier : str
             Company identifier (ticker symbol, CIK, LEI, etc.).
-            
+
         Returns
         -------
         response : DataResponse
             Response containing the company information.
         """
         endpoint = f"companies/{identifier}"
-        
+
         return self.request(
             endpoint=endpoint,
             headers=self._prepare_headers(),
             category=DataCategory.FUNDAMENTAL,
-            format=DataFormat.JSON
+            format=DataFormat.JSON,
         )
-    
+
     def get_company_news(
-        self,
-        identifier: str,
-        page_size: int = 100,
-        next_page: Optional[str] = None
+        self, identifier: str, page_size: int = 100, next_page: Optional[str] = None
     ) -> DataResponse:
         """
         Get news for a company.
-        
+
         Parameters
         ----------
         identifier : str
@@ -151,29 +138,27 @@ class IntrinioConnector(APIConnector):
             Number of results per page.
         next_page : str, optional
             Token for the next page of results.
-            
+
         Returns
         -------
         response : DataResponse
             Response containing the company news.
         """
         endpoint = f"companies/{identifier}/news"
-        
-        params = {
-            "page_size": page_size
-        }
-        
+
+        params = {"page_size": page_size}
+
         if next_page:
             params["next_page"] = next_page
-        
+
         return self.request(
             endpoint=endpoint,
             params=params,
             headers=self._prepare_headers(),
             category=DataCategory.NEWS,
-            format=DataFormat.JSON
+            format=DataFormat.JSON,
         )
-    
+
     def get_company_fundamentals(
         self,
         identifier: str,
@@ -182,11 +167,11 @@ class IntrinioConnector(APIConnector):
         fiscal_year: Optional[int] = None,
         reported_only: bool = False,
         page_size: int = 100,
-        next_page: Optional[str] = None
+        next_page: Optional[str] = None,
     ) -> DataResponse:
         """
         Get fundamentals for a company.
-        
+
         Parameters
         ----------
         identifier : str
@@ -203,35 +188,35 @@ class IntrinioConnector(APIConnector):
             Number of results per page.
         next_page : str, optional
             Token for the next page of results.
-            
+
         Returns
         -------
         response : DataResponse
             Response containing the company fundamentals.
         """
         endpoint = f"companies/{identifier}/fundamentals"
-        
+
         params = {
             "statement": statement,
             "fiscal_period": fiscal_period,
             "reported": str(reported_only).lower(),
-            "page_size": page_size
+            "page_size": page_size,
         }
-        
+
         if fiscal_year:
             params["fiscal_year"] = fiscal_year
-        
+
         if next_page:
             params["next_page"] = next_page
-        
+
         return self.request(
             endpoint=endpoint,
             params=params,
             headers=self._prepare_headers(),
             category=DataCategory.FUNDAMENTAL,
-            format=DataFormat.JSON
+            format=DataFormat.JSON,
         )
-    
+
     def get_company_metrics(
         self,
         identifier: str,
@@ -240,11 +225,11 @@ class IntrinioConnector(APIConnector):
         end_date: Optional[Union[str, date, datetime]] = None,
         frequency: str = "daily",
         page_size: int = 100,
-        next_page: Optional[str] = None
+        next_page: Optional[str] = None,
     ) -> DataResponse:
         """
         Get metrics for a company.
-        
+
         Parameters
         ----------
         identifier : str
@@ -261,48 +246,45 @@ class IntrinioConnector(APIConnector):
             Number of results per page.
         next_page : str, optional
             Token for the next page of results.
-            
+
         Returns
         -------
         response : DataResponse
             Response containing the company metrics.
         """
         endpoint = f"companies/{identifier}/historical_data"
-        
-        params = {
-            "frequency": frequency,
-            "page_size": page_size
-        }
-        
+
+        params = {"frequency": frequency, "page_size": page_size}
+
         # Convert metrics to string if needed
         if metrics:
             if isinstance(metrics, list):
                 params["metrics"] = ",".join(metrics)
             else:
                 params["metrics"] = metrics
-        
+
         # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["start_date"] = start_date
-        
+
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["end_date"] = end_date
-        
+
         if next_page:
             params["next_page"] = next_page
-        
+
         return self.request(
             endpoint=endpoint,
             params=params,
             headers=self._prepare_headers(),
             category=DataCategory.FUNDAMENTAL,
-            format=DataFormat.JSON
+            format=DataFormat.JSON,
         )
-    
+
     def get_security_prices(
         self,
         identifier: str,
@@ -310,11 +292,11 @@ class IntrinioConnector(APIConnector):
         end_date: Optional[Union[str, date, datetime]] = None,
         frequency: str = "daily",
         page_size: int = 100,
-        next_page: Optional[str] = None
+        next_page: Optional[str] = None,
     ) -> DataResponse:
         """
         Get historical prices for a security.
-        
+
         Parameters
         ----------
         identifier : str
@@ -329,41 +311,38 @@ class IntrinioConnector(APIConnector):
             Number of results per page.
         next_page : str, optional
             Token for the next page of results.
-            
+
         Returns
         -------
         response : DataResponse
             Response containing the historical prices.
         """
         endpoint = f"securities/{identifier}/prices"
-        
-        params = {
-            "frequency": frequency,
-            "page_size": page_size
-        }
-        
+
+        params = {"frequency": frequency, "page_size": page_size}
+
         # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["start_date"] = start_date
-        
+
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["end_date"] = end_date
-        
+
         if next_page:
             params["next_page"] = next_page
-        
+
         return self.request(
             endpoint=endpoint,
             params=params,
             headers=self._prepare_headers(),
             category=DataCategory.MARKET_DATA,
-            format=DataFormat.JSON
+            format=DataFormat.JSON,
         )
-    
+
     def get_security_intraday_prices(
         self,
         identifier: str,
@@ -371,11 +350,11 @@ class IntrinioConnector(APIConnector):
         end_date: Optional[Union[str, date, datetime]] = None,
         frequency: str = "1min",
         page_size: int = 100,
-        next_page: Optional[str] = None
+        next_page: Optional[str] = None,
     ) -> DataResponse:
         """
         Get intraday prices for a security.
-        
+
         Parameters
         ----------
         identifier : str
@@ -390,76 +369,71 @@ class IntrinioConnector(APIConnector):
             Number of results per page.
         next_page : str, optional
             Token for the next page of results.
-            
+
         Returns
         -------
         response : DataResponse
             Response containing the intraday prices.
         """
         endpoint = f"securities/{identifier}/prices/intraday"
-        
-        params = {
-            "frequency": frequency,
-            "page_size": page_size
-        }
-        
+
+        params = {"frequency": frequency, "page_size": page_size}
+
         # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["start_date"] = start_date
-        
+
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["end_date"] = end_date
-        
+
         if next_page:
             params["next_page"] = next_page
-        
+
         return self.request(
             endpoint=endpoint,
             params=params,
             headers=self._prepare_headers(),
             category=DataCategory.MARKET_DATA,
-            format=DataFormat.JSON
+            format=DataFormat.JSON,
         )
-    
+
     def get_security_realtime_price(
-        self,
-        identifier: str,
-        source: Optional[str] = None
+        self, identifier: str, source: Optional[str] = None
     ) -> DataResponse:
         """
         Get real-time price for a security.
-        
+
         Parameters
         ----------
         identifier : str
             Security identifier (ticker symbol, FIGI, ISIN, CUSIP, etc.).
         source : str, optional
             Price source.
-            
+
         Returns
         -------
         response : DataResponse
             Response containing the real-time price.
         """
         endpoint = f"securities/{identifier}/prices/realtime"
-        
+
         params = {}
-        
+
         if source:
             params["source"] = source
-        
+
         return self.request(
             endpoint=endpoint,
             params=params,
             headers=self._prepare_headers(),
             category=DataCategory.MARKET_DATA,
-            format=DataFormat.JSON
+            format=DataFormat.JSON,
         )
-    
+
     def get_security_dividends(
         self,
         identifier: str,
@@ -467,11 +441,11 @@ class IntrinioConnector(APIConnector):
         end_date: Optional[Union[str, date, datetime]] = None,
         frequency: str = "daily",
         page_size: int = 100,
-        next_page: Optional[str] = None
+        next_page: Optional[str] = None,
     ) -> DataResponse:
         """
         Get dividends for a security.
-        
+
         Parameters
         ----------
         identifier : str
@@ -486,52 +460,49 @@ class IntrinioConnector(APIConnector):
             Number of results per page.
         next_page : str, optional
             Token for the next page of results.
-            
+
         Returns
         -------
         response : DataResponse
             Response containing the dividends.
         """
         endpoint = f"securities/{identifier}/dividends"
-        
-        params = {
-            "frequency": frequency,
-            "page_size": page_size
-        }
-        
+
+        params = {"frequency": frequency, "page_size": page_size}
+
         # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["start_date"] = start_date
-        
+
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["end_date"] = end_date
-        
+
         if next_page:
             params["next_page"] = next_page
-        
+
         return self.request(
             endpoint=endpoint,
             params=params,
             headers=self._prepare_headers(),
             category=DataCategory.FUNDAMENTAL,
-            format=DataFormat.JSON
+            format=DataFormat.JSON,
         )
-    
+
     def get_security_earnings(
         self,
         identifier: str,
         start_date: Optional[Union[str, date, datetime]] = None,
         end_date: Optional[Union[str, date, datetime]] = None,
         page_size: int = 100,
-        next_page: Optional[str] = None
+        next_page: Optional[str] = None,
     ) -> DataResponse:
         """
         Get earnings for a security.
-        
+
         Parameters
         ----------
         identifier : str
@@ -544,66 +515,61 @@ class IntrinioConnector(APIConnector):
             Number of results per page.
         next_page : str, optional
             Token for the next page of results.
-            
+
         Returns
         -------
         response : DataResponse
             Response containing the earnings.
         """
         endpoint = f"securities/{identifier}/earnings"
-        
-        params = {
-            "page_size": page_size
-        }
-        
+
+        params = {"page_size": page_size}
+
         # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["start_date"] = start_date
-        
+
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["end_date"] = end_date
-        
+
         if next_page:
             params["next_page"] = next_page
-        
+
         return self.request(
             endpoint=endpoint,
             params=params,
             headers=self._prepare_headers(),
             category=DataCategory.FUNDAMENTAL,
-            format=DataFormat.JSON
+            format=DataFormat.JSON,
         )
-    
-    def get_economic_index(
-        self,
-        identifier: str
-    ) -> DataResponse:
+
+    def get_economic_index(self, identifier: str) -> DataResponse:
         """
         Get economic index information.
-        
+
         Parameters
         ----------
         identifier : str
             Economic index identifier.
-            
+
         Returns
         -------
         response : DataResponse
             Response containing the economic index information.
         """
         endpoint = f"indices/economic/{identifier}"
-        
+
         return self.request(
             endpoint=endpoint,
             headers=self._prepare_headers(),
             category=DataCategory.ECONOMIC,
-            format=DataFormat.JSON
+            format=DataFormat.JSON,
         )
-    
+
     def get_economic_index_data(
         self,
         identifier: str,
@@ -611,11 +577,11 @@ class IntrinioConnector(APIConnector):
         end_date: Optional[Union[str, date, datetime]] = None,
         frequency: str = "daily",
         page_size: int = 100,
-        next_page: Optional[str] = None
+        next_page: Optional[str] = None,
     ) -> DataResponse:
         """
         Get data for an economic index.
-        
+
         Parameters
         ----------
         identifier : str
@@ -630,67 +596,61 @@ class IntrinioConnector(APIConnector):
             Number of results per page.
         next_page : str, optional
             Token for the next page of results.
-            
+
         Returns
         -------
         response : DataResponse
             Response containing the economic index data.
         """
         endpoint = f"indices/economic/{identifier}/data"
-        
-        params = {
-            "frequency": frequency,
-            "page_size": page_size
-        }
-        
+
+        params = {"frequency": frequency, "page_size": page_size}
+
         # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["start_date"] = start_date
-        
+
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["end_date"] = end_date
-        
+
         if next_page:
             params["next_page"] = next_page
-        
+
         return self.request(
             endpoint=endpoint,
             params=params,
             headers=self._prepare_headers(),
             category=DataCategory.ECONOMIC,
-            format=DataFormat.JSON
+            format=DataFormat.JSON,
         )
-    
-    def get_stock_market_index(
-        self,
-        identifier: str
-    ) -> DataResponse:
+
+    def get_stock_market_index(self, identifier: str) -> DataResponse:
         """
         Get stock market index information.
-        
+
         Parameters
         ----------
         identifier : str
             Stock market index identifier.
-            
+
         Returns
         -------
         response : DataResponse
             Response containing the stock market index information.
         """
         endpoint = f"indices/stock_market/{identifier}"
-        
+
         return self.request(
             endpoint=endpoint,
             headers=self._prepare_headers(),
             category=DataCategory.MARKET_DATA,
-            format=DataFormat.JSON
+            format=DataFormat.JSON,
         )
-    
+
     def get_stock_market_index_data(
         self,
         identifier: str,
@@ -698,11 +658,11 @@ class IntrinioConnector(APIConnector):
         end_date: Optional[Union[str, date, datetime]] = None,
         frequency: str = "daily",
         page_size: int = 100,
-        next_page: Optional[str] = None
+        next_page: Optional[str] = None,
     ) -> DataResponse:
         """
         Get data for a stock market index.
-        
+
         Parameters
         ----------
         identifier : str
@@ -717,67 +677,61 @@ class IntrinioConnector(APIConnector):
             Number of results per page.
         next_page : str, optional
             Token for the next page of results.
-            
+
         Returns
         -------
         response : DataResponse
             Response containing the stock market index data.
         """
         endpoint = f"indices/stock_market/{identifier}/data"
-        
-        params = {
-            "frequency": frequency,
-            "page_size": page_size
-        }
-        
+
+        params = {"frequency": frequency, "page_size": page_size}
+
         # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["start_date"] = start_date
-        
+
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["end_date"] = end_date
-        
+
         if next_page:
             params["next_page"] = next_page
-        
+
         return self.request(
             endpoint=endpoint,
             params=params,
             headers=self._prepare_headers(),
             category=DataCategory.MARKET_DATA,
-            format=DataFormat.JSON
+            format=DataFormat.JSON,
         )
-    
-    def get_forex_currency(
-        self,
-        pair: str
-    ) -> DataResponse:
+
+    def get_forex_currency(self, pair: str) -> DataResponse:
         """
         Get forex currency pair information.
-        
+
         Parameters
         ----------
         pair : str
             Forex currency pair.
-            
+
         Returns
         -------
         response : DataResponse
             Response containing the forex currency pair information.
         """
         endpoint = f"forex/currencies/{pair}"
-        
+
         return self.request(
             endpoint=endpoint,
             headers=self._prepare_headers(),
             category=DataCategory.MARKET_DATA,
-            format=DataFormat.JSON
+            format=DataFormat.JSON,
         )
-    
+
     def get_forex_currency_prices(
         self,
         pair: str,
@@ -785,11 +739,11 @@ class IntrinioConnector(APIConnector):
         end_date: Optional[Union[str, date, datetime]] = None,
         frequency: str = "daily",
         page_size: int = 100,
-        next_page: Optional[str] = None
+        next_page: Optional[str] = None,
     ) -> DataResponse:
         """
         Get prices for a forex currency pair.
-        
+
         Parameters
         ----------
         pair : str
@@ -804,41 +758,38 @@ class IntrinioConnector(APIConnector):
             Number of results per page.
         next_page : str, optional
             Token for the next page of results.
-            
+
         Returns
         -------
         response : DataResponse
             Response containing the forex currency pair prices.
         """
         endpoint = f"forex/currencies/{pair}/prices"
-        
-        params = {
-            "frequency": frequency,
-            "page_size": page_size
-        }
-        
+
+        params = {"frequency": frequency, "page_size": page_size}
+
         # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["start_date"] = start_date
-        
+
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["end_date"] = end_date
-        
+
         if next_page:
             params["next_page"] = next_page
-        
+
         return self.request(
             endpoint=endpoint,
             params=params,
             headers=self._prepare_headers(),
             category=DataCategory.MARKET_DATA,
-            format=DataFormat.JSON
+            format=DataFormat.JSON,
         )
-    
+
     def get_options_chain(
         self,
         symbol: str,
@@ -847,11 +798,11 @@ class IntrinioConnector(APIConnector):
         type: Optional[str] = None,
         moneyness: Optional[str] = None,
         page_size: int = 100,
-        next_page: Optional[str] = None
+        next_page: Optional[str] = None,
     ) -> DataResponse:
         """
         Get options chain.
-        
+
         Parameters
         ----------
         symbol : str
@@ -868,87 +819,79 @@ class IntrinioConnector(APIConnector):
             Number of results per page.
         next_page : str, optional
             Token for the next page of results.
-            
+
         Returns
         -------
         response : DataResponse
             Response containing the options chain.
         """
         endpoint = f"options/chain"
-        
-        params = {
-            "symbol": symbol,
-            "page_size": page_size
-        }
-        
+
+        params = {"symbol": symbol, "page_size": page_size}
+
         # Convert expiration to string if needed
         if expiration:
             if isinstance(expiration, (date, datetime)):
                 expiration = expiration.strftime("%Y-%m-%d")
             params["expiration"] = expiration
-        
+
         if strike:
             params["strike"] = strike
-        
+
         if type:
             params["type"] = type
-        
+
         if moneyness:
             params["moneyness"] = moneyness
-        
+
         if next_page:
             params["next_page"] = next_page
-        
+
         return self.request(
             endpoint=endpoint,
             params=params,
             headers=self._prepare_headers(),
             category=DataCategory.MARKET_DATA,
-            format=DataFormat.JSON
+            format=DataFormat.JSON,
         )
-    
-    def get_options_expirations(
-        self,
-        symbol: str
-    ) -> DataResponse:
+
+    def get_options_expirations(self, symbol: str) -> DataResponse:
         """
         Get options expirations.
-        
+
         Parameters
         ----------
         symbol : str
             Underlying symbol.
-            
+
         Returns
         -------
         response : DataResponse
             Response containing the options expirations.
         """
         endpoint = f"options/expirations"
-        
-        params = {
-            "symbol": symbol
-        }
-        
+
+        params = {"symbol": symbol}
+
         return self.request(
             endpoint=endpoint,
             params=params,
             headers=self._prepare_headers(),
             category=DataCategory.MARKET_DATA,
-            format=DataFormat.JSON
+            format=DataFormat.JSON,
         )
-    
+
     def get_options_prices(
         self,
         identifier: str,
         start_date: Optional[Union[str, date, datetime]] = None,
         end_date: Optional[Union[str, date, datetime]] = None,
         page_size: int = 100,
-        next_page: Optional[str] = None
+        next_page: Optional[str] = None,
     ) -> DataResponse:
         """
         Get historical prices for an option.
-        
+
         Parameters
         ----------
         identifier : str
@@ -961,49 +904,44 @@ class IntrinioConnector(APIConnector):
             Number of results per page.
         next_page : str, optional
             Token for the next page of results.
-            
+
         Returns
         -------
         response : DataResponse
             Response containing the historical option prices.
         """
         endpoint = f"options/prices/{identifier}"
-        
-        params = {
-            "page_size": page_size
-        }
-        
+
+        params = {"page_size": page_size}
+
         # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["start_date"] = start_date
-        
+
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["end_date"] = end_date
-        
+
         if next_page:
             params["next_page"] = next_page
-        
+
         return self.request(
             endpoint=endpoint,
             params=params,
             headers=self._prepare_headers(),
             category=DataCategory.MARKET_DATA,
-            format=DataFormat.JSON
+            format=DataFormat.JSON,
         )
-    
+
     def search_companies(
-        self,
-        query: str,
-        page_size: int = 100,
-        next_page: Optional[str] = None
+        self, query: str, page_size: int = 100, next_page: Optional[str] = None
     ) -> DataResponse:
         """
         Search for companies.
-        
+
         Parameters
         ----------
         query : str
@@ -1012,39 +950,33 @@ class IntrinioConnector(APIConnector):
             Number of results per page.
         next_page : str, optional
             Token for the next page of results.
-            
+
         Returns
         -------
         response : DataResponse
             Response containing the search results.
         """
         endpoint = "companies/search"
-        
-        params = {
-            "query": query,
-            "page_size": page_size
-        }
-        
+
+        params = {"query": query, "page_size": page_size}
+
         if next_page:
             params["next_page"] = next_page
-        
+
         return self.request(
             endpoint=endpoint,
             params=params,
             headers=self._prepare_headers(),
             category=DataCategory.FUNDAMENTAL,
-            format=DataFormat.JSON
+            format=DataFormat.JSON,
         )
-    
+
     def search_securities(
-        self,
-        query: str,
-        page_size: int = 100,
-        next_page: Optional[str] = None
+        self, query: str, page_size: int = 100, next_page: Optional[str] = None
     ) -> DataResponse:
         """
         Search for securities.
-        
+
         Parameters
         ----------
         query : str
@@ -1053,26 +985,23 @@ class IntrinioConnector(APIConnector):
             Number of results per page.
         next_page : str, optional
             Token for the next page of results.
-            
+
         Returns
         -------
         response : DataResponse
             Response containing the search results.
         """
         endpoint = "securities/search"
-        
-        params = {
-            "query": query,
-            "page_size": page_size
-        }
-        
+
+        params = {"query": query, "page_size": page_size}
+
         if next_page:
             params["next_page"] = next_page
-        
+
         return self.request(
             endpoint=endpoint,
             params=params,
             headers=self._prepare_headers(),
             category=DataCategory.MARKET_DATA,
-            format=DataFormat.JSON
+            format=DataFormat.JSON,
         )

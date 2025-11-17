@@ -4,9 +4,10 @@
 
 import numpy as np
 import pandas as pd
+import tensorflow as tf
+
 from alphamind.ai_models.transformer_timeseries import TemporalFusionTransformer
 from alphamind.data import DataLoader
-import tensorflow as tf
 
 # Set random seeds for reproducibility
 np.random.seed(42)

@@ -13,8 +13,11 @@ sys.path.append("/home/ubuntu/alphamind_project/backend")
 # Corrected imports based on project structure
 # from models.attention_mechanism import FinancialTimeSeriesTransformer # Incorrect path
 # from models.portfolio_optimization import PortfolioOptimizer # Incorrect path
-from alternative_data.sentiment_analysis import (MarketSentimentAnalyzer,
-                                                 SentimentBasedStrategy)
+from alternative_data.sentiment_analysis import (
+    MarketSentimentAnalyzer,
+    SentimentBasedStrategy,
+)
+
 # Assuming these imports are correct based on the project structure
 from infrastructure.authentication import AuthenticationSystem
 

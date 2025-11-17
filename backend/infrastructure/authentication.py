@@ -2,8 +2,8 @@ import datetime
 from functools import wraps
 
 import bcrypt
-import jwt
 from flask import Flask, jsonify, request
+import jwt
 
 
 class AuthenticationSystem:

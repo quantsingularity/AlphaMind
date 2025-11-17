@@ -1,8 +1,8 @@
-import numpy as np
-import pandas as pd
 from confluent_kafka import DeserializingConsumer, KafkaException
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroDeserializer
+import numpy as np
+import pandas as pd
 
 # Define the market data schema
 market_data_schema = """

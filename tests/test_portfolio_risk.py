@@ -4,34 +4,36 @@ Unit tests for the risk aggregation module.
 This module contains tests for the portfolio risk aggregation functionality.
 """
 
+from datetime import datetime
 import unittest
+
 import numpy as np
 import pandas as pd
-from datetime import datetime
 
 from backend.risk_system.risk_aggregation.portfolio_risk import (
-    RiskLimit,
+    PortfolioRiskAggregator,
     PositionRisk,
-    PortfolioRiskAggregator
+    RiskLimit,
 )
+
 
 class TestRiskLimit(unittest.TestCase):
     """Test cases for the RiskLimit class."""
-    
+
     def test_is_breached_no_breach(self):
         """Test that is_breached returns False when value is below limits."""
         limit = RiskLimit(metric_name="var", soft_limit=5.0, hard_limit=10.0)
         is_breached, severity = limit.is_breached(3.0)
         self.assertFalse(is_breached)
         self.assertEqual(severity, "none")
-        
+
     def test_is_breached_soft_breach(self):
         """Test that is_breached returns True with 'soft' when value exceeds soft limit."""
         limit = RiskLimit(metric_name="var", soft_limit=5.0, hard_limit=10.0)
         is_breached, severity = limit.is_breached(7.0)
         self.assertTrue(is_breached)
         self.assertEqual(severity, "soft")
-        
+
     def test_is_breached_hard_breach(self):
         """Test that is_breached returns True with 'hard' when value exceeds hard limit."""
         limit = RiskLimit(metric_name="var", soft_limit=5.0, hard_limit=10.0)
@@ -42,18 +44,18 @@ class TestRiskLimit(unittest.TestCase):
 
 class TestPositionRisk(unittest.TestCase):
     """Test cases for the PositionRisk class."""
-    
+
     def setUp(self):
         """Set up test fixtures."""
         self.position = PositionRisk(position_id="TEST001", instrument_type="equity")
-        
+
     def test_add_risk_limit(self):
         """Test adding a risk limit to a position."""
         self.position.add_risk_limit("var", 5.0, 10.0, "VaR limit")
         self.assertIn("var", self.position.risk_limits)
         self.assertEqual(self.position.risk_limits["var"].soft_limit, 5.0)
         self.assertEqual(self.position.risk_limits["var"].hard_limit, 10.0)
-        
+
     def test_calculate_var(self):
         """Test calculating VaR for a position."""
         returns = np.array([-0.01, -0.02, -0.03, 0.01, 0.02, 0.03])
@@ -61,7 +63,7 @@ class TestPositionRisk(unittest.TestCase):
         self.assertAlmostEqual(var, -0.03, places=6)
         self.assertIn("var", self.position.risk_metrics)
         self.assertEqual(self.position.risk_metrics["var"], var)
-        
+
     def test_calculate_expected_shortfall(self):
         """Test calculating Expected Shortfall for a position."""
         returns = np.array([-0.03, -0.02, -0.01, 0.01, 0.02, 0.03])
@@ -69,7 +71,7 @@ class TestPositionRisk(unittest.TestCase):
         self.assertAlmostEqual(es, -0.03, places=6)
         self.assertIn("expected_shortfall", self.position.risk_metrics)
         self.assertEqual(self.position.risk_metrics["expected_shortfall"], es)
-        
+
     def test_check_limits_no_breach(self):
         """Test checking limits with no breaches."""
         self.position.add_risk_limit("var", 5.0, 10.0)
@@ -78,7 +80,7 @@ class TestPositionRisk(unittest.TestCase):
         self.assertIn("var", results)
         self.assertFalse(results["var"][0])
         self.assertEqual(results["var"][1], "none")
-        
+
     def test_check_limits_with_breach(self):
         """Test checking limits with a breach."""
         self.position.add_risk_limit("var", 5.0, 10.0)
@@ -91,47 +93,60 @@ class TestPositionRisk(unittest.TestCase):
 
 class TestPortfolioRiskAggregator(unittest.TestCase):
     """Test cases for the PortfolioRiskAggregator class."""
-    
+
     def setUp(self):
         """Set up test fixtures."""
         self.portfolio = PortfolioRiskAggregator(portfolio_id="PORT001")
         self.position1 = PositionRisk(position_id="POS001", instrument_type="equity")
         self.position2 = PositionRisk(position_id="POS002", instrument_type="equity")
-        
+
     def test_add_position(self):
         """Test adding a position to the portfolio."""
         self.portfolio.add_position(self.position1)
         self.assertIn(self.position1.position_id, self.portfolio.positions)
-        self.assertEqual(self.portfolio.positions[self.position1.position_id], self.position1)
-        
+        self.assertEqual(
+            self.portfolio.positions[self.position1.position_id], self.position1
+        )
+
     def test_add_portfolio_risk_limit(self):
         """Test adding a risk limit at the portfolio level."""
-        self.portfolio.add_portfolio_risk_limit("var", 10.0, 20.0, "Portfolio VaR limit")
+        self.portfolio.add_portfolio_risk_limit(
+            "var", 10.0, 20.0, "Portfolio VaR limit"
+        )
         self.assertIn("var", self.portfolio.portfolio_risk_limits)
         self.assertEqual(self.portfolio.portfolio_risk_limits["var"].soft_limit, 10.0)
         self.assertEqual(self.portfolio.portfolio_risk_limits["var"].hard_limit, 20.0)
-        
+
     def test_calculate_portfolio_var(self):
         """Test calculating portfolio VaR."""
-        returns_matrix = pd.DataFrame({
-            'asset1': [-0.01, -0.02, 0.01, 0.02, 0.03],
-            'asset2': [-0.02, -0.01, 0.02, 0.01, 0.03]
-        })
+        returns_matrix = pd.DataFrame(
+            {
+                "asset1": [-0.01, -0.02, 0.01, 0.02, 0.03],
+                "asset2": [-0.02, -0.01, 0.02, 0.01, 0.03],
+            }
+        )
         weights = np.array([0.6, 0.4])
-        var = self.portfolio.calculate_portfolio_var(returns_matrix, weights, confidence_level=0.95)
+        var = self.portfolio.calculate_portfolio_var(
+            returns_matrix, weights, confidence_level=0.95
+        )
         self.assertIn("var", self.portfolio.portfolio_risk_metrics)
         self.assertEqual(self.portfolio.portfolio_risk_metrics["var"], var)
-        
+
     def test_calculate_diversification_benefit(self):
         """Test calculating diversification benefit."""
         individual_vars = np.array([5.0, 4.0])
         portfolio_var = 7.0
-        div_benefit = self.portfolio.calculate_diversification_benefit(individual_vars, portfolio_var)
+        div_benefit = self.portfolio.calculate_diversification_benefit(
+            individual_vars, portfolio_var
+        )
         expected_benefit = 1 - (7.0 / 9.0)
         self.assertAlmostEqual(div_benefit, expected_benefit, places=6)
         self.assertIn("diversification_benefit", self.portfolio.portfolio_risk_metrics)
-        self.assertEqual(self.portfolio.portfolio_risk_metrics["diversification_benefit"], div_benefit)
-        
+        self.assertEqual(
+            self.portfolio.portfolio_risk_metrics["diversification_benefit"],
+            div_benefit,
+        )
+
     def test_check_portfolio_limits_no_breach(self):
         """Test checking portfolio limits with no breaches."""
         self.portfolio.add_portfolio_risk_limit("var", 10.0, 20.0)
@@ -140,7 +155,7 @@ class TestPortfolioRiskAggregator(unittest.TestCase):
         self.assertIn("var", results)
         self.assertFalse(results["var"][0])
         self.assertEqual(results["var"][1], "none")
-        
+
     def test_check_portfolio_limits_with_breach(self):
         """Test checking portfolio limits with a breach."""
         self.portfolio.add_portfolio_risk_limit("var", 10.0, 20.0)
@@ -149,42 +164,42 @@ class TestPortfolioRiskAggregator(unittest.TestCase):
         self.assertIn("var", results)
         self.assertTrue(results["var"][0])
         self.assertEqual(results["var"][1], "soft")
-        
+
     def test_generate_risk_report(self):
         """Test generating a comprehensive risk report."""
         # Add positions
         self.portfolio.add_position(self.position1)
         self.portfolio.add_position(self.position2)
-        
+
         # Add risk metrics
         self.portfolio.portfolio_risk_metrics["var"] = 12.0
         self.portfolio.portfolio_risk_metrics["diversification_benefit"] = 0.2
-        
+
         self.position1.risk_metrics["var"] = 8.0
         self.position2.risk_metrics["var"] = 7.0
-        
+
         # Add risk limits
         self.portfolio.add_portfolio_risk_limit("var", 10.0, 20.0)
         self.position1.add_risk_limit("var", 5.0, 10.0)
         self.position2.add_risk_limit("var", 5.0, 10.0)
-        
+
         # Generate report
         report = self.portfolio.generate_risk_report()
-        
+
         # Check report structure
         self.assertEqual(report["portfolio_id"], "PORT001")
         self.assertIn("portfolio_metrics", report)
         self.assertIn("portfolio_limit_breaches", report)
         self.assertIn("positions", report)
-        
+
         # Check portfolio metrics
         self.assertEqual(report["portfolio_metrics"]["var"], 12.0)
         self.assertEqual(report["portfolio_metrics"]["diversification_benefit"], 0.2)
-        
+
         # Check portfolio limit breaches
         self.assertTrue(report["portfolio_limit_breaches"]["var"][0])
         self.assertEqual(report["portfolio_limit_breaches"]["var"][1], "soft")
-        
+
         # Check position metrics and breaches
         self.assertIn("POS001", report["positions"])
         self.assertIn("POS002", report["positions"])
@@ -194,5 +209,5 @@ class TestPortfolioRiskAggregator(unittest.TestCase):
         self.assertTrue(report["positions"]["POS002"]["limit_breaches"]["var"][0])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

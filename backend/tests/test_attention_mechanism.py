@@ -8,10 +8,12 @@ import tensorflow as tf
 # Add the backend directory to the path to allow imports
 sys.path.append("/home/ubuntu/alphamind_project/backend")
 
-from ai_models.attention_mechanism import (FinancialTimeSeriesTransformer,
-                                           MultiHeadAttention,
-                                           TemporalAttentionBlock,
-                                           get_positional_encoding)
+from ai_models.attention_mechanism import (
+    FinancialTimeSeriesTransformer,
+    MultiHeadAttention,
+    TemporalAttentionBlock,
+    get_positional_encoding,
+)
 
 # Constants for testing
 BATCH_SIZE = 4

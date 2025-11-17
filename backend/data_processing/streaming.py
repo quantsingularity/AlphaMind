@@ -6,29 +6,40 @@ financial data, including real-time data handling, event processing,
 and integration with various streaming platforms.
 """
 
-import os
-import time
-import uuid
+from abc import ABC, abstractmethod
+import asyncio
+from enum import Enum
+import json
 import logging
-import threading
+import os
 import queue
-from typing import Dict, List, Optional, Union, Any, Callable, Tuple, Iterator, Generator
+import threading
+import time
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generator,
+    Iterator,
+    List,
+    Optional,
+    Tuple,
+    Union,
+)
+import uuid
+
 import numpy as np
 import pandas as pd
-from enum import Enum
-from abc import ABC, abstractmethod
-import json
-import asyncio
 import websockets
 
 
 class StreamEvent:
     """
     Class representing a streaming data event.
-    
+
     This class provides a common structure for events in the
     streaming data processing framework.
-    
+
     Parameters
     ----------
     event_type : str
@@ -42,14 +53,14 @@ class StreamEvent:
     metadata : dict, optional
         Additional metadata for the event.
     """
-    
+
     def __init__(
         self,
         event_type: str,
         data: Any,
         timestamp: Optional[float] = None,
         source: Optional[str] = None,
-        metadata: Optional[Dict] = None
+        metadata: Optional[Dict] = None,
     ):
         self.id = str(uuid.uuid4())
         self.event_type = event_type
@@ -57,11 +68,11 @@ class StreamEvent:
         self.timestamp = timestamp or time.time()
         self.source = source
         self.metadata = metadata or {}
-    
+
     def to_dict(self) -> Dict:
         """
         Convert event to dictionary.
-        
+
         Returns
         -------
         event_dict : dict
@@ -73,19 +84,19 @@ class StreamEvent:
             "data": self.data,
             "timestamp": self.timestamp,
             "source": self.source,
-            "metadata": self.metadata
+            "metadata": self.metadata,
         }
-    
+
     @classmethod
-    def from_dict(cls, data: Dict) -> 'StreamEvent':
+    def from_dict(cls, data: Dict) -> "StreamEvent":
         """
         Create event from dictionary.
-        
+
         Parameters
         ----------
         data : dict
             Dictionary representation of the event.
-            
+
         Returns
         -------
         event : StreamEvent
@@ -96,13 +107,13 @@ class StreamEvent:
             data=data["data"],
             timestamp=data["timestamp"],
             source=data["source"],
-            metadata=data["metadata"]
+            metadata=data["metadata"],
         )
-        
+
         event.id = data["id"]
-        
+
         return event
-    
+
     def __str__(self) -> str:
         """String representation of the event."""
         return f"StreamEvent(id={self.id}, type={self.event_type}, source={self.source}, timestamp={self.timestamp})"
@@ -111,47 +122,41 @@ class StreamEvent:
 class DataStream(ABC):
     """
     Abstract base class for data streams.
-    
+
     This class provides a common interface for all data streams
     in the streaming data processing framework.
     """
-    
+
     def __init__(self):
         self.listeners = []
         self.running = False
         self.logger = logging.getLogger(self.__class__.__name__)
-    
+
     @abstractmethod
     def start(self) -> None:
         """Start the data stream."""
         self.running = True
-    
+
     @abstractmethod
     def stop(self) -> None:
         """Stop the data stream."""
         self.running = False
-    
-    def add_listener(
-        self,
-        listener: Callable[[StreamEvent], None]
-    ) -> None:
+
+    def add_listener(self, listener: Callable[[StreamEvent], None]) -> None:
         """
         Add a listener to the data stream.
-        
+
         Parameters
         ----------
         listener : callable
             Function to call when an event is received.
         """
         self.listeners.append(listener)
-    
-    def remove_listener(
-        self,
-        listener: Callable[[StreamEvent], None]
-    ) -> None:
+
+    def remove_listener(self, listener: Callable[[StreamEvent], None]) -> None:
         """
         Remove a listener from the data stream.
-        
+
         Parameters
         ----------
         listener : callable
@@ -159,14 +164,11 @@ class DataStream(ABC):
         """
         if listener in self.listeners:
             self.listeners.remove(listener)
-    
-    def notify_listeners(
-        self,
-        event: StreamEvent
-    ) -> None:
+
+    def notify_listeners(self, event: StreamEvent) -> None:
         """
         Notify all listeners of an event.
-        
+
         Parameters
         ----------
         event : StreamEvent
@@ -182,10 +184,10 @@ class DataStream(ABC):
 class FileStream(DataStream):
     """
     Data stream from a file.
-    
+
     This class provides methods for streaming data from a file,
     with support for various file formats and streaming modes.
-    
+
     Parameters
     ----------
     filepath : str
@@ -199,14 +201,14 @@ class FileStream(DataStream):
     repeat : bool, default=False
         Whether to repeat the file when finished.
     """
-    
+
     def __init__(
         self,
         filepath: str,
         event_type: str = "file_data",
         chunk_size: int = 1000,
         delay: float = 0.1,
-        repeat: bool = False
+        repeat: bool = False,
     ):
         super().__init__()
         self.filepath = filepath
@@ -215,63 +217,61 @@ class FileStream(DataStream):
         self.delay = delay
         self.repeat = repeat
         self.thread = None
-    
+
     def start(self) -> None:
         """Start streaming data from the file."""
         super().start()
-        
+
         if self.thread and self.thread.is_alive():
             return
-        
+
         self.thread = threading.Thread(target=self._stream_file)
         self.thread.daemon = True
         self.thread.start()
-    
+
     def stop(self) -> None:
         """Stop streaming data from the file."""
         super().stop()
-        
+
         if self.thread:
             self.thread.join(timeout=1)
             self.thread = None
-    
+
     def _stream_file(self) -> None:
         """Stream data from the file."""
         while self.running:
             try:
                 with open(self.filepath, "r") as f:
                     chunk = []
-                    
+
                     for line in f:
                         if not self.running:
                             break
-                        
+
                         chunk.append(line.strip())
-                        
+
                         if len(chunk) >= self.chunk_size:
                             event = StreamEvent(
                                 event_type=self.event_type,
                                 data=chunk,
-                                source=self.filepath
+                                source=self.filepath,
                             )
-                            
+
                             self.notify_listeners(event)
                             chunk = []
                             time.sleep(self.delay)
-                    
+
                     # Send remaining lines
                     if chunk and self.running:
                         event = StreamEvent(
-                            event_type=self.event_type,
-                            data=chunk,
-                            source=self.filepath
+                            event_type=self.event_type, data=chunk, source=self.filepath
                         )
-                        
+
                         self.notify_listeners(event)
-                
+
                 if not self.repeat or not self.running:
                     break
-                
+
             except Exception as e:
                 self.logger.error(f"Error streaming file: {e}")
                 break
@@ -280,10 +280,10 @@ class FileStream(DataStream):
 class CSVStream(DataStream):
     """
     Data stream from a CSV file.
-    
+
     This class provides methods for streaming data from a CSV file,
     with support for various streaming modes and data transformations.
-    
+
     Parameters
     ----------
     filepath : str
@@ -297,14 +297,14 @@ class CSVStream(DataStream):
     repeat : bool, default=False
         Whether to repeat the file when finished.
     """
-    
+
     def __init__(
         self,
         filepath: str,
         event_type: str = "csv_data",
         chunk_size: int = 100,
         delay: float = 0.1,
-        repeat: bool = False
+        repeat: bool = False,
     ):
         super().__init__()
         self.filepath = filepath
@@ -313,26 +313,26 @@ class CSVStream(DataStream):
         self.delay = delay
         self.repeat = repeat
         self.thread = None
-    
+
     def start(self) -> None:
         """Start streaming data from the CSV file."""
         super().start()
-        
+
         if self.thread and self.thread.is_alive():
             return
-        
+
         self.thread = threading.Thread(target=self._stream_csv)
         self.thread.daemon = True
         self.thread.start()
-    
+
     def stop(self) -> None:
         """Stop streaming data from the CSV file."""
         super().stop()
-        
+
         if self.thread:
             self.thread.join(timeout=1)
             self.thread = None
-    
+
     def _stream_csv(self) -> None:
         """Stream data from the CSV file."""
         while self.running:
@@ -341,19 +341,17 @@ class CSVStream(DataStream):
                 for chunk in pd.read_csv(self.filepath, chunksize=self.chunk_size):
                     if not self.running:
                         break
-                    
+
                     event = StreamEvent(
-                        event_type=self.event_type,
-                        data=chunk,
-                        source=self.filepath
+                        event_type=self.event_type, data=chunk, source=self.filepath
                     )
-                    
+
                     self.notify_listeners(event)
                     time.sleep(self.delay)
-                
+
                 if not self.repeat or not self.running:
                     break
-                
+
             except Exception as e:
                 self.logger.error(f"Error streaming CSV: {e}")
                 break
@@ -362,10 +360,10 @@ class CSVStream(DataStream):
 class WebSocketStream(DataStream):
     """
     Data stream from a WebSocket connection.
-    
+
     This class provides methods for streaming data from a WebSocket connection,
     with support for various data formats and connection options.
-    
+
     Parameters
     ----------
     url : str
@@ -381,7 +379,7 @@ class WebSocketStream(DataStream):
     reconnect_delay : float, default=5.0
         Delay before reconnecting in seconds.
     """
-    
+
     def __init__(
         self,
         url: str,
@@ -389,7 +387,7 @@ class WebSocketStream(DataStream):
         headers: Optional[Dict] = None,
         auth: Optional[Tuple[str, str]] = None,
         reconnect: bool = True,
-        reconnect_delay: float = 5.0
+        reconnect_delay: float = 5.0,
     ):
         super().__init__()
         self.url = url
@@ -400,54 +398,53 @@ class WebSocketStream(DataStream):
         self.reconnect_delay = reconnect_delay
         self.thread = None
         self.websocket = None
-    
+
     def start(self) -> None:
         """Start streaming data from the WebSocket connection."""
         super().start()
-        
+
         if self.thread and self.thread.is_alive():
             return
-        
+
         self.thread = threading.Thread(target=self._run_websocket)
         self.thread.daemon = True
         self.thread.start()
-    
+
     def stop(self) -> None:
         """Stop streaming data from the WebSocket connection."""
         super().stop()
-        
+
         if self.thread:
             self.thread.join(timeout=1)
             self.thread = None
-    
+
     def _run_websocket(self) -> None:
         """Run the WebSocket connection."""
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        
+
         try:
             loop.run_until_complete(self._connect_websocket())
         except Exception as e:
             self.logger.error(f"Error in WebSocket connection: {e}")
         finally:
             loop.close()
-    
+
     async def _connect_websocket(self) -> None:
         """Connect to the WebSocket server."""
         while self.running:
             try:
                 async with websockets.connect(
-                    self.url,
-                    extra_headers=self.headers
+                    self.url, extra_headers=self.headers
                 ) as websocket:
                     self.websocket = websocket
                     self.logger.info(f"Connected to WebSocket: {self.url}")
-                    
+
                     # Handle incoming messages
                     async for message in websocket:
                         if not self.running:
                             break
-                        
+
                         try:
                             # Parse message based on content
                             if isinstance(message, str):
@@ -457,42 +454,43 @@ class WebSocketStream(DataStream):
                                     data = message
                             else:
                                 data = message
-                            
+
                             event = StreamEvent(
-                                event_type=self.event_type,
-                                data=data,
-                                source=self.url
+                                event_type=self.event_type, data=data, source=self.url
                             )
-                            
+
                             self.notify_listeners(event)
-                            
+
                         except Exception as e:
-                            self.logger.error(f"Error processing WebSocket message: {e}")
-                
+                            self.logger.error(
+                                f"Error processing WebSocket message: {e}"
+                            )
+
                 self.websocket = None
-                
+
                 if not self.reconnect or not self.running:
                     break
-                
-                self.logger.info(f"Reconnecting to WebSocket in {self.reconnect_delay} seconds...")
+
+                self.logger.info(
+                    f"Reconnecting to WebSocket in {self.reconnect_delay} seconds..."
+                )
                 await asyncio.sleep(self.reconnect_delay)
-                
+
             except Exception as e:
                 self.logger.error(f"WebSocket connection error: {e}")
-                
+
                 if not self.reconnect or not self.running:
                     break
-                
-                self.logger.info(f"Reconnecting to WebSocket in {self.reconnect_delay} seconds...")
+
+                self.logger.info(
+                    f"Reconnecting to WebSocket in {self.reconnect_delay} seconds..."
+                )
                 await asyncio.sleep(self.reconnect_delay)
-    
-    async def send(
-        self,
-        message: Union[str, Dict]
-    ) -> None:
+
+    async def send(self, message: Union[str, Dict]) -> None:
         """
         Send a message to the WebSocket server.
-        
+
         Parameters
         ----------
         message : str or dict
@@ -500,20 +498,20 @@ class WebSocketStream(DataStream):
         """
         if not self.websocket:
             raise RuntimeError("WebSocket is not connected")
-        
+
         if isinstance(message, dict):
             message = json.dumps(message)
-        
+
         await self.websocket.send(message)
 
 
 class KafkaStreamAdapter(DataStream):
     """
     Data stream adapter for Kafka.
-    
+
     This class provides methods for streaming data from a Kafka topic,
     with support for various Kafka configurations and data formats.
-    
+
     Parameters
     ----------
     bootstrap_servers : str
@@ -527,14 +525,14 @@ class KafkaStreamAdapter(DataStream):
     auto_offset_reset : str, default="latest"
         Offset reset strategy. Options: "earliest", "latest".
     """
-    
+
     def __init__(
         self,
         bootstrap_servers: str,
         topic: str,
         event_type: str = "kafka_data",
         group_id: Optional[str] = None,
-        auto_offset_reset: str = "latest"
+        auto_offset_reset: str = "latest",
     ):
         super().__init__()
         self.bootstrap_servers = bootstrap_servers
@@ -544,50 +542,50 @@ class KafkaStreamAdapter(DataStream):
         self.auto_offset_reset = auto_offset_reset
         self.thread = None
         self.consumer = None
-    
+
     def start(self) -> None:
         """Start streaming data from the Kafka topic."""
         super().start()
-        
+
         if self.thread and self.thread.is_alive():
             return
-        
+
         self.thread = threading.Thread(target=self._consume_kafka)
         self.thread.daemon = True
         self.thread.start()
-    
+
     def stop(self) -> None:
         """Stop streaming data from the Kafka topic."""
         super().stop()
-        
+
         if self.consumer:
             self.consumer.close()
             self.consumer = None
-        
+
         if self.thread:
             self.thread.join(timeout=1)
             self.thread = None
-    
+
     def _consume_kafka(self) -> None:
         """Consume data from the Kafka topic."""
         try:
             # Import Kafka library
             from kafka import KafkaConsumer
-            
+
             # Create consumer
             self.consumer = KafkaConsumer(
                 self.topic,
                 bootstrap_servers=self.bootstrap_servers,
                 group_id=self.group_id,
                 auto_offset_reset=self.auto_offset_reset,
-                value_deserializer=lambda x: self._deserialize_message(x)
+                value_deserializer=lambda x: self._deserialize_message(x),
             )
-            
+
             # Consume messages
             for message in self.consumer:
                 if not self.running:
                     break
-                
+
                 event = StreamEvent(
                     event_type=self.event_type,
                     data=message.value,
@@ -597,29 +595,28 @@ class KafkaStreamAdapter(DataStream):
                         "topic": message.topic,
                         "partition": message.partition,
                         "offset": message.offset,
-                        "key": message.key
-                    }
+                        "key": message.key,
+                    },
                 )
-                
+
                 self.notify_listeners(event)
-            
+
         except ImportError:
-            self.logger.error("Kafka library not available. Install with: pip install kafka-python")
+            self.logger.error(
+                "Kafka library not available. Install with: pip install kafka-python"
+            )
         except Exception as e:
             self.logger.error(f"Error consuming Kafka messages: {e}")
-    
-    def _deserialize_message(
-        self,
-        message: bytes
-    ) -> Any:
+
+    def _deserialize_message(self, message: bytes) -> Any:
         """
         Deserialize a Kafka message.
-        
+
         Parameters
         ----------
         message : bytes
             Message to deserialize.
-            
+
         Returns
         -------
         data : any
@@ -636,10 +633,10 @@ class KafkaStreamAdapter(DataStream):
 class WebSocketStreamAdapter(DataStream):
     """
     Data stream adapter for WebSocket server.
-    
+
     This class provides methods for streaming data from a WebSocket server,
     with support for various WebSocket configurations and data formats.
-    
+
     Parameters
     ----------
     host : str, default="0.0.0.0"
@@ -649,12 +646,12 @@ class WebSocketStreamAdapter(DataStream):
     event_type : str, default="websocket_data"
         Type of events to generate.
     """
-    
+
     def __init__(
         self,
         host: str = "0.0.0.0",
         port: int = 8765,
-        event_type: str = "websocket_data"
+        event_type: str = "websocket_data",
     ):
         super().__init__()
         self.host = host
@@ -663,60 +660,54 @@ class WebSocketStreamAdapter(DataStream):
         self.thread = None
         self.server = None
         self.clients = set()
-    
+
     def start(self) -> None:
         """Start the WebSocket server."""
         super().start()
-        
+
         if self.thread and self.thread.is_alive():
             return
-        
+
         self.thread = threading.Thread(target=self._run_server)
         self.thread.daemon = True
         self.thread.start()
-    
+
     def stop(self) -> None:
         """Stop the WebSocket server."""
         super().stop()
-        
+
         if self.server:
             self.server.close()
             self.server = None
-        
+
         if self.thread:
             self.thread.join(timeout=1)
             self.thread = None
-    
+
     def _run_server(self) -> None:
         """Run the WebSocket server."""
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        
+
         try:
-            start_server = websockets.serve(
-                self._handle_client,
-                self.host,
-                self.port
-            )
-            
+            start_server = websockets.serve(self._handle_client, self.host, self.port)
+
             self.server = loop.run_until_complete(start_server)
-            self.logger.info(f"WebSocket server started on ws://{self.host}:{self.port}")
-            
+            self.logger.info(
+                f"WebSocket server started on ws://{self.host}:{self.port}"
+            )
+
             loop.run_forever()
-            
+
         except Exception as e:
             self.logger.error(f"Error in WebSocket server: {e}")
         finally:
             loop.close()
-    
-    async def _handle_client(
-        self,
-        websocket,
-        path
-    ) -> None:
+
+    async def _handle_client(self, websocket, path) -> None:
         """
         Handle a WebSocket client connection.
-        
+
         Parameters
         ----------
         websocket : WebSocketServerProtocol
@@ -726,13 +717,13 @@ class WebSocketStreamAdapter(DataStream):
         """
         # Add client to set
         self.clients.add(websocket)
-        
+
         try:
             # Handle incoming messages
             async for message in websocket:
                 if not self.running:
                     break
-                
+
                 try:
                     # Parse message based on content
                     if isinstance(message, str):
@@ -742,31 +733,28 @@ class WebSocketStreamAdapter(DataStream):
                             data = message
                     else:
                         data = message
-                    
+
                     event = StreamEvent(
                         event_type=self.event_type,
                         data=data,
-                        source=f"{websocket.remote_address[0]}:{websocket.remote_address[1]}"
+                        source=f"{websocket.remote_address[0]}:{websocket.remote_address[1]}",
                     )
-                    
+
                     self.notify_listeners(event)
-                    
+
                 except Exception as e:
                     self.logger.error(f"Error processing WebSocket message: {e}")
-        
+
         except websockets.exceptions.ConnectionClosed:
             pass
         finally:
             # Remove client from set
             self.clients.remove(websocket)
-    
-    async def broadcast(
-        self,
-        message: Union[str, Dict]
-    ) -> None:
+
+    async def broadcast(self, message: Union[str, Dict]) -> None:
         """
         Broadcast a message to all connected clients.
-        
+
         Parameters
         ----------
         message : str or dict
@@ -774,35 +762,29 @@ class WebSocketStreamAdapter(DataStream):
         """
         if isinstance(message, dict):
             message = json.dumps(message)
-        
+
         if not self.clients:
             return
-        
+
         # Send message to all clients
-        await asyncio.gather(*[
-            client.send(message)
-            for client in self.clients
-        ])
+        await asyncio.gather(*[client.send(message) for client in self.clients])
 
 
 class StreamProcessor:
     """
     Processor for streaming data.
-    
+
     This class provides methods for processing streaming data,
     including filtering, transformation, and aggregation.
-    
+
     Parameters
     ----------
     name : str, optional
         Name of the processor.
         If None, generates a random name.
     """
-    
-    def __init__(
-        self,
-        name: Optional[str] = None
-    ):
+
+    def __init__(self, name: Optional[str] = None):
         self.name = name or f"processor-{uuid.uuid4()}"
         self.streams = []
         self.processors = []
@@ -810,14 +792,11 @@ class StreamProcessor:
         self.transformers = []
         self.handlers = []
         self.logger = logging.getLogger(self.__class__.__name__)
-    
-    def add_stream(
-        self,
-        stream: DataStream
-    ) -> None:
+
+    def add_stream(self, stream: DataStream) -> None:
         """
         Add a data stream to the processor.
-        
+
         Parameters
         ----------
         stream : DataStream
@@ -825,14 +804,11 @@ class StreamProcessor:
         """
         self.streams.append(stream)
         stream.add_listener(self._process_event)
-    
-    def remove_stream(
-        self,
-        stream: DataStream
-    ) -> None:
+
+    def remove_stream(self, stream: DataStream) -> None:
         """
         Remove a data stream from the processor.
-        
+
         Parameters
         ----------
         stream : DataStream
@@ -841,28 +817,22 @@ class StreamProcessor:
         if stream in self.streams:
             stream.remove_listener(self._process_event)
             self.streams.remove(stream)
-    
-    def add_processor(
-        self,
-        processor: 'StreamProcessor'
-    ) -> None:
+
+    def add_processor(self, processor: "StreamProcessor") -> None:
         """
         Add a downstream processor.
-        
+
         Parameters
         ----------
         processor : StreamProcessor
             Processor to add.
         """
         self.processors.append(processor)
-    
-    def remove_processor(
-        self,
-        processor: 'StreamProcessor'
-    ) -> None:
+
+    def remove_processor(self, processor: "StreamProcessor") -> None:
         """
         Remove a downstream processor.
-        
+
         Parameters
         ----------
         processor : StreamProcessor
@@ -870,14 +840,11 @@ class StreamProcessor:
         """
         if processor in self.processors:
             self.processors.remove(processor)
-    
-    def add_filter(
-        self,
-        filter_func: Callable[[StreamEvent], bool]
-    ) -> None:
+
+    def add_filter(self, filter_func: Callable[[StreamEvent], bool]) -> None:
         """
         Add a filter function.
-        
+
         Parameters
         ----------
         filter_func : callable
@@ -885,52 +852,48 @@ class StreamProcessor:
             If True, the event is processed; if False, it is discarded.
         """
         self.filters.append(filter_func)
-    
+
     def add_transformer(
         self,
-        transformer_func: Callable[[StreamEvent], Union[StreamEvent, List[StreamEvent]]]
+        transformer_func: Callable[
+            [StreamEvent], Union[StreamEvent, List[StreamEvent]]
+        ],
     ) -> None:
         """
         Add a transformer function.
-        
+
         Parameters
         ----------
         transformer_func : callable
             Function that takes an event and returns a new event or list of events.
         """
         self.transformers.append(transformer_func)
-    
-    def add_handler(
-        self,
-        handler_func: Callable[[StreamEvent], None]
-    ) -> None:
+
+    def add_handler(self, handler_func: Callable[[StreamEvent], None]) -> None:
         """
         Add a handler function.
-        
+
         Parameters
         ----------
         handler_func : callable
             Function that takes an event and performs an action.
         """
         self.handlers.append(handler_func)
-    
+
     def start(self) -> None:
         """Start all data streams."""
         for stream in self.streams:
             stream.start()
-    
+
     def stop(self) -> None:
         """Stop all data streams."""
         for stream in self.streams:
             stream.stop()
-    
-    def _process_event(
-        self,
-        event: StreamEvent
-    ) -> None:
+
+    def _process_event(self, event: StreamEvent) -> None:
         """
         Process an event.
-        
+
         Parameters
         ----------
         event : StreamEvent
@@ -943,29 +906,29 @@ class StreamProcessor:
                     return
             except Exception as e:
                 self.logger.error(f"Error in filter: {e}")
-        
+
         # Apply transformers
         events = [event]
-        
+
         for transformer_func in self.transformers:
             try:
                 new_events = []
-                
+
                 for event in events:
                     result = transformer_func(event)
-                    
+
                     if result is None:
                         continue
                     elif isinstance(result, list):
                         new_events.extend(result)
                     else:
                         new_events.append(result)
-                
+
                 events = new_events
-                
+
             except Exception as e:
                 self.logger.error(f"Error in transformer: {e}")
-        
+
         # Apply handlers
         for event in events:
             for handler_func in self.handlers:
@@ -973,7 +936,7 @@ class StreamProcessor:
                     handler_func(event)
                 except Exception as e:
                     self.logger.error(f"Error in handler: {e}")
-            
+
             # Forward to downstream processors
             for processor in self.processors:
                 processor._process_event(event)
@@ -982,34 +945,27 @@ class StreamProcessor:
 class StreamingPipeline:
     """
     Pipeline for streaming data processing.
-    
+
     This class provides methods for building and executing
     streaming data processing pipelines.
-    
+
     Parameters
     ----------
     name : str, optional
         Name of the pipeline.
         If None, generates a random name.
     """
-    
-    def __init__(
-        self,
-        name: Optional[str] = None
-    ):
+
+    def __init__(self, name: Optional[str] = None):
         self.name = name or f"pipeline-{uuid.uuid4()}"
         self.stages = []
         self.running = False
         self.logger = logging.getLogger(self.__class__.__name__)
-    
-    def add_stage(
-        self,
-        processor: StreamProcessor,
-        name: Optional[str] = None
-    ) -> None:
+
+    def add_stage(self, processor: StreamProcessor, name: Optional[str] = None) -> None:
         """
         Add a stage to the pipeline.
-        
+
         Parameters
         ----------
         processor : StreamProcessor
@@ -1019,48 +975,45 @@ class StreamingPipeline:
         """
         stage_name = name or processor.name
         self.stages.append((stage_name, processor))
-        
+
         # Connect to previous stage if exists
         if len(self.stages) > 1:
             prev_processor = self.stages[-2][1]
             prev_processor.add_processor(processor)
-    
+
     def start(self) -> None:
         """Start the pipeline."""
         if self.running:
             return
-        
+
         self.running = True
-        
+
         # Start all stages
         for name, processor in self.stages:
             self.logger.info(f"Starting pipeline stage: {name}")
             processor.start()
-    
+
     def stop(self) -> None:
         """Stop the pipeline."""
         if not self.running:
             return
-        
+
         self.running = False
-        
+
         # Stop all stages in reverse order
         for name, processor in reversed(self.stages):
             self.logger.info(f"Stopping pipeline stage: {name}")
             processor.stop()
-    
-    def get_stage(
-        self,
-        name: str
-    ) -> Optional[StreamProcessor]:
+
+    def get_stage(self, name: str) -> Optional[StreamProcessor]:
         """
         Get a stage by name.
-        
+
         Parameters
         ----------
         name : str
             Name of the stage.
-            
+
         Returns
         -------
         processor : StreamProcessor or None
@@ -1069,5 +1022,5 @@ class StreamingPipeline:
         for stage_name, processor in self.stages:
             if stage_name == name:
                 return processor
-        
+
         return None
