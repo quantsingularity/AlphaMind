@@ -15,9 +15,9 @@ tf.random.set_seed(42)
 
 # Load historical market data
 def load_market_data(tickers, start_date, end_date):
-    """
-    Load market data for the specified tickers and date range
-    """
+#    """
+#    Load market data for the specified tickers and date range
+#    """
     data_loader = DataLoader()
     data = data_loader.load_market_data(
         tickers=tickers,
@@ -30,9 +30,9 @@ def load_market_data(tickers, start_date, end_date):
 
 # Prepare data for the TFT model
 def prepare_tft_data(data, lookback_window=30, forecast_horizon=5):
-    """
-    Prepare data for Temporal Fusion Transformer model
-    """
+#    """
+#    Prepare data for Temporal Fusion Transformer model
+#    """
     features = []
     targets = []
 
@@ -87,9 +87,9 @@ def calculate_macd(prices, fast=12, slow=26, signal=9):
 
 # Train the TFT model
 def train_tft_model(X_train, y_train, num_features):
-    """
-    Train a Temporal Fusion Transformer model
-    """
+#    """
+#    Train a Temporal Fusion Transformer model
+#    """
     # Define model parameters
     lookback_window = X_train.shape[1]
     forecast_horizon = y_train.shape[1]
@@ -129,9 +129,9 @@ def train_tft_model(X_train, y_train, num_features):
 
 # Make predictions with the trained model
 def predict_with_tft(model, X_test, num_features):
-    """
-    Make predictions with the trained TFT model
-    """
+#    """
+#    Make predictions with the trained TFT model
+#    """
     lookback_window = X_test.shape[1]
     forecast_horizon = 5  # Same as training
 

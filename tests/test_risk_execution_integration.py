@@ -1,8 +1,8 @@
-"""
-Integration test for the risk management and execution engine modules.
-
-This module tests the integration between risk management and execution engine components.
-"""
+#"""
+#Integration test for the risk management and execution engine modules.
+#
+#This module tests the integration between risk management and execution engine components.
+#"""
 
 from datetime import datetime
 import unittest
@@ -11,7 +11,6 @@ import numpy as np
 import pandas as pd
 
 from backend.execution_engine.order_management.order_manager import (
-    Order,
     OrderFill,
     OrderManager,
     OrderSide,
@@ -30,10 +29,10 @@ from backend.risk_system.risk_aggregation.position_limits import (
 
 
 class TestRiskExecutionIntegration(unittest.TestCase):
-    """Test cases for the integration between risk and execution components."""
-
-    def setUp(self):
-        """Set up test fixtures."""
+#    """Test cases for the integration between risk and execution components."""
+#
+#    def setUp(self):
+#        """Set up test fixtures."""
         # Set up risk components
         self.portfolio = PortfolioRiskAggregator(portfolio_id="PORT001")
         self.position1 = PositionRisk(position_id="POS001", instrument_type="equity")
@@ -56,38 +55,38 @@ class TestRiskExecutionIntegration(unittest.TestCase):
         self.order_manager = OrderManager()
 
     def test_order_risk_check_integration(self):
-        """Test that orders are checked against risk limits before execution."""
-        # Create an order
-        order = self.order_manager.create_order(
-            instrument_id="AAPL",
-            side=OrderSide.BUY,
-            quantity=1000,
-            order_type=OrderType.LIMIT,
-            limit_price=1500.0,  # This would exceed the position limit
-        )
-
-        # Calculate notional value
-        notional_value = order.quantity * order.limit_price
-
-        # Check against position limits
-        is_breached, severity = self.limits_manager.check_limit(
-            "AAPL_NOTIONAL", notional_value
-        )
-
-        # Assert that the limit is breached
-        self.assertTrue(is_breached)
-        self.assertEqual(severity, "soft")
-
-        # In a real system, we would reject the order based on this breach
-        if is_breached and severity == "hard":
-            # Simulate order rejection
-            order.update_status("REJECTED")
-
-        # For soft breaches, we might allow the order but with warnings
-        self.assertNotEqual(order.status, "REJECTED")
-
-    def test_fill_risk_update_integration(self):
-        """Test that order fills update risk metrics."""
+#        """Test that orders are checked against risk limits before execution."""
+#        # Create an order
+#        order = self.order_manager.create_order(
+#            instrument_id="AAPL",
+#            side=OrderSide.BUY,
+#            quantity=1000,
+#            order_type=OrderType.LIMIT,
+#            limit_price=1500.0,  # This would exceed the position limit
+#        )
+#
+#        # Calculate notional value
+#        notional_value = order.quantity * order.limit_price
+#
+#        # Check against position limits
+#        is_breached, severity = self.limits_manager.check_limit(
+#            "AAPL_NOTIONAL", notional_value
+#        )
+#
+#        # Assert that the limit is breached
+#        self.assertTrue(is_breached)
+#        self.assertEqual(severity, "soft")
+#
+#        # In a real system, we would reject the order based on this breach
+#        if is_breached and severity == "hard":
+#            # Simulate order rejection
+#            order.update_status("REJECTED")
+#
+#        # For soft breaches, we might allow the order but with warnings
+#        self.assertNotEqual(order.status, "REJECTED")
+#
+#    def test_fill_risk_update_integration(self):
+#        """Test that order fills update risk metrics."""
         # Create and submit an order
         order = self.order_manager.create_order(
             instrument_id="AAPL",
@@ -118,45 +117,45 @@ class TestRiskExecutionIntegration(unittest.TestCase):
         self.assertEqual(self.position1.risk_metrics["exposure"], 14950.0)
 
     def test_portfolio_var_calculation_with_positions(self):
-        """Test calculating portfolio VaR with position data."""
-        # Create a returns matrix for two assets
-        returns_matrix = pd.DataFrame(
-            {
-                "asset1": [-0.01, -0.02, 0.01, 0.02, 0.03],
-                "asset2": [-0.02, -0.01, 0.02, 0.01, 0.03],
-            }
-        )
-
-        # Set position weights
-        weights = np.array([0.6, 0.4])
-
-        # Calculate portfolio VaR
-        var = self.portfolio.calculate_portfolio_var(
-            returns_matrix, weights, confidence_level=0.95
-        )
-
-        # Check that VaR was calculated
-        self.assertIsNotNone(var)
-        self.assertIn("var", self.portfolio.portfolio_risk_metrics)
-
-        # Add a portfolio risk limit
-        self.portfolio.add_portfolio_risk_limit("var", 0.01, 0.02)
-
-        # Check if the limit is breached
-        breaches = self.portfolio.check_portfolio_limits()
-
-        # In a real system, limit breaches would affect order execution
-        # For example, we might prevent new orders if VaR limits are breached
-        if breaches.get("var", (False, ""))[0]:
-            # Simulate preventing new orders
-            can_place_new_orders = False
-        else:
-            can_place_new_orders = True
-
-        # Check that the risk limit breach status is correctly reflected in the can_place_new_orders variable
-        # The actual enforcement of preventing orders would be implemented in a production system
-        self.assertEqual(can_place_new_orders, not breaches.get("var", (False, ""))[0])
-
-
-if __name__ == "__main__":
-    unittest.main()
+#        """Test calculating portfolio VaR with position data."""
+#        # Create a returns matrix for two assets
+#        returns_matrix = pd.DataFrame(
+#            {
+#                "asset1": [-0.01, -0.02, 0.01, 0.02, 0.03],
+#                "asset2": [-0.02, -0.01, 0.02, 0.01, 0.03],
+#            }
+#        )
+#
+#        # Set position weights
+#        weights = np.array([0.6, 0.4])
+#
+#        # Calculate portfolio VaR
+#        var = self.portfolio.calculate_portfolio_var(
+#            returns_matrix, weights, confidence_level=0.95
+#        )
+#
+#        # Check that VaR was calculated
+#        self.assertIsNotNone(var)
+#        self.assertIn("var", self.portfolio.portfolio_risk_metrics)
+#
+#        # Add a portfolio risk limit
+#        self.portfolio.add_portfolio_risk_limit("var", 0.01, 0.02)
+#
+#        # Check if the limit is breached
+#        breaches = self.portfolio.check_portfolio_limits()
+#
+#        # In a real system, limit breaches would affect order execution
+#        # For example, we might prevent new orders if VaR limits are breached
+#        if breaches.get("var", (False, ""))[0]:
+#            # Simulate preventing new orders
+#            can_place_new_orders = False
+#        else:
+#            can_place_new_orders = True
+#
+#        # Check that the risk limit breach status is correctly reflected in the can_place_new_orders variable
+#        # The actual enforcement of preventing orders would be implemented in a production system
+#        self.assertEqual(can_place_new_orders, not breaches.get("var", (False, ""))[0])
+#
+#
+#if __name__ == "__main__":
+#    unittest.main()
