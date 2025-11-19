@@ -75,4 +75,4 @@ AlphaMind is built using a modern microservices architecture with the following 
 - Testing infrastructure
 - Code quality tools
 - Version control workflow
-- Documentation standards 
+- Documentation standards

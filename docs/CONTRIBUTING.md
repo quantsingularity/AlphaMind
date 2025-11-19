@@ -43,10 +43,10 @@ We welcome suggestions for enhancements! Please create an issue with:
    ```
    cd backend
    pip install -r requirements.txt
-   
+
    cd ../web-frontend
    npm install
-   
+
    cd ../mobile-frontend
    yarn install
    ```
@@ -54,10 +54,10 @@ We welcome suggestions for enhancements! Please create an issue with:
    ```
    cd tests
    pytest
-   
+
    cd ../web-frontend
    npm test
-   
+
    cd ../mobile-frontend
    yarn test
    ```

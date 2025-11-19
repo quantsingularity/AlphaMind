@@ -52,7 +52,7 @@ run_timed() {
   local status=$?
   local end_time=$(date +%s)
   local duration=$((end_time - start_time))
-  
+
   echo -e "${COLOR_CYAN}Command completed in ${duration}s${COLOR_RESET}"
   return $status
 }
@@ -159,7 +159,7 @@ print_info "Setting up build configuration for $BUILD_ENV environment..."
 # Create or update .env file based on environment
 if [[ ! -f ".env.$BUILD_ENV" ]]; then
   print_warning ".env.$BUILD_ENV file not found, creating default configuration..."
-  
+
   case "$BUILD_ENV" in
     development)
       cat > ".env.$BUILD_ENV" << EOF
@@ -237,30 +237,30 @@ echo "  Report directory: $REPORT_DIR"
 
 build_backend() {
   print_header "Building Backend"
-  
+
   if [[ ! -d "backend" ]]; then
     print_warning "Backend directory not found, skipping"
     return
   fi
-  
+
   cd backend
-  
+
   # Clean build if requested
   if [[ "$CLEAN_BUILD" == "true" ]]; then
     print_info "Cleaning previous build artifacts..."
     rm -rf build dist *.egg-info
     find . -name "__pycache__" -type d -exec rm -rf {} +
   fi
-  
+
   # Install backend dependencies
   print_info "Installing backend dependencies..."
   pip install -r requirements.txt
-  
+
   # Build Python package
   print_info "Building Python package..."
   if [[ -f "setup.py" ]]; then
     python setup.py build
-    
+
     if [[ "$BUILD_ENV" == "production" ]]; then
       print_info "Creating distribution packages..."
       python setup.py sdist bdist_wheel
@@ -271,7 +271,7 @@ build_backend() {
   else
     print_warning "No setup.py or pyproject.toml found, skipping package build"
   fi
-  
+
   # Run type checking
   print_info "Running type checking..."
   if command_exists mypy; then
@@ -279,7 +279,7 @@ build_backend() {
   else
     print_warning "mypy not found, skipping type checking"
   fi
-  
+
   # Generate API documentation if in production mode
   if [[ "$BUILD_ENV" == "production" ]]; then
     print_info "Generating API documentation..."
@@ -291,7 +291,7 @@ build_backend() {
       print_warning "sphinx-build not found or docs directory missing, skipping documentation generation"
     fi
   fi
-  
+
   print_success "Backend build completed"
   cd "$PROJECT_ROOT"
 }
@@ -300,20 +300,20 @@ build_backend() {
 
 build_web_frontend() {
   print_header "Building Web Frontend"
-  
+
   if [[ ! -d "web-frontend" ]]; then
     print_warning "Web frontend directory not found, skipping"
     return
   fi
-  
+
   cd web-frontend
-  
+
   # Clean build if requested
   if [[ "$CLEAN_BUILD" == "true" ]]; then
     print_info "Cleaning previous build artifacts..."
     rm -rf build dist .cache node_modules/.cache
   fi
-  
+
   # Install dependencies
   print_info "Installing web frontend dependencies..."
   if [[ -f "yarn.lock" ]]; then
@@ -321,29 +321,29 @@ build_web_frontend() {
   else
     npm ci
   fi
-  
+
   # Set up environment variables for the build
   print_info "Setting up environment variables for $BUILD_ENV..."
-  
+
   # Create or update .env file based on environment
   if [[ -f "../.env.$BUILD_ENV" ]]; then
     cp "../.env.$BUILD_ENV" .env
   fi
-  
+
   # Add REACT_APP_ prefix to environment variables for React apps
   if [[ -f "package.json" ]] && grep -q "react-scripts" package.json; then
     print_info "Detected React app, preparing environment variables..."
-    
+
     # Create .env.local file with REACT_APP_ prefixed variables
     if [[ -f ".env" ]]; then
       cat .env | sed 's/^/REACT_APP_/' > .env.local
     fi
   fi
-  
+
   # Build command and options
   BUILD_CMD=""
   BUILD_OPTS=""
-  
+
   if [[ -f "package.json" ]]; then
     # Determine build command based on package.json
     if grep -q "\"build:$BUILD_ENV\"" package.json; then
@@ -351,16 +351,16 @@ build_web_frontend() {
     elif grep -q "\"build\"" package.json; then
       BUILD_CMD="build"
     fi
-    
+
     # Add options based on configuration
     if [[ "$VERBOSE" == "true" ]]; then
       BUILD_OPTS="$BUILD_OPTS --verbose"
     fi
-    
+
     if [[ "$CACHE" == "false" ]]; then
       BUILD_OPTS="$BUILD_OPTS --no-cache"
     fi
-    
+
     if [[ "$ANALYZE" == "true" ]]; then
       # Check if webpack-bundle-analyzer is installed
       if ! grep -q "webpack-bundle-analyzer" package.json; then
@@ -371,11 +371,11 @@ build_web_frontend() {
           npm install --save-dev webpack-bundle-analyzer
         fi
       fi
-      
+
       # Set environment variable for bundle analysis
       export ANALYZE=true
     fi
-    
+
     # Run the build
     print_info "Building web frontend for $BUILD_ENV environment..."
     if [[ -n "$BUILD_CMD" ]]; then
@@ -394,11 +394,11 @@ build_web_frontend() {
     cd "$PROJECT_ROOT"
     return 1
   fi
-  
+
   # Optimize assets if enabled
   if [[ "$OPTIMIZE" == "true" && "$BUILD_ENV" == "production" ]]; then
     print_info "Optimizing assets..."
-    
+
     # Check if build output directory exists
     BUILD_DIR=""
     if [[ -d "dist" ]]; then
@@ -410,7 +410,7 @@ build_web_frontend() {
       cd "$PROJECT_ROOT"
       return
     fi
-    
+
     # Optimize images
     if command_exists imagemin; then
       print_info "Optimizing images..."
@@ -418,12 +418,12 @@ build_web_frontend() {
     else
       print_warning "imagemin not found, skipping image optimization"
     fi
-    
+
     # Gzip assets for serving with compression
     print_info "Creating gzipped versions of assets..."
     find "$BUILD_DIR" -type f \( -name "*.js" -o -name "*.css" -o -name "*.html" -o -name "*.json" -o -name "*.svg" \) -exec gzip -9 -k {} \;
   fi
-  
+
   print_success "Web frontend build completed"
   cd "$PROJECT_ROOT"
 }
@@ -432,19 +432,19 @@ build_web_frontend() {
 
 build_mobile_frontend() {
   print_header "Building Mobile Frontend"
-  
+
   if [[ ! -d "mobile-frontend" ]]; then
     print_warning "Mobile frontend directory not found, skipping"
     return
   fi
-  
+
   cd mobile-frontend
-  
+
   # Clean build if requested
   if [[ "$CLEAN_BUILD" == "true" ]]; then
     print_info "Cleaning previous build artifacts..."
     rm -rf build dist android/app/build ios/build
-    
+
     # For React Native
     if [[ -d "android" && -d "ios" ]]; then
       print_info "Cleaning React Native build cache..."
@@ -453,7 +453,7 @@ build_mobile_frontend() {
       rm -rf node_modules/.cache
     fi
   fi
-  
+
   # Install dependencies
   print_info "Installing mobile frontend dependencies..."
   if [[ -f "yarn.lock" ]]; then
@@ -461,19 +461,19 @@ build_mobile_frontend() {
   else
     npm ci
   fi
-  
+
   # Set up environment variables for the build
   print_info "Setting up environment variables for $BUILD_ENV..."
-  
+
   # Create or update .env file based on environment
   if [[ -f "../.env.$BUILD_ENV" ]]; then
     cp "../.env.$BUILD_ENV" .env
   fi
-  
+
   # Build command and options
   BUILD_CMD=""
   BUILD_OPTS=""
-  
+
   if [[ -f "package.json" ]]; then
     # Determine build command based on package.json and environment
     if grep -q "\"build:$BUILD_ENV\"" package.json; then
@@ -481,7 +481,7 @@ build_mobile_frontend() {
     elif grep -q "\"build\"" package.json; then
       BUILD_CMD="build"
     fi
-    
+
     # For React Native, use specific platform builds if available
     if [[ -d "android" && -d "ios" ]]; then
       if [[ "$BUILD_ENV" == "production" ]]; then
@@ -498,12 +498,12 @@ build_mobile_frontend() {
         fi
       fi
     fi
-    
+
     # Add options based on configuration
     if [[ "$VERBOSE" == "true" ]]; then
       BUILD_OPTS="$BUILD_OPTS --verbose"
     fi
-    
+
     # Run the build
     print_info "Building mobile frontend for $BUILD_ENV environment..."
     if [[ -n "$BUILD_CMD" ]]; then
@@ -514,7 +514,7 @@ build_mobile_frontend() {
       fi
     else
       print_warning "No suitable build script found in package.json"
-      
+
       # For React Native, try direct build commands if no script is found
       if [[ -d "android" ]]; then
         print_info "Attempting direct Android build..."
@@ -532,7 +532,7 @@ build_mobile_frontend() {
     cd "$PROJECT_ROOT"
     return 1
   fi
-  
+
   print_success "Mobile frontend build completed"
   cd "$PROJECT_ROOT"
 }
@@ -541,12 +541,12 @@ build_mobile_frontend() {
 
 generate_build_report() {
   print_header "Generating Build Report"
-  
+
   REPORT_FILE="$REPORT_DIR/build-report.html"
-  
+
   # Create report directory if it doesn't exist
   mkdir -p "$REPORT_DIR"
-  
+
   # Create report HTML file
   cat > "$REPORT_FILE" << EOF
 <!DOCTYPE html>
@@ -613,7 +613,7 @@ generate_build_report() {
   <div class="container">
     <h1>AlphaMind Build Report</h1>
     <div class="timestamp">Generated on $(date)</div>
-    
+
     <div class="summary-box">
       <h2>Build Summary</h2>
       <p>
@@ -625,9 +625,9 @@ generate_build_report() {
         <strong>Build analysis:</strong> ${ANALYZE}
       </p>
     </div>
-    
+
     <h2>Build Results</h2>
-    
+
     <table>
       <tr>
         <th>Component</th>
@@ -635,12 +635,12 @@ generate_build_report() {
         <th>Output Location</th>
       </tr>
 EOF
-  
+
   # Add backend build results
   if [[ " ${COMPONENTS[*]} " =~ " backend " ]]; then
     echo "      <tr>" >> "$REPORT_FILE"
     echo "        <td>Backend</td>" >> "$REPORT_FILE"
-    
+
     if [[ -d "backend/dist" ]]; then
       echo "        <td class=\"success\">Success</td>" >> "$REPORT_FILE"
       echo "        <td>backend/dist</td>" >> "$REPORT_FILE"
@@ -651,15 +651,15 @@ EOF
       echo "        <td class=\"warning\">Unknown</td>" >> "$REPORT_FILE"
       echo "        <td>N/A</td>" >> "$REPORT_FILE"
     fi
-    
+
     echo "      </tr>" >> "$REPORT_FILE"
   fi
-  
+
   # Add web frontend build results
   if [[ " ${COMPONENTS[*]} " =~ " web-frontend " ]]; then
     echo "      <tr>" >> "$REPORT_FILE"
     echo "        <td>Web Frontend</td>" >> "$REPORT_FILE"
-    
+
     if [[ -d "web-frontend/dist" ]]; then
       echo "        <td class=\"success\">Success</td>" >> "$REPORT_FILE"
       echo "        <td>web-frontend/dist</td>" >> "$REPORT_FILE"
@@ -670,15 +670,15 @@ EOF
       echo "        <td class=\"warning\">Unknown</td>" >> "$REPORT_FILE"
       echo "        <td>N/A</td>" >> "$REPORT_FILE"
     fi
-    
+
     echo "      </tr>" >> "$REPORT_FILE"
   fi
-  
+
   # Add mobile frontend build results
   if [[ " ${COMPONENTS[*]} " =~ " mobile-frontend " ]]; then
     echo "      <tr>" >> "$REPORT_FILE"
     echo "        <td>Mobile Frontend</td>" >> "$REPORT_FILE"
-    
+
     if [[ -d "mobile-frontend/android/app/build/outputs/apk" ]]; then
       echo "        <td class=\"success\">Success</td>" >> "$REPORT_FILE"
       echo "        <td>mobile-frontend/android/app/build/outputs/apk</td>" >> "$REPORT_FILE"
@@ -695,21 +695,21 @@ EOF
       echo "        <td class=\"warning\">Unknown</td>" >> "$REPORT_FILE"
       echo "        <td>N/A</td>" >> "$REPORT_FILE"
     fi
-    
+
     echo "      </tr>" >> "$REPORT_FILE"
   fi
-  
+
   # Close HTML
   cat >> "$REPORT_FILE" << EOF
     </table>
-    
+
     <h2>Build Artifacts</h2>
-    
+
     <p>The following build artifacts were generated:</p>
-    
+
     <ul>
 EOF
-  
+
   # List backend artifacts
   if [[ " ${COMPONENTS[*]} " =~ " backend " ]]; then
     if [[ -d "backend/dist" ]]; then
@@ -721,12 +721,12 @@ EOF
       echo "        </ul>" >> "$REPORT_FILE"
       echo "      </li>" >> "$REPORT_FILE"
     fi
-    
+
     if [[ -d "backend/docs/build/html" ]]; then
       echo "      <li><strong>Backend Documentation:</strong> backend/docs/build/html</li>" >> "$REPORT_FILE"
     fi
   fi
-  
+
   # List web frontend artifacts
   if [[ " ${COMPONENTS[*]} " =~ " web-frontend " ]]; then
     WEB_BUILD_DIR=""
@@ -735,32 +735,32 @@ EOF
     elif [[ -d "web-frontend/build" ]]; then
       WEB_BUILD_DIR="web-frontend/build"
     fi
-    
+
     if [[ -n "$WEB_BUILD_DIR" ]]; then
       echo "      <li><strong>Web Frontend Build:</strong> $WEB_BUILD_DIR</li>" >> "$REPORT_FILE"
-      
+
       # List bundle size if available
       if [[ -f "$WEB_BUILD_DIR/asset-manifest.json" ]]; then
         echo "      <li><strong>Web Frontend Bundle:</strong>" >> "$REPORT_FILE"
         echo "        <ul>" >> "$REPORT_FILE"
-        
+
         # Find JS and CSS files
         find "$WEB_BUILD_DIR" -type f -name "*.js" -not -path "*/node_modules/*" | sort | while read -r file; do
           size=$(du -h "$file" | cut -f1)
           echo "          <li>$(basename "$file") - $size</li>" >> "$REPORT_FILE"
         done
-        
+
         find "$WEB_BUILD_DIR" -type f -name "*.css" -not -path "*/node_modules/*" | sort | while read -r file; do
           size=$(du -h "$file" | cut -f1)
           echo "          <li>$(basename "$file") - $size</li>" >> "$REPORT_FILE"
         done
-        
+
         echo "        </ul>" >> "$REPORT_FILE"
         echo "      </li>" >> "$REPORT_FILE"
       fi
     fi
   fi
-  
+
   # List mobile frontend artifacts
   if [[ " ${COMPONENTS[*]} " =~ " mobile-frontend " ]]; then
     if [[ -d "mobile-frontend/android/app/build/outputs/apk" ]]; then
@@ -773,16 +773,16 @@ EOF
       echo "        </ul>" >> "$REPORT_FILE"
       echo "      </li>" >> "$REPORT_FILE"
     fi
-    
+
     if [[ -d "mobile-frontend/ios/build" ]]; then
       echo "      <li><strong>iOS Build:</strong> mobile-frontend/ios/build</li>" >> "$REPORT_FILE"
     fi
   fi
-  
+
   # Close HTML
   cat >> "$REPORT_FILE" << EOF
     </ul>
-    
+
     <h2>Next Steps</h2>
     <p>
       The build artifacts are now ready for deployment. Use the deployment script to deploy to the ${BUILD_ENV} environment:
@@ -792,9 +792,9 @@ EOF
 </body>
 </html>
 EOF
-  
+
   print_success "Build report generated: $REPORT_FILE"
-  
+
   # Open the report in a browser if possible
   if command_exists xdg-open; then
     xdg-open "$REPORT_FILE" &>/dev/null &

@@ -44,4 +44,3 @@
   systemd:
     name: apparmor
     state: restarted
-

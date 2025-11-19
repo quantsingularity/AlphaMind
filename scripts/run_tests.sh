@@ -154,7 +154,7 @@ if [[ -d "web-frontend" || -d "mobile-frontend" ]]; then
     print_error "Node.js not found. Please install Node.js first."
     exit 1
   fi
-  
+
   if [[ -d "web-frontend" ]]; then
     cd web-frontend
     if [[ ! -d "node_modules" ]]; then
@@ -167,7 +167,7 @@ if [[ -d "web-frontend" || -d "mobile-frontend" ]]; then
     fi
     cd "$PROJECT_ROOT"
   fi
-  
+
   if [[ -d "mobile-frontend" ]]; then
     cd mobile-frontend
     if [[ ! -d "node_modules" ]]; then
@@ -235,27 +235,27 @@ echo "  Fail fast: $FAIL_FAST"
 
 run_unit_tests() {
   print_header "Running Unit Tests"
-  
+
   # Backend unit tests
   if [[ "$TEST_TYPE" == "all" || "$TEST_TYPE" == "unit" ]]; then
     print_info "Running backend unit tests..."
-    
+
     UNIT_TEST_ARGS="$PYTEST_ARGS --html=$REPORT_DIR/unit/backend-report.html --self-contained-html"
-    
+
     if [[ -n "$COMPONENT" ]]; then
       print_info "Testing component: $COMPONENT"
       python -m pytest $UNIT_TEST_ARGS "$BACKEND_TEST_PATH/tests/unit"
     else
       python -m pytest $UNIT_TEST_ARGS backend/tests/unit tests/unit
     fi
-    
+
     print_success "Backend unit tests completed"
   fi
-  
+
   # Web frontend unit tests
   if [[ ("$TEST_TYPE" == "all" || "$TEST_TYPE" == "unit") && -d "web-frontend" && (-z "$COMPONENT" || "$COMPONENT" == "web-frontend") ]]; then
     print_info "Running web frontend unit tests..."
-    
+
     cd web-frontend
     if [[ -f "package.json" ]]; then
       if grep -q "\"test\"" package.json; then
@@ -264,7 +264,7 @@ run_unit_tests() {
         else
           npm test -- --coverage --reporters=default --reporters=jest-junit
         fi
-        
+
         # Copy test reports
         if [[ -d "coverage" ]]; then
           mkdir -p "$REPORT_DIR/coverage/web-frontend"
@@ -273,7 +273,7 @@ run_unit_tests() {
         if [[ -f "junit.xml" ]]; then
           cp junit.xml "$REPORT_DIR/unit/web-frontend-junit.xml"
         fi
-        
+
         print_success "Web frontend unit tests completed"
       else
         print_warning "No test script found in web-frontend/package.json"
@@ -283,11 +283,11 @@ run_unit_tests() {
     fi
     cd "$PROJECT_ROOT"
   fi
-  
+
   # Mobile frontend unit tests
   if [[ ("$TEST_TYPE" == "all" || "$TEST_TYPE" == "unit") && -d "mobile-frontend" && (-z "$COMPONENT" || "$COMPONENT" == "mobile-frontend") ]]; then
     print_info "Running mobile frontend unit tests..."
-    
+
     cd mobile-frontend
     if [[ -f "package.json" ]]; then
       if grep -q "\"test\"" package.json; then
@@ -296,7 +296,7 @@ run_unit_tests() {
         else
           npm test -- --coverage --reporters=default --reporters=jest-junit
         fi
-        
+
         # Copy test reports
         if [[ -d "coverage" ]]; then
           mkdir -p "$REPORT_DIR/coverage/mobile-frontend"
@@ -305,7 +305,7 @@ run_unit_tests() {
         if [[ -f "junit.xml" ]]; then
           cp junit.xml "$REPORT_DIR/unit/mobile-frontend-junit.xml"
         fi
-        
+
         print_success "Mobile frontend unit tests completed"
       else
         print_warning "No test script found in mobile-frontend/package.json"
@@ -321,27 +321,27 @@ run_unit_tests() {
 
 run_integration_tests() {
   print_header "Running Integration Tests"
-  
+
   # Backend integration tests
   if [[ "$TEST_TYPE" == "all" || "$TEST_TYPE" == "integration" ]]; then
     print_info "Running backend integration tests..."
-    
+
     INTEGRATION_TEST_ARGS="$PYTEST_ARGS --html=$REPORT_DIR/integration/backend-report.html --self-contained-html"
-    
+
     if [[ -n "$COMPONENT" ]]; then
       print_info "Testing component: $COMPONENT"
       python -m pytest $INTEGRATION_TEST_ARGS "$BACKEND_TEST_PATH/tests/integration"
     else
       python -m pytest $INTEGRATION_TEST_ARGS backend/tests/integration tests/integration
     fi
-    
+
     print_success "Backend integration tests completed"
   fi
-  
+
   # Web frontend integration tests
   if [[ ("$TEST_TYPE" == "all" || "$TEST_TYPE" == "integration") && -d "web-frontend" && (-z "$COMPONENT" || "$COMPONENT" == "web-frontend") ]]; then
     print_info "Running web frontend integration tests..."
-    
+
     cd web-frontend
     if [[ -f "package.json" ]]; then
       if grep -q "\"test:integration\"" package.json; then
@@ -350,12 +350,12 @@ run_integration_tests() {
         else
           npm run test:integration
         fi
-        
+
         # Copy test reports if they exist
         if [[ -f "integration-results.xml" ]]; then
           cp integration-results.xml "$REPORT_DIR/integration/web-frontend-results.xml"
         fi
-        
+
         print_success "Web frontend integration tests completed"
       else
         print_warning "No integration test script found in web-frontend/package.json"
@@ -365,11 +365,11 @@ run_integration_tests() {
     fi
     cd "$PROJECT_ROOT"
   fi
-  
+
   # Mobile frontend integration tests
   if [[ ("$TEST_TYPE" == "all" || "$TEST_TYPE" == "integration") && -d "mobile-frontend" && (-z "$COMPONENT" || "$COMPONENT" == "mobile-frontend") ]]; then
     print_info "Running mobile frontend integration tests..."
-    
+
     cd mobile-frontend
     if [[ -f "package.json" ]]; then
       if grep -q "\"test:integration\"" package.json; then
@@ -378,12 +378,12 @@ run_integration_tests() {
         else
           npm run test:integration
         fi
-        
+
         # Copy test reports if they exist
         if [[ -f "integration-results.xml" ]]; then
           cp integration-results.xml "$REPORT_DIR/integration/mobile-frontend-results.xml"
         fi
-        
+
         print_success "Mobile frontend integration tests completed"
       else
         print_warning "No integration test script found in mobile-frontend/package.json"
@@ -399,23 +399,23 @@ run_integration_tests() {
 
 run_e2e_tests() {
   print_header "Running End-to-End Tests"
-  
+
   # Check if we should run E2E tests
   if [[ "$TEST_TYPE" != "all" && "$TEST_TYPE" != "e2e" ]]; then
     return
   fi
-  
+
   # Check if component filtering allows E2E tests
   if [[ -n "$COMPONENT" && "$COMPONENT" != "e2e" && "$COMPONENT" != "web-frontend" && "$COMPONENT" != "mobile-frontend" ]]; then
     print_info "Skipping E2E tests for component: $COMPONENT"
     return
   fi
-  
+
   # Backend E2E tests
   print_info "Running backend E2E tests..."
-  
+
   E2E_TEST_ARGS="$PYTEST_ARGS --html=$REPORT_DIR/e2e/backend-report.html --self-contained-html"
-  
+
   if [[ -d "tests/e2e" ]]; then
     python -m pytest $E2E_TEST_ARGS tests/e2e
     print_success "Backend E2E tests completed"
@@ -425,11 +425,11 @@ run_e2e_tests() {
   else
     print_warning "No backend E2E tests found"
   fi
-  
+
   # Web frontend E2E tests
   if [[ -d "web-frontend" && (-z "$COMPONENT" || "$COMPONENT" == "web-frontend" || "$COMPONENT" == "e2e") ]]; then
     print_info "Running web frontend E2E tests..."
-    
+
     cd web-frontend
     if [[ -f "package.json" ]]; then
       if grep -q "\"test:e2e\"" package.json; then
@@ -438,13 +438,13 @@ run_e2e_tests() {
         else
           npm run test:e2e
         fi
-        
+
         # Copy test reports if they exist
         if [[ -d "cypress/reports" ]]; then
           mkdir -p "$REPORT_DIR/e2e/web-frontend"
           cp -r cypress/reports/* "$REPORT_DIR/e2e/web-frontend/"
         fi
-        
+
         print_success "Web frontend E2E tests completed"
       else
         print_warning "No E2E test script found in web-frontend/package.json"
@@ -454,11 +454,11 @@ run_e2e_tests() {
     fi
     cd "$PROJECT_ROOT"
   fi
-  
+
   # Mobile frontend E2E tests
   if [[ -d "mobile-frontend" && (-z "$COMPONENT" || "$COMPONENT" == "mobile-frontend" || "$COMPONENT" == "e2e") ]]; then
     print_info "Running mobile frontend E2E tests..."
-    
+
     cd mobile-frontend
     if [[ -f "package.json" ]]; then
       if grep -q "\"test:e2e\"" package.json; then
@@ -467,13 +467,13 @@ run_e2e_tests() {
         else
           npm run test:e2e
         fi
-        
+
         # Copy test reports if they exist
         if [[ -d "e2e/reports" ]]; then
           mkdir -p "$REPORT_DIR/e2e/mobile-frontend"
           cp -r e2e/reports/* "$REPORT_DIR/e2e/mobile-frontend/"
         fi
-        
+
         print_success "Mobile frontend E2E tests completed"
       else
         print_warning "No E2E test script found in mobile-frontend/package.json"
@@ -489,9 +489,9 @@ run_e2e_tests() {
 
 generate_test_summary() {
   print_header "Generating Test Summary"
-  
+
   SUMMARY_FILE="$REPORT_DIR/test-summary.html"
-  
+
   # Create summary HTML file
   cat > "$SUMMARY_FILE" << EOF
 <!DOCTYPE html>
@@ -565,7 +565,7 @@ generate_test_summary() {
   <div class="container">
     <h1>AlphaMind Test Summary</h1>
     <div class="timestamp">Generated on $(date)</div>
-    
+
     <div class="summary-box">
       <h2>Test Run Summary</h2>
       <p>
@@ -575,9 +575,9 @@ generate_test_summary() {
         <strong>Report Directory:</strong> ${REPORT_DIR}
       </p>
     </div>
-    
+
     <h2>Test Reports</h2>
-    
+
     <h3>Unit Tests</h3>
     <table>
       <tr>
@@ -586,7 +586,7 @@ generate_test_summary() {
         <th>Report</th>
       </tr>
 EOF
-  
+
   # Add unit test reports
   if [[ -f "$REPORT_DIR/unit/backend-report.html" ]]; then
     echo "      <tr>" >> "$SUMMARY_FILE"
@@ -595,7 +595,7 @@ EOF
     echo "        <td><a href=\"unit/backend-report.html\" class=\"report-link\">View Report</a></td>" >> "$SUMMARY_FILE"
     echo "      </tr>" >> "$SUMMARY_FILE"
   fi
-  
+
   if [[ -f "$REPORT_DIR/unit/web-frontend-junit.xml" ]]; then
     echo "      <tr>" >> "$SUMMARY_FILE"
     echo "        <td>Web Frontend</td>" >> "$SUMMARY_FILE"
@@ -603,7 +603,7 @@ EOF
     echo "        <td><a href=\"unit/web-frontend-junit.xml\" class=\"report-link\">View Report</a></td>" >> "$SUMMARY_FILE"
     echo "      </tr>" >> "$SUMMARY_FILE"
   fi
-  
+
   if [[ -f "$REPORT_DIR/unit/mobile-frontend-junit.xml" ]]; then
     echo "      <tr>" >> "$SUMMARY_FILE"
     echo "        <td>Mobile Frontend</td>" >> "$SUMMARY_FILE"
@@ -611,11 +611,11 @@ EOF
     echo "        <td><a href=\"unit/mobile-frontend-junit.xml\" class=\"report-link\">View Report</a></td>" >> "$SUMMARY_FILE"
     echo "      </tr>" >> "$SUMMARY_FILE"
   fi
-  
+
   # Continue with integration tests
   cat >> "$SUMMARY_FILE" << EOF
     </table>
-    
+
     <h3>Integration Tests</h3>
     <table>
       <tr>
@@ -624,7 +624,7 @@ EOF
         <th>Report</th>
       </tr>
 EOF
-  
+
   # Add integration test reports
   if [[ -f "$REPORT_DIR/integration/backend-report.html" ]]; then
     echo "      <tr>" >> "$SUMMARY_FILE"
@@ -633,7 +633,7 @@ EOF
     echo "        <td><a href=\"integration/backend-report.html\" class=\"report-link\">View Report</a></td>" >> "$SUMMARY_FILE"
     echo "      </tr>" >> "$SUMMARY_FILE"
   fi
-  
+
   if [[ -f "$REPORT_DIR/integration/web-frontend-results.xml" ]]; then
     echo "      <tr>" >> "$SUMMARY_FILE"
     echo "        <td>Web Frontend</td>" >> "$SUMMARY_FILE"
@@ -641,7 +641,7 @@ EOF
     echo "        <td><a href=\"integration/web-frontend-results.xml\" class=\"report-link\">View Report</a></td>" >> "$SUMMARY_FILE"
     echo "      </tr>" >> "$SUMMARY_FILE"
   fi
-  
+
   if [[ -f "$REPORT_DIR/integration/mobile-frontend-results.xml" ]]; then
     echo "      <tr>" >> "$SUMMARY_FILE"
     echo "        <td>Mobile Frontend</td>" >> "$SUMMARY_FILE"
@@ -649,11 +649,11 @@ EOF
     echo "        <td><a href=\"integration/mobile-frontend-results.xml\" class=\"report-link\">View Report</a></td>" >> "$SUMMARY_FILE"
     echo "      </tr>" >> "$SUMMARY_FILE"
   fi
-  
+
   # Continue with E2E tests
   cat >> "$SUMMARY_FILE" << EOF
     </table>
-    
+
     <h3>End-to-End Tests</h3>
     <table>
       <tr>
@@ -662,7 +662,7 @@ EOF
         <th>Report</th>
       </tr>
 EOF
-  
+
   # Add E2E test reports
   if [[ -f "$REPORT_DIR/e2e/backend-report.html" ]]; then
     echo "      <tr>" >> "$SUMMARY_FILE"
@@ -671,7 +671,7 @@ EOF
     echo "        <td><a href=\"e2e/backend-report.html\" class=\"report-link\">View Report</a></td>" >> "$SUMMARY_FILE"
     echo "      </tr>" >> "$SUMMARY_FILE"
   fi
-  
+
   if [[ -d "$REPORT_DIR/e2e/web-frontend" ]]; then
     echo "      <tr>" >> "$SUMMARY_FILE"
     echo "        <td>Web Frontend</td>" >> "$SUMMARY_FILE"
@@ -679,7 +679,7 @@ EOF
     echo "        <td><a href=\"e2e/web-frontend/\" class=\"report-link\">View Reports</a></td>" >> "$SUMMARY_FILE"
     echo "      </tr>" >> "$SUMMARY_FILE"
   fi
-  
+
   if [[ -d "$REPORT_DIR/e2e/mobile-frontend" ]]; then
     echo "      <tr>" >> "$SUMMARY_FILE"
     echo "        <td>Mobile Frontend</td>" >> "$SUMMARY_FILE"
@@ -687,29 +687,29 @@ EOF
     echo "        <td><a href=\"e2e/mobile-frontend/\" class=\"report-link\">View Reports</a></td>" >> "$SUMMARY_FILE"
     echo "      </tr>" >> "$SUMMARY_FILE"
   fi
-  
+
   # Add coverage section
   cat >> "$SUMMARY_FILE" << EOF
     </table>
-    
+
     <h3>Coverage Reports</h3>
 EOF
-  
+
   if [[ "$COVERAGE" == "true" ]]; then
     echo "    <p>Coverage reports are available <a href=\"coverage/html/index.html\" class=\"report-link\">here</a>.</p>" >> "$SUMMARY_FILE"
   else
     echo "    <p>Coverage reporting was disabled for this test run.</p>" >> "$SUMMARY_FILE"
   fi
-  
+
   # Close HTML
   cat >> "$SUMMARY_FILE" << EOF
   </div>
 </body>
 </html>
 EOF
-  
+
   print_success "Test summary generated: $SUMMARY_FILE"
-  
+
   # Open the summary in a browser if possible
   if command_exists xdg-open; then
     xdg-open "$SUMMARY_FILE" &>/dev/null &

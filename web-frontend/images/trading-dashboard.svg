@@ -12,13 +12,13 @@
     .legend-item { font-family: Arial; font-size: 12px; }
     .legend-box { fill: white; stroke: #e9ecef; stroke-width: 1; }
   </style>
-  
+
   <!-- Background -->
   <rect class="chart-bg" x="0" y="0" width="800" height="500" rx="8" />
-  
+
   <!-- Chart Title -->
   <text class="chart-title" x="400" y="30" text-anchor="middle">Stock Price Performance (2020-2023)</text>
-  
+
   <!-- Chart Area -->
   <g transform="translate(60, 50)">
     <!-- Grid Lines - Horizontal -->
@@ -28,14 +28,14 @@
     <line class="grid-line" x1="0" y1="240" x2="700" y2="240" />
     <line class="grid-line" x1="0" y1="320" x2="700" y2="320" />
     <line class="grid-line" x1="0" y1="400" x2="700" y2="400" />
-    
+
     <!-- Grid Lines - Vertical -->
     <line class="grid-line" x1="0" y1="0" x2="0" y2="400" />
     <line class="grid-line" x1="175" y1="0" x2="175" y2="400" />
     <line class="grid-line" x1="350" y1="0" x2="350" y2="400" />
     <line class="grid-line" x1="525" y1="0" x2="525" y2="400" />
     <line class="grid-line" x1="700" y1="0" x2="700" y2="400" />
-    
+
     <!-- Y-Axis Labels -->
     <text class="axis-label" x="-10" y="0" text-anchor="end" dominant-baseline="middle">$400</text>
     <text class="axis-label" x="-10" y="80" text-anchor="end" dominant-baseline="middle">$320</text>
@@ -43,14 +43,14 @@
     <text class="axis-label" x="-10" y="240" text-anchor="end" dominant-baseline="middle">$160</text>
     <text class="axis-label" x="-10" y="320" text-anchor="end" dominant-baseline="middle">$80</text>
     <text class="axis-label" x="-10" y="400" text-anchor="end" dominant-baseline="middle">$0</text>
-    
+
     <!-- X-Axis Labels -->
     <text class="axis-label" x="0" y="420" text-anchor="middle">Jan 2020</text>
     <text class="axis-label" x="175" y="420" text-anchor="middle">Jan 2021</text>
     <text class="axis-label" x="350" y="420" text-anchor="middle">Jan 2022</text>
     <text class="axis-label" x="525" y="420" text-anchor="middle">Jul 2022</text>
     <text class="axis-label" x="700" y="420" text-anchor="middle">Jan 2023</text>
-    
+
     <!-- Chart Lines -->
     <path class="line-aapl" d="M0,320 C35,300 70,280 105,260 S175,240 210,220 S280,200 315,180 S385,160 420,140 S490,120 525,100 S595,80 630,60 S700,40 700,40" />
     <path class="line-msft" d="M0,340 C35,330 70,320 105,310 S175,300 210,290 S280,280 315,270 S385,260 420,250 S490,240 525,230 S595,220 630,210 S700,200 700,200" />
@@ -58,22 +58,22 @@
     <path class="line-amzn" d="M0,280 C35,260 70,240 105,220 S175,200 210,180 S280,160 315,140 S385,120 420,100 S490,80 525,60 S595,40 630,20 S700,0 700,0" />
     <path class="line-fb" d="M0,360 C35,350 70,340 105,330 S175,320 210,310 S280,300 315,290 S385,280 420,270 S490,260 525,250 S595,240 630,230 S700,220 700,220" />
   </g>
-  
+
   <!-- Legend -->
   <rect class="legend-box" x="580" y="60" width="180" height="130" rx="4" />
   <g transform="translate(590, 80)">
     <line class="line-aapl" x1="0" y1="0" x2="20" y2="0" />
     <text class="legend-item" x="30" y="4">AAPL</text>
-    
+
     <line class="line-msft" x1="0" y1="20" x2="20" y2="20" />
     <text class="legend-item" x="30" y="24">MSFT</text>
-    
+
     <line class="line-googl" x1="0" y1="40" x2="20" y2="40" />
     <text class="legend-item" x="30" y="44">GOOGL</text>
-    
+
     <line class="line-amzn" x1="0" y1="60" x2="20" y2="60" />
     <text class="legend-item" x="30" y="64">AMZN</text>
-    
+
     <line class="line-fb" x1="0" y1="80" x2="20" y2="80" />
     <text class="legend-item" x="30" y="84">FB</text>
   </g>

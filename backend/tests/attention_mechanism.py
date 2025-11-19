@@ -158,4 +158,3 @@ class FinancialTimeSeriesTransformer(tf.keras.Model):
         output = self.final_layer(x_encoded)
 
         return output
-

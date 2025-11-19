@@ -306,4 +306,3 @@ This script orchestrates the entire release process for the AlphaMind project by
 *   Git tagging requires user input for the version number.
 *   Deployment requires user confirmation if enabled.
 *   Ensure the `deploy.sh` script is fully configured and tested before enabling `AUTO_DEPLOY` in `release.sh`.
-

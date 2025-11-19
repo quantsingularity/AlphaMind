@@ -2,7 +2,7 @@
 Refinitiv API connector for financial data.
 
 This module provides a connector for accessing financial market data
-from Refinitiv (formerly Thomson Reuters), including market data, 
+from Refinitiv (formerly Thomson Reuters), including market data,
 reference data, and historical data.
 
 Note: This connector is a stub implementation that defines the interface

@@ -24,7 +24,7 @@ data:
   DATABASE_NAME: {{ .Values.database.name }}
   DATABASE_USER: {{ .Values.database.user }}
   LOG_LEVEL: {{ .Values.logLevel }}
-  
+
   # Security Configuration
   ENABLE_ENCRYPTION: "true"
   ENCRYPTION_ALGORITHM: "AES-256-GCM"
@@ -35,7 +35,7 @@ data:
   SESSION_TIMEOUT: "900"
   PASSWORD_MIN_LENGTH: "12"
   ENABLE_MFA: "true"
-  
+
   # Compliance Configuration
   AUDIT_ENABLED: "true"
   AUDIT_LOG_RETENTION_DAYS: "2555"  # 7 years for financial compliance
@@ -43,7 +43,7 @@ data:
   GDPR_COMPLIANCE_MODE: "strict"
   PCI_DSS_COMPLIANCE: "true"
   SOX_COMPLIANCE: "true"
-  
+
   # Monitoring and Alerting
   ENABLE_METRICS: "true"
   METRICS_PORT: "9090"
@@ -51,33 +51,33 @@ data:
   ENABLE_DISTRIBUTED_TRACING: "true"
   LOG_FORMAT: "json"
   LOG_DESTINATION: "stdout"
-  
+
   # Rate Limiting
   RATE_LIMIT_ENABLED: "true"
   RATE_LIMIT_REQUESTS_PER_MINUTE: "100"
   RATE_LIMIT_BURST_SIZE: "20"
-  
+
   # Database Security
   DATABASE_SSL_MODE: "require"
   DATABASE_CONNECTION_TIMEOUT: "30"
   DATABASE_MAX_CONNECTIONS: "100"
   DATABASE_IDLE_TIMEOUT: "300"
-  
+
   # Redis Security
   REDIS_AUTH_ENABLED: "true"
   REDIS_SSL_ENABLED: "true"
   REDIS_CONNECTION_TIMEOUT: "10"
-  
+
   # Backup Configuration
   BACKUP_ENABLED: "true"
   BACKUP_SCHEDULE: "0 2 * * *"  # Daily at 2 AM
   BACKUP_RETENTION_DAYS: "2555"  # 7 years
   BACKUP_ENCRYPTION_ENABLED: "true"
-  
+
   # Network Security
   ALLOWED_ORIGINS: {{ .Values.security.allowedOrigins | default "*" }}
   TRUSTED_PROXIES: {{ .Values.security.trustedProxies | default "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16" }}
-  
+
   # Feature Flags
   ENABLE_API_VERSIONING: "true"
   ENABLE_REQUEST_VALIDATION: "true"
@@ -119,7 +119,7 @@ data:
       "assessment_date": "{{ now | date "2006-01-02" }}",
       "next_assessment": "{{ now | date_modify "+1y" | date "2006-01-02" }}"
     }
-  
+
   # GDPR Configuration
   gdpr_config.json: |
     {
@@ -144,7 +144,7 @@ data:
       "breach_notification_hours": 72,
       "dpo_required": true
     }
-  
+
   # SOX Configuration
   sox_config.json: |
     {
@@ -174,7 +174,7 @@ data:
       "audit_frequency": "annual",
       "documentation_required": true
     }
-  
+
   # NIST CSF Configuration
   nist_csf_config.json: |
     {
@@ -216,7 +216,7 @@ data:
       "implementation_tier": "Tier 3 - Repeatable",
       "profile_priority": "High"
     }
-  
+
   # ISO 27001 Configuration
   iso_27001_config.json: |
     {

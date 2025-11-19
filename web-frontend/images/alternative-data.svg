@@ -7,14 +7,14 @@
     .title { font-family: Arial; font-size: 16px; font-weight: bold; fill: #343a40; text-anchor: middle; }
     .subtitle { font-family: Arial; font-size: 12px; fill: #6c757d; text-anchor: middle; }
   </style>
-  
+
   <!-- Background -->
   <rect class="bg" x="0" y="0" width="800" height="500" rx="8" />
-  
+
   <!-- Title -->
   <text class="title" x="400" y="40">Alternative Data Processing</text>
   <text class="subtitle" x="400" y="65">Satellite Imagery Analysis for Retail Parking Lots</text>
-  
+
   <!-- Satellite Icon -->
   <circle class="icon-bg" cx="150" cy="150" r="60" />
   <path class="icon" d="M150,110 L170,130 L150,150 L130,130 Z" />
@@ -22,7 +22,7 @@
   <path class="icon" d="M150,150 L190,190 L150,230 L110,190 Z" />
   <text class="text" x="150" y="250">Satellite Data</text>
   <text class="subtitle" x="150" y="270">Raw Imagery</text>
-  
+
   <!-- Processing Icon -->
   <circle class="icon-bg" cx="400" cy="150" r="60" />
   <rect class="icon" x="370" y="120" width="60" height="10" rx="2" />
@@ -31,7 +31,7 @@
   <rect class="icon" x="370" y="180" width="30" height="10" rx="2" />
   <text class="text" x="400" y="250">Computer Vision</text>
   <text class="subtitle" x="400" y="270">Object Detection & Counting</text>
-  
+
   <!-- Results Icon -->
   <circle class="icon-bg" cx="650" cy="150" r="60" />
   <path class="icon" d="M620,170 L640,130 L660,150 L680,120" stroke="#4a6cf7" stroke-width="3" fill="none" />
@@ -42,22 +42,22 @@
   <line x1="620" y1="110" x2="680" y2="110" stroke="#e9ecef" stroke-width="1" />
   <text class="text" x="650" y="250">Retail Traffic Analysis</text>
   <text class="subtitle" x="650" y="270">Occupancy Trends & Forecasts</text>
-  
+
   <!-- Arrows -->
   <path d="M220,150 L320,150" stroke="#4a6cf7" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
   <path d="M470,150 L570,150" stroke="#4a6cf7" stroke-width="2" fill="none" marker-end="url(#arrowhead)" />
-  
+
   <!-- Markers for arrows -->
   <defs>
     <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
       <polygon points="0 0, 10 3.5, 0 7" fill="#4a6cf7" />
     </marker>
   </defs>
-  
+
   <!-- Bottom Section - Example Results -->
   <rect x="100" y="320" width="600" height="140" rx="8" fill="white" stroke="#e9ecef" stroke-width="2" />
   <text class="title" x="400" y="350">Sample Analysis Results</text>
-  
+
   <!-- Bar Chart -->
   <rect x="150" y="380" width="30" height="40" fill="#4a6cf7" />
   <rect x="190" y="380" width="30" height="60" fill="#4a6cf7" />
@@ -66,14 +66,14 @@
   <rect x="310" y="380" width="30" height="30" fill="#4a6cf7" />
   <rect x="350" y="380" width="30" height="45" fill="#4a6cf7" />
   <rect x="390" y="380" width="30" height="65" fill="#4a6cf7" />
-  
+
   <!-- Line Chart -->
-  <polyline points="450,420 470,400 490,410 510,390 530,380 550,400 570,370 590,390 610,380 630,350" 
+  <polyline points="450,420 470,400 490,410 510,390 530,380 550,400 570,370 590,390 610,380 630,350"
            stroke="#28a745" stroke-width="2" fill="none" />
-  
+
   <!-- X-Axis -->
   <line x1="150" y1="420" x2="630" y2="420" stroke="#e9ecef" stroke-width="1" />
-  
+
   <!-- Labels -->
   <text class="subtitle" x="270" y="440">Parking Lot Occupancy</text>
   <text class="subtitle" x="530" y="440">Revenue Correlation</text>

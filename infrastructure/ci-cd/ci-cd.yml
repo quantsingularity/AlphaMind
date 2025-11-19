@@ -33,7 +33,7 @@ jobs:
 
     - name: Test Backend
       # Run pytest from the tests directory as done locally
-      working-directory: ./tests 
+      working-directory: ./tests
       run: pytest
 
     # --- Web Frontend Steps ---
@@ -77,4 +77,3 @@ jobs:
     - name: Test Mobile Frontend
       working-directory: ./mobile-frontend
       run: yarn test
-

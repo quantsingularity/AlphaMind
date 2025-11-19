@@ -2,7 +2,7 @@
   <defs>
     <pattern id="neural" width="20" height="20" patternUnits="userSpaceOnUse">
       <circle cx="10" cy="10" r="2" fill="#4361ee" fill-opacity="0.3"/>
-      <path d="M 10 10 L 30 30 M 10 10 L 30 -10 M 10 10 L -10 30 M 10 10 L -10 -10" 
+      <path d="M 10 10 L 30 30 M 10 10 L 30 -10 M 10 10 L -10 30 M 10 10 L -10 -10"
         stroke="#4361ee" stroke-width="0.5" stroke-opacity="0.2"/>
     </pattern>
   </defs>

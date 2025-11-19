@@ -216,4 +216,4 @@
 2. Gather relevant logs
 3. Check known issues
 4. Contact support
-5. Follow up resolution 
+5. Follow up resolution

@@ -9,74 +9,74 @@
     .data-line { stroke: #28a745; stroke-width: 2; fill: none; }
     .risk-line { stroke: #dc3545; stroke-width: 2; fill: none; }
   </style>
-  
+
   <!-- Markers for arrows -->
   <defs>
     <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
       <polygon points="0 0, 10 3.5, 0 7" fill="#4a6cf7" />
     </marker>
   </defs>
-  
+
   <!-- Background -->
   <rect class="bg" x="0" y="0" width="800" height="500" rx="8" />
-  
+
   <!-- Title -->
   <text class="title" x="400" y="40">Quantitative Research Framework</text>
   <text class="subtitle" x="400" y="65">Machine Learning Factor Models and Regime Detection</text>
-  
+
   <!-- Data Sources Module -->
   <rect class="module" x="100" y="100" width="160" height="80" />
   <text class="title" x="180" y="130">Data Sources</text>
   <text class="subtitle" x="180" y="150">Market Data, Fundamentals,</text>
   <text class="subtitle" x="180" y="170">Alternative Data</text>
-  
+
   <!-- Factor Extraction Module -->
   <rect class="module" x="100" y="220" width="160" height="80" />
   <text class="title" x="180" y="250">Factor Extraction</text>
   <text class="subtitle" x="180" y="270">Value, Momentum, Quality,</text>
   <text class="subtitle" x="180" y="290">Low Volatility, Size</text>
-  
+
   <!-- ML Model Module -->
   <rect class="module" x="320" y="160" width="160" height="80" />
   <text class="title" x="400" y="190">ML Factor Models</text>
   <text class="subtitle" x="400" y="210">Non-linear Relationships</text>
   <text class="subtitle" x="400" y="230">Feature Interactions</text>
-  
+
   <!-- Regime Detection Module -->
   <rect class="module" x="540" y="100" width="160" height="80" />
   <text class="title" x="620" y="130">Regime Detection</text>
   <text class="subtitle" x="620" y="150">Hidden Markov Models</text>
   <text class="subtitle" x="620" y="170">Bayesian Changepoint</text>
-  
+
   <!-- Alpha Generation Module -->
   <rect class="module" x="540" y="220" width="160" height="80" />
   <text class="title" x="620" y="250">Alpha Generation</text>
   <text class="subtitle" x="620" y="270">Regime-Adjusted Signals</text>
   <text class="subtitle" x="620" y="290">Dynamic Weighting</text>
-  
+
   <!-- Arrows -->
   <path class="arrow" d="M260,140 L320,160" />
   <path class="arrow" d="M260,260 L320,200" />
   <path class="arrow" d="M480,160 L540,140" />
   <path class="arrow" d="M480,200 L540,240" />
   <path class="arrow" d="M620,180 L620,220" />
-  
+
   <!-- Bottom Section - Example Results -->
   <rect x="100" y="340" width="600" height="120" rx="8" fill="white" stroke="#e9ecef" stroke-width="2" />
   <text class="title" x="400" y="370">Regime-Adjusted Factor Performance</text>
-  
+
   <!-- Chart -->
   <line x1="150" y1="430" x2="650" y2="430" stroke="#e9ecef" stroke-width="1" />
   <line x1="150" y1="380" x2="150" y2="430" stroke="#e9ecef" stroke-width="1" />
-  
+
   <!-- Data Lines -->
   <path class="data-line" d="M150,410 L200,400 L250,390 L300,400 L350,410 L400,380 L450,370 L500,380 L550,390 L600,380 L650,370" />
   <path class="risk-line" d="M150,420 L200,410 L250,420 L300,410 L350,420 L400,410 L450,400 L500,410 L550,420 L600,410 L650,400" />
-  
+
   <!-- Legend -->
   <line x1="200" y1="450" x2="230" y2="450" stroke="#28a745" stroke-width="2" />
   <text x="290" y="455" font-family="Arial" font-size="12" fill="#6c757d">Value Factor Performance</text>
-  
+
   <line x1="400" y1="450" x2="430" y2="450" stroke="#dc3545" stroke-width="2" />
   <text x="490" y="455" font-family="Arial" font-size="12" fill="#6c757d">Momentum Factor Performance</text>
 </svg>

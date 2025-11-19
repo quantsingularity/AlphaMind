@@ -148,7 +148,7 @@ install_system_dependencies() {
     if [[ "$PACKAGE_MANAGER" == "apt" ]]; then
       print_info "Updating package lists..."
       sudo apt-get update
-      
+
       print_info "Installing essential build tools and libraries..."
       sudo apt-get install -y build-essential curl wget git unzip zip \
         libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev \
@@ -156,7 +156,7 @@ install_system_dependencies() {
     elif [[ "$PACKAGE_MANAGER" == "dnf" || "$PACKAGE_MANAGER" == "yum" ]]; then
       print_info "Updating package lists..."
       sudo $PACKAGE_MANAGER update -y
-      
+
       print_info "Installing essential build tools and libraries..."
       sudo $PACKAGE_MANAGER install -y gcc gcc-c++ make curl wget git unzip zip \
         openssl-devel zlib-devel bzip2-devel readline-devel sqlite-devel \
@@ -165,11 +165,11 @@ install_system_dependencies() {
   elif [[ "$OS" == "macos" ]]; then
     print_info "Updating Homebrew..."
     brew update
-    
+
     print_info "Installing essential build tools and libraries..."
     brew install curl wget git unzip zip openssl readline sqlite3 xz
   fi
-  
+
   print_success "System dependencies installed successfully"
 }
 
@@ -179,7 +179,7 @@ install_system_dependencies
 
 if [[ "$SKIP_PYTHON" == "false" ]]; then
   print_header "Setting up Python Environment"
-  
+
   # Check for Python 3.10+
   if command_exists python3.10; then
     PYTHON_CMD="python3.10"
@@ -191,7 +191,7 @@ if [[ "$SKIP_PYTHON" == "false" ]]; then
       PYTHON_CMD="python3"
     else
       print_warning "Python 3.10+ is required but found $PY_VERSION"
-      
+
       if [[ "$OS" == "linux" ]]; then
         if [[ "$PACKAGE_MANAGER" == "apt" ]]; then
           print_info "Installing Python 3.10..."
@@ -217,34 +217,34 @@ if [[ "$SKIP_PYTHON" == "false" ]]; then
     print_error "Python 3 not found"
     exit 1
   fi
-  
+
   print_success "Using Python: $($PYTHON_CMD --version)"
-  
+
   # Set up virtual environment
   print_info "Setting up Python virtual environment..."
-  
+
   if [[ -d "venv" && "$FORCE_REINSTALL" == "true" ]]; then
     print_info "Removing existing virtual environment..."
     rm -rf venv
   fi
-  
+
   if [[ ! -d "venv" ]]; then
     $PYTHON_CMD -m venv venv
     print_success "Virtual environment created"
   else
     print_info "Using existing virtual environment"
   fi
-  
+
   # Activate virtual environment
   source venv/bin/activate
-  
+
   # Upgrade pip
   print_info "Upgrading pip..."
   pip install --upgrade pip
-  
+
   # Install dependencies based on setup type
   print_info "Installing Python dependencies for $SETUP_TYPE environment..."
-  
+
   if [[ "$SETUP_TYPE" == "development" ]]; then
     pip install -r requirements.txt
     pip install pytest pytest-cov black flake8 mypy sphinx sphinx-rtd-theme
@@ -254,9 +254,9 @@ if [[ "$SKIP_PYTHON" == "false" ]]; then
   elif [[ "$SETUP_TYPE" == "production" ]]; then
     pip install -r requirements.txt
   fi
-  
+
   print_success "Python environment setup complete"
-  
+
   # Deactivate virtual environment
   deactivate
 fi
@@ -265,7 +265,7 @@ fi
 
 if [[ "$SKIP_NODE" == "false" ]]; then
   print_header "Setting up Node.js Environment"
-  
+
   # Check for Node.js
   if command_exists node; then
     NODE_VERSION=$(node --version | cut -d'v' -f2)
@@ -273,7 +273,7 @@ if [[ "$SKIP_NODE" == "false" ]]; then
       print_success "Using Node.js $NODE_VERSION"
     else
       print_warning "Node.js 16+ is required but found $NODE_VERSION"
-      
+
       if [[ "$OS" == "linux" ]]; then
         print_info "Installing Node.js 16 via NodeSource..."
         curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
@@ -283,12 +283,12 @@ if [[ "$SKIP_NODE" == "false" ]]; then
         brew install node@16
         brew link --force node@16
       fi
-      
+
       print_success "Node.js $(node --version) installed"
     fi
   else
     print_info "Node.js not found, installing..."
-    
+
     if [[ "$OS" == "linux" ]]; then
       curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
       sudo apt-get install -y nodejs
@@ -296,21 +296,21 @@ if [[ "$SKIP_NODE" == "false" ]]; then
       brew install node@16
       brew link --force node@16
     fi
-    
+
     print_success "Node.js $(node --version) installed"
   fi
-  
+
   # Check for npm
   if ! command_exists npm; then
     print_error "npm not found. Please install npm manually."
     exit 1
   fi
-  
+
   print_success "Using npm $(npm --version)"
-  
+
   # Install global npm packages based on setup type
   print_info "Installing global npm packages for $SETUP_TYPE environment..."
-  
+
   if [[ "$SETUP_TYPE" == "development" ]]; then
     npm install -g yarn pnpm typescript eslint prettier
   elif [[ "$SETUP_TYPE" == "testing" ]]; then
@@ -318,12 +318,12 @@ if [[ "$SKIP_NODE" == "false" ]]; then
   elif [[ "$SETUP_TYPE" == "production" ]]; then
     npm install -g yarn pnpm
   fi
-  
+
   # Install frontend dependencies
   if [[ -d "web-frontend" ]]; then
     print_info "Installing web frontend dependencies..."
     cd web-frontend
-    
+
     if [[ -f "yarn.lock" ]]; then
       yarn install
     elif [[ -f "package-lock.json" ]]; then
@@ -331,16 +331,16 @@ if [[ "$SKIP_NODE" == "false" ]]; then
     else
       npm install
     fi
-    
+
     cd "$PROJECT_ROOT"
     print_success "Web frontend dependencies installed"
   fi
-  
+
   # Install mobile frontend dependencies
   if [[ -d "mobile-frontend" ]]; then
     print_info "Installing mobile frontend dependencies..."
     cd mobile-frontend
-    
+
     if [[ -f "yarn.lock" ]]; then
       yarn install
     elif [[ -f "package-lock.json" ]]; then
@@ -348,11 +348,11 @@ if [[ "$SKIP_NODE" == "false" ]]; then
     else
       npm install
     fi
-    
+
     cd "$PROJECT_ROOT"
     print_success "Mobile frontend dependencies installed"
   fi
-  
+
   print_success "Node.js environment setup complete"
 fi
 
@@ -360,13 +360,13 @@ fi
 
 if [[ "$SKIP_DOCKER" == "false" ]]; then
   print_header "Setting up Docker"
-  
+
   # Check for Docker
   if command_exists docker; then
     print_success "Docker is already installed: $(docker --version)"
   else
     print_info "Docker not found, installing..."
-    
+
     if [[ "$OS" == "linux" ]]; then
       curl -fsSL https://get.docker.com -o get-docker.sh
       sudo sh get-docker.sh
@@ -376,14 +376,14 @@ if [[ "$SKIP_DOCKER" == "false" ]]; then
       print_info "Please install Docker Desktop for Mac manually: https://docs.docker.com/desktop/mac/install/"
       print_info "After installation, run this script again with --skip-docker"
     fi
-    
+
     if command_exists docker; then
       print_success "Docker installed: $(docker --version)"
     else
       print_warning "Docker installation may require manual steps"
     fi
   fi
-  
+
   # Check for Docker Compose
   if command_exists docker-compose; then
     print_success "Docker Compose is already installed: $(docker-compose --version)"
@@ -391,7 +391,7 @@ if [[ "$SKIP_DOCKER" == "false" ]]; then
     print_success "Docker Compose V2 is already installed"
   else
     print_info "Docker Compose not found, installing..."
-    
+
     if [[ "$OS" == "linux" ]]; then
       COMPOSE_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep 'tag_name' | cut -d\" -f4)
       sudo curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
@@ -399,14 +399,14 @@ if [[ "$SKIP_DOCKER" == "false" ]]; then
     elif [[ "$OS" == "macos" ]]; then
       brew install docker-compose
     fi
-    
+
     if command_exists docker-compose; then
       print_success "Docker Compose installed: $(docker-compose --version)"
     else
       print_warning "Docker Compose installation may require manual steps"
     fi
   fi
-  
+
   print_success "Docker setup complete"
 fi
 
@@ -419,21 +419,21 @@ VALIDATION_PASSED=true
 # Validate Python environment
 if [[ "$SKIP_PYTHON" == "false" ]]; then
   print_info "Validating Python environment..."
-  
+
   if [[ ! -d "venv" ]]; then
     print_error "Python virtual environment not found"
     VALIDATION_PASSED=false
   else
     source venv/bin/activate
-    
+
     if ! pip list | grep -q "pytest"; then
       print_warning "pytest not found in virtual environment"
     fi
-    
+
     if [[ "$SETUP_TYPE" == "development" && ! $(pip list | grep -q "black") ]]; then
       print_warning "black not found in virtual environment"
     fi
-    
+
     deactivate
   fi
 fi
@@ -441,23 +441,23 @@ fi
 # Validate Node.js environment
 if [[ "$SKIP_NODE" == "false" ]]; then
   print_info "Validating Node.js environment..."
-  
+
   if ! command_exists node; then
     print_error "Node.js not found"
     VALIDATION_PASSED=false
   fi
-  
+
   if ! command_exists npm; then
     print_error "npm not found"
     VALIDATION_PASSED=false
   fi
-  
+
   if [[ -d "web-frontend" ]]; then
     if [[ ! -d "web-frontend/node_modules" ]]; then
       print_warning "Web frontend dependencies not installed"
     fi
   fi
-  
+
   if [[ -d "mobile-frontend" ]]; then
     if [[ ! -d "mobile-frontend/node_modules" ]]; then
       print_warning "Mobile frontend dependencies not installed"
@@ -468,7 +468,7 @@ fi
 # Validate Docker environment
 if [[ "$SKIP_DOCKER" == "false" ]]; then
   print_info "Validating Docker environment..."
-  
+
   if ! command_exists docker; then
     print_error "Docker not found"
     VALIDATION_PASSED=false
@@ -477,7 +477,7 @@ if [[ "$SKIP_DOCKER" == "false" ]]; then
       print_warning "Docker daemon is not running or current user doesn't have permission"
     fi
   fi
-  
+
   if ! command_exists docker-compose && ! (docker compose version &>/dev/null); then
     print_warning "Docker Compose not found"
   fi
@@ -497,7 +497,7 @@ print_header "Creating Environment Configuration"
 # Create .env file if it doesn't exist
 if [[ ! -f ".env" || "$FORCE_REINSTALL" == "true" ]]; then
   print_info "Creating .env file..."
-  
+
   cat > .env << EOF
 # AlphaMind Environment Configuration
 # Generated by setup_environment.sh on $(date)

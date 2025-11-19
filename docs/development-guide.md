@@ -151,4 +151,4 @@ Types:
 - Use discussion board for questions
 - Contact maintainers for urgent issues
 - Check documentation first
-- Follow issue templates 
+- Follow issue templates

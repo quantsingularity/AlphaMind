@@ -310,4 +310,3 @@ resource "aws_cloudwatch_metric_filter" "no_mfa_console_signin" {
 # Data sources
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
-

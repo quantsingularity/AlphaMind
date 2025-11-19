@@ -151,17 +151,17 @@ if [[ "$LINT_TYPE" == "all" || "$LINT_TYPE" == "js" ]]; then
     print_error "Node.js not found. Please install Node.js first."
     exit 1
   fi
-  
+
   if ! command_exists eslint; then
     print_info "Installing ESLint globally..."
     npm install -g eslint
   fi
-  
+
   if ! command_exists prettier; then
     print_info "Installing Prettier globally..."
     npm install -g prettier
   fi
-  
+
   if ! command_exists stylelint; then
     print_info "Installing Stylelint globally..."
     npm install -g stylelint
@@ -210,16 +210,16 @@ echo "  Strict mode: $STRICT"
 
 run_python_linters() {
   print_header "Running Python Linters"
-  
+
   if [[ "$LINT_TYPE" != "all" && "$LINT_TYPE" != "python" ]]; then
     return
   fi
-  
+
   if [[ ${#PYTHON_PATHS[@]} -eq 0 ]]; then
     print_info "No Python paths to lint"
     return
   fi
-  
+
   PYTHON_FILES=()
   for path in "${PYTHON_PATHS[@]}"; do
     if [[ -d "$path" ]]; then
@@ -230,14 +230,14 @@ run_python_linters() {
       PYTHON_FILES+=("$path")
     fi
   done
-  
+
   if [[ ${#PYTHON_FILES[@]} -eq 0 ]]; then
     print_info "No Python files found to lint"
     return
   fi
-  
+
   print_info "Found ${#PYTHON_FILES[@]} Python files to lint"
-  
+
   # Run Black (code formatter)
   print_info "Running Black code formatter..."
   if [[ "$FIX" == "true" ]]; then
@@ -247,7 +247,7 @@ run_python_linters() {
     black --check "${PYTHON_FILES[@]}" 2>&1 | tee "$REPORT_DIR/python/black.log" || true
     print_info "Black check completed (use --fix to apply formatting)"
   fi
-  
+
   # Run isort (import sorter)
   print_info "Running isort import sorter..."
   if [[ "$FIX" == "true" ]]; then
@@ -257,22 +257,22 @@ run_python_linters() {
     isort --check-only "${PYTHON_FILES[@]}" 2>&1 | tee "$REPORT_DIR/python/isort.log" || true
     print_info "isort check completed (use --fix to apply sorting)"
   fi
-  
+
   # Run Flake8 (linter)
   print_info "Running Flake8 linter..."
   flake8 "${PYTHON_FILES[@]}" --output-file="$REPORT_DIR/python/flake8.log" || true
   print_info "Flake8 completed, report saved to $REPORT_DIR/python/flake8.log"
-  
+
   # Run MyPy (type checker)
   print_info "Running MyPy type checker..."
   mypy "${PYTHON_FILES[@]}" 2>&1 | tee "$REPORT_DIR/python/mypy.log" || true
   print_info "MyPy completed, report saved to $REPORT_DIR/python/mypy.log"
-  
+
   # Run Pylint (comprehensive linter)
   print_info "Running Pylint..."
   pylint "${PYTHON_FILES[@]}" --output="$REPORT_DIR/python/pylint.log" || true
   print_info "Pylint completed, report saved to $REPORT_DIR/python/pylint.log"
-  
+
   print_success "Python linting completed"
 }
 
@@ -280,33 +280,33 @@ run_python_linters() {
 
 run_js_linters() {
   print_header "Running JavaScript/TypeScript Linters"
-  
+
   if [[ "$LINT_TYPE" != "all" && "$LINT_TYPE" != "js" ]]; then
     return
   fi
-  
+
   if [[ ${#JS_PATHS[@]} -eq 0 ]]; then
     print_info "No JavaScript/TypeScript paths to lint"
     return
   fi
-  
+
   for path in "${JS_PATHS[@]}"; do
     if [[ ! -d "$path" ]]; then
       print_warning "Directory not found: $path"
       continue
     fi
-    
+
     print_info "Linting $path..."
-    
+
     cd "$path"
-    
+
     # Check if package.json exists
     if [[ ! -f "package.json" ]]; then
       print_warning "No package.json found in $path"
       cd "$PROJECT_ROOT"
       continue
     fi
-    
+
     # Install dependencies if node_modules doesn't exist
     if [[ ! -d "node_modules" ]]; then
       print_info "Installing dependencies..."
@@ -316,7 +316,7 @@ run_js_linters() {
         npm install
       fi
     fi
-    
+
     # Run ESLint
     print_info "Running ESLint..."
     if [[ -f ".eslintrc.js" || -f ".eslintrc.json" || -f ".eslintrc.yml" || -f ".eslintrc" ]]; then
@@ -330,7 +330,7 @@ run_js_linters() {
     else
       print_warning "No ESLint configuration found in $path"
     fi
-    
+
     # Run Prettier
     print_info "Running Prettier..."
     if [[ -f ".prettierrc.js" || -f ".prettierrc.json" || -f ".prettierrc.yml" || -f ".prettierrc" ]]; then
@@ -344,7 +344,7 @@ run_js_linters() {
     else
       print_warning "No Prettier configuration found in $path"
     fi
-    
+
     # Run Stylelint for CSS files
     print_info "Running Stylelint for CSS..."
     if [[ -f ".stylelintrc.js" || -f ".stylelintrc.json" || -f ".stylelintrc.yml" || -f ".stylelintrc" ]]; then
@@ -358,14 +358,14 @@ run_js_linters() {
     else
       print_warning "No Stylelint configuration found in $path"
     fi
-    
+
     # Run TypeScript compiler check if tsconfig.json exists
     if [[ -f "tsconfig.json" ]]; then
       print_info "Running TypeScript compiler check..."
       npx tsc --noEmit 2>&1 | tee "$REPORT_DIR/js/tsc-$path.log" || true
       print_info "TypeScript check completed"
     fi
-    
+
     # Run project-specific lint script if it exists
     if grep -q "\"lint\"" package.json; then
       print_info "Running project-specific lint script..."
@@ -376,10 +376,10 @@ run_js_linters() {
       fi
       print_info "Project-specific lint completed"
     fi
-    
+
     cd "$PROJECT_ROOT"
   done
-  
+
   print_success "JavaScript/TypeScript linting completed"
 }
 
@@ -387,9 +387,9 @@ run_js_linters() {
 
 generate_lint_summary() {
   print_header "Generating Lint Summary"
-  
+
   SUMMARY_FILE="$REPORT_DIR/lint-summary.html"
-  
+
   # Create summary HTML file
   cat > "$SUMMARY_FILE" << EOF
 <!DOCTYPE html>
@@ -469,7 +469,7 @@ generate_lint_summary() {
   <div class="container">
     <h1>AlphaMind Lint Summary</h1>
     <div class="timestamp">Generated on $(date)</div>
-    
+
     <div class="summary-box">
       <h2>Lint Run Summary</h2>
       <p>
@@ -480,16 +480,16 @@ generate_lint_summary() {
       </p>
     </div>
 EOF
-  
+
   # Add Python lint reports
   if [[ "$LINT_TYPE" == "all" || "$LINT_TYPE" == "python" ]]; then
     cat >> "$SUMMARY_FILE" << EOF
-    
+
     <h2>Python Linting Results</h2>
-    
+
     <h3>Black (Code Formatter)</h3>
 EOF
-    
+
     if [[ -f "$REPORT_DIR/python/black.log" ]]; then
       echo "    <pre>" >> "$SUMMARY_FILE"
       cat "$REPORT_DIR/python/black.log" | head -n 20 >> "$SUMMARY_FILE"
@@ -501,12 +501,12 @@ EOF
     else
       echo "    <p>No Black log found</p>" >> "$SUMMARY_FILE"
     fi
-    
+
     cat >> "$SUMMARY_FILE" << EOF
-    
+
     <h3>isort (Import Sorter)</h3>
 EOF
-    
+
     if [[ -f "$REPORT_DIR/python/isort.log" ]]; then
       echo "    <pre>" >> "$SUMMARY_FILE"
       cat "$REPORT_DIR/python/isort.log" | head -n 20 >> "$SUMMARY_FILE"
@@ -518,12 +518,12 @@ EOF
     else
       echo "    <p>No isort log found</p>" >> "$SUMMARY_FILE"
     fi
-    
+
     cat >> "$SUMMARY_FILE" << EOF
-    
+
     <h3>Flake8 (Linter)</h3>
 EOF
-    
+
     if [[ -f "$REPORT_DIR/python/flake8.log" ]]; then
       echo "    <pre>" >> "$SUMMARY_FILE"
       cat "$REPORT_DIR/python/flake8.log" | head -n 20 >> "$SUMMARY_FILE"
@@ -535,12 +535,12 @@ EOF
     else
       echo "    <p>No Flake8 log found</p>" >> "$SUMMARY_FILE"
     fi
-    
+
     cat >> "$SUMMARY_FILE" << EOF
-    
+
     <h3>MyPy (Type Checker)</h3>
 EOF
-    
+
     if [[ -f "$REPORT_DIR/python/mypy.log" ]]; then
       echo "    <pre>" >> "$SUMMARY_FILE"
       cat "$REPORT_DIR/python/mypy.log" | head -n 20 >> "$SUMMARY_FILE"
@@ -552,12 +552,12 @@ EOF
     else
       echo "    <p>No MyPy log found</p>" >> "$SUMMARY_FILE"
     fi
-    
+
     cat >> "$SUMMARY_FILE" << EOF
-    
+
     <h3>Pylint (Comprehensive Linter)</h3>
 EOF
-    
+
     if [[ -f "$REPORT_DIR/python/pylint.log" ]]; then
       echo "    <pre>" >> "$SUMMARY_FILE"
       cat "$REPORT_DIR/python/pylint.log" | head -n 20 >> "$SUMMARY_FILE"
@@ -570,24 +570,24 @@ EOF
       echo "    <p>No Pylint log found</p>" >> "$SUMMARY_FILE"
     fi
   fi
-  
+
   # Add JavaScript/TypeScript lint reports
   if [[ "$LINT_TYPE" == "all" || "$LINT_TYPE" == "js" ]]; then
     cat >> "$SUMMARY_FILE" << EOF
-    
+
     <h2>JavaScript/TypeScript Linting Results</h2>
 EOF
-    
+
     # List all JS paths
     for path in "${JS_PATHS[@]}"; do
       if [[ -d "$path" ]]; then
         cat >> "$SUMMARY_FILE" << EOF
-    
+
     <h3>${path}</h3>
-    
+
     <h4>ESLint</h4>
 EOF
-        
+
         if [[ -f "$REPORT_DIR/js/eslint-$path.log" ]]; then
           echo "    <pre>" >> "$SUMMARY_FILE"
           cat "$REPORT_DIR/js/eslint-$path.log" | head -n 20 >> "$SUMMARY_FILE"
@@ -599,12 +599,12 @@ EOF
         else
           echo "    <p>No ESLint log found for $path</p>" >> "$SUMMARY_FILE"
         fi
-        
+
         cat >> "$SUMMARY_FILE" << EOF
-    
+
     <h4>Prettier</h4>
 EOF
-        
+
         if [[ -f "$REPORT_DIR/js/prettier-$path.log" ]]; then
           echo "    <pre>" >> "$SUMMARY_FILE"
           cat "$REPORT_DIR/js/prettier-$path.log" | head -n 20 >> "$SUMMARY_FILE"
@@ -616,12 +616,12 @@ EOF
         else
           echo "    <p>No Prettier log found for $path</p>" >> "$SUMMARY_FILE"
         fi
-        
+
         cat >> "$SUMMARY_FILE" << EOF
-    
+
     <h4>TypeScript Compiler</h4>
 EOF
-        
+
         if [[ -f "$REPORT_DIR/js/tsc-$path.log" ]]; then
           echo "    <pre>" >> "$SUMMARY_FILE"
           cat "$REPORT_DIR/js/tsc-$path.log" | head -n 20 >> "$SUMMARY_FILE"
@@ -633,12 +633,12 @@ EOF
         else
           echo "    <p>No TypeScript compiler log found for $path</p>" >> "$SUMMARY_FILE"
         fi
-        
+
         cat >> "$SUMMARY_FILE" << EOF
-    
+
     <h4>CSS Linting (Stylelint)</h4>
 EOF
-        
+
         if [[ -f "$REPORT_DIR/css/stylelint-$path.log" ]]; then
           echo "    <pre>" >> "$SUMMARY_FILE"
           cat "$REPORT_DIR/css/stylelint-$path.log" | head -n 20 >> "$SUMMARY_FILE"
@@ -653,10 +653,10 @@ EOF
       fi
     done
   fi
-  
+
   # Close HTML
   cat >> "$SUMMARY_FILE" << EOF
-    
+
     <h2>Next Steps</h2>
     <p>
       To fix linting issues automatically, run the script with the <code>--fix</code> flag:
@@ -676,9 +676,9 @@ EOF
 </body>
 </html>
 EOF
-  
+
   print_success "Lint summary generated: $SUMMARY_FILE"
-  
+
   # Open the summary in a browser if possible
   if command_exists xdg-open; then
     xdg-open "$SUMMARY_FILE" &>/dev/null &
@@ -716,23 +716,23 @@ print_info "Lint summary: $REPORT_DIR/lint-summary.html"
 # Check if we should fail in strict mode
 if [[ "$STRICT" == "true" ]]; then
   ERRORS_FOUND=false
-  
+
   # Check Python lint logs for errors
   if [[ -f "$REPORT_DIR/python/flake8.log" && -s "$REPORT_DIR/python/flake8.log" ]]; then
     ERRORS_FOUND=true
   fi
-  
+
   if [[ -f "$REPORT_DIR/python/mypy.log" && -s "$REPORT_DIR/python/mypy.log" ]]; then
     ERRORS_FOUND=true
   fi
-  
+
   # Check JS lint logs for errors
   for path in "${JS_PATHS[@]}"; do
     if [[ -f "$REPORT_DIR/js/eslint-$path.log" && -s "$REPORT_DIR/js/eslint-$path.log" ]]; then
       ERRORS_FOUND=true
     fi
   done
-  
+
   if [[ "$ERRORS_FOUND" == "true" ]]; then
     print_error "Lint errors found and strict mode is enabled. Exiting with error."
     exit 1

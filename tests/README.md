@@ -123,10 +123,10 @@ def test_portfolio_optimization(setup_portfolio):
     # Arrange
     portfolio = setup_portfolio
     target_return = 0.1
-    
+
     # Act
     optimized = portfolio.optimize(target_return=target_return)
-    
+
     # Assert
     assert optimized.expected_return >= target_return
     assert optimized.sharpe_ratio > portfolio.sharpe_ratio

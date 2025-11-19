@@ -9,55 +9,55 @@
     .server { fill: #e9ecef; stroke: #6c757d; stroke-width: 1; }
     .network { stroke: #28a745; stroke-width: 2; stroke-dasharray: 5,5; fill: none; }
   </style>
-  
+
   <!-- Markers for arrows -->
   <defs>
     <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
       <polygon points="0 0, 10 3.5, 0 7" fill="#4a6cf7" />
     </marker>
   </defs>
-  
+
   <!-- Background -->
   <rect class="bg" x="0" y="0" width="800" height="500" rx="8" />
-  
+
   <!-- Title -->
   <text class="title" x="400" y="40">Execution Infrastructure</text>
   <text class="subtitle" x="400" y="65">Low-Latency Trading and Smart Order Routing</text>
-  
+
   <!-- Exchange 1 -->
   <rect class="server" x="600" y="120" width="120" height="60" rx="4" />
   <text class="text" x="660" y="155">NYSE</text>
-  
+
   <!-- Exchange 2 -->
   <rect class="server" x="600" y="220" width="120" height="60" rx="4" />
   <text class="text" x="660" y="255">NASDAQ</text>
-  
+
   <!-- Exchange 3 -->
   <rect class="server" x="600" y="320" width="120" height="60" rx="4" />
   <text class="text" x="660" y="355">ARCA</text>
-  
+
   <!-- Smart Order Router -->
   <rect class="module" x="340" y="220" width="160" height="80" />
   <text class="title" x="420" y="250">Smart Order Router</text>
   <text class="subtitle" x="420" y="270">Venue Selection</text>
   <text class="subtitle" x="420" y="290">Order Splitting</text>
-  
+
   <!-- FPGA Accelerator -->
   <rect class="module" x="340" y="120" width="160" height="60" />
   <text class="title" x="420" y="150">FPGA Accelerator</text>
   <text class="subtitle" x="420" y="170">Microsecond Latency</text>
-  
+
   <!-- Liquidity Forecasting -->
   <rect class="module" x="340" y="320" width="160" height="60" />
   <text class="title" x="420" y="350">Liquidity Forecasting</text>
   <text class="subtitle" x="420" y="370">Hawkes Process Model</text>
-  
+
   <!-- Trading Strategy -->
   <rect class="module" x="100" y="220" width="160" height="80" />
   <text class="title" x="180" y="250">Trading Strategy</text>
   <text class="subtitle" x="180" y="270">Signal Generation</text>
   <text class="subtitle" x="180" y="290">Order Creation</text>
-  
+
   <!-- Arrows -->
   <path class="arrow" d="M260,260 L340,260" />
   <path class="arrow" d="M420,220 L420,180" />
@@ -65,15 +65,15 @@
   <path class="arrow" d="M500,150 L600,150" />
   <path class="arrow" d="M500,260 L600,250" />
   <path class="arrow" d="M500,350 L600,350" />
-  
+
   <!-- Network Lines -->
   <path class="network" d="M660,180 C700,180 700,220 660,220" />
   <path class="network" d="M660,280 C700,280 700,320 660,320" />
-  
+
   <!-- Bottom Section - Latency Metrics -->
   <rect x="100" y="400" width="600" height="60" rx="8" fill="white" stroke="#e9ecef" stroke-width="2" />
   <text class="title" x="400" y="430">Execution Latency: <tspan fill="#28a745">25μs</tspan> | Order Routing Time: <tspan fill="#28a745">15μs</tspan> | Market Impact: <tspan fill="#28a745">0.5bps</tspan></text>
-  
+
   <!-- Clock -->
   <circle cx="180" cy="150" r="40" fill="white" stroke="#4a6cf7" stroke-width="2" />
   <line x1="180" y1="150" x2="180" y2="120" stroke="#4a6cf7" stroke-width="2" />

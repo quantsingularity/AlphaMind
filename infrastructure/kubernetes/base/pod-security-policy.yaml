@@ -12,7 +12,7 @@ spec:
   allowPrivilegeEscalation: false
   requiredDropCapabilities:
     - ALL
-  
+
   # Volumes and file systems
   volumes:
     - 'configMap'
@@ -21,17 +21,17 @@ spec:
     - 'secret'
     - 'downwardAPI'
     - 'persistentVolumeClaim'
-  
+
   # Host networking
   hostNetwork: false
   hostIPC: false
   hostPID: false
-  
+
   # Host ports
   hostPorts:
     - min: 0
       max: 0
-  
+
   # Security context
   runAsUser:
     rule: 'MustRunAsNonRoot'
@@ -40,28 +40,28 @@ spec:
     ranges:
       - min: 1000
         max: 65535
-  
+
   # SELinux
   seLinux:
     rule: 'RunAsAny'
-  
+
   # Supplemental groups
   supplementalGroups:
     rule: 'MustRunAs'
     ranges:
       - min: 1000
         max: 65535
-  
+
   # File system group
   fsGroup:
     rule: 'MustRunAs'
     ranges:
       - min: 1000
         max: 65535
-  
+
   # Read-only root filesystem
   readOnlyRootFilesystem: true
-  
+
   # Forbidden sysctls
   forbiddenSysctls:
     - '*'
@@ -97,4 +97,3 @@ subjects:
 - kind: ServiceAccount
   name: alphamind-service-account
   namespace: alphamind-dev
-

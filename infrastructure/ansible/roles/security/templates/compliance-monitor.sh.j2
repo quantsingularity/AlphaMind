@@ -80,7 +80,7 @@ check_ssl_certificates() {
             local expiry_epoch=$(date -d "$expiry_date" +%s)
             local current_epoch=$(date +%s)
             local days_until_expiry=$(( (expiry_epoch - current_epoch) / 86400 ))
-            
+
             if [ "$days_until_expiry" -lt 30 ]; then
                 send_alert "Security Alert: SSL Certificate Expiring" "Host: $HOSTNAME certificate $cert expires in $days_until_expiry days"
             fi
@@ -185,4 +185,3 @@ EOF
 
 # Archive the report
 cp /tmp/compliance-status.txt "/var/log/compliance-reports/compliance-$(date '+%Y%m%d-%H%M%S').txt"
-

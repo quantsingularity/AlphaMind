@@ -169,4 +169,4 @@ fetch('https://api.alphamind.com/v1/ai/generate', {
         max_tokens: 100
     })
 });
-``` 
+```

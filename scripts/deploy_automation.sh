@@ -52,7 +52,7 @@ run_timed() {
   local status=$?
   local end_time=$(date +%s)
   local duration=$((end_time - start_time))
-  
+
   echo -e "${COLOR_CYAN}Command completed in ${duration}s${COLOR_RESET}"
   return $status
 }
@@ -63,7 +63,7 @@ run_remote() {
     print_error "Remote host not configured"
     return 1
   fi
-  
+
   print_info "Running on $REMOTE_HOST: $1"
   ssh $SSH_OPTIONS "$REMOTE_HOST" "$1"
 }
@@ -74,10 +74,10 @@ transfer_files() {
     print_error "Remote host not configured"
     return 1
   fi
-  
+
   local source="$1"
   local dest="$2"
-  
+
   print_info "Transferring $source to $REMOTE_HOST:$dest"
   scp $SSH_OPTIONS -r "$source" "$REMOTE_HOST:$dest"
 }
@@ -179,10 +179,10 @@ CONFIG_FILE="$PROJECT_ROOT/config/deploy/$DEPLOY_ENV.conf"
 if [[ ! -f "$CONFIG_FILE" ]]; then
   print_warning "Deployment configuration file not found: $CONFIG_FILE"
   print_info "Creating default configuration..."
-  
+
   # Create config directory if it doesn't exist
   mkdir -p "$PROJECT_ROOT/config/deploy"
-  
+
   # Create default configuration based on environment
   case "$DEPLOY_ENV" in
     development)
@@ -295,10 +295,10 @@ EOF
       exit 1
       ;;
   esac
-  
+
   print_success "Default configuration created: $CONFIG_FILE"
   print_warning "Please review and update the configuration before deploying"
-  
+
   if [[ "$FORCE" != "true" ]]; then
     print_info "Exiting. Run with --force to continue with default configuration."
     exit 0
@@ -348,15 +348,15 @@ echo "  Rollback: $ROLLBACK"
 
 if [[ "$SKIP_TESTS" == "false" && "$ROLLBACK" == "false" ]]; then
   print_header "Running Tests Before Deployment"
-  
+
   if [[ -f "./run_tests.sh" ]]; then
     print_info "Running tests for $DEPLOY_ENV environment..."
-    
+
     TEST_ARGS="--type all"
     if [[ -n "$COMPONENT" ]]; then
       TEST_ARGS="$TEST_ARGS --component $COMPONENT"
     fi
-    
+
     if ! bash ./run_tests.sh $TEST_ARGS; then
       print_error "Tests failed!"
       if [[ "$FORCE" != "true" ]]; then
@@ -377,15 +377,15 @@ fi
 
 if [[ "$SKIP_BUILD" == "false" && "$ROLLBACK" == "false" ]]; then
   print_header "Building Application"
-  
+
   if [[ -f "./optimized_build.sh" ]]; then
     print_info "Building application for $DEPLOY_ENV environment..."
-    
+
     BUILD_ARGS="--env $DEPLOY_ENV"
     if [[ -n "$COMPONENT" ]]; then
       BUILD_ARGS="$BUILD_ARGS --component $COMPONENT"
     fi
-    
+
     if ! bash ./optimized_build.sh $BUILD_ARGS; then
       print_error "Build failed!"
       exit 1
@@ -408,19 +408,19 @@ RELEASE_DIR="$REMOTE_DIR/releases/$TIMESTAMP"
 # Check if we're doing a rollback
 if [[ "$ROLLBACK" == "true" ]]; then
   print_info "Preparing rollback..."
-  
+
   # Get list of releases
   if [[ "$DRY_RUN" == "false" ]]; then
     RELEASES=$(run_remote "ls -1t $REMOTE_DIR/releases" | head -n 10)
-    
+
     if [[ -z "$RELEASES" ]]; then
       print_error "No previous releases found for rollback"
       exit 1
     fi
-    
+
     # Get current and previous release
     CURRENT_RELEASE=$(run_remote "readlink $REMOTE_DIR/current" | xargs basename)
-    
+
     # Find the release before the current one
     PREVIOUS_RELEASE=""
     for release in $RELEASES; do
@@ -429,12 +429,12 @@ if [[ "$ROLLBACK" == "true" ]]; then
         break
       fi
     done
-    
+
     if [[ -z "$PREVIOUS_RELEASE" ]]; then
       print_error "No previous release found for rollback"
       exit 1
     fi
-    
+
     print_info "Rolling back from $CURRENT_RELEASE to $PREVIOUS_RELEASE"
     RELEASE_DIR="$REMOTE_DIR/releases/$PREVIOUS_RELEASE"
   else
@@ -443,7 +443,7 @@ if [[ "$ROLLBACK" == "true" ]]; then
   fi
 else
   print_info "Preparing new deployment..."
-  
+
   # Create release directory structure
   if [[ "$DRY_RUN" == "false" ]]; then
     run_remote "mkdir -p $RELEASE_DIR"
@@ -460,17 +460,17 @@ fi
 
 deploy_backend() {
   print_header "Deploying Backend"
-  
+
   if [[ ! -d "backend" ]]; then
     print_warning "Backend directory not found, skipping"
     return
   fi
-  
+
   if [[ "$ROLLBACK" == "true" ]]; then
     print_info "Rollback: Using previous backend deployment"
     return
   fi
-  
+
   # Determine backend build artifacts
   BACKEND_BUILD=""
   if [[ -d "backend/dist" ]]; then
@@ -481,29 +481,29 @@ deploy_backend() {
     print_warning "No backend build artifacts found"
     BACKEND_BUILD="backend"
   fi
-  
+
   # Transfer backend files
   if [[ "$DRY_RUN" == "false" ]]; then
     print_info "Transferring backend files..."
     transfer_files "$BACKEND_BUILD" "$RELEASE_DIR/backend"
     transfer_files "backend/requirements.txt" "$RELEASE_DIR/backend/"
-    
+
     # Transfer configuration files
     if [[ -d "config" ]]; then
       transfer_files "config" "$RELEASE_DIR/"
     fi
-    
+
     # Set up virtual environment on remote server
     print_info "Setting up Python virtual environment..."
     run_remote "cd $RELEASE_DIR && python3 -m venv venv"
     run_remote "cd $RELEASE_DIR && source venv/bin/activate && pip install -r backend/requirements.txt"
-    
+
     # Run database migrations if needed
     if [[ "$DEPLOY_ENV" != "development" ]]; then
       print_info "Running database migrations..."
       run_remote "cd $RELEASE_DIR && source venv/bin/activate && cd backend && python manage.py migrate --noinput"
     fi
-    
+
     # Collect static files if needed
     if [[ "$DEPLOY_ENV" != "development" ]]; then
       print_info "Collecting static files..."
@@ -512,23 +512,23 @@ deploy_backend() {
   else
     print_info "Dry run: Would transfer backend files and set up environment"
   fi
-  
+
   print_success "Backend deployment prepared"
 }
 
 deploy_web_frontend() {
   print_header "Deploying Web Frontend"
-  
+
   if [[ ! -d "web-frontend" ]]; then
     print_warning "Web frontend directory not found, skipping"
     return
   fi
-  
+
   if [[ "$ROLLBACK" == "true" ]]; then
     print_info "Rollback: Using previous web frontend deployment"
     return
   fi
-  
+
   # Determine web frontend build artifacts
   WEB_BUILD=""
   if [[ -d "web-frontend/dist" ]]; then
@@ -539,7 +539,7 @@ deploy_web_frontend() {
     print_warning "No web frontend build artifacts found"
     WEB_BUILD="web-frontend"
   fi
-  
+
   # Transfer web frontend files
   if [[ "$DRY_RUN" == "false" ]]; then
     print_info "Transferring web frontend files..."
@@ -547,7 +547,7 @@ deploy_web_frontend() {
   else
     print_info "Dry run: Would transfer web frontend files"
   fi
-  
+
   print_success "Web frontend deployment prepared"
 }
 
@@ -575,16 +575,16 @@ if [[ "$DRY_RUN" == "false" ]]; then
   run_remote "mkdir -p $REMOTE_DIR/shared/logs"
   run_remote "mkdir -p $REMOTE_DIR/shared/uploads"
   run_remote "mkdir -p $REMOTE_DIR/shared/tmp"
-  
+
   # Link shared directories
   run_remote "ln -sf $REMOTE_DIR/shared/logs $RELEASE_DIR/logs"
   run_remote "ln -sf $REMOTE_DIR/shared/uploads $RELEASE_DIR/uploads"
   run_remote "ln -sf $REMOTE_DIR/shared/tmp $RELEASE_DIR/tmp"
-  
+
   # Deploy based on strategy
   if [[ "$DEPLOYMENT_STRATEGY" == "blue-green" ]]; then
     print_info "Using blue-green deployment strategy..."
-    
+
     # Determine current color (blue or green)
     CURRENT_COLOR="blue"
     if run_remote "[ -L $REMOTE_DIR/current ] && [ \$(readlink $REMOTE_DIR/current | grep -c blue) -gt 0 ]"; then
@@ -594,14 +594,14 @@ if [[ "$DRY_RUN" == "false" ]]; then
       CURRENT_COLOR="green"
       NEW_COLOR="blue"
     fi
-    
+
     print_info "Current deployment is $CURRENT_COLOR, new deployment will be $NEW_COLOR"
-    
+
     # Create color-specific directory
     run_remote "mkdir -p $REMOTE_DIR/$NEW_COLOR"
     run_remote "rm -rf $REMOTE_DIR/$NEW_COLOR/*"
     run_remote "cp -R $RELEASE_DIR/* $REMOTE_DIR/$NEW_COLOR/"
-    
+
     # Update configuration if needed
     if [[ "$USE_DOCKER" == "true" ]]; then
       print_info "Updating Docker configuration..."
@@ -614,7 +614,7 @@ if [[ "$DRY_RUN" == "false" ]]; then
         run_remote "sudo cp $REMOTE_DIR/$NEW_COLOR/config/nginx/$DEPLOY_ENV.conf $WEB_SERVER_CONFIG"
         run_remote "sudo ln -sf $WEB_SERVER_CONFIG $WEB_SERVER_ENABLED"
       fi
-      
+
       # Update application server configuration
       if [[ -n "$APP_SERVER_CONFIG" ]]; then
         print_info "Updating application server configuration..."
@@ -622,36 +622,36 @@ if [[ "$DRY_RUN" == "false" ]]; then
         run_remote "sudo systemctl daemon-reload"
       fi
     fi
-    
+
     # Switch to new deployment
     print_info "Switching to new deployment..."
     run_remote "ln -sfn $REMOTE_DIR/$NEW_COLOR $REMOTE_DIR/current"
-    
+
     # Restart services
     if [[ "$USE_DOCKER" != "true" ]]; then
       print_info "Restarting services..."
       run_remote "sudo systemctl restart $(basename $APP_SERVER_CONFIG)"
       run_remote "sudo systemctl restart $WEB_SERVER"
     fi
-    
+
     print_info "Waiting for health check..."
     sleep 5
-    
+
     # Verify deployment
     if run_remote "curl -s -o /dev/null -w '%{http_code}' http://localhost/health" | grep -q "200"; then
       print_success "Deployment health check passed"
     else
       print_error "Deployment health check failed"
-      
+
       if [[ "$ROLLBACK" != "true" ]]; then
         print_warning "Rolling back to previous deployment..."
         run_remote "ln -sfn $REMOTE_DIR/$CURRENT_COLOR $REMOTE_DIR/current"
-        
+
         if [[ "$USE_DOCKER" != "true" ]]; then
           run_remote "sudo systemctl restart $(basename $APP_SERVER_CONFIG)"
           run_remote "sudo systemctl restart $WEB_SERVER"
         fi
-        
+
         print_error "Deployment failed and rolled back to previous version"
         exit 1
       fi
@@ -659,17 +659,17 @@ if [[ "$DRY_RUN" == "false" ]]; then
   else
     # Simple direct deployment
     print_info "Using direct deployment strategy..."
-    
+
     # Backup current deployment if it exists
     if run_remote "[ -L $REMOTE_DIR/current ]"; then
       print_info "Backing up current deployment..."
       run_remote "cp -R $(run_remote "readlink $REMOTE_DIR/current") $REMOTE_DIR/previous"
     fi
-    
+
     # Update current symlink
     print_info "Updating current symlink..."
     run_remote "ln -sfn $RELEASE_DIR $REMOTE_DIR/current"
-    
+
     # Update configuration if needed
     if [[ "$USE_DOCKER" == "true" ]]; then
       print_info "Updating Docker configuration..."
@@ -682,25 +682,25 @@ if [[ "$DRY_RUN" == "false" ]]; then
         run_remote "sudo cp $REMOTE_DIR/current/config/nginx/$DEPLOY_ENV.conf $WEB_SERVER_CONFIG"
         run_remote "sudo ln -sf $WEB_SERVER_CONFIG $WEB_SERVER_ENABLED"
       fi
-      
+
       # Update application server configuration
       if [[ -n "$APP_SERVER_CONFIG" ]]; then
         print_info "Updating application server configuration..."
         run_remote "sudo cp $REMOTE_DIR/current/config/systemd/$DEPLOY_ENV.service $APP_SERVER_CONFIG"
         run_remote "sudo systemctl daemon-reload"
       fi
-      
+
       # Restart services
       print_info "Restarting services..."
       run_remote "sudo systemctl restart $(basename $APP_SERVER_CONFIG)"
       run_remote "sudo systemctl restart $WEB_SERVER"
     fi
   fi
-  
+
   # Clean up old releases
   print_info "Cleaning up old releases..."
   run_remote "cd $REMOTE_DIR/releases && ls -1t | tail -n +$((KEEP_RELEASES + 1)) | xargs -I {} rm -rf {}"
-  
+
   print_success "Deployment activated successfully!"
 else
   print_info "Dry run: Would activate deployment and restart services"
@@ -784,7 +784,7 @@ cat > "$REPORT_FILE" << EOF
   <div class="container">
     <h1>AlphaMind Deployment Report</h1>
     <div class="timestamp">Generated on $(date)</div>
-    
+
     <div class="summary-box success">
       <h2>Deployment Summary</h2>
       <p>
@@ -797,9 +797,9 @@ cat > "$REPORT_FILE" << EOF
         <strong>Status:</strong> ${ROLLBACK:+Rollback}${ROLLBACK:-Success}
       </p>
     </div>
-    
+
     <h2>Deployed Components</h2>
-    
+
     <table>
       <tr>
         <th>Component</th>
@@ -820,12 +820,12 @@ done
 # Close HTML
 cat >> "$REPORT_FILE" << EOF
     </table>
-    
+
     <h2>Deployment Log</h2>
     <pre>
 $(tail -n 50 "$LOG_FILE")
     </pre>
-    
+
     <h2>Next Steps</h2>
     <p>
       The application has been successfully deployed to the ${DEPLOY_ENV} environment.

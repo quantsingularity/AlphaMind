@@ -11,63 +11,63 @@
     .risk-low { fill: #28a745; }
     .distribution { stroke: #343a40; stroke-width: 1; fill: none; }
   </style>
-  
+
   <!-- Markers for arrows -->
   <defs>
     <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
       <polygon points="0 0, 10 3.5, 0 7" fill="#4a6cf7" />
     </marker>
   </defs>
-  
+
   <!-- Background -->
   <rect class="bg" x="0" y="0" width="800" height="500" rx="8" />
-  
+
   <!-- Title -->
   <text class="title" x="400" y="40">Risk Management Framework</text>
   <text class="subtitle" x="400" y="65">Bayesian VaR, Stress Testing, and Counterparty Risk</text>
-  
+
   <!-- Portfolio Module -->
   <rect class="module" x="100" y="100" width="160" height="80" />
   <text class="title" x="180" y="130">Portfolio</text>
   <text class="subtitle" x="180" y="150">Positions, Exposures,</text>
   <text class="subtitle" x="180" y="170">Correlations</text>
-  
+
   <!-- Market Data Module -->
   <rect class="module" x="100" y="220" width="160" height="80" />
   <text class="title" x="180" y="250">Market Data</text>
   <text class="subtitle" x="180" y="270">Historical Returns,</text>
   <text class="subtitle" x="180" y="290">Volatility Regimes</text>
-  
+
   <!-- Bayesian VaR Module -->
   <rect class="module" x="320" y="100" width="160" height="80" />
   <text class="title" x="400" y="130">Bayesian VaR</text>
   <text class="subtitle" x="400" y="150">Regime-Switching Models</text>
   <text class="subtitle" x="400" y="170">Tail Risk Estimation</text>
-  
+
   <!-- Stress Testing Module -->
   <rect class="module" x="320" y="220" width="160" height="80" />
   <text class="title" x="400" y="250">Stress Testing</text>
   <text class="subtitle" x="400" y="270">Historical Scenarios</text>
   <text class="subtitle" x="400" y="290">Copula-Based Simulation</text>
-  
+
   <!-- Counterparty Risk Module -->
   <rect class="module" x="320" y="340" width="160" height="80" />
   <text class="title" x="400" y="370">Counterparty Risk</text>
   <text class="subtitle" x="400" y="390">Credit Value Adjustment</text>
   <text class="subtitle" x="400" y="410">Default Correlation</text>
-  
+
   <!-- Risk Limits Module -->
   <rect class="module" x="540" y="160" width="160" height="80" />
   <text class="title" x="620" y="190">Risk Limits</text>
   <text class="subtitle" x="620" y="210">Position Limits</text>
   <text class="subtitle" x="620" y="230">Exposure Constraints</text>
-  
+
   <!-- Risk Reporting Module -->
   <rect class="module" x="540" y="280" width="160" height="80" />
   <text class="title" x="620" y="310">Risk Reporting</text>
   <text class="subtitle" x="620" y="330">Daily Risk Metrics</text>
   <text class="subtitle" x="620" y="350">Limit Utilization</text>
-  
+
   <!-- Arrows -->
   <path class="arrow" d="M260,140 L320,140" />
   <path class="arrow" d="M260,260 L320,260" />
@@ -76,20 +76,20 @@
   <path class="arrow" d="M480,260 C510,260 510,220 540,220" />
   <path class="arrow" d="M480,380 C510,380 510,320 540,320" />
   <path class="arrow" d="M620,240 L620,280" />
-  
+
   <!-- Bottom Section - VaR Distribution -->
   <rect x="100" y="440" width="600" height="40" rx="8" fill="white" stroke="#e9ecef" stroke-width="2" />
-  
+
   <!-- VaR Distribution -->
   <path class="distribution" d="M150,460 C200,460 200,450 250,450 S300,460 350,460 S400,470 450,470 S500,450 550,450 S600,460 650,460" />
-  
+
   <!-- VaR Markers -->
   <line x1="350" y1="440" x2="350" y2="480" stroke="#28a745" stroke-width="2" />
   <text x="350" y="430" font-family="Arial" font-size="10" fill="#28a745" text-anchor="middle">95% VaR</text>
-  
+
   <line x1="450" y1="440" x2="450" y2="480" stroke="#fd7e14" stroke-width="2" />
   <text x="450" y="430" font-family="Arial" font-size="10" fill="#fd7e14" text-anchor="middle">99% VaR</text>
-  
+
   <line x1="550" y1="440" x2="550" y2="480" stroke="#dc3545" stroke-width="2" />
   <text x="550" y="430" font-family="Arial" font-size="10" fill="#dc3545" text-anchor="middle">99.9% VaR</text>
 </svg>

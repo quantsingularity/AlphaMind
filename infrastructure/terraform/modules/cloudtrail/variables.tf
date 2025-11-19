@@ -41,4 +41,3 @@ variable "enable_log_file_validation" {
   type        = bool
   default     = true
 }
-

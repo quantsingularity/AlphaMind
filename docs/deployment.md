@@ -90,10 +90,10 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 server {
     listen 443 ssl;
     server_name api.alphamind.com;
-    
+
     ssl_certificate /path/to/certificate.crt;
     ssl_certificate_key /path/to/private.key;
-    
+
     # SSL configuration
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
@@ -199,4 +199,4 @@ pg_dump -U username -d dbname > backup.sql
 - docker logs
 - nginx access logs
 - application logs
-- monitoring dashboards 
+- monitoring dashboards

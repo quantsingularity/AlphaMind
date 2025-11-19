@@ -7,7 +7,7 @@
     .arrow { stroke: #4a6cf7; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
     .data-flow { stroke: #28a745; stroke-width: 2; stroke-dasharray: 5,5; fill: none; marker-end: url(#arrowhead-green); }
   </style>
-  
+
   <!-- Markers for arrows -->
   <defs>
     <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
@@ -17,70 +17,70 @@
       <polygon points="0 0, 10 3.5, 0 7" fill="#28a745" />
     </marker>
   </defs>
-  
+
   <!-- Background -->
   <rect class="diagram-bg" x="0" y="0" width="800" height="500" rx="8" />
-  
+
   <!-- Title -->
   <text x="400" y="40" font-family="Arial" font-size="20" font-weight="bold" fill="#343a40" text-anchor="middle">AlphaMind AI/ML Architecture</text>
-  
+
   <!-- Input Data Module -->
   <rect class="module" x="100" y="100" width="160" height="80" />
   <text class="module-title" x="180" y="130">Input Data</text>
   <text class="module-desc" x="180" y="150">Market Data, Alternative</text>
   <text class="module-desc" x="180" y="165">Data, Features</text>
-  
+
   <!-- Preprocessing Module -->
   <rect class="module" x="100" y="220" width="160" height="80" />
   <text class="module-title" x="180" y="250">Preprocessing</text>
   <text class="module-desc" x="180" y="270">Normalization, Feature</text>
   <text class="module-desc" x="180" y="285">Engineering, Encoding</text>
-  
+
   <!-- Temporal Fusion Transformer -->
   <rect class="module" x="320" y="100" width="160" height="80" />
   <text class="module-title" x="400" y="130">Temporal Fusion</text>
   <text class="module-title" x="400" y="150">Transformer</text>
   <text class="module-desc" x="400" y="170">Multi-horizon Forecasting</text>
-  
+
   <!-- Reinforcement Learning -->
   <rect class="module" x="320" y="220" width="160" height="80" />
   <text class="module-title" x="400" y="250">Reinforcement Learning</text>
   <text class="module-desc" x="400" y="270">Portfolio Optimization</text>
-  
+
   <!-- Generative Models -->
   <rect class="module" x="320" y="340" width="160" height="80" />
   <text class="module-title" x="400" y="370">Generative Models</text>
   <text class="module-desc" x="400" y="390">Market Simulation</text>
-  
+
   <!-- Ensemble Module -->
   <rect class="module" x="540" y="220" width="160" height="80" />
   <text class="module-title" x="620" y="250">Ensemble Integration</text>
   <text class="module-desc" x="620" y="270">Model Weighting &</text>
   <text class="module-desc" x="620" y="285">Confidence Scoring</text>
-  
+
   <!-- Output Module -->
   <rect class="module" x="540" y="340" width="160" height="80" />
   <text class="module-title" x="620" y="370">Trading Signals</text>
   <text class="module-desc" x="620" y="390">Alpha Generation &</text>
   <text class="module-desc" x="620" y="405">Risk Management</text>
-  
+
   <!-- Arrows -->
   <!-- Input to Preprocessing -->
   <path class="arrow" d="M180,180 L180,220" />
-  
+
   <!-- Preprocessing to Models -->
   <path class="arrow" d="M260,240 C290,240 290,140 320,140" />
   <path class="arrow" d="M260,260 L320,260" />
   <path class="arrow" d="M260,280 C290,280 290,380 320,380" />
-  
+
   <!-- Models to Ensemble -->
   <path class="arrow" d="M480,140 C510,140 510,240 540,240" />
   <path class="arrow" d="M480,260 L540,260" />
   <path class="arrow" d="M480,380 C510,380 510,280 540,280" />
-  
+
   <!-- Ensemble to Output -->
   <path class="arrow" d="M620,300 L620,340" />
-  
+
   <!-- Data Flow -->
   <path class="data-flow" d="M180,300 C180,420 400,420 620,420" />
 </svg>

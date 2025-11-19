@@ -342,4 +342,3 @@ This infrastructure configuration is designed to meet common financial industry 
 **Last Updated**: $(date)
 **Version**: 2.0.0
 **Compliance Standards**: PCI DSS v4.0, GDPR, SOX, NIST CSF 2.0, ISO 27001:2022
-

@@ -3,7 +3,7 @@ variable "aws_region" {
   description = "AWS region to deploy resources"
   type        = string
   default     = "us-west-2"
-  
+
   validation {
     condition = can(regex("^[a-z]{2}-[a-z]+-[0-9]$", var.aws_region))
     error_message = "AWS region must be in the format: us-west-2, eu-west-1, etc."
@@ -13,7 +13,7 @@ variable "aws_region" {
 variable "environment" {
   description = "Environment name (dev, staging, prod)"
   type        = string
-  
+
   validation {
     condition = contains(["dev", "staging", "prod"], var.environment)
     error_message = "Environment must be one of: dev, staging, prod."
@@ -24,7 +24,7 @@ variable "app_name" {
   description = "Application name"
   type        = string
   default     = "alphamind"
-  
+
   validation {
     condition = can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.app_name))
     error_message = "App name must start with a letter, contain only lowercase letters, numbers, and hyphens."
@@ -36,7 +36,7 @@ variable "vpc_cidr" {
   description = "CIDR block for the VPC"
   type        = string
   default     = "10.0.0.0/16"
-  
+
   validation {
     condition = can(cidrhost(var.vpc_cidr, 0))
     error_message = "VPC CIDR must be a valid IPv4 CIDR block."
@@ -47,7 +47,7 @@ variable "availability_zones" {
   description = "List of availability zones"
   type        = list(string)
   default     = ["us-west-2a", "us-west-2b", "us-west-2c"]
-  
+
   validation {
     condition = length(var.availability_zones) >= 2
     error_message = "At least 2 availability zones must be specified for high availability."
@@ -90,7 +90,7 @@ variable "instance_type" {
   description = "EC2 instance type"
   type        = string
   default     = "t3.medium"  # Upgraded for financial workloads
-  
+
   validation {
     condition = can(regex("^[a-z][0-9][a-z]?\\.(nano|micro|small|medium|large|xlarge|[0-9]+xlarge)$", var.instance_type))
     error_message = "Instance type must be a valid EC2 instance type."
@@ -146,7 +146,7 @@ variable "db_password" {
   description = "Database password"
   type        = string
   sensitive   = true
-  
+
   validation {
     condition = length(var.db_password) >= 12
     error_message = "Database password must be at least 12 characters long for PCI DSS compliance."
@@ -189,7 +189,7 @@ variable "kms_deletion_window" {
   description = "KMS key deletion window in days"
   type        = number
   default     = 30
-  
+
   validation {
     condition = var.kms_deletion_window >= 7 && var.kms_deletion_window <= 30
     error_message = "KMS deletion window must be between 7 and 30 days."
@@ -316,7 +316,7 @@ variable "data_classification" {
   description = "Data classification level"
   type        = string
   default     = "Financial"
-  
+
   validation {
     condition = contains(["Public", "Internal", "Confidential", "Financial", "Restricted"], var.data_classification)
     error_message = "Data classification must be one of: Public, Internal, Confidential, Financial, Restricted."
