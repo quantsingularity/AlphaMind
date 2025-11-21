@@ -40,7 +40,7 @@
     name: "{{ db_user }}"
     password: "{{ db_password }}"
     priv: "{{ db_name }}.*:ALL"
-    host: '%'
+    host: "%"
     state: present
     login_user: root
     login_password: "{{ db_root_password }}"

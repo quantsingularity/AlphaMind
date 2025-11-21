@@ -51,12 +51,14 @@ The mobile application provides the following key features:
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/abrar2030/AlphaMind.git
    cd AlphaMind/mobile-frontend
    ```
 
 2. Install dependencies:
+
    ```bash
    yarn install
    # or
@@ -64,11 +66,13 @@ The mobile application provides the following key features:
    ```
 
 3. Start the Metro bundler:
+
    ```bash
    npx react-native start
    ```
 
 4. Run on Android:
+
    ```bash
    npx react-native run-android
    ```
@@ -100,6 +104,7 @@ npm test
 ```
 
 The `tests/` directory contains:
+
 - Unit tests for components
 - Integration tests for screens
 - End-to-end tests using Detox
@@ -128,6 +133,7 @@ The APK will be generated at `android/app/build/outputs/apk/release/app-release.
 ### iOS
 
 1. Open the project in Xcode:
+
    ```bash
    cd ios
    open AlphaMind.xcworkspace

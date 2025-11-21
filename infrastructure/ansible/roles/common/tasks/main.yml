@@ -2,7 +2,7 @@
 # roles/common/tasks/main.yml
 - name: Update all packages
   yum:
-    name: '*'
+    name: "*"
     state: latest
     update_only: yes
 

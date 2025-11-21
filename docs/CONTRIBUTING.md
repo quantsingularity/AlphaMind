@@ -11,6 +11,7 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) to foster an in
 ### Reporting Bugs
 
 If you find a bug, please create an issue with the following information:
+
 - A clear, descriptive title
 - Steps to reproduce the bug
 - Expected behavior
@@ -21,6 +22,7 @@ If you find a bug, please create an issue with the following information:
 ### Suggesting Enhancements
 
 We welcome suggestions for enhancements! Please create an issue with:
+
 - A clear, descriptive title
 - Detailed description of the proposed enhancement
 - Any relevant examples, mockups, or references
@@ -40,6 +42,7 @@ We welcome suggestions for enhancements! Please create an issue with:
 
 1. Clone the repository
 2. Install dependencies:
+
    ```
    cd backend
    pip install -r requirements.txt
@@ -50,7 +53,9 @@ We welcome suggestions for enhancements! Please create an issue with:
    cd ../mobile-frontend
    yarn install
    ```
+
 3. Run tests to ensure everything is working:
+
    ```
    cd tests
    pytest

@@ -10,24 +10,28 @@
 ## Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/abrar2030/AlphaMind.git
 cd AlphaMind
 ```
 
 2. Set up the Python virtual environment:
+
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
 3. Install backend dependencies:
+
 ```bash
 cd backend
 pip install -r requirements.txt
 ```
 
 4. Install frontend dependencies:
+
 ```bash
 cd ../frontend
 npm install
@@ -46,12 +50,14 @@ npm install
 ## Running the Application
 
 1. Start the backend server:
+
 ```bash
 cd backend
 python app.py
 ```
 
 2. Start the frontend development server:
+
 ```bash
 cd frontend
 npm run dev
@@ -62,6 +68,7 @@ The application should now be accessible at `http://localhost:3000`
 ## Testing
 
 Run the test suite:
+
 ```bash
 ./test_components.sh
 ```

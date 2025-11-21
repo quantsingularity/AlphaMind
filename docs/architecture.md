@@ -5,12 +5,14 @@
 AlphaMind is built using a modern microservices architecture with the following components:
 
 ### Frontend
+
 - Built with React.js
 - Uses modern state management
 - Implements responsive design principles
 - Communicates with backend via RESTful API
 
 ### Backend
+
 - Python-based server
 - RESTful API endpoints
 - Database integration
@@ -18,6 +20,7 @@ AlphaMind is built using a modern microservices architecture with the following 
 - Business logic implementation
 
 ### Infrastructure
+
 - Containerized deployment with Docker
 - CI/CD pipeline integration
 - Monitoring and logging

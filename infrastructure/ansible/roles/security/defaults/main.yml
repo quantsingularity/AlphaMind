@@ -50,7 +50,7 @@ siem_protocol: "tcp"
 
 # Backup settings
 backup_encryption_key_file: "/etc/security/backup.key"
-backup_retention_days: 2555  # 7 years for financial compliance
+backup_retention_days: 2555 # 7 years for financial compliance
 
 # SSL/TLS settings
 ssl_cipher_suite: "ECDHE+AESGCM:ECDHE+CHACHA20:DHE+AESGCM:DHE+CHACHA20:!aNULL:!MD5:!DSS"
@@ -75,4 +75,4 @@ cpu_usage_threshold: 85
 
 # Incident response
 incident_response_team: "security@company.com"
-incident_escalation_time: 30  # minutes
+incident_escalation_time: 30 # minutes

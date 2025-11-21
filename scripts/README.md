@@ -27,6 +27,7 @@ This package contains a set of comprehensive automation scripts designed to impr
 ```
 
 Options:
+
 - `--type TYPE` - Setup type: development, testing, or production (default: development)
 - `--verbose` - Enable verbose output
 - `--skip-python` - Skip Python environment setup
@@ -42,6 +43,7 @@ Options:
 ```
 
 Options:
+
 - `--type TYPE` - Test type: unit, integration, e2e, or all (default: all)
 - `--component COMPONENT` - Specific component to test (e.g., ai_models, risk_system)
 - `--verbose` - Enable verbose output
@@ -58,6 +60,7 @@ Options:
 ```
 
 Options:
+
 - `--type TYPE` - Lint type: python, js, all (default: all)
 - `--component COMPONENT` - Specific component to lint (e.g., backend, web-frontend)
 - `--fix` - Automatically fix issues where possible
@@ -73,6 +76,7 @@ Options:
 ```
 
 Options:
+
 - `--env ENV` - Build environment: development, staging, production (default: development)
 - `--component COMPONENT` - Specific component to build (e.g., backend, web-frontend)
 - `--clean` - Perform a clean build (remove previous build artifacts)
@@ -90,6 +94,7 @@ Options:
 ```
 
 Options:
+
 - `--env ENV` - Deployment environment: development, staging, production (default: development)
 - `--component COMPONENT` - Specific component to deploy (e.g., backend, web-frontend)
 - `--verbose` - Enable verbose output
@@ -120,9 +125,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test:

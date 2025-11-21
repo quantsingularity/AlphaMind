@@ -3,6 +3,7 @@
 ## Code Style and Standards
 
 ### Python (Backend)
+
 - Follow PEP 8 guidelines
 - Use type hints
 - Maximum line length: 100 characters
@@ -10,6 +11,7 @@
 - Use meaningful variable and function names
 
 ### JavaScript/TypeScript (Frontend)
+
 - Follow ESLint configuration
 - Use TypeScript for type safety
 - Follow React best practices
@@ -19,6 +21,7 @@
 ## Git Workflow
 
 ### Branch Naming Convention
+
 - `feature/` - New features
 - `bugfix/` - Bug fixes
 - `hotfix/` - Urgent fixes
@@ -26,6 +29,7 @@
 - `docs/` - Documentation updates
 
 ### Commit Message Format
+
 ```
 <type>(<scope>): <subject>
 
@@ -35,6 +39,7 @@
 ```
 
 Types:
+
 - feat: New feature
 - fix: Bug fix
 - docs: Documentation changes
@@ -46,6 +51,7 @@ Types:
 ## Testing
 
 ### Backend Testing
+
 - Use pytest for Python tests
 - Unit tests for all business logic
 - Integration tests for API endpoints
@@ -53,6 +59,7 @@ Types:
 - Maintain 80%+ test coverage
 
 ### Frontend Testing
+
 - Use Jest and React Testing Library
 - Unit tests for components
 - Integration tests for user flows
@@ -78,6 +85,7 @@ Types:
 ## Performance Guidelines
 
 ### Backend
+
 - Optimize database queries
 - Implement caching where appropriate
 - Use async/await for I/O operations
@@ -85,6 +93,7 @@ Types:
 - Implement proper error handling
 
 ### Frontend
+
 - Optimize bundle size
 - Implement lazy loading
 - Use proper state management

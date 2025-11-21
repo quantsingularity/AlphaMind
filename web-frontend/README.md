@@ -52,12 +52,14 @@ The web interface provides the following key features:
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/abrar2030/AlphaMind.git
    cd AlphaMind/web-frontend
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    # or
@@ -65,6 +67,7 @@ The web interface provides the following key features:
    ```
 
 3. Start the development server:
+
    ```bash
    npm start
    # or

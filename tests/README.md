@@ -100,6 +100,7 @@ Tests can be configured using pytest configuration files or environment variable
 ## Continuous Integration
 
 Tests are automatically run in the CI/CD pipeline on:
+
 - Pull requests to the main branch
 - Direct pushes to the main branch
 - Scheduled runs (nightly builds)
@@ -143,6 +144,7 @@ Performance tests ensure the system meets latency and throughput requirements:
 ## Test Data
 
 Test data is provided through:
+
 - Fixtures defined in `conftest.py`
 - Static test data files in the `tests/data` directory
 - Dynamically generated test data

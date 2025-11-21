@@ -14,7 +14,7 @@
     state: directory
     owner: nginx
     group: nginx
-    mode: '0755'
+    mode: "0755"
 
 - name: Configure Nginx
   template:

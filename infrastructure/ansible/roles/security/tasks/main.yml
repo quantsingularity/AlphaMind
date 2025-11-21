@@ -135,12 +135,17 @@
     proto: "{{ item.proto }}"
     src: "{{ item.src | default(omit) }}"
   loop:
-    - { rule: 'allow', port: '22', proto: 'tcp', src: '{{ management_network }}' }
-    - { rule: 'allow', port: '80', proto: 'tcp' }
-    - { rule: 'allow', port: '443', proto: 'tcp' }
-    - { rule: 'deny', port: '3306', proto: 'tcp' }
-    - { rule: 'deny', port: '5432', proto: 'tcp' }
-    - { rule: 'deny', port: '6379', proto: 'tcp' }
+    - {
+        rule: "allow",
+        port: "22",
+        proto: "tcp",
+        src: "{{ management_network }}",
+      }
+    - { rule: "allow", port: "80", proto: "tcp" }
+    - { rule: "allow", port: "443", proto: "tcp" }
+    - { rule: "deny", port: "3306", proto: "tcp" }
+    - { rule: "deny", port: "5432", proto: "tcp" }
+    - { rule: "deny", port: "6379", proto: "tcp" }
 
 - name: Enable UFW firewall
   ufw:
@@ -159,21 +164,21 @@
     state: present
     reload: yes
   loop:
-    - { name: 'net.ipv4.ip_forward', value: '0' }
-    - { name: 'net.ipv4.conf.all.send_redirects', value: '0' }
-    - { name: 'net.ipv4.conf.default.send_redirects', value: '0' }
-    - { name: 'net.ipv4.conf.all.accept_source_route', value: '0' }
-    - { name: 'net.ipv4.conf.default.accept_source_route', value: '0' }
-    - { name: 'net.ipv4.conf.all.accept_redirects', value: '0' }
-    - { name: 'net.ipv4.conf.default.accept_redirects', value: '0' }
-    - { name: 'net.ipv4.conf.all.secure_redirects', value: '0' }
-    - { name: 'net.ipv4.conf.default.secure_redirects', value: '0' }
-    - { name: 'net.ipv4.conf.all.log_martians', value: '1' }
-    - { name: 'net.ipv4.conf.default.log_martians', value: '1' }
-    - { name: 'net.ipv4.icmp_echo_ignore_broadcasts', value: '1' }
-    - { name: 'net.ipv4.icmp_ignore_bogus_error_responses', value: '1' }
-    - { name: 'net.ipv4.tcp_syncookies', value: '1' }
-    - { name: 'kernel.randomize_va_space', value: '2' }
+    - { name: "net.ipv4.ip_forward", value: "0" }
+    - { name: "net.ipv4.conf.all.send_redirects", value: "0" }
+    - { name: "net.ipv4.conf.default.send_redirects", value: "0" }
+    - { name: "net.ipv4.conf.all.accept_source_route", value: "0" }
+    - { name: "net.ipv4.conf.default.accept_source_route", value: "0" }
+    - { name: "net.ipv4.conf.all.accept_redirects", value: "0" }
+    - { name: "net.ipv4.conf.default.accept_redirects", value: "0" }
+    - { name: "net.ipv4.conf.all.secure_redirects", value: "0" }
+    - { name: "net.ipv4.conf.default.secure_redirects", value: "0" }
+    - { name: "net.ipv4.conf.all.log_martians", value: "1" }
+    - { name: "net.ipv4.conf.default.log_martians", value: "1" }
+    - { name: "net.ipv4.icmp_echo_ignore_broadcasts", value: "1" }
+    - { name: "net.ipv4.icmp_ignore_bogus_error_responses", value: "1" }
+    - { name: "net.ipv4.tcp_syncookies", value: "1" }
+    - { name: "kernel.randomize_va_space", value: "2" }
 
 - name: Remove unnecessary packages
   package:
@@ -218,13 +223,13 @@
     line: "{{ item.line }}"
     backup: yes
   loop:
-    - { regexp: '^minlen', line: 'minlen = 12' }
-    - { regexp: '^minclass', line: 'minclass = 4' }
-    - { regexp: '^maxrepeat', line: 'maxrepeat = 2' }
-    - { regexp: '^dcredit', line: 'dcredit = -1' }
-    - { regexp: '^ucredit', line: 'ucredit = -1' }
-    - { regexp: '^lcredit', line: 'lcredit = -1' }
-    - { regexp: '^ocredit', line: 'ocredit = -1' }
+    - { regexp: "^minlen", line: "minlen = 12" }
+    - { regexp: "^minclass", line: "minclass = 4" }
+    - { regexp: "^maxrepeat", line: "maxrepeat = 2" }
+    - { regexp: "^dcredit", line: "dcredit = -1" }
+    - { regexp: "^ucredit", line: "ucredit = -1" }
+    - { regexp: "^lcredit", line: "lcredit = -1" }
+    - { regexp: "^ocredit", line: "ocredit = -1" }
 
 - name: Configure account lockout policy
   lineinfile:
@@ -233,21 +238,21 @@
     line: "{{ item.line }}"
     backup: yes
   loop:
-    - { regexp: '^deny', line: 'deny = 5' }
-    - { regexp: '^unlock_time', line: 'unlock_time = 900' }
-    - { regexp: '^fail_interval', line: 'fail_interval = 900' }
+    - { regexp: "^deny", line: "deny = 5" }
+    - { regexp: "^unlock_time", line: "unlock_time = 900" }
+    - { regexp: "^fail_interval", line: "fail_interval = 900" }
 
 - name: Configure session timeout
   lineinfile:
     path: /etc/profile
-    line: 'export TMOUT=900'
+    line: "export TMOUT=900"
     backup: yes
 
 - name: Create compliance monitoring script
   template:
     src: compliance-monitor.sh.j2
     dest: /usr/local/bin/compliance-monitor.sh
-    mode: '0755'
+    mode: "0755"
 
 - name: Schedule compliance monitoring
   cron:
@@ -260,7 +265,7 @@
   template:
     src: incident-response.sh.j2
     dest: /usr/local/bin/incident-response.sh
-    mode: '0755'
+    mode: "0755"
 
 - name: Configure log forwarding for SIEM
   template:
@@ -273,7 +278,7 @@
   template:
     src: vuln-scan.sh.j2
     dest: /usr/local/bin/vuln-scan.sh
-    mode: '0755'
+    mode: "0755"
 
 - name: Schedule vulnerability scanning
   cron:
@@ -302,7 +307,7 @@
   template:
     src: compliance-report.sh.j2
     dest: /usr/local/bin/compliance-report.sh
-    mode: '0755'
+    mode: "0755"
 
 - name: Schedule compliance reporting
   cron:

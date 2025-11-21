@@ -5,12 +5,14 @@ This document outlines the known limitations and test failures in the AlphaMind 
 ## 1. Model Serialization Issues
 
 ### Portfolio Optimizer
+
 - **Issue**: The `save_load` test in the portfolio optimizer fails due to model serialization problems.
 - **Details**: When attempting to save and load the model, there are shape mismatch errors during reconstruction.
 - **Impact**: Models cannot be reliably saved and loaded, which affects production deployment scenarios.
 - **Recommendation**: Implement custom object serialization for the portfolio optimizer model, ensuring all layers and custom methods are properly registered with the Keras serialization system.
 
 ### Sentiment Analyzer
+
 - **Issue**: Similar serialization issues exist in the sentiment analyzer model.
 - **Details**: The model save/load functionality uses `.h5` format but may require additional custom object handling.
 - **Recommendation**: Standardize model serialization approach across all ML components.
@@ -18,6 +20,7 @@ This document outlines the known limitations and test failures in the AlphaMind 
 ## 2. Date Handling Issues
 
 ### Sentiment Strategy
+
 - **Issue**: Multiple test failures in `TestSentimentBasedStrategy` related to date handling.
 - **Details**: The error `AttributeError: 'numpy.datetime64' object has no attribute 'strftime'` indicates inconsistent date type handling.
 - **Impact**: The sentiment-based trading strategy cannot process dates correctly, affecting signal generation.
@@ -26,6 +29,7 @@ This document outlines the known limitations and test failures in the AlphaMind 
 ## 3. Generative Model Architecture Issues
 
 ### MarketGAN
+
 - **Issue**: Input shape mismatches and batch size inconsistencies in the generative models.
 - **Details**: The `TransformerGenerator` expects different input shapes than what is provided in tests.
 - **Impact**: The generative finance models cannot be reliably used for synthetic data generation.
@@ -34,6 +38,7 @@ This document outlines the known limitations and test failures in the AlphaMind 
 ## 4. Authentication System Issues
 
 ### JWT Token Handling
+
 - **Issue**: JWT token validation failures in authentication tests.
 - **Details**: Invalid token format or encoding issues when validating JWT tokens.
 - **Impact**: The authentication system may reject valid tokens or accept invalid ones in certain scenarios.

@@ -1,12 +1,6 @@
 import React, { useMemo } from "react"; // Added useMemo
 import { StyleSheet, View, ScrollView, Text } from "react-native";
-import {
-  Headline,
-  Paragraph,
-  Card,
-  Title,
-  useTheme,
-} from "react-native-paper";
+import { Headline, Paragraph, Card, Title, useTheme } from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 // Mock KPI data
@@ -45,63 +39,67 @@ export default function HomeScreen() {
   const theme = useTheme();
 
   // Memoize styles to prevent recreation on every render unless theme changes
-  const styles = useMemo(() => StyleSheet.create({
-    container: {
-      backgroundColor: theme.colors.background, // Use theme color
-      flexGrow: 1,
-      padding: 16,
-    },
-    infoText: {
-      color: theme.colors.outline, // Use theme color (formerly '#888')
-      marginTop: 16,
-      textAlign: "center",
-    },
-    kpiCard: {
-      marginBottom: 16,
-      width: "48%",
-    },
-    kpiCardContent: {
-      alignItems: "center",
-      paddingHorizontal: 8,
-      paddingVertical: 12,
-    },
-    kpiChange: {
-      fontSize: 12,
-      marginTop: 2,
-    },
-    kpiContainer: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      justifyContent: "space-between",
-      marginBottom: 24,
-    },
-    kpiIcon: {
-      marginBottom: 8,
-    },
-    kpiTextContainer: {
-      alignItems: "center",
-    },
-    kpiTitle: {
-      color: theme.colors.onSurfaceVariant, // Use theme color (formerly '#666')
-      fontSize: 12,
-      marginBottom: 2,
-      textAlign: "center",
-    },
-    kpiValue: {
-      fontSize: 16,
-      lineHeight: 20,
-      textAlign: "center",
-    },
-    paragraph: {
-      fontSize: 16,
-      marginBottom: 24,
-      textAlign: "center",
-    },
-    title: {
-      marginBottom: 8,
-      textAlign: "center",
-    },
-  }), [theme]);
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          backgroundColor: theme.colors.background, // Use theme color
+          flexGrow: 1,
+          padding: 16,
+        },
+        infoText: {
+          color: theme.colors.outline, // Use theme color (formerly '#888')
+          marginTop: 16,
+          textAlign: "center",
+        },
+        kpiCard: {
+          marginBottom: 16,
+          width: "48%",
+        },
+        kpiCardContent: {
+          alignItems: "center",
+          paddingHorizontal: 8,
+          paddingVertical: 12,
+        },
+        kpiChange: {
+          fontSize: 12,
+          marginTop: 2,
+        },
+        kpiContainer: {
+          flexDirection: "row",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+          marginBottom: 24,
+        },
+        kpiIcon: {
+          marginBottom: 8,
+        },
+        kpiTextContainer: {
+          alignItems: "center",
+        },
+        kpiTitle: {
+          color: theme.colors.onSurfaceVariant, // Use theme color (formerly '#666')
+          fontSize: 12,
+          marginBottom: 2,
+          textAlign: "center",
+        },
+        kpiValue: {
+          fontSize: 16,
+          lineHeight: 20,
+          textAlign: "center",
+        },
+        paragraph: {
+          fontSize: 16,
+          marginBottom: 24,
+          textAlign: "center",
+        },
+        title: {
+          marginBottom: 8,
+          textAlign: "center",
+        },
+      }),
+    [theme],
+  );
 
   return (
     <ScrollView

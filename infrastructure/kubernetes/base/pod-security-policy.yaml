@@ -3,10 +3,10 @@ kind: PodSecurityPolicy
 metadata:
   name: alphamind-restricted-psp
   annotations:
-    seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'docker/default,runtime/default'
-    apparmor.security.beta.kubernetes.io/allowedProfileNames: 'runtime/default'
-    seccomp.security.alpha.kubernetes.io/defaultProfileName:  'runtime/default'
-    apparmor.security.beta.kubernetes.io/defaultProfileName:  'runtime/default'
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: "docker/default,runtime/default"
+    apparmor.security.beta.kubernetes.io/allowedProfileNames: "runtime/default"
+    seccomp.security.alpha.kubernetes.io/defaultProfileName: "runtime/default"
+    apparmor.security.beta.kubernetes.io/defaultProfileName: "runtime/default"
 spec:
   # Privilege escalation
   allowPrivilegeEscalation: false
@@ -15,12 +15,12 @@ spec:
 
   # Volumes and file systems
   volumes:
-    - 'configMap'
-    - 'emptyDir'
-    - 'projected'
-    - 'secret'
-    - 'downwardAPI'
-    - 'persistentVolumeClaim'
+    - "configMap"
+    - "emptyDir"
+    - "projected"
+    - "secret"
+    - "downwardAPI"
+    - "persistentVolumeClaim"
 
   # Host networking
   hostNetwork: false
@@ -34,27 +34,27 @@ spec:
 
   # Security context
   runAsUser:
-    rule: 'MustRunAsNonRoot'
+    rule: "MustRunAsNonRoot"
   runAsGroup:
-    rule: 'MustRunAs'
+    rule: "MustRunAs"
     ranges:
       - min: 1000
         max: 65535
 
   # SELinux
   seLinux:
-    rule: 'RunAsAny'
+    rule: "RunAsAny"
 
   # Supplemental groups
   supplementalGroups:
-    rule: 'MustRunAs'
+    rule: "MustRunAs"
     ranges:
       - min: 1000
         max: 65535
 
   # File system group
   fsGroup:
-    rule: 'MustRunAs'
+    rule: "MustRunAs"
     ranges:
       - min: 1000
         max: 65535
@@ -64,7 +64,7 @@ spec:
 
   # Forbidden sysctls
   forbiddenSysctls:
-    - '*'
+    - "*"
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -72,11 +72,11 @@ kind: ClusterRole
 metadata:
   name: alphamind-psp-user
 rules:
-- apiGroups: ['policy']
-  resources: ['podsecuritypolicies']
-  verbs:     ['use']
-  resourceNames:
-  - alphamind-restricted-psp
+  - apiGroups: ["policy"]
+    resources: ["podsecuritypolicies"]
+    verbs: ["use"]
+    resourceNames:
+      - alphamind-restricted-psp
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -88,12 +88,12 @@ roleRef:
   name: alphamind-psp-user
   apiGroup: rbac.authorization.k8s.io
 subjects:
-- kind: ServiceAccount
-  name: alphamind-service-account
-  namespace: alphamind-prod
-- kind: ServiceAccount
-  name: alphamind-service-account
-  namespace: alphamind-staging
-- kind: ServiceAccount
-  name: alphamind-service-account
-  namespace: alphamind-dev
+  - kind: ServiceAccount
+    name: alphamind-service-account
+    namespace: alphamind-prod
+  - kind: ServiceAccount
+    name: alphamind-service-account
+    namespace: alphamind-staging
+  - kind: ServiceAccount
+    name: alphamind-service-account
+    namespace: alphamind-dev

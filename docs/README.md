@@ -45,6 +45,7 @@ The documentation directory contains comprehensive guides, references, and resou
 ### For New Users
 
 Start with the `getting-started.md` guide, which provides:
+
 - System requirements
 - Installation instructions
 - Basic usage examples
@@ -60,6 +61,7 @@ Start with the `getting-started.md` guide, which provides:
 ### For Deployment
 
 The `deployment.md` guide covers:
+
 - Environment setup
 - Configuration requirements
 - Deployment procedures
@@ -90,6 +92,7 @@ For more details, see the [Contributing Guidelines](CONTRIBUTING.md).
 ## Image Resources
 
 The `images/` directory contains:
+
 - System architecture diagrams
 - UI screenshots
 - Workflow illustrations
