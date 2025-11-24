@@ -1,9 +1,9 @@
-#""""""
+# """"""
 ## Portfolio Risk Aggregation Module.
 #
 ## This module provides functionality for aggregating risk across different positions
 ## and portfolios, calculating various risk metrics, and monitoring risk limits.
-#""""""
+# """"""
 
 # from dataclasses import dataclass
 # import logging
@@ -76,10 +76,8 @@
 #             soft_limit=soft_limit,
 #             hard_limit=hard_limit,
 #             description=description,
-        )
 #         logger.info(
 #             f"Added risk limit for {metric_name} on position {self.position_id}"
-        )
 
 #     def calculate_var(
 #         self, returns: np.ndarray, confidence_level: float = 0.95
@@ -100,7 +98,6 @@
 #         except Exception as e:
 #             logger.error(
 #                 f"Error calculating VaR for position {self.position_id}: {str(e)}"
-            )
 #             raise
 
 #     def calculate_expected_shortfall(
@@ -123,7 +120,6 @@
 #         except Exception as e:
 #             logger.error(
 #                 f"Error calculating Expected Shortfall for position {self.position_id}: {str(e)}"
-            )
 #             raise
 
 #     def check_limits(self) -> Dict[str, Tuple[bool, str]]:
@@ -143,7 +139,6 @@
 #                         f"Risk limit breach for {metric_name} on position {self.position_id}: "
 #                         f"{value} exceeds {severity} limit of "
 #                         f"{self.risk_limits[metric_name].soft_limit if severity == 'soft' else self.risk_limits[metric_name].hard_limit}"
-                    )
 
 #         return results
 

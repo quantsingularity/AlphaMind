@@ -125,10 +125,8 @@
 #    """Test successful user login."""
 #     client.post(
         "/api/auth/register", json={"username": "loginuser", "password": "password123"}
-    )
 #     response = client.post(
         "/api/auth/login", json={"username": "loginuser", "password": "password123"}
-    )
 #     assert response.status_code == 200
 #     assert response.json["message"] == "Login successful"
 #     assert "token" in response.json
@@ -151,7 +149,6 @@
 #    """Test login for a user that does not exist."""
 #     response = client.post(
         "/api/auth/login", json={"username": "nosuchuser", "password": "password123"}
-    )
 #     assert response.status_code == 401
 #     assert response.json["message"] == "Invalid credentials"
 
@@ -190,10 +187,8 @@
 #     client.post(
         "/api/auth/register",
 #         json={"username": "protecteduser", "password": "password123"},
-    )
 #     login_response = client.post(
         "/api/auth/login", json={"username": "protecteduser", "password": "password123"}
-    )
 #     token = login_response.json["token"]
 
 #     headers = {"Authorization": f"Bearer {token}"}

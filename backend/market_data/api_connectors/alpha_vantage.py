@@ -21,7 +21,6 @@
 #     DataProvider,
 #     DataResponse,
 #     RateLimiter,
-)
 
 
 # class AlphaVantageConnector(APIConnector):
@@ -57,7 +56,6 @@
 
 #         super().__init__(
 #             credentials=credentials, base_url=base_url, rate_limiter=rate_limiter
-        )
 
 #         self.premium = premium
 #         self.logger = logging.getLogger(self.__class__.__name__)
@@ -114,7 +112,6 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
 
 #     def get_time_series(
 #         self,
@@ -153,11 +150,9 @@
 #         elif interval == "weekly":
 #             function = (
                 "TIME_SERIES_WEEKLY_ADJUSTED" if adjusted else "TIME_SERIES_WEEKLY"
-            )
 #         elif interval == "monthly":
 #             function = (
                 "TIME_SERIES_MONTHLY_ADJUSTED" if adjusted else "TIME_SERIES_MONTHLY"
-            )
 #         else:
 #             raise ValueError(f"Invalid interval: {interval}")
 
@@ -178,7 +173,6 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON if datatype == "json" else DataFormat.CSV,
-        )
 
 #     def get_technical_indicator(
 #         self,
@@ -227,7 +221,6 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON if datatype == "json" else DataFormat.CSV,
-        )
 
 #     def get_forex_rate(self, from_currency: str, to_currency: str) -> DataResponse:
 #        """"""
@@ -257,7 +250,6 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
 
 #     def get_forex_time_series(
 #         self,
@@ -318,7 +310,6 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON if datatype == "json" else DataFormat.CSV,
-        )
 
 #     def get_crypto_rate(self, from_currency: str, to_currency: str) -> DataResponse:
 #        """"""
@@ -348,7 +339,6 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
 
 #     def get_crypto_time_series(
 #         self,
@@ -408,7 +398,6 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON if datatype == "json" else DataFormat.CSV,
-        )
 
 #     def get_sector_performance(self) -> DataResponse:
 #        """"""
@@ -426,7 +415,6 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
 
 #     def get_economic_indicator(
 #         self, indicator: str, interval: str = "annual", datatype: str = "json"
@@ -460,7 +448,6 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON if datatype == "json" else DataFormat.CSV,
-        )
 
 #     def search_symbol(self, keywords: str, datatype: str = "json") -> DataResponse:
 #        """"""
@@ -490,7 +477,6 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON if datatype == "json" else DataFormat.CSV,
-        )
 
 #     def get_company_overview(self, symbol: str) -> DataResponse:
 #        """"""
@@ -517,7 +503,6 @@
 #             params=params,
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
 
 #     def get_income_statement(self, symbol: str) -> DataResponse:
 #        """"""
@@ -544,7 +529,6 @@
 #             params=params,
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
 
 #     def get_balance_sheet(self, symbol: str) -> DataResponse:
 #        """"""
@@ -571,7 +555,6 @@
 #             params=params,
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
 
 #     def get_cash_flow(self, symbol: str) -> DataResponse:
 #        """"""
@@ -598,7 +581,6 @@
 #             params=params,
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
 
 #     def get_earnings(self, symbol: str) -> DataResponse:
 #        """"""
@@ -625,4 +607,3 @@
 #             params=params,
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )

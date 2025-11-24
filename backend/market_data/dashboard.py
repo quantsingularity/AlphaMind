@@ -25,7 +25,6 @@
 # Configure logging
 # logging.basicConfig(
 #     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
 # logger = logging.getLogger(__name__)
 
 
@@ -92,20 +91,17 @@
 #        """"""
 #         self.portfolio_value_history.append(
 #             {"timestamp": timestamp, "value": portfolio_value}
-        )
 
 #         self.cash_history.append({"timestamp": timestamp, "value": cash})
 
 #         self.equity_history.append(
 #             {"timestamp": timestamp, "value": portfolio_value - cash}
-        )
 
 #         self.positions = positions
 
         # Calculate unrealized PnL
 #         self.unrealized_pnl = sum(
 #             pos.get("unrealized_pnl", 0.0) for pos in positions.values()
-        )
 
         # Calculate performance metrics
 #         self._calculate_performance_metrics()
@@ -126,7 +122,6 @@
         # Update win rate
 #         winning_trades = sum(
 #             1 for t in self.trades_history if t.get("realized_pnl", 0) > 0
-        )
 #         total_trades = len(self.trades_history)
 #         self.win_rate = winning_trades / total_trades if total_trades > 0 else 0.0
 
@@ -179,11 +174,9 @@
 
 #         self.system_health["cpu_usage"].append(
 #             {"timestamp": timestamp, "value": cpu_usage}
-        )
 
 #         self.system_health["memory_usage"].append(
 #             {"timestamp": timestamp, "value": memory_usage}
-        )
 
 #         self.system_health["latency"].append({"timestamp": timestamp, "value": latency})
 
@@ -422,7 +415,6 @@
 #                             dbc.Col(
 #                                 dbc.NavbarBrand(
                                     "AlphaMind Trading Dashboard", className="ms-2"
-                                )
                             ),
                         ],
 #                         align="center",
@@ -441,12 +433,10 @@
 #                                         dbc.NavItem(
 #                                             dbc.NavLink(
                                                 "Performance", href="#performance"
-                                            )
                                         ),
 #                                         dbc.NavItem(
 #                                             dbc.NavLink(
                                                 "Market Data", href="#market-data"
-                                            )
                                         ),
 #                                         dbc.NavItem(
 #                                             dbc.NavLink("Orders", href="#orders")
@@ -456,8 +446,6 @@
                                         ),
                                     ],
 #                                     navbar=True,
-                                )
-                            )
                         ],
 #                         align="center",
                     ),
@@ -467,7 +455,6 @@
 #             color="dark",
 #             dark=True,
 #             className="mb-4",
-        )
 
         # Create overview cards
 #         overview_cards = dbc.Row(
@@ -530,7 +517,6 @@
                 ),
             ],
 #             className="mb-4",
-        )
 
         # Create portfolio section
 #         portfolio_section = html.Div(
@@ -567,7 +553,6 @@
 #                     className="mb-4",
                 ),
             ]
-        )
 
         # Create performance section
 #         performance_section = html.Div(
@@ -620,7 +605,6 @@
 #                     className="mb-4",
                 ),
             ]
-        )
 
         # Create market data section
 #         market_data_section = html.Div(
@@ -647,7 +631,6 @@
 #                                                         width=4,
                                                     ),
                                                 ]
-                                            )
                                         ]
                                     ),
 #                                     dbc.CardBody(dcc.Graph(id="price-chart")),
@@ -675,7 +658,6 @@
 #                     className="mb-4",
                 ),
             ]
-        )
 
         # Create orders section
 #         orders_section = html.Div(
@@ -696,7 +678,6 @@
 #                     className="mb-4",
                 ),
             ]
-        )
 
         # Create system section
 #         system_section = html.Div(
@@ -749,7 +730,6 @@
 #                     className="mb-4",
                 ),
             ]
-        )
 
         # Create main layout
 #         layout = html.Div(
@@ -773,7 +753,6 @@
 #                     fluid=True,
                 ),
             ]
-        )
 
 #         return layout
 
@@ -800,7 +779,6 @@
 #                 Output("sharpe-ratio", "children"),
             ],
 #             [Input("interval-component", "n_intervals")],
-        )
 #         def update_overview_cards(n):
 #             summary = self.metrics.get_summary()
 
@@ -813,7 +791,6 @@
 #             portfolio_change_str = f"{daily_return:.2%}"
 #             portfolio_change_class = (
                 "text-success" if daily_return >= 0 else "text-danger"
-            )
 
             # Daily P&L
 #             daily_pnl = portfolio_value * daily_return
@@ -846,13 +823,11 @@
 #                 total_pnl_percent_str,
 #                 total_pnl_class,
 #                 sharpe_ratio_str,
-            )
 
         # Portfolio section callbacks
 #         @app.callback(
 #             Output("equity-curve", "figure"),
 #             [Input("interval-component", "n_intervals")],
-        )
 #         def update_equity_curve(n):
             # Create figure
 #             fig = go.Figure()
@@ -869,8 +844,6 @@
 #                         mode="lines",
 #                         name="Portfolio Value",
 #                         line=dict(color="#2FA4E7", width=2),
-                    )
-                )
 
             # Add cash trace
 #             if self.metrics.cash_history:
@@ -884,8 +857,6 @@
 #                         mode="lines",
 #                         name="Cash",
 #                         line=dict(color="#73B9EE", width=2, dash="dash"),
-                    )
-                )
 
             # Add equity trace
 #             if self.metrics.equity_history:
@@ -899,8 +870,6 @@
 #                         mode="lines",
 #                         name="Equity",
 #                         line=dict(color="#1A7BB9", width=2, dash="dot"),
-                    )
-                )
 
             # Update layout
 #             fig.update_layout(
@@ -912,14 +881,12 @@
 #                     orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1
                 ),
 #                 margin=dict(l=10, r=10, t=30, b=10),
-            )
 
 #             return fig
 
 #         @app.callback(
 #             Output("asset-allocation", "figure"),
 #             [Input("interval-component", "n_intervals")],
-        )
 #         def update_asset_allocation(n):
             # Get positions
 #             positions = self.metrics.positions
@@ -951,9 +918,7 @@
 #                         hole=0.4,
 #                         textinfo="label+percent",
 #                         insidetextorientation="radial",
-                    )
                 ]
-            )
 
             # Update layout
 #             fig.update_layout(
@@ -961,14 +926,12 @@
 #                 template="plotly_dark",
 #                 margin=dict(l=10, r=10, t=30, b=10),
 #                 showlegend=False,
-            )
 
 #             return fig
 
 #         @app.callback(
 #             Output("positions-table", "children"),
 #             [Input("interval-component", "n_intervals")],
-        )
 #         def update_positions_table(n):
             # Get positions
 #             positions = self.metrics.positions
@@ -989,8 +952,6 @@
 #                             html.Th("Unrealized P&L"),
 #                             html.Th("Unrealized P&L %"),
                         ]
-                    )
-                )
             ]
 
 #             rows = []
@@ -1004,7 +965,6 @@
 #                     unrealized_pnl / (quantity * avg_price)
 #                     if quantity * avg_price > 0
 #                     else 0
-                )
 
                 # Determine class for P&L
 #                 pnl_class = "text-success" if unrealized_pnl >= 0 else "text-danger"
@@ -1019,7 +979,6 @@
 #                         html.Td(f"${unrealized_pnl:,.2f}", className=pnl_class),
 #                         html.Td(f"{unrealized_pnl_percent:.2%}", className=pnl_class),
                     ]
-                )
 
 #                 rows.append(row)
 
@@ -1031,7 +990,6 @@
 #                 striped=True,
 #                 hover=True,
 #                 responsive=True,
-            )
 
 #             return table
 
@@ -1039,7 +997,6 @@
 #         @app.callback(
 #             Output("returns-chart", "figure"),
 #             [Input("interval-component", "n_intervals")],
-        )
 #         def update_returns_chart(n):
             # Create figure
 #             fig = make_subplots(specs=[[{"secondary_y": True}]])
@@ -1057,7 +1014,6 @@
 #                         marker_color=np.where(df["value"] >= 0, "#2FA4E7", "#E74C3C"),
                     ),
 #                     secondary_y=False,
-                )
 
             # Add cumulative returns trace
 #             if self.metrics.cumulative_returns:
@@ -1073,7 +1029,6 @@
 #                         line=dict(color="#18BC9C", width=2),
                     ),
 #                     secondary_y=True,
-                )
 
             # Update layout
 #             fig.update_layout(
@@ -1083,7 +1038,6 @@
 #                     orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1
                 ),
 #                 margin=dict(l=10, r=10, t=30, b=10),
-            )
 
             # Update axes
 #             fig.update_yaxes(title_text="Daily Returns", secondary_y=False)
@@ -1094,7 +1048,6 @@
 #         @app.callback(
 #             Output("drawdowns-chart", "figure"),
 #             [Input("interval-component", "n_intervals")],
-        )
 #         def update_drawdowns_chart(n):
             # Create figure
 #             fig = go.Figure()
@@ -1112,8 +1065,6 @@
 #                         name="Drawdowns",
 #                         fill="tozeroy",
 #                         line=dict(color="#E74C3C", width=2),
-                    )
-                )
 
             # Update layout
 #             fig.update_layout(
@@ -1122,14 +1073,12 @@
 #                 yaxis_title="Drawdown",
 #                 template="plotly_dark",
 #                 margin=dict(l=10, r=10, t=30, b=10),
-            )
 
 #             return fig
 
 #         @app.callback(
 #             Output("performance-metrics", "children"),
 #             [Input("interval-component", "n_intervals")],
-        )
 #         def update_performance_metrics(n):
 #             summary = self.metrics.get_summary()
 
@@ -1144,7 +1093,6 @@
 #                                     dbc.CardBody(
 #                                         html.H4(
 #                                             f"{summary['performance']['cumulative_return']:.2%}"
-                                        )
                                     ),
                                 ]
                             ),
@@ -1157,7 +1105,6 @@
 #                                     dbc.CardBody(
 #                                         html.H4(
 #                                             f"{summary['performance']['volatility']:.2%}"
-                                        )
                                     ),
                                 ]
                             ),
@@ -1175,7 +1122,6 @@
 #                                     dbc.CardBody(
 #                                         html.H4(
 #                                             f"{summary['performance']['sharpe_ratio']:.2f}"
-                                        )
                                     ),
                                 ]
                             ),
@@ -1188,7 +1134,6 @@
 #                                     dbc.CardBody(
 #                                         html.H4(
 #                                             f"{summary['performance']['sortino_ratio']:.2f}"
-                                        )
                                     ),
                                 ]
                             ),
@@ -1206,7 +1151,6 @@
 #                                     dbc.CardBody(
 #                                         html.H4(
 #                                             f"{summary['performance']['max_drawdown']:.2%}"
-                                        )
                                     ),
                                 ]
                             ),
@@ -1219,7 +1163,6 @@
 #                                     dbc.CardBody(
 #                                         html.H4(
 #                                             f"{summary['performance']['win_rate']:.2%}"
-                                        )
                                     ),
                                 ]
                             ),
@@ -1234,7 +1177,6 @@
 #         @app.callback(
 #             Output("risk-metrics", "children"),
 #             [Input("interval-component", "n_intervals")],
-        )
 #         def update_risk_metrics(n):
 #             summary = self.metrics.get_summary()
 
@@ -1276,7 +1218,6 @@
 #                                     dbc.CardBody(
 #                                         html.H4(
 #                                             f"{summary['risk']['expected_shortfall']:.2%}"
-                                        )
                                     ),
                                 ]
                             ),
@@ -1305,7 +1246,6 @@
 #                                     dbc.CardBody(
 #                                         html.H4(
 #                                             f"{summary['portfolio']['positions_count']}"
-                                        )
                                     ),
                                 ]
                             ),
@@ -1318,7 +1258,6 @@
 #                                     dbc.CardBody(
 #                                         html.H4(
 #                                             f"{summary['trading']['active_orders']}"
-                                        )
                                     ),
                                 ]
                             ),
@@ -1334,7 +1273,6 @@
 #         @app.callback(
 #             Output("market-symbol-dropdown", "options"),
 #             [Input("interval-component", "n_intervals")],
-        )
 #         def update_symbol_dropdown(n):
             # Get available symbols
 #             symbols = list(self.metrics.market_data.keys())
@@ -1350,7 +1288,6 @@
 #                 Input("interval-component", "n_intervals"),
 #                 Input("market-symbol-dropdown", "value"),
             ],
-        )
 #         def update_market_charts(n, symbol):
             # Default figures
 #             price_fig = go.Figure()
@@ -1362,13 +1299,11 @@
 #                     title="Price Chart (Select Symbol)",
 #                     template="plotly_dark",
 #                     margin=dict(l=10, r=10, t=30, b=10),
-                )
 
 #                 orderbook_fig.update_layout(
 #                     title="Order Book (Select Symbol)",
 #                     template="plotly_dark",
 #                     margin=dict(l=10, r=10, t=30, b=10),
-                )
 
 #                 return price_fig, orderbook_fig
 
@@ -1396,7 +1331,6 @@
                                     "close": float(k["c"]),
                                     "volume": float(k["v"]),
                                 }
-                            )
 
 #                 if ohlcv_data:
 #                     df = pd.DataFrame(ohlcv_data)
@@ -1411,9 +1345,7 @@
 #                                 low=df["low"],
 #                                 close=df["close"],
 #                                 name="OHLC",
-                            )
                         ]
-                    )
 
                     # Add volume as bar chart
 #                     price_fig.add_trace(
@@ -1423,8 +1355,6 @@
 #                             name="Volume",
 #                             marker_color="rgba(128, 128, 128, 0.5)",
 #                             yaxis="y2",
-                        )
-                    )
 
                     # Update layout
 #                     price_fig.update_layout(
@@ -1436,7 +1366,6 @@
 #                             title="Volume", overlaying="y", side="right", showgrid=False
                         ),
 #                         margin=dict(l=10, r=10, t=30, b=10),
-                    )
 #                 else:
                     # If no OHLCV data, try to use trade data
 #                     trade_data = []
@@ -1457,7 +1386,6 @@
                                         "price": float(trade["p"]),
                                         "quantity": float(trade["q"]),
                                     }
-                                )
 
 #                     if trade_data:
 #                         df = pd.DataFrame(trade_data)
@@ -1471,9 +1399,7 @@
 #                                     mode="lines",
 #                                     name="Price",
 #                                     line=dict(color="#2FA4E7", width=2),
-                                )
                             ]
-                        )
 
                         # Update layout
 #                         price_fig.update_layout(
@@ -1482,19 +1408,16 @@
 #                             yaxis_title="Price",
 #                             template="plotly_dark",
 #                             margin=dict(l=10, r=10, t=30, b=10),
-                        )
 #                     else:
 #                         price_fig.update_layout(
 #                             title=f"{symbol} Price Chart (No Data)",
 #                             template="plotly_dark",
 #                             margin=dict(l=10, r=10, t=30, b=10),
-                        )
 #             else:
 #                 price_fig.update_layout(
 #                     title=f"{symbol} Price Chart (No Data)",
 #                     template="plotly_dark",
 #                     margin=dict(l=10, r=10, t=30, b=10),
-                )
 
             # Create order book chart
 #             orderbook_data = None
@@ -1532,8 +1455,6 @@
 #                         name="Bids",
 #                         line=dict(color="#18BC9C", width=2),
 #                         fill="tozeroy",
-                    )
-                )
 
                 # Add ask trace
 #                 orderbook_fig.add_trace(
@@ -1544,8 +1465,6 @@
 #                         name="Asks",
 #                         line=dict(color="#E74C3C", width=2),
 #                         fill="tozeroy",
-                    )
-                )
 
                 # Update layout
 #                 orderbook_fig.update_layout(
@@ -1554,20 +1473,17 @@
 #                     yaxis_title="Cumulative Quantity",
 #                     template="plotly_dark",
 #                     margin=dict(l=10, r=10, t=30, b=10),
-                )
 #             else:
 #                 orderbook_fig.update_layout(
 #                     title=f"{symbol} Order Book (No Data)",
 #                     template="plotly_dark",
 #                     margin=dict(l=10, r=10, t=30, b=10),
-                )
 
 #             return price_fig, orderbook_fig
 
 #         @app.callback(
 #             Output("market-overview", "children"),
 #             [Input("interval-component", "n_intervals")],
-        )
 #         def update_market_overview(n):
             # Get available symbols
 #             symbols = list(self.metrics.market_data.keys())
@@ -1585,8 +1501,6 @@
 #                             html.Th("24h Change"),
 #                             html.Th("24h Volume"),
                         ]
-                    )
-                )
             ]
 
 #             rows = []
@@ -1626,7 +1540,6 @@
                     "text-success"
 #                     if price_change and price_change >= 0
 #                     else "text-danger"
-                )
 
 #                 row = html.Tr(
                     [
@@ -1638,7 +1551,6 @@
                         ),
 #                         html.Td(f"{volume:,.2f}" if volume else "N/A"),
                     ]
-                )
 
 #                 rows.append(row)
 
@@ -1650,7 +1562,6 @@
 #                 striped=True,
 #                 hover=True,
 #                 responsive=True,
-            )
 
 #             return table
 
@@ -1658,7 +1569,6 @@
 #         @app.callback(
 #             Output("active-orders-table", "children"),
 #             [Input("interval-component", "n_intervals")],
-        )
 #         def update_active_orders_table(n):
 #             active_orders = self.metrics.active_orders
 
@@ -1679,8 +1589,6 @@
 #                             html.Th("Status"),
 #                             html.Th("Created At"),
                         ]
-                    )
-                )
             ]
 
 #             rows = []
@@ -1688,7 +1596,6 @@
                 # Determine class for side
 #                 side_class = (
                     "text-success" if order.get("side") == "buy" else "text-danger"
-                )
 
 #                 row = html.Tr(
                     [
@@ -1707,7 +1614,6 @@
 #                         html.Td(order.get("status", "").upper()),
 #                         html.Td(order.get("created_at", "")),
                     ]
-                )
 
 #                 rows.append(row)
 
@@ -1719,14 +1625,12 @@
 #                 striped=True,
 #                 hover=True,
 #                 responsive=True,
-            )
 
 #             return table
 
 #         @app.callback(
 #             Output("recent-trades-table", "children"),
 #             [Input("interval-component", "n_intervals")],
-        )
 #         def update_recent_trades_table(n):
 #             trades = self.metrics.trades_history
 
@@ -1748,8 +1652,6 @@
 #                             html.Th("Time"),
 #                             html.Th("P&L"),
                         ]
-                    )
-                )
             ]
 
 #             rows = []
@@ -1757,12 +1659,10 @@
                 # Determine class for side and P&L
 #                 side_class = (
                     "text-success" if trade.get("side") == "buy" else "text-danger"
-                )
 #                 pnl_class = (
                     "text-success"
 #                     if trade.get("realized_pnl", 0) >= 0
 #                     else "text-danger"
-                )
 
 #                 row = html.Tr(
                     [
@@ -1780,7 +1680,6 @@
 #                             className=pnl_class,
                         ),
                     ]
-                )
 
 #                 rows.append(row)
 
@@ -1792,7 +1691,6 @@
 #                 striped=True,
 #                 hover=True,
 #                 responsive=True,
-            )
 
 #             return table
 
@@ -1805,7 +1703,6 @@
 #                 Output("errors-chart", "figure"),
             ],
 #             [Input("interval-component", "n_intervals")],
-        )
 #         def update_system_charts(n):
             # Create CPU usage chart
 #             cpu_fig = go.Figure()
@@ -1821,8 +1718,6 @@
 #                         mode="lines",
 #                         name="CPU Usage",
 #                         line=dict(color="#2FA4E7", width=2),
-                    )
-                )
 
 #             cpu_fig.update_layout(
 #                 title="CPU Usage",
@@ -1831,7 +1726,6 @@
 #                 template="plotly_dark",
 #                 margin=dict(l=10, r=10, t=30, b=10),
 #                 yaxis=dict(range=[0, 100]),
-            )
 
             # Create memory usage chart
 #             memory_fig = go.Figure()
@@ -1848,8 +1742,6 @@
 #                         name="Memory Usage",
 #                         line=dict(color="#18BC9C", width=2),
 #                         fill="tozeroy",
-                    )
-                )
 
 #             memory_fig.update_layout(
 #                 title="Memory Usage",
@@ -1858,7 +1750,6 @@
 #                 template="plotly_dark",
 #                 margin=dict(l=10, r=10, t=30, b=10),
 #                 yaxis=dict(range=[0, 100]),
-            )
 
             # Create latency chart
 #             latency_fig = go.Figure()
@@ -1874,8 +1765,6 @@
 #                         mode="lines",
 #                         name="Latency",
 #                         line=dict(color="#F39C12", width=2),
-                    )
-                )
 
 #             latency_fig.update_layout(
 #                 title="System Latency",
@@ -1883,7 +1772,6 @@
 #                 yaxis_title="Latency (ms)",
 #                 template="plotly_dark",
 #                 margin=dict(l=10, r=10, t=30, b=10),
-            )
 
             # Create errors chart
 #             errors_fig = go.Figure()
@@ -1898,8 +1786,6 @@
 #                         y=df["value"],
 #                         name="Errors",
 #                         marker_color="#E74C3C",
-                    )
-                )
 
 #             errors_fig.update_layout(
 #                 title="System Errors",
@@ -1907,7 +1793,6 @@
 #                 yaxis_title="Error Count",
 #                 template="plotly_dark",
 #                 margin=dict(l=10, r=10, t=30, b=10),
-            )
 
 #             return cpu_fig, memory_fig, latency_fig, errors_fig
 
@@ -2103,7 +1988,6 @@
         # Generate system health data
 #         client.update_system_health(
 #             cpu_usage=30.0, memory_usage=40.0, latency=5.0, errors=0
-        )
 
     # Generate initial data
 #     generate_example_data()

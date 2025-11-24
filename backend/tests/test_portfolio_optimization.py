@@ -33,7 +33,6 @@
     # Ensure the optimizer internally compiles its model with the registered loss
 #     opt = PortfolioOptimizer(
 #         n_assets=N_ASSETS, lookback_window=LOOKBACK_WINDOW, hidden_units=HIDDEN_UNITS
-    )
     # We assume the optimizer compiles the model with the custom loss internally.
     # If not, the test needs to be adjusted or the class needs modification.
     # For testing save/load, we might need to explicitly compile here if not done in __init__
@@ -136,7 +135,6 @@
 
 #     optimal_weights = optimizer.optimize_portfolio(
 #         recent_price, recent_vol, recent_macro, current_weights
-    )
 
 #     assert optimal_weights.shape == (N_ASSETS,)
 #     assert np.isclose(
@@ -192,7 +190,6 @@
     # Create a new optimizer instance and assign the loaded model
 #     new_optimizer = PortfolioOptimizer(
 #         n_assets=N_ASSETS, lookback_window=LOOKBACK_WINDOW, hidden_units=HIDDEN_UNITS
-    )
 #     new_optimizer.model = loaded_keras_model
 
     # Check if the loaded model is a Keras model

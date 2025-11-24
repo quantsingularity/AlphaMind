@@ -13,7 +13,6 @@
 #     MultiHeadAttention,
 #     TemporalAttentionBlock,
 #     get_positional_encoding,
-)
 
 # Constants for testing
 # BATCH_SIZE = 4
@@ -34,7 +33,7 @@
 ## @pytest.fixture
 ## def sample_mask():
 #    """Provides a sample mask tensor."""
-    # Example mask: mask the last 3 positions for each sequence in the batch
+# Example mask: mask the last 3 positions for each sequence in the batch
 #     mask = tf.ones((BATCH_SIZE, 1, 1, SEQ_LENGTH))
 #     mask_indices = tf.range(SEQ_LENGTH - 3, SEQ_LENGTH)
 #     updates = tf.zeros((BATCH_SIZE, 1, 1, 3), dtype=tf.float32)
@@ -42,7 +41,6 @@
 #         mask,
 #         [[i, 0, 0, j] for i in range(BATCH_SIZE) for j in mask_indices],
 #         tf.reshape(updates, [-1]),
-    )
 #     return mask  # Shape (batch_size, 1, 1, seq_length)
 
 
@@ -57,7 +55,7 @@
 #     mha = MultiHeadAttention(d_model=D_MODEL, num_heads=NUM_HEADS)
 #     output = mha(sample_input, sample_input, sample_input, mask=sample_mask)
 #     assert output.shape == (BATCH_SIZE, SEQ_LENGTH, D_MODEL)
-    # Further checks could involve verifying that masked positions have near-zero attention weights, but this is complex.
+# Further checks could involve verifying that masked positions have near-zero attention weights, but this is complex.
 
 
 # --- Test TemporalAttentionBlock ---
@@ -78,21 +76,21 @@
 # --- Test get_positional_encoding ---
 # def test_get_positional_encoding_shape():
 #     pos_encoding = get_positional_encoding(seq_length=SEQ_LENGTH, d_model=D_MODEL)
-    # Expected shape includes batch dimension added inside the function
+# Expected shape includes batch dimension added inside the function
 #     assert pos_encoding.shape == (1, SEQ_LENGTH, D_MODEL)
 
 
 # def test_get_positional_encoding_values():
 #     pos_encoding = get_positional_encoding(seq_length=50, d_model=100)
-    # Check specific values based on the sin/cos formula
-    # Example: Check first element (pos=0)
+# Check specific values based on the sin/cos formula
+# Example: Check first element (pos=0)
 #     assert np.isclose(
 #         pos_encoding[0, 0, 0], np.sin(0 / (10000 ** (0 / 100)))
 #     )  # sin(0) = 0
 #     assert np.isclose(
 #         pos_encoding[0, 0, 1], np.cos(0 / (10000 ** (0 / 100)))
 #     )  # cos(0) = 1
-    # Example: Check second element (pos=1)
+# Example: Check second element (pos=1)
 #     assert np.isclose(pos_encoding[0, 1, 0], np.sin(1 / (10000 ** (0 / 100))))  # sin(1)
 #     assert np.isclose(pos_encoding[0, 1, 1], np.cos(1 / (10000 ** (0 / 100))))  # cos(1)
 
@@ -106,11 +104,10 @@
 #         dff=DFF,
 #         input_seq_length=SEQ_LENGTH,
 #         output_seq_length=OUTPUT_SEQ_LENGTH,
-    )
 #     output = transformer(sample_input, training=False)
-    # The final layer projects the output for each position in the sequence
-    # to the desired output sequence length (or number of output features per position)
-    # The output shape should be (batch_size, input_seq_length, output_seq_length)
+# The final layer projects the output for each position in the sequence
+# to the desired output sequence length (or number of output features per position)
+# The output shape should be (batch_size, input_seq_length, output_seq_length)
 #     assert output.shape == (BATCH_SIZE, SEQ_LENGTH, OUTPUT_SEQ_LENGTH)
 
 
@@ -122,6 +119,5 @@
 #         dff=DFF,
 #         input_seq_length=SEQ_LENGTH,
 #         output_seq_length=OUTPUT_SEQ_LENGTH,
-    )
 #     output = transformer(sample_input, training=False, mask=sample_mask)
 #     assert output.shape == (BATCH_SIZE, SEQ_LENGTH, OUTPUT_SEQ_LENGTH)

@@ -24,7 +24,6 @@
 # logging.basicConfig(
 #     level=logging.INFO,
 #     format="%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s",
-)
 # logger = logging.getLogger(__name__)
 
 # Add file handler for persistent logging
@@ -34,8 +33,6 @@
 #     file_handler.setFormatter(
 #         logging.Formatter(
             "%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s"
-        )
-    )
 #     logger.addHandler(file_handler)
 # except Exception as e:
 #     logger.warning(f"Could not set up file logging: {e}")
@@ -147,7 +144,6 @@
 #             self.endpoints = config.get("endpoints", self.endpoints)
 #             self.streaming_endpoints = config.get(
                 "streaming_endpoints", self.streaming_endpoints
-            )
 
             # Validate and merge retry settings
 #             if "retry_settings" in config:
@@ -241,7 +237,6 @@
 #             self.session = aiohttp.ClientSession(
 #                 timeout=aiohttp.ClientTimeout(total=30),  # 30 second timeout
 #                 headers={"User-Agent": "AlphaMind/1.0"},
-            )
 #             logger.info("Market data feed HTTP session initialized")
 #             return True
 #         except Exception as e:

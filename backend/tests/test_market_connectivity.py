@@ -18,12 +18,10 @@
 #     EnhancedMarketConnectivityManager,
 #     EnhancedVenueAdapter,
 #     FailureMode,
-)
 # from order_management.market_connectivity import (
 #     ConnectionStatus,
 #     VenueConfig,
 #     VenueType,
-)
 
 
 # class TestEnhancedVenueAdapter(unittest.TestCase):
@@ -44,7 +42,6 @@
                 "url": "wss://test.exchange.com/ws",
             },
 #             capabilities=["market_data", "order_execution"],
-        )
 
         # Create an enhanced venue adapter
 #         self.adapter = EnhancedVenueAdapter(self.config)
@@ -313,12 +310,10 @@
         # Ensure venue1 is connected before simulating failure
 #         self.assertEqual(
 #             self.manager.venues["venue1"].status, ConnectionStatus.CONNECTED
-        )
 
         # Mock the reconnection_manager.connection_lost method to prevent async behavior
 #         self.manager.venues["venue1"].reconnection_manager.connection_lost = (
 #             lambda: None
-        )
 
         # Simulate failure for venue1
 #         success = self.manager.simulate_venue_failure("venue1")
@@ -328,12 +323,10 @@
 #         self.assertEqual(self.manager.venues["venue1"].status, ConnectionStatus.ERROR)
 #         self.assertEqual(
 #             self.manager.venues["venue1"].last_error, "Simulated complete failure"
-        )
 
         # Check that venue2 is still connected
 #         self.assertEqual(
 #             self.manager.venues["venue2"].status, ConnectionStatus.CONNECTED
-        )
 
 #     def test_simulate_market_data_issue(self):
 #        """Test simulating a market data issue."""
@@ -375,7 +368,6 @@
         # Mock the reconnection_manager.connection_lost method to prevent async behavior
 #         self.manager.venues["venue1"].reconnection_manager.connection_lost = (
 #             lambda: None
-        )
 
         # Simulate failure for venue1
 #         self.manager.venues["venue1"].status = ConnectionStatus.ERROR

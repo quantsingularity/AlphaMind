@@ -12,7 +12,6 @@
 #         if self.copula == "t":
 #             rv = multivariate_t(
 #                 df=3, shape=self._create_dependence_matrix(factor_correlations)
-            )
 #         return rv.rvs(1000)
 
 #     def _create_dependence_matrix(self, base_corr):
@@ -30,4 +29,3 @@
                 "Max_Drawdown": shocked_returns.min(),
                 "Leverage_Impact": np.linalg.norm(shocked_returns, ord=2),
             }
-        )

@@ -109,7 +109,6 @@
 #                     y_pred,
 #                     sample_weights=test_weights if sample_weights is not None else None,
 #                     task_type=task_type,
-                )
 
 #                 fold_results.append(fold_metrics)
 
@@ -119,7 +118,6 @@
 #                 avg_metrics[metric] = np.mean([fold[metric] for fold in fold_results])
 #                 avg_metrics[f"{metric}_std"] = np.std(
 #                     [fold[metric] for fold in fold_results]
-                )
 
 #             self.results[model_name] = avg_metrics
 
@@ -177,7 +175,6 @@
             # Perform permutation test
 #             perm_test_result = self.statistical_tests.permutation_test(
 #                 baseline, model, X, y, n_permutations=n_permutations
-            )
 
             # Store results
 #             comparison_results[model_name] = {
@@ -259,7 +256,6 @@
 #                 bar.get_y() + bar.get_height() / 2,
 #                 f"{df['value'].iloc[i]:.4f}",
 #                 va="center",
-            )
 
         # Adjust layout
 #         plt.tight_layout()
@@ -331,7 +327,6 @@
 #                         if results_df.iloc[i, j] > results_df[metric_cols[j]].mean()
 #                         else "black"
                     ),
-                )
 
         # Add title
 #         ax.set_title(title or "Model Performance Metrics Heatmap")
@@ -531,7 +526,6 @@
 #                     loss_fn(y_true[i], y_pred1[i]) - loss_fn(y_true[i], y_pred2[i])
 #                     for i in range(len(y_true))
                 ]
-            )
 
         # Calculate mean of loss differential
 #         d_bar = np.mean(d)
@@ -624,14 +618,12 @@
 #                     if i < j:
 #                         loss_diffs[(model_i, model_j)] = (
 #                             losses[model_i] - losses[model_j]
-                        )
 
             # Calculate test statistics
 #             t_stats = {}
 #             for (model_i, model_j), diff in loss_diffs.items():
 #                 t_stats[(model_i, model_j)] = np.mean(diff) / (
 #                     np.std(diff) / np.sqrt(len(diff))
-                )
 
             # Find maximum absolute t-statistic
 #             max_t = max(abs(t) for t in t_stats.values())
@@ -652,7 +644,6 @@
 #                 for (model_i, model_j), diff in boot_diffs.items():
 #                     boot_t_stats[(model_i, model_j)] = np.mean(diff) / (
 #                         np.std(diff) / np.sqrt(len(diff))
-                    )
 
                 # Find maximum absolute bootstrap t-statistic
 #                 max_t_boot.append(max(abs(t) for t in boot_t_stats.values()))

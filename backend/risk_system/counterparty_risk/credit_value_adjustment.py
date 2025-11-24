@@ -19,5 +19,4 @@
 #                     * discount_curve.discount(t)
 #                     * self.default_probs["hazard_rate"]
 #                     * surv_prob
-                )
 #         return cva

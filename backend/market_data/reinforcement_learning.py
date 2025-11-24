@@ -30,7 +30,6 @@
 # Configure logging
 # logging.basicConfig(
 #     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
 # logger = logging.getLogger(__name__)
 
 
@@ -720,7 +719,6 @@
 #                 nn.Linear(hidden_size, hidden_size),
 #                 nn.ReLU(),
 #                 nn.Linear(hidden_size, num_actions),
-            )
 
 #         elif len(input_shape) == 3:
             # Image-like observations (features, window_size, channels)
@@ -740,7 +738,6 @@
                 ),
 #                 nn.ReLU(),
 #                 nn.Linear(hidden_size, num_actions),
-            )
 
 #         else:
 #             raise ValueError(f"Unsupported input shape: {input_shape}")
@@ -1102,14 +1099,12 @@
 #                 nn.Linear(hidden_size, hidden_size),
 #                 nn.ReLU(),
 #                 nn.Linear(hidden_size, action_dim * 2),  # Mean and log_std
-            )
 
             # Create critic network
 #             self.critic = nn.Sequential(
 #                 nn.Linear(hidden_size, hidden_size),
 #                 nn.ReLU(),
 #                 nn.Linear(hidden_size, 1),
-            )
 
 #         elif len(input_shape) == 3:
             # Image-like observations (features, window_size, channels)
@@ -1128,21 +1123,18 @@
 #                     64 * (input_shape[1] // 4) * (input_shape[2] // 4), hidden_size
                 ),
 #                 nn.ReLU(),
-            )
 
             # Create actor network
 #             self.actor = nn.Sequential(
 #                 nn.Linear(hidden_size, hidden_size),
 #                 nn.ReLU(),
 #                 nn.Linear(hidden_size, action_dim * 2),  # Mean and log_std
-            )
 
             # Create critic network
 #             self.critic = nn.Sequential(
 #                 nn.Linear(hidden_size, hidden_size),
 #                 nn.ReLU(),
 #                 nn.Linear(hidden_size, 1),
-            )
 
 #         else:
 #             raise ValueError(f"Unsupported input shape: {input_shape}")
@@ -1695,7 +1687,6 @@
 #                     if not any(
 #                         time_col in col.lower()
 #                         for time_col in ["date", "time", "timestamp"]
-                    )
                 ]
 
 #         self.features = features
@@ -1712,7 +1703,6 @@
 #             action_space=self.action_space,
 #             observation_type=self.observation_type,
 #             random_start=random_start,
-        )
 
 #         return self.env
 
@@ -1750,7 +1740,6 @@
 #                 input_shape=input_shape,
 #                 num_actions=self.env.action_space["n"],
 #                 device=self.device,
-            )
 
 #         elif self.algorithm == RLAlgorithm.PPO:
 #             if self.action_space == ActionSpace.DISCRETE:
@@ -1762,7 +1751,6 @@
 
 #             self.agent = PPOAgent(
 #                 input_shape=input_shape, action_dim=action_dim, device=self.device
-            )
 
 #         else:
 #             raise ValueError(f"Unsupported algorithm: {self.algorithm}")
@@ -1813,7 +1801,6 @@
 #                 eval_interval=eval_interval,
 #                 render=render,
 #                 verbose=verbose,
-            )
 
 #         elif self.algorithm == RLAlgorithm.PPO:
 #             metrics = self.agent.train(
@@ -1823,7 +1810,6 @@
 #                 eval_interval=eval_interval,
 #                 render=render,
 #                 verbose=verbose,
-            )
 
         # Save agent if requested
 #         if save_path is not None:
@@ -1887,7 +1873,6 @@
         # Create environment for backtesting
 #         backtest_env = self.create_environment(
 #             data=data, features=features, random_start=False
-        )
 
         # Reset environment
 #         state = backtest_env.reset()
@@ -1929,7 +1914,6 @@
 #                     f"Step {backtest_env.current_step}/{backtest_env.max_steps} | "
 #                     f"Equity: {info['equity']:.2f} | "
 #                     f"Return: {info['total_return']:.2%}"
-                )
 
         # Calculate performance metrics
 #         equity_curve = np.array(results["equities"])
@@ -2030,7 +2014,6 @@
                 "close": np.ones(self.window_size + 1),
 #                 **{feature: np.ones(self.window_size + 1) for feature in self.features},
             }
-        )
 
 #         self.create_environment(dummy_data, self.features)
 

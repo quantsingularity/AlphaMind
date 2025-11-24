@@ -64,7 +64,6 @@
 #                 raise ValueError(
                     "Could not automatically detect feature importance method. "
                     "Please specify method explicitly."
-                )
 
         # Extract importance based on method
 #         if method == "native":
@@ -97,12 +96,10 @@
 #             raise ValueError(
 #                 f"Length of feature_names ({len(self.feature_names)}) does not match "
 #                 f"length of importance values ({len(importance)})"
-            )
 
         # Create DataFrame
 #         importance_df = pd.DataFrame(
 #             {"Feature": self.feature_names, "Importance": importance}
-        )
 
         # Sort by importance
 #         importance_df = importance_df.sort_values("Importance", ascending=False)
@@ -153,7 +150,6 @@
 #             n_repeats=n_repeats,
 #             random_state=random_state,
 #             n_jobs=n_jobs,
-        )
 
         # Create feature names if not provided
 #         if self.feature_names is None:
@@ -166,7 +162,6 @@
                 "Importance": perm_importance.importances_mean,
                 "Std": perm_importance.importances_std,
             }
-        )
 
         # Sort by importance
 #         importance_df = importance_df.sort_values("Importance", ascending=False)
@@ -208,7 +203,6 @@
 #         if self.importance_values is None:
 #             raise ValueError(
                 "No importance values available. Run extract_importance() first."
-            )
 
         # Select top N features if specified
 #         if top_n is not None:
@@ -231,7 +225,6 @@
 #                 fmt="none",
 #                 ecolor="black",
 #                 capsize=3,
-            )
 
         # Add values to bars if requested
 #         if show_values:
@@ -241,7 +234,6 @@
 #                     bar.get_y() + bar.get_height() / 2,
 #                     f"{bar.get_width():.4f}",
 #                     va="center",
-                )
 
         # Add labels and title
 #         ax.set_xlabel("Importance")
@@ -333,7 +325,6 @@
 #                 grid_resolution=grid_resolution,
 #                 percentiles=percentiles,
 #                 method=method,
-            )
 
             # Store results
 #             self.pdp_results[feature_name] = {
@@ -378,7 +369,6 @@
 #         if not self.pdp_results:
 #             raise ValueError(
                 "No partial dependence results available. Run compute() first."
-            )
 
         # Use all features if not specified
 #         if features is None:
@@ -474,7 +464,6 @@
 #         if not self.pdp_results:
 #             raise ValueError(
                 "No partial dependence results available. Run compute() first."
-            )
 
         # Check if both features are available
 #         feature1, feature2 = feature_pair
@@ -506,7 +495,6 @@
 #         ax.set_ylabel(feature2)
 #         ax.set_title(
 #             title or f"Partial Dependence Interaction: {feature1} vs {feature2}"
-        )
 
         # Adjust layout
 #         plt.tight_layout()
@@ -574,7 +562,6 @@
 #             raise ImportError(
                 "SHAP package is required for SHAP explanations. "
                 "Install it with: pip install shap"
-            )
 
         # Convert to numpy array if DataFrame
 #         if isinstance(X, pd.DataFrame):
@@ -668,7 +655,6 @@
 #             raise ImportError(
                 "SHAP package is required for SHAP explanations. "
                 "Install it with: pip install shap"
-            )
 
 #         if self.shap_values is None:
 #             raise ValueError("No SHAP values available. Run compute_shap() first.")
@@ -697,14 +683,12 @@
 #                 feature_names=self.feature_names,
 #                 max_display=max_display,
 #                 plot_type="bar",
-            )
 #         elif plot_type in ["dot", "violin"]:
 #             shap.summary_plot(
 #                 shap_values,
 #                 self.data,
 #                 feature_names=self.feature_names,
 #                 max_display=max_display,
-            )
 #         else:
 #             raise ValueError(f"Unsupported plot type: {plot_type}")
 
@@ -729,7 +713,6 @@
 #             raise ImportError(
                 "SHAP package is required for SHAP explanations. "
                 "Install it with: pip install shap"
-            )
 
 #         if self.shap_values is None:
 #             raise ValueError("No SHAP values available. Run compute_shap() first.")
@@ -763,7 +746,6 @@
 #             self.data,
 #             feature_names=self.feature_names,
 #             interaction_index=interaction_idx,
-        )
 
 #     def plot_force(
 #         self, sample_index: int = 0, class_index: Optional[int] = None
@@ -784,7 +766,6 @@
 #             raise ImportError(
                 "SHAP package is required for SHAP explanations. "
                 "Install it with: pip install shap"
-            )
 
 #         if self.shap_values is None:
 #             raise ValueError("No SHAP values available. Run compute_shap() first.")
@@ -815,7 +796,6 @@
 #             shap_values[sample_index],
 #             sample_data,
 #             feature_names=self.feature_names,
-        )
 
 
 # class PermutationImportance:
@@ -879,7 +859,6 @@
 #             n_repeats=n_repeats,
 #             random_state=random_state,
 #             n_jobs=n_jobs,
-        )
 
         # Create feature names if not provided
 #         if self.feature_names is None:
@@ -895,7 +874,6 @@
                 "Importance": perm_importance.importances_mean,
                 "Std": perm_importance.importances_std,
             }
-        )
 
         # Sort by importance
 #         importance_df = importance_df.sort_values("Importance", ascending=False)
@@ -957,7 +935,6 @@
 #             fmt="none",
 #             ecolor="black",
 #             capsize=3,
-        )
 
         # Add values to bars if requested
 #         if show_values:
@@ -967,7 +944,6 @@
 #                     bar.get_y() + bar.get_height() / 2,
 #                     f"{bar.get_width():.4f}",
 #                     va="center",
-                )
 
         # Add labels and title
 #         ax.set_xlabel("Importance")

@@ -16,7 +16,6 @@
 # from alternative_data.sentiment_analysis import (
 #     MarketSentimentAnalyzer,
 #     SentimentBasedStrategy,
-)
 
 # Assuming these imports are correct based on the project structure
 # from infrastructure.authentication import AuthenticationSystem
@@ -121,7 +120,6 @@
 #             [0.7, 0.2, 0.1],  # Negative
 #             [0.2, 0.6, 0.2],  # Neutral
         ]
-    )
 #     analyzer.model.predict = lambda x: mock_predictions[: len(x)]
 
 #     scores = analyzer.get_sentiment_score(sample_texts[:3])

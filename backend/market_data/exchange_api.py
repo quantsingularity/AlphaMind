@@ -23,7 +23,6 @@
 # Configure logging
 # logging.basicConfig(
 #     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
 # logger = logging.getLogger(__name__)
 
 
@@ -157,7 +156,6 @@
 
 #         return endpoints.get(
 #             self.exchange_id, {"rest": "", "websocket": "", "test": ""}
-        )
 
 #     def _get_default_rate_limits(self) -> Dict[str, Any]:
 #        """"""
@@ -212,7 +210,6 @@
                 "orders_per_second": 1,
                 "orders_per_day": 1000,
             },
-        )
 
 #     def _get_default_options(self) -> Dict[str, Any]:
 #        """"""
@@ -754,7 +751,6 @@
 #        """"""
 #         raise NotImplementedError(
             "Subclasses must implement _parse_order_from_exchange"
-        )
 
 
 # class BinanceAPI(ExchangeAPI):
@@ -811,7 +807,6 @@
 
 #                     self.ws_listen_key_timer = asyncio.create_task(
 #                         self._keep_listen_key_alive()
-                    )
 #                 else:
 #                     logger.error(f"Failed to get listen key: {response.status}")
 #         except Exception as e:
@@ -1581,7 +1576,6 @@
 #         credentials = ExchangeCredentials(
 #             api_key=os.environ["BINANCE_API_KEY"],
 #             api_secret=os.environ["BINANCE_API_SECRET"],
-        )
 #         config.credentials = credentials
 
     # Add exchange to manager
@@ -1603,7 +1597,6 @@
 #         orderbook = await exchange.get_orderbook("BTCUSDT", limit=5)
 #         print(
 #             f"BTC/USDT orderbook: {len(orderbook['bids'])} bids, {len(orderbook['asks'])} asks"
-        )
 
         # If credentials are available, test authenticated endpoints
 #         if config.credentials:
@@ -1623,7 +1616,6 @@
 #                 quantity=0.001,
 #                 price=20000.0,
 #                 time_in_force=TimeInForce.GTC,
-            )
 
 #             try:
 #                 created_order = await exchange.create_order(order)
@@ -1632,7 +1624,6 @@
                 # Cancel the order
 #                 canceled = await exchange.cancel_order(
 #                     order_id=created_order.exchange_order_id, symbol="BTCUSDT"
-                )
 #                 print(f"Order canceled: {canceled}")
 #             except ExchangeAPIError as e:
 #                 print(f"Error creating/canceling order: {e}")

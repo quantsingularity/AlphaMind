@@ -32,7 +32,6 @@
 # logging.basicConfig(
 #     level=logging.INFO,
 #     format="%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s",
-)
 # logger = logging.getLogger(__name__)
 
 # Add file handler for persistent logging
@@ -41,8 +40,6 @@
 #     file_handler.setFormatter(
 #         logging.Formatter(
             "%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s"
-        )
-    )
 #     logger.addHandler(file_handler)
 # except Exception as e:
 #     logger.warning(f"Could not set up file logging: {e}")
@@ -305,7 +302,6 @@
 
 #         logger.info(
 #             f"Initialized plugin: {self.metadata.name} v{self.metadata.version}"
-        )
 
 #     @abstractmethod
 #     def _get_metadata(self) -> PluginMetadata:
@@ -358,7 +354,6 @@
 #                 self.last_error = "Invalid configuration"
 #                 logger.error(
 #                     f"Plugin {self.metadata.name} initialization failed: Invalid configuration"
-                )
 #                 return False
 
             # Perform any necessary setup
@@ -369,7 +364,6 @@
 #                     self.last_error = "Setup failed"
 #                 logger.error(
 #                     f"Plugin {self.metadata.name} setup failed: {self.last_error}"
-                )
 #                 return False
 
 #             self.status = PluginStatus.ACTIVE
@@ -397,7 +391,6 @@
 #             if not cleanup_success:
 #                 logger.warning(
 #                     f"Plugin {self.metadata.name} cleanup had issues: {self.last_error}"
-                )
                 # Continue with shutdown despite cleanup issues
 
 #             self.status = PluginStatus.UNLOADED
@@ -431,7 +424,6 @@
 #         if self.status != PluginStatus.ACTIVE:
 #             raise PluginError(
 #                 f"Plugin {self.metadata.name} is not active (status: {self.status.value})"
-            )
 
         # Generate cache key from kwargs
 #         cache_key = self._generate_cache_key(**kwargs)
@@ -444,12 +436,10 @@
             ):
 #                 logger.debug(
 #                     f"Using cached data for {self.metadata.name} (key: {cache_key[:30]}...)"
-                )
 #                 return self.cache[cache_key]
 #             else:
 #                 logger.debug(
 #                     f"Cache expired for {self.metadata.name} (key: {cache_key[:30]}...)"
-                )
 
         # Implement retry logic
 #         retries = 0
@@ -464,7 +454,6 @@
 #                     self.status = PluginStatus.RETRYING
 #                     logger.info(
 #                         f"Retry attempt {retries}/{max_retries} for {self.metadata.name}"
-                    )
 #                     self.health_metrics["retry_count"] += 1
 
                 # Fetch data
@@ -488,7 +477,6 @@
 #                     except DataValidationError as e:
 #                         logger.warning(
 #                             f"Data validation error for {self.metadata.name}: {e}"
-                        )
 #                         self.health_metrics["validation_errors"] += 1
                         # Continue despite validation error, but log it
 
@@ -500,17 +488,14 @@
 #                     if cache_ttl is not None:
 #                         self.cache_expiry[cache_key] = datetime.now() + timedelta(
 #                             seconds=cache_ttl
-                        )
 #                     else:
                         # Default cache TTL based on data frequency
 #                         default_ttl = self._get_default_cache_ttl()
 #                         self.cache_expiry[cache_key] = datetime.now() + timedelta(
 #                             seconds=default_ttl
-                        )
 
 #                 logger.info(
 #                     f"Successfully fetched data from {self.metadata.name} in {elapsed:.2f}s"
-                )
 #                 return data
 
 #             except Exception as e:
@@ -522,20 +507,16 @@
 #                     wait_time = min(backoff, max_wait)
 #                     logger.warning(
 #                         f"Error fetching data from {self.metadata.name} (attempt {retries}/{max_retries+1}): {e}"
-                    )
 #                     logger.info(f"Retrying in {wait_time:.1f} seconds...")
 #                     await asyncio.sleep(wait_time)
 #                     backoff = min(
 #                         backoff * self.retry_settings["backoff_factor"], max_wait
-                    )
 #                 else:
 #                     logger.error(
 #                         f"Failed to fetch data from {self.metadata.name} after {max_retries} retries: {e}"
-                    )
 #                     logger.debug(traceback.format_exc())
 #                     raise PluginError(
 #                         f"Failed to fetch data after {max_retries} retries: {e}"
-                    )
 
 #     def _validate_config(self) -> bool:
 #        """"""
@@ -611,7 +592,6 @@
 #                 if missing_fields:
 #                     raise DataValidationError(
 #                         f"Missing required fields: {', '.join(missing_fields)}"
-                    )
 #             elif isinstance(data, pd.DataFrame):
 #                 missing_columns = [
 #                     field
@@ -621,7 +601,6 @@
 #                 if missing_columns:
 #                     raise DataValidationError(
 #                         f"Missing required columns: {', '.join(missing_columns)}"
-                    )
 
         # Check schema if specified
 #         if self.validation_settings["schema"]:
@@ -630,7 +609,6 @@
 #                     if field in data and not isinstance(data[field], field_type):
 #                         raise DataValidationError(
 #                             f"Field {field} has invalid type: {type(data[field])}, expected {field_type}"
-                        )
 
         # Plugin-specific data validation
 #         try:
@@ -1195,7 +1173,6 @@
 #         if filing_type not in valid_filing_types:
 #             raise ValueError(
 #                 f"Invalid filing type: {filing_type}. Must be one of {valid_filing_types}"
-            )
 
         # Download filings
 #         logger.info(f"Downloading {count} {filing_type} filings for {ticker}")
@@ -1215,7 +1192,6 @@
                     "url": f"https://www.sec.gov/Archives/edgar/data/{i}12345/{filing_type.replace(' ', '')}-{filing_date}.html",
                     "content_summary": f"Sample {filing_type} filing content for {ticker}",
                 }
-            )
 
 #         logger.info(f"Retrieved {len(mock_filings)} {filing_type} filings for {ticker}")
 #         return mock_filings

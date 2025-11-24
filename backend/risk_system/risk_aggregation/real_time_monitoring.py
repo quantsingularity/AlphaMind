@@ -440,6 +440,5 @@
                     "timestamp": alert.timestamp.isoformat(),
                     "acknowledged": alert.acknowledged,
                 }
-            )
 
 #         return dashboard_data
