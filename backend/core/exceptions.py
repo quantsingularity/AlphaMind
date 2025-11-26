@@ -1,369 +1,311 @@
-# """"""
-## Exception handling module for AlphaMind.
-#
-## This module provides a comprehensive exception hierarchy and utilities
-## for consistent error handling throughout the AlphaMind system.
-# """"""
-
-# import datetime
-# from enum import Enum
-# import logging
-# import sys
-# import traceback
-# from typing import Any, Dict, List, Optional
+import datetime
+from enum import Enum
+import logging
+from typing import Any, Dict, List, Optional
 
 # Configure logging
-# logger = logging.getLogger(__name__)
+logger = logging.getLogger("AlphaMind.Exceptions")
+logger.setLevel(logging.INFO)
 
 
-# class ErrorSeverity(Enum):
-#    """Severity levels for errors."""
-#
-##     INFO = "info"
-##     WARNING = "warning"
-##     ERROR = "error"
-##     CRITICAL = "critical"
-#
-#
-## class ErrorCategory(Enum):
-#    """Categories of errors."""
+class ErrorSeverity(Enum):
+    """Severity levels for errors, mapped to standard logging levels."""
 
-#     VALIDATION = "validation"
-#     CONFIGURATION = "configuration"
-#     CONNECTION = "connection"
-#     EXECUTION = "execution"
-#     DATA = "data"
-#     SYSTEM = "system"
-#     UNKNOWN = "unknown"
+    INFO = "info"  # Minor issue, purely informational
+    WARNING = "warning"  # Non-fatal issue, execution can continue
+    ERROR = "error"  # Failure of a module/operation, usually recoverable
+    CRITICAL = "critical"  # System-wide failure, halts the trading process
 
 
-# class AlphaMindException(Exception):
-#    """Base exception class for all AlphaMind exceptions."""
-#
-##     def __init__(
-##         self,
-##         message: str,
-##         error_code: str = "UNKNOWN_ERROR",
-##         category: ErrorCategory = ErrorCategory.UNKNOWN,
-##         severity: ErrorSeverity = ErrorSeverity.ERROR,
-##         details: Dict[str, Any] = None,
-#    ):
-#        """Initialize AlphaMindException."""
+class ErrorCategory(Enum):
+    """Categories of errors, used to classify the origin of the failure."""
 
-#         Args:
-#             message: Error message
-#             error_code: Error code
-#             category: Error category
-#             severity: Error severity
-#             details: Additional error details
-#        """"""
-##         self.message = message
-##         self.error_code = error_code
-##         self.category = category
-##         self.severity = severity
-##         self.details = details or {}
-##         self.timestamp = datetime.datetime.now()
-#
-#        # Log the error based on severity
-##         if severity == ErrorSeverity.CRITICAL:
-##             logger.critical(f"{error_code}: {message}")
-##         elif severity == ErrorSeverity.ERROR:
-##             logger.error(f"{error_code}: {message}")
-##         elif severity == ErrorSeverity.WARNING:
-##             logger.warning(f"{error_code}: {message}")
-##         else:
-##             logger.info(f"{error_code}: {message}")
-#
-##         super().__init__(message)
-#
-##     def to_dict(self) -> Dict[str, Any]:
-#        """Convert exception to dictionary representation."""
-
-#         Returns:
-#             Dictionary representation of the exception
-#        """"""
-##         return {
-#            "error_code": self.error_code,
-#            "message": self.message,
-#            "category": self.category.value,
-#            "severity": self.severity.value,
-#            "timestamp": self.timestamp.isoformat(),
-#            "details": self.details,
-#        }
-#
-#
-## class ValidationException(AlphaMindException):
-#    """Exception raised for validation errors."""
-
-#     def __init__(
-#         self,
-#         message: str,
-#         error_code: str = "VALIDATION_ERROR",
-#         details: Dict[str, Any] = None,
-#         field: Optional[str] = None,
-#     ):
-#        """Initialize ValidationException."""
-#
-##         Args:
-##             message: Error message
-##             error_code: Error code
-##             details: Additional error details
-##             field: Field that failed validation
-#        """"""
-#         details = details or {}
-#         if field:
-#             details["field"] = field
-
-#         super().__init__(
-#             message=message,
-#             error_code=error_code,
-#             category=ErrorCategory.VALIDATION,
-#             severity=ErrorSeverity.WARNING,
-#             details=details,
-#         )
+    VALIDATION = "validation"  # Input or data structure is incorrect
+    CONFIGURATION = "configuration"  # Missing or invalid settings
+    CONNECTION = "connection"  # External API/DB connection failure
+    EXECUTION = "execution"  # Runtime logic or processing failure
+    DATA = "data"  # Data quality or format issue
+    SYSTEM = "system"  # OS, resource, or unhandled language exception
+    UNKNOWN = "unknown"  # Catch-all for wrapped exceptions
 
 
-# class ConfigurationException(AlphaMindException):
-#    """Exception raised for configuration errors."""
-#
-##     def __init__(
-##         self,
-##         message: str,
-##         error_code: str = "CONFIG_ERROR",
-##         details: Dict[str, Any] = None,
-##         config_key: Optional[str] = None,
-#    ):
-#        """Initialize ConfigurationException."""
-
-#         Args:
-#             message: Error message
-#             error_code: Error code
-#             details: Additional error details
-#             config_key: Configuration key that caused the error
-#        """"""
-##         details = details or {}
-##         if config_key:
-##             details["config_key"] = config_key
-#
-##         super().__init__(
-##             message=message,
-##             error_code=error_code,
-##             category=ErrorCategory.CONFIGURATION,
-##             severity=ErrorSeverity.ERROR,
-##             details=details,
-#        )
-#
-#
-## class ConnectionException(AlphaMindException):
-#    """Exception raised for connection errors."""
-
-#     def __init__(
-#         self,
-#         message: str,
-#         error_code: str = "CONNECTION_ERROR",
-#         details: Dict[str, Any] = None,
-#         service: Optional[str] = None,
-#     ):
-#        """Initialize ConnectionException."""
-#
-##         Args:
-##             message: Error message
-##             error_code: Error code
-##             details: Additional error details
-##             service: Service that failed to connect
-#        """"""
-#         details = details or {}
-#         if service:
-#             details["service"] = service
-
-#         super().__init__(
-#             message=message,
-#             error_code=error_code,
-#             category=ErrorCategory.CONNECTION,
-#             severity=ErrorSeverity.ERROR,
-#             details=details,
-#         )
+# --- 2. Base Exception ---
 
 
-# class ExecutionException(AlphaMindException):
-#    """Exception raised for execution errors."""
-#
-##     def __init__(
-##         self,
-##         message: str,
-##         error_code: str = "EXECUTION_ERROR",
-##         details: Dict[str, Any] = None,
-##         operation: Optional[str] = None,
-#    ):
-#        """Initialize ExecutionException."""
+class AlphaMindException(Exception):
+    """
+    Base exception class for all AlphaMind exceptions.
+    It automatically logs the error and provides a standardized dictionary representation.
+    """
 
-#         Args:
-#             message: Error message
-#             error_code: Error code
-#             details: Additional error details
-#             operation: Operation that failed
-#        """"""
-##         details = details or {}
-##         if operation:
-##             details["operation"] = operation
-#
-##         super().__init__(
-##             message=message,
-##             error_code=error_code,
-##             category=ErrorCategory.EXECUTION,
-##             severity=ErrorSeverity.ERROR,
-##             details=details,
-#        )
-#
-#
-## class DataException(AlphaMindException):
-#    """Exception raised for data errors."""
+    def __init__(
+        self,
+        message: str,
+        error_code: str = "UNKNOWN_ERROR",
+        category: ErrorCategory = ErrorCategory.UNKNOWN,
+        severity: ErrorSeverity = ErrorSeverity.ERROR,
+        details: Dict[str, Any] = None,
+    ):
+        """
+        Initialize AlphaMindException.
 
-#     def __init__(
-#         self,
-#         message: str,
-#         error_code: str = "DATA_ERROR",
-#         details: Dict[str, Any] = None,
-#         data_source: Optional[str] = None,
-#     ):
-#        """Initialize DataException."""
-#
-##         Args:
-##             message: Error message
-##             error_code: Error code
-##             details: Additional error details
-##             data_source: Data source that caused the error
-#        """"""
-#         details = details or {}
-#         if data_source:
-#             details["data_source"] = data_source
+        Args:
+            message: Human-readable error message
+            error_code: Unique, machine-readable error code
+            category: Error category (e.g., CONFIGURATION, CONNECTION)
+            severity: Error severity (e.g., CRITICAL, WARNING)
+            details: Additional context for debugging (e.g., failed key, API status)
+        """
+        self.message = message
+        self.error_code = error_code
+        self.category = category
+        self.severity = severity
+        self.details = details or {}
+        self.timestamp = datetime.datetime.now()
 
-#         super().__init__(
-#             message=message,
-#             error_code=error_code,
-#             category=ErrorCategory.DATA,
-#             severity=ErrorSeverity.ERROR,
-#             details=details,
-#         )
+        # Log the error based on severity using the logger instance
+        log_message = f"[{self.category.value.upper()}] {self.error_code}: {message}"
+
+        if severity == ErrorSeverity.CRITICAL:
+            logger.critical(log_message, extra={"details": self.details})
+        elif severity == ErrorSeverity.ERROR:
+            logger.error(log_message, extra={"details": self.details})
+        elif severity == ErrorSeverity.WARNING:
+            logger.warning(log_message, extra={"details": self.details})
+        else:  # ErrorSeverity.INFO
+            logger.info(log_message, extra={"details": self.details})
+
+        super().__init__(message)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert exception to dictionary representation for logging/API responses."""
+
+        return {
+            "error_code": self.error_code,
+            "message": self.message,
+            "category": self.category.value,
+            "severity": self.severity.value,
+            "timestamp": self.timestamp.isoformat(),
+            "details": self.details,
+        }
 
 
-# class SystemException(AlphaMindException):
-#    """Exception raised for system errors."""
-#
-##     def __init__(
-##         self,
-##         message: str,
-##         error_code: str = "SYSTEM_ERROR",
-##         details: Dict[str, Any] = None,
-#    ):
-#        """Initialize SystemException."""
+# --- 3. Exception Hierarchy ---
 
-#         Args:
-#             message: Error message
-#             error_code: Error code
-#             details: Additional error details
-#        """"""
-##         super().__init__(
-##             message=message,
-##             error_code=error_code,
-##             category=ErrorCategory.SYSTEM,
-##             severity=ErrorSeverity.CRITICAL,
-##             details=details,
-#        )
-#
-#
-## def handle_exception(
-##     exc: Exception,
-##     default_message: str = "An unexpected error occurred",
-##     log_traceback: bool = True,
-## ) -> Dict[str, Any]:
-#    """Handle an exception and return a standardized error response."""
 
-#     Args:
-#         exc: Exception to handle
-#         default_message: Default message if exception is not an AlphaMindException
-#         log_traceback: Whether to log the traceback
+class ValidationException(AlphaMindException):
+    """Exception raised when input data or parameters are invalid."""
 
-#     Returns:
-#         Standardized error response dictionary
-#    """"""
-##     if log_traceback:
-##         logger.error("Exception traceback:", exc_info=True)
-#
-##     if isinstance(exc, AlphaMindException):
-##         return exc.to_dict()
-##     else:
-#        # Wrap unknown exceptions in SystemException
-##         system_exc = SystemException(
-##             message=str(exc) or default_message,
-##             error_code="UNHANDLED_EXCEPTION",
-##             details={"exception_type": exc.__class__.__name__},
-#        )
-##         return system_exc.to_dict()
-#
-#
-## class ErrorCollector:
-#    """Collects and aggregates errors."""
+    def __init__(
+        self,
+        message: str,
+        error_code: str = "VALIDATION_ERROR",
+        details: Dict[str, Any] = None,
+        field: Optional[str] = None,
+    ):
+        """Initialize ValidationException."""
+        details = details or {}
+        if field:
+            details["field"] = field
 
-#     def __init__(self):
-#        """Initialize error collector."""
-##         self.errors: List[Dict[str, Any]] = []
-#
-##     def add_error(self, error: AlphaMindException) -> None:
-#        """Add an error to the collector."""
+        super().__init__(
+            message=message,
+            error_code=error_code,
+            category=ErrorCategory.VALIDATION,
+            severity=ErrorSeverity.WARNING,  # Typically warning, as logic flow can correct/skip
+            details=details,
+        )
 
-#         Args:
-#             error: Error to add
-#        """"""
-##         self.errors.append(error.to_dict())
-#
-##     def add_validation_error(self, message: str, field: Optional[str] = None) -> None:
-#        """Add a validation error to the collector."""
 
-#         Args:
-#             message: Error message
-#             field: Field that failed validation
-#        """"""
-##         error = ValidationException(message=message, field=field)
-##         self.add_error(error)
-#
-##     def has_errors(self) -> bool:
-#        """Check if the collector has any errors."""
+class ConfigurationException(AlphaMindException):
+    """Exception raised for missing or invalid configuration settings."""
 
-#         Returns:
-#             True if the collector has errors, False otherwise
-#        """"""
-##         return len(self.errors) > 0
-#
-##     def has_critical_errors(self) -> bool:
-#        """Check if the collector has any critical errors."""
+    def __init__(
+        self,
+        message: str,
+        error_code: str = "CONFIG_ERROR",
+        details: Dict[str, Any] = None,
+        config_key: Optional[str] = None,
+    ):
+        """Initialize ConfigurationException."""
+        details = details or {}
+        if config_key:
+            details["config_key"] = config_key
 
-#         Returns:
-#             True if the collector has critical errors, False otherwise
-#        """"""
-##         return any(e["severity"] == ErrorSeverity.CRITICAL.value for e in self.errors)
-#
-##     def get_errors(self) -> List[Dict[str, Any]]:
-#        """Get all collected errors."""
+        super().__init__(
+            message=message,
+            error_code=error_code,
+            category=ErrorCategory.CONFIGURATION,
+            severity=ErrorSeverity.ERROR,  # Often requires human intervention to fix config
+            details=details,
+        )
 
-#         Returns:
-#             List of error dictionaries
-#        """"""
-##         return self.errors.copy()
-#
-##     def clear(self) -> None:
-#        """Clear all collected errors."""
-#         self.errors = []
 
-#     def to_dict(self) -> Dict[str, Any]:
-#        """Convert collector to dictionary representation."""
-#
-##         Returns:
-##             Dictionary representation of the collector
-#        """"""
-#         return {
-#             "has_errors": self.has_errors(),
-#             "has_critical_errors": self.has_critical_errors(),
-#             "error_count": len(self.errors),
-#             "errors": self.get_errors(),
-#         }
+class ConnectionException(AlphaMindException):
+    """Exception raised for failures connecting to external services (APIs, databases)."""
+
+    def __init__(
+        self,
+        message: str,
+        error_code: str = "CONNECTION_ERROR",
+        details: Dict[str, Any] = None,
+        service: Optional[str] = None,
+    ):
+        """Initialize ConnectionException."""
+        details = details or {}
+        if service:
+            details["service"] = service
+
+        super().__init__(
+            message=message,
+            error_code=error_code,
+            category=ErrorCategory.CONNECTION,
+            severity=ErrorSeverity.ERROR,
+            details=details,
+        )
+
+
+class ExecutionException(AlphaMindException):
+    """Exception raised when a module's core operation fails (e.g., model prediction, backtest logic)."""
+
+    def __init__(
+        self,
+        message: str,
+        error_code: str = "EXECUTION_ERROR",
+        details: Dict[str, Any] = None,
+        operation: Optional[str] = None,
+    ):
+        """Initialize ExecutionException."""
+        details = details or {}
+        if operation:
+            details["operation"] = operation
+
+        super().__init__(
+            message=message,
+            error_code=error_code,
+            category=ErrorCategory.EXECUTION,
+            severity=ErrorSeverity.ERROR,
+            details=details,
+        )
+
+
+class DataException(AlphaMindException):
+    """Exception raised for issues related to data quality, format, or availability."""
+
+    def __init__(
+        self,
+        message: str,
+        error_code: str = "DATA_ERROR",
+        details: Dict[str, Any] = None,
+        data_source: Optional[str] = None,
+    ):
+        """Initialize DataException."""
+        details = details or {}
+        if data_source:
+            details["data_source"] = data_source
+
+        super().__init__(
+            message=message,
+            error_code=error_code,
+            category=ErrorCategory.DATA,
+            severity=ErrorSeverity.ERROR,
+            details=details,
+        )
+
+
+class SystemException(AlphaMindException):
+    """Exception raised for underlying system issues (OS, resource limits, unhandled Python errors)."""
+
+    def __init__(
+        self,
+        message: str,
+        error_code: str = "SYSTEM_ERROR",
+        details: Dict[str, Any] = None,
+    ):
+        """Initialize SystemException."""
+        super().__init__(
+            message=message,
+            error_code=error_code,
+            category=ErrorCategory.SYSTEM,
+            severity=ErrorSeverity.CRITICAL,  # System errors are usually unrecoverable without restart/fix
+            details=details,
+        )
+
+
+# --- 4. Utilities ---
+
+
+def handle_exception(
+    exc: Exception,
+    default_message: str = "An unexpected error occurred",
+    log_traceback: bool = True,
+) -> Dict[str, Any]:
+    """
+    Handle an exception (whether AlphaMind-specific or built-in) and return a
+    standardized error response dictionary.
+
+    Args:
+        exc: Exception to handle
+        default_message: Default message if exception is not an AlphaMindException
+        log_traceback: Whether to log the full Python traceback
+    """
+    if log_traceback:
+        # Log the full traceback for unhandled or unexpected errors
+        logger.error(
+            f"Unwrapped exception caught: {exc.__class__.__name__}", exc_info=True
+        )
+
+    if isinstance(exc, AlphaMindException):
+        # Already logged within the exception's __init__
+        return exc.to_dict()
+    else:
+        # Wrap unknown exceptions in SystemException for standardized reporting
+        system_exc = SystemException(
+            message=str(exc) or default_message,
+            error_code="UNHANDLED_EXCEPTION",
+            details={"exception_type": exc.__class__.__name__},
+        )
+        # Note: We return the dictionary here to prevent double-logging (it's logged in SystemException.__init__)
+        return system_exc.to_dict()
+
+
+class ErrorCollector:
+    """Collects and aggregates errors, useful for batch processing or validation steps."""
+
+    def __init__(self):
+        """Initialize error collector."""
+        self.errors: List[Dict[str, Any]] = []
+
+    def add_error(self, error: AlphaMindException) -> None:
+        """Add an error to the collector (in its dictionary form)."""
+        self.errors.append(error.to_dict())
+
+    def add_validation_error(self, message: str, field: Optional[str] = None) -> None:
+        """Convenience method to add a ValidationException."""
+        error = ValidationException(message=message, field=field)
+        self.add_error(error)
+
+    def has_errors(self) -> bool:
+        """Check if the collector has any errors."""
+        return len(self.errors) > 0
+
+    def has_critical_errors(self) -> bool:
+        """Check if the collector has any critical errors."""
+        return any(e["severity"] == ErrorSeverity.CRITICAL.value for e in self.errors)
+
+    def get_errors(self) -> List[Dict[str, Any]]:
+        """Get all collected errors."""
+        return self.errors.copy()
+
+    def clear(self) -> None:
+        """Clear all collected errors."""
+        self.errors = []
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert collector to dictionary representation for easy review."""
+        return {
+            "has_errors": self.has_errors(),
+            "has_critical_errors": self.has_critical_errors(),
+            "error_count": len(self.errors),
+            "errors": self.get_errors(),
+        }
