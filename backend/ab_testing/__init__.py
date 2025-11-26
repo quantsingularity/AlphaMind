@@ -1,33 +1,33 @@
-# """"""
-## AlphaMind A/B Testing Framework
-#
-## This package provides a comprehensive framework for conducting A/B tests
-## in financial applications, including experiment tracking, statistical analysis,
-## visualization tools, and experiment configuration management.
-# """"""
+"""
+AlphaMind A/B Testing Framework
 
-# from .config import ExperimentConfig
-# from .experiment import Experiment, ExperimentGroup
-# from .statistics import (
-#     BayesianABTest,
-#     MannWhitneyU,
-#     MultipleTestingCorrection,
-#     StatisticalTest,
-#     TTest,
-# )
-# from .tracking import ExperimentResult, ExperimentTracker
-# from .visualization import ExperimentVisualizer
+This package provides a comprehensive framework for conducting A/B tests
+in financial applications, including experiment tracking, statistical analysis,
+visualization tools, and experiment configuration management.
+"""
 
-# __all__ = [
-#     "Experiment",
-#     "ExperimentGroup",
-#     "ExperimentTracker",
-#     "ExperimentResult",
-#     "StatisticalTest",
-#     "TTest",
-#     "MannWhitneyU",
-#     "BayesianABTest",
-#     "MultipleTestingCorrection",
-#     "ExperimentVisualizer",
-#     "ExperimentConfig",
-# ]
+from .config import ExperimentConfig
+from .experiment import Experiment, ExperimentGroup
+from .statistics import (
+    BayesianABTest,
+    MannWhitneyU,
+    MultipleTestingCorrection,
+    StatisticalTest,
+    TTest,
+)
+from .tracking import ExperimentResult, ExperimentTracker
+from .visualization import ExperimentVisualizer
+
+__all__ = [
+    "Experiment",
+    "ExperimentGroup",
+    "ExperimentTracker",
+    "ExperimentResult",
+    "StatisticalTest",
+    "TTest",
+    "MannWhitneyU",
+    "BayesianABTest",
+    "MultipleTestingCorrection",
+    "ExperimentVisualizer",
+    "ExperimentConfig",
+]
