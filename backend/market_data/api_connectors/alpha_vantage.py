@@ -1,10 +1,10 @@
-#""""""
+# """"""
 ## Alpha Vantage API connector for financial data.
 #
 ## This module provides a connector for accessing financial market data
 ## from Alpha Vantage, including stock prices, technical indicators,
 ## forex data, and more.
-#""""""
+# """"""
 
 # from datetime import datetime, timedelta
 # import logging
@@ -40,18 +40,18 @@
 #    """"""
 
 #     def __init__(self, api_key: str, premium: bool = False):
-        # Create credentials
+#         # Create credentials
 #         credentials = APICredentials(api_key=api_key)
 
-        # Set base URL
+#         # Set base URL
 #         base_url = "https://www.alphavantage.co/query"
 
-        # Create rate limiter based on subscription level
+#         # Create rate limiter based on subscription level
 #         if premium:
-            # Premium API: 75 requests per minute, 300 requests per day
+#             # Premium API: 75 requests per minute, 300 requests per day
 #             rate_limiter = RateLimiter(requests_per_minute=75, requests_per_day=300)
 #         else:
-            # Free API: 5 requests per minute, 500 requests per day
+#             # Free API: 5 requests per minute, 500 requests per day
 #             rate_limiter = RateLimiter(requests_per_minute=5, requests_per_day=500)
 
 #         super().__init__(
@@ -81,8 +81,8 @@
 ##         success : bool
 ##             Whether authentication was successful.
 #        """"""
-        # Alpha Vantage uses API key for authentication
-        # Test authentication by making a simple request
+#         # Alpha Vantage uses API key for authentication
+#         # Test authentication by making a simple request
 #         response = self.get_stock_quote("AAPL")
 
 #         return response.is_success()
@@ -102,10 +102,10 @@
 ##             Response containing the stock quote.
 #        """"""
 #         params = {
-            "function": "GLOBAL_QUOTE",
-            "symbol": symbol,
-            "apikey": self.credentials.api_key,
-        }
+#             "function": "GLOBAL_QUOTE",
+#             "symbol": symbol,
+#             "apikey": self.credentials.api_key,
+#         }
 
 #         return self.request(
 #             endpoint="",
@@ -142,29 +142,29 @@
 ##         response : DataResponse
 ##             Response containing the time series data.
 #        """"""
-        # Determine function based on interval and adjusted
+#         # Determine function based on interval and adjusted
 #         if interval == "intraday":
 #             function = "TIME_SERIES_INTRADAY"
 #         elif interval == "daily":
 #             function = "TIME_SERIES_DAILY_ADJUSTED" if adjusted else "TIME_SERIES_DAILY"
 #         elif interval == "weekly":
 #             function = (
-                "TIME_SERIES_WEEKLY_ADJUSTED" if adjusted else "TIME_SERIES_WEEKLY"
+#                 "TIME_SERIES_WEEKLY_ADJUSTED" if adjusted else "TIME_SERIES_WEEKLY"
 #         elif interval == "monthly":
 #             function = (
-                "TIME_SERIES_MONTHLY_ADJUSTED" if adjusted else "TIME_SERIES_MONTHLY"
+#                 "TIME_SERIES_MONTHLY_ADJUSTED" if adjusted else "TIME_SERIES_MONTHLY"
 #         else:
 #             raise ValueError(f"Invalid interval: {interval}")
 
 #         params = {
-            "function": function,
-            "symbol": symbol,
-            "outputsize": outputsize,
-            "datatype": datatype,
-            "apikey": self.credentials.api_key,
-        }
+#             "function": function,
+#             "symbol": symbol,
+#             "outputsize": outputsize,
+#             "datatype": datatype,
+#             "apikey": self.credentials.api_key,
+#         }
 
-        # Add interval parameter for intraday data
+#         # Add interval parameter for intraday data
 #         if interval == "intraday":
 #             params["interval"] = "5min"  # Default to 5-minute intervals
 
@@ -207,14 +207,14 @@
 ##             Response containing the technical indicator data.
 #        """"""
 #         params = {
-            "function": indicator,
-            "symbol": symbol,
-            "interval": interval,
-            "time_period": time_period,
-            "series_type": series_type,
-            "datatype": datatype,
-            "apikey": self.credentials.api_key,
-        }
+#             "function": indicator,
+#             "symbol": symbol,
+#             "interval": interval,
+#             "time_period": time_period,
+#             "series_type": series_type,
+#             "datatype": datatype,
+#             "apikey": self.credentials.api_key,
+#         }
 
 #         return self.request(
 #             endpoint="",
@@ -239,11 +239,11 @@
 ##             Response containing the forex exchange rate.
 #        """"""
 #         params = {
-            "function": "CURRENCY_EXCHANGE_RATE",
-            "from_currency": from_currency,
-            "to_currency": to_currency,
-            "apikey": self.credentials.api_key,
-        }
+#             "function": "CURRENCY_EXCHANGE_RATE",
+#             "from_currency": from_currency,
+#             "to_currency": to_currency,
+#             "apikey": self.credentials.api_key,
+#         }
 
 #         return self.request(
 #             endpoint="",
@@ -280,7 +280,7 @@
 ##         response : DataResponse
 ##             Response containing the forex time series data.
 #        """"""
-        # Determine function based on interval
+#         # Determine function based on interval
 #         if interval == "intraday":
 #             function = "FX_INTRADAY"
 #         elif interval == "daily":
@@ -293,15 +293,15 @@
 #             raise ValueError(f"Invalid interval: {interval}")
 
 #         params = {
-            "function": function,
-            "from_symbol": from_currency,
-            "to_symbol": to_currency,
-            "outputsize": outputsize,
-            "datatype": datatype,
-            "apikey": self.credentials.api_key,
-        }
+#             "function": function,
+#             "from_symbol": from_currency,
+#             "to_symbol": to_currency,
+#             "outputsize": outputsize,
+#             "datatype": datatype,
+#             "apikey": self.credentials.api_key,
+#         }
 
-        # Add interval parameter for intraday data
+#         # Add interval parameter for intraday data
 #         if interval == "intraday":
 #             params["interval"] = "5min"  # Default to 5-minute intervals
 
@@ -328,11 +328,11 @@
 ##             Response containing the cryptocurrency exchange rate.
 #        """"""
 #         params = {
-            "function": "CURRENCY_EXCHANGE_RATE",
-            "from_currency": from_currency,
-            "to_currency": to_currency,
-            "apikey": self.credentials.api_key,
-        }
+#             "function": "CURRENCY_EXCHANGE_RATE",
+#             "from_currency": from_currency,
+#             "to_currency": to_currency,
+#             "apikey": self.credentials.api_key,
+#         }
 
 #         return self.request(
 #             endpoint="",
@@ -369,7 +369,7 @@
 ##         response : DataResponse
 ##             Response containing the cryptocurrency time series data.
 #        """"""
-        # Determine function based on interval
+#         # Determine function based on interval
 #         if interval == "intraday":
 #             function = "CRYPTO_INTRADAY"
 #         elif interval == "daily":
@@ -382,14 +382,14 @@
 #             raise ValueError(f"Invalid interval: {interval}")
 
 #         params = {
-            "function": function,
-            "symbol": symbol,
-            "market": market,
-            "datatype": datatype,
-            "apikey": self.credentials.api_key,
-        }
+#             "function": function,
+#             "symbol": symbol,
+#             "market": market,
+#             "datatype": datatype,
+#             "apikey": self.credentials.api_key,
+#         }
 
-        # Add interval parameter for intraday data
+#         # Add interval parameter for intraday data
 #         if interval == "intraday":
 #             params["interval"] = "5min"  # Default to 5-minute intervals
 
@@ -437,11 +437,11 @@
 ##             Response containing the economic indicator data.
 #        """"""
 #         params = {
-            "function": indicator,
-            "interval": interval,
-            "datatype": datatype,
-            "apikey": self.credentials.api_key,
-        }
+#             "function": indicator,
+#             "interval": interval,
+#             "datatype": datatype,
+#             "apikey": self.credentials.api_key,
+#         }
 
 #         return self.request(
 #             endpoint="",
@@ -466,11 +466,11 @@
 ##             Response containing the search results.
 #        """"""
 #         params = {
-            "function": "SYMBOL_SEARCH",
-            "keywords": keywords,
-            "datatype": datatype,
-            "apikey": self.credentials.api_key,
-        }
+#             "function": "SYMBOL_SEARCH",
+#             "keywords": keywords,
+#             "datatype": datatype,
+#             "apikey": self.credentials.api_key,
+#         }
 
 #         return self.request(
 #             endpoint="",
@@ -493,10 +493,10 @@
 ##             Response containing the company overview data.
 #        """"""
 #         params = {
-            "function": "OVERVIEW",
-            "symbol": symbol,
-            "apikey": self.credentials.api_key,
-        }
+#             "function": "OVERVIEW",
+#             "symbol": symbol,
+#             "apikey": self.credentials.api_key,
+#         }
 
 #         return self.request(
 #             endpoint="",
@@ -519,10 +519,10 @@
 ##             Response containing the income statement data.
 #        """"""
 #         params = {
-            "function": "INCOME_STATEMENT",
-            "symbol": symbol,
-            "apikey": self.credentials.api_key,
-        }
+#             "function": "INCOME_STATEMENT",
+#             "symbol": symbol,
+#             "apikey": self.credentials.api_key,
+#         }
 
 #         return self.request(
 #             endpoint="",
@@ -545,10 +545,10 @@
 ##             Response containing the balance sheet data.
 #        """"""
 #         params = {
-            "function": "BALANCE_SHEET",
-            "symbol": symbol,
-            "apikey": self.credentials.api_key,
-        }
+#             "function": "BALANCE_SHEET",
+#             "symbol": symbol,
+#             "apikey": self.credentials.api_key,
+#         }
 
 #         return self.request(
 #             endpoint="",
@@ -571,10 +571,10 @@
 ##             Response containing the cash flow data.
 #        """"""
 #         params = {
-            "function": "CASH_FLOW",
-            "symbol": symbol,
-            "apikey": self.credentials.api_key,
-        }
+#             "function": "CASH_FLOW",
+#             "symbol": symbol,
+#             "apikey": self.credentials.api_key,
+#         }
 
 #         return self.request(
 #             endpoint="",
@@ -597,10 +597,10 @@
 ##             Response containing the earnings data.
 #        """"""
 #         params = {
-            "function": "EARNINGS",
-            "symbol": symbol,
-            "apikey": self.credentials.api_key,
-        }
+#             "function": "EARNINGS",
+#             "symbol": symbol,
+#             "apikey": self.credentials.api_key,
+#         }
 
 #         return self.request(
 #             endpoint="",

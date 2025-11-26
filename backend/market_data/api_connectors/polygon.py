@@ -1,9 +1,9 @@
-#""""""
+# """"""
 ## Polygon.io API connector for financial data.
 #
 ## This module provides a connector for accessing financial market data
 ## from Polygon.io, including stocks, options, forex, and crypto data.
-#""""""
+# """"""
 
 # from datetime import date, datetime, timedelta
 # import logging
@@ -20,7 +20,7 @@
 #     DataProvider,
 #     DataResponse,
 #     RateLimiter,
-)
+# )
 
 
 # class PolygonConnector(APIConnector):
@@ -37,20 +37,20 @@
 #    """"""
 
 #     def __init__(self, api_key: str):
-        # Create credentials
+#         # Create credentials
 #         credentials = APICredentials(api_key=api_key)
 
-        # Set base URL
+#         # Set base URL
 #         base_url = "https://api.polygon.io"
 
-        # Create rate limiter
-        # Polygon.io has different rate limits based on subscription tier
-        # Using a conservative limit of 5 requests per second
+#         # Create rate limiter
+#         # Polygon.io has different rate limits based on subscription tier
+#         # Using a conservative limit of 5 requests per second
 #         rate_limiter = RateLimiter(requests_per_second=5)
 
 #         super().__init__(
 #             credentials=credentials, base_url=base_url, rate_limiter=rate_limiter
-        )
+#         )
 
 #         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -75,8 +75,8 @@
 ##         success : bool
 ##             Whether authentication was successful.
 #        """"""
-        # Polygon.io uses API key for authentication
-        # Test authentication by making a simple request
+#         # Polygon.io uses API key for authentication
+#         # Test authentication by making a simple request
 #         response = self.get_ticker_details("AAPL")
 
 #         return response.is_success()
@@ -121,7 +121,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_tickers(
 #         self,
@@ -191,7 +191,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_ticker_news(
 #         self,
@@ -243,7 +243,7 @@
 #             params=params,
 #             category=DataCategory.NEWS,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_ticker_types(self) -> DataResponse:
 #        """"""
@@ -262,7 +262,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_market_status(self) -> DataResponse:
 #        """"""
@@ -281,7 +281,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_market_holidays(self) -> DataResponse:
 #        """"""
@@ -300,7 +300,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_stock_exchanges(self) -> DataResponse:
 #        """"""
@@ -319,7 +319,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_conditions(self, asset_class: str = "stocks") -> DataResponse:
 #        """"""
@@ -343,7 +343,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_previous_close(self, ticker: str, adjusted: bool = True) -> DataResponse:
 #        """"""
@@ -370,7 +370,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_aggregates(
 #         self,
@@ -410,7 +410,7 @@
 ##         response : DataResponse
 ##             Response containing the aggregates.
 #        """"""
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if isinstance(from_date, (date, datetime)):
 #             from_date = from_date.strftime("%Y-%m-%d")
 
@@ -421,14 +421,14 @@
 
 #         params = self._add_api_key(
 #             {"adjusted": str(adjusted).lower(), "sort": sort, "limit": limit}
-        )
+#         )
 
 #         return self.request(
 #             endpoint=endpoint,
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_grouped_daily(
 #         self,
@@ -453,7 +453,7 @@
 ##         response : DataResponse
 ##             Response containing the grouped daily data.
 #        """"""
-        # Convert date to string if needed
+#         # Convert date to string if needed
 #         if isinstance(date, (date, datetime)):
 #             date = date.strftime("%Y-%m-%d")
 
@@ -461,14 +461,14 @@
 
 #         params = self._add_api_key(
 #             {"adjusted": str(adjusted).lower(), "include_otc": str(include_otc).lower()}
-        )
+#         )
 
 #         return self.request(
 #             endpoint=endpoint,
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_daily_open_close(
 #         self, ticker: str, date: Union[str, date, datetime], adjusted: bool = True
@@ -490,7 +490,7 @@
 ##         response : DataResponse
 ##             Response containing the daily open/close.
 #        """"""
-        # Convert date to string if needed
+#         # Convert date to string if needed
 #         if isinstance(date, (date, datetime)):
 #             date = date.strftime("%Y-%m-%d")
 
@@ -503,7 +503,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_last_quote(self, ticker: str) -> DataResponse:
 #        """"""
@@ -527,7 +527,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_last_trade(self, ticker: str) -> DataResponse:
 #        """"""
@@ -551,7 +551,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_snapshot(self, ticker: str) -> DataResponse:
 #        """"""
@@ -575,7 +575,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_snapshots(self, tickers: List[str]) -> DataResponse:
 #        """"""
@@ -600,7 +600,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_gainers_losers(
 #         self, direction: str = "gainers", limit: int = 20
@@ -629,7 +629,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_forex_currencies(self) -> DataResponse:
 #        """"""
@@ -648,7 +648,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_forex_last_quote(
 #         self, from_currency: str, to_currency: str
@@ -677,7 +677,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_crypto_last_trade(
 #         self, from_currency: str, to_currency: str
@@ -706,7 +706,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_options_contracts(
 #         self,
@@ -746,13 +746,13 @@
 #         endpoint = "v3/reference/options/contracts"
 
 #         params = self._add_api_key(
-            {
-                "underlying_ticker": underlying_ticker,
-                "limit": limit,
-                "sort": sort,
-                "order": order,
-            }
-        )
+#             {
+#                 "underlying_ticker": underlying_ticker,
+#                 "limit": limit,
+#                 "sort": sort,
+#                 "order": order,
+#             }
+#         )
 
 #         if expiration_date:
 #             params["expiration_date"] = expiration_date
@@ -768,7 +768,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_options_last_trade(self, options_ticker: str) -> DataResponse:
 #        """"""
@@ -792,7 +792,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_technical_indicators(
 #         self,
@@ -841,16 +841,16 @@
 #         endpoint = f"v1/indicators/{indicator_type}/{ticker}"
 
 #         params = self._add_api_key(
-            {
-                "timespan": timespan,
-                "adjusted": str(adjusted).lower(),
-                "window": window,
-                "series_type": series_type,
-                "expand_underlying": str(expand_underlying).lower(),
-                "order": order,
-                "limit": limit,
-            }
-        )
+#             {
+#                 "timespan": timespan,
+#                 "adjusted": str(adjusted).lower(),
+#                 "window": window,
+#                 "series_type": series_type,
+#                 "expand_underlying": str(expand_underlying).lower(),
+#                 "order": order,
+#                 "limit": limit,
+#             }
+#         )
 
 #         if timestamp:
 #             params["timestamp"] = timestamp
@@ -860,4 +860,4 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )

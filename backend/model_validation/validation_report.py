@@ -1,10 +1,10 @@
-#""""""
+# """"""
 ## Model validation reporting for financial machine learning models.
 #
 ## This module provides tools for generating comprehensive validation reports
 ## for machine learning models in financial applications, including performance
 ## metrics, cross-validation results, and model diagnostics.
-#""""""
+# """"""
 
 # from datetime import datetime
 # from io import StringIO
@@ -51,7 +51,7 @@
 #         task_type: str = "regression",
 #         feature_names: Optional[List[str]] = None,
 #         target_name: Optional[str] = None,
-    ):
+#     ):
 #         self.model_name = model_name
 #         self.model = model
 #         self.task_type = task_type
@@ -60,17 +60,17 @@
 #         self.report_id = str(uuid.uuid4())[:8]
 #         self.creation_time = datetime.now()
 
-        # Initialize report sections
+#         # Initialize report sections
 #         self.sections = {
-            "model_info": {},
-            "performance_metrics": {},
-            "cross_validation": {},
-            "feature_importance": {},
-            "diagnostics": {},
-            "warnings": [],
-        }
+#             "model_info": {},
+#             "performance_metrics": {},
+#             "cross_validation": {},
+#             "feature_importance": {},
+#             "diagnostics": {},
+#             "warnings": [],
+#         }
 
-        # Store model info
+#         # Store model info
 #         self._store_model_info()
 
 #     def _store_model_info(self) -> None:
@@ -104,7 +104,7 @@
 #         Add performance metrics to the report.
 
 #         Parameters
-        ----------
+#         ----------
 #         y_true : array-like
 #             Ground truth (correct) target values.
 #         y_pred : array-like
@@ -137,7 +137,7 @@
 #         Add cross-validation results to the report.
 
 #         Parameters
-        ----------
+#         ----------
 #         cv_results : dict
 #             Dictionary of cross-validation results, with metric names as keys
 #             and lists of values for each fold as values.
@@ -167,7 +167,7 @@
 #         Add feature importance to the report.
 
 #         Parameters
-        ----------
+#         ----------
 #         importance_values : DataFrame
 #             DataFrame containing feature importance values.
 #        """"""
@@ -181,7 +181,7 @@
 #         Add residual analysis to the report (for regression models).
 
 #         Parameters
-        ----------
+#         ----------
 #         y_true : array-like
 #             Ground truth (correct) target values.
 #         y_pred : array-like
@@ -223,7 +223,7 @@
 #         Add confusion matrix to the report (for classification models).
 
 #         Parameters
-        ----------
+#         ----------
 #         y_true : array-like
 #             Ground truth (correct) target values.
 #         y_pred : array-like
@@ -257,7 +257,7 @@
 #         Add ROC curve to the report (for binary classification models).
 
 #         Parameters
-        ----------
+#         ----------
 #         y_true : array-like
 #             Ground truth (correct) target values.
 #         y_score : array-like
@@ -290,7 +290,7 @@
 #         Add precision-recall curve to the report (for binary classification models).
 
 #         Parameters
-        ----------
+#         ----------
 #         y_true : array-like
 #             Ground truth (correct) target values.
 #         y_score : array-like
@@ -323,7 +323,7 @@
 #         Add learning curve to the report.
 
 #         Parameters
-        ----------
+#         ----------
 #         train_sizes : array-like
 #             Training set sizes.
 #         train_scores : array-like
@@ -347,7 +347,7 @@
 #         Add calibration curve to the report (for classification models).
 
 #         Parameters
-        ----------
+#         ----------
 #         y_true : array-like
 #             Ground truth (correct) target values.
 #         y_prob : array-like
@@ -378,7 +378,7 @@
 #         Add custom section to the report.
 
 #         Parameters
-        ----------
+#         ----------
 #         section_name : str
 #             Name of the section.
 #         content : any
@@ -401,7 +401,7 @@
 #         Generate validation report.
 
 #         Parameters
-        ----------
+#         ----------
 #         format : str, default="markdown"
 #             Report format. Options: "markdown", "html", "json".
 #         output_file : str, optional
@@ -410,7 +410,7 @@
 #             Whether to include plots in the report.
 
 #         Returns
-        -------
+#         -------
 #         report : str or None
 #             Report as a string if output_file is None, otherwise None.
 #        """"""
@@ -427,10 +427,10 @@
 ##         self, output_file: Optional[str] = None
 ##     ) -> Union[str, None]:
 #        """Generate JSON report."""
-        # Convert to JSON
+#         # Convert to JSON
 #         report_json = json.dumps(self.sections, indent=2)
 
-        # Save to file if specified
+#         # Save to file if specified
 #         if output_file:
 #             with open(output_file, "w") as f:
 #                 f.write(report_json)
@@ -645,16 +645,16 @@
 ##         self, output_file: Optional[str] = None, include_plots: bool = True
 ##     ) -> Union[str, None]:
 #        """Generate HTML report."""
-        # First generate markdown report
+#         # First generate markdown report
 #         md_report = self._generate_markdown_report(None, include_plots)
 
-        # Convert markdown to HTML
+#         # Convert markdown to HTML
 #         try:
 #             import markdown
 
 #             html_report = markdown.markdown(md_report, extensions=["tables"])
 
-            # Add basic styling
+#             # Add basic styling
 #             html_report = f""""""
 #             <!DOCTYPE html>
 #             <html>
@@ -705,7 +705,7 @@
 #         Plot performance comparison across datasets.
 
 #         Parameters
-        ----------
+#         ----------
 #         datasets : list, optional
 #             List of dataset names to include. If None, includes all datasets.
 #         metrics : list, optional
@@ -716,7 +716,7 @@
 #             Plot title. If None, uses default title.
 
 #         Returns
-        -------
+#         -------
 #         fig : Figure
 #             Matplotlib figure.
 #        """"""
@@ -790,7 +790,7 @@
 #         Plot cross-validation results.
 
 #         Parameters
-        ----------
+#         ----------
 #         metrics : list, optional
 #             List of metrics to include. If None, includes all metrics.
 #         figsize : tuple, default=(12, 6)
@@ -799,7 +799,7 @@
 #             Plot title. If None, uses default title.
 
 #         Returns
-        -------
+#         -------
 #         fig : Figure
 #             Matplotlib figure.
 #        """"""
@@ -876,7 +876,7 @@
 #         Plot feature importance.
 
 #         Parameters
-        ----------
+#         ----------
 #         top_n : int, optional
 #             Number of top features to plot. If None, plots all features.
 #         figsize : tuple, default=(10, 6)
@@ -889,7 +889,7 @@
 #             Whether to show importance values on bars.
 
 #         Returns
-        -------
+#         -------
 #         fig : Figure
 #             Matplotlib figure.
 #        """"""
@@ -951,7 +951,7 @@
 #         Plot residual analysis (for regression models).
 
 #         Parameters
-        ----------
+#         ----------
 #         y_true : array-like
 #             Ground truth (correct) target values.
 #         y_pred : array-like
@@ -962,7 +962,7 @@
 #             Plot title. If None, uses default title.
 
 #         Returns
-        -------
+#         -------
 #         fig : Figure
 #             Matplotlib figure.
 #        """"""
@@ -1032,7 +1032,7 @@
 #         Plot confusion matrix (for classification models).
 
 #         Parameters
-        ----------
+#         ----------
 #         figsize : tuple, default=(8, 6)
 #             Figure size.
 #         title : str, optional
@@ -1041,7 +1041,7 @@
 #             Colormap for heatmap.
 
 #         Returns
-        -------
+#         -------
 #         fig : Figure
 #             Matplotlib figure.
 #        """"""
@@ -1105,14 +1105,14 @@
 #         Plot ROC curve (for classification models).
 
 #         Parameters
-        ----------
+#         ----------
 #         figsize : tuple, default=(8, 6)
 #             Figure size.
 #         title : str, optional
 #             Plot title. If None, uses default title.
 
 #         Returns
-        -------
+#         -------
 #         fig : Figure
 #             Matplotlib figure.
 #        """"""
@@ -1157,14 +1157,14 @@
 #         Plot precision-recall curve (for classification models).
 
 #         Parameters
-        ----------
+#         ----------
 #         figsize : tuple, default=(8, 6)
 #             Figure size.
 #         title : str, optional
 #             Plot title. If None, uses default title.
 
 #         Returns
-        -------
+#         -------
 #         fig : Figure
 #             Matplotlib figure.
 #        """"""
@@ -1211,14 +1211,14 @@
 #         Plot learning curve.
 
 #         Parameters
-        ----------
+#         ----------
 #         figsize : tuple, default=(8, 6)
 #             Figure size.
 #         title : str, optional
 #             Plot title. If None, uses default title.
 
 #         Returns
-        -------
+#         -------
 #         fig : Figure
 #             Matplotlib figure.
 #        """"""
@@ -1286,14 +1286,14 @@
 #         Plot calibration curve (for classification models).
 
 #         Parameters
-        ----------
+#         ----------
 #         figsize : tuple, default=(8, 6)
 #             Figure size.
 #         title : str, optional
 #             Plot title. If None, uses default title.
 
 #         Returns
-        -------
+#         -------
 #         fig : Figure
 #             Matplotlib figure.
 #        """"""

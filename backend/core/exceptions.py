@@ -1,9 +1,9 @@
-#""""""
+# """"""
 ## Exception handling module for AlphaMind.
 #
 ## This module provides a comprehensive exception hierarchy and utilities
 ## for consistent error handling throughout the AlphaMind system.
-#""""""
+# """"""
 
 # import datetime
 # from enum import Enum
@@ -101,7 +101,7 @@
 #         error_code: str = "VALIDATION_ERROR",
 #         details: Dict[str, Any] = None,
 #         field: Optional[str] = None,
-    ):
+#     ):
 #        """Initialize ValidationException."""
 #
 ##         Args:
@@ -120,7 +120,7 @@
 #             category=ErrorCategory.VALIDATION,
 #             severity=ErrorSeverity.WARNING,
 #             details=details,
-        )
+#         )
 
 
 # class ConfigurationException(AlphaMindException):
@@ -163,7 +163,7 @@
 #         error_code: str = "CONNECTION_ERROR",
 #         details: Dict[str, Any] = None,
 #         service: Optional[str] = None,
-    ):
+#     ):
 #        """Initialize ConnectionException."""
 #
 ##         Args:
@@ -182,7 +182,7 @@
 #             category=ErrorCategory.CONNECTION,
 #             severity=ErrorSeverity.ERROR,
 #             details=details,
-        )
+#         )
 
 
 # class ExecutionException(AlphaMindException):
@@ -225,7 +225,7 @@
 #         error_code: str = "DATA_ERROR",
 #         details: Dict[str, Any] = None,
 #         data_source: Optional[str] = None,
-    ):
+#     ):
 #        """Initialize DataException."""
 #
 ##         Args:
@@ -244,7 +244,7 @@
 #             category=ErrorCategory.DATA,
 #             severity=ErrorSeverity.ERROR,
 #             details=details,
-        )
+#         )
 
 
 # class SystemException(AlphaMindException):
@@ -362,8 +362,8 @@
 ##             Dictionary representation of the collector
 #        """"""
 #         return {
-            "has_errors": self.has_errors(),
-            "has_critical_errors": self.has_critical_errors(),
-            "error_count": len(self.errors),
-            "errors": self.get_errors(),
-        }
+#             "has_errors": self.has_errors(),
+#             "has_critical_errors": self.has_critical_errors(),
+#             "error_count": len(self.errors),
+#             "errors": self.get_errors(),
+#         }

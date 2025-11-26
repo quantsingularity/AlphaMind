@@ -1,4 +1,4 @@
-#""""""
+# """"""
 ## Refinitiv API connector for financial data.
 #
 ## This module provides a connector for accessing financial market data
@@ -8,7 +8,7 @@
 ## Note: This connector is a stub implementation that defines the interface
 ## for interacting with Refinitiv APIs. Actual implementation requires
 ## Refinitiv API access credentials.
-#""""""
+# """"""
 
 # from datetime import date, datetime, timedelta
 # import logging
@@ -26,7 +26,7 @@
 #     DataRequest,
 #     DataResponse,
 #     RateLimiter,
-)
+# )
 
 
 # class RefinitivConnector(APIConnector):
@@ -57,28 +57,28 @@
 #         password: Optional[str] = None,
 #         app_id: Optional[str] = None,
 #         access_token: Optional[str] = None,
-    ):
-        # Create credentials
+#     ):
+#         # Create credentials
 #         credentials = APICredentials(
 #             username=username,
 #             password=password,
 #             api_key=app_id,
 #             access_token=access_token,
-        )
+#         )
 
-        # Set base URL
+#         # Set base URL
 #         base_url = "https://api.refinitiv.com"
 
-        # Create rate limiter
+#         # Create rate limiter
 #         rate_limiter = RateLimiter(requests_per_second=5)
 
 #         super().__init__(
 #             credentials=credentials, base_url=base_url, rate_limiter=rate_limiter
-        )
+#         )
 
 #         self.logger = logging.getLogger(self.__class__.__name__)
 
-        # Placeholder for Refinitiv session
+#         # Placeholder for Refinitiv session
 #         self.session = None
 
 #     @property
@@ -102,10 +102,10 @@
 ##         success : bool
 ##             Whether authentication was successful.
 #        """"""
-        # Stub implementation
+#         # Stub implementation
 #         self.logger.warning(
-            "This is a stub implementation. Actual implementation requires Refinitiv API access."
-        )
+#             "This is a stub implementation. Actual implementation requires Refinitiv API access."
+#         )
 #         return False
 
 #     def _create_request(
@@ -141,7 +141,7 @@
 #             params=params,
 #             category=category,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def _create_error_response(self, request: DataRequest, error: str) -> DataResponse:
 #        """"""
@@ -190,31 +190,31 @@
 ##         response : DataResponse
 ##             Response containing the time series data.
 #        """"""
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if isinstance(start_date, (date, datetime)):
 #             start_date = start_date.strftime("%Y-%m-%d")
 
 #         if isinstance(end_date, (date, datetime)):
 #             end_date = end_date.strftime("%Y-%m-%d")
 
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint="/data/historical-pricing/v1/views/summaries",
 #             params={
-                "universe": ric,
-                "fields": fields if isinstance(fields, list) else [fields],
-                "start": start_date,
-                "end": end_date,
-                "interval": interval,
-            },
+#                 "universe": ric,
+#                 "fields": fields if isinstance(fields, list) else [fields],
+#                 "start": start_date,
+#                 "end": end_date,
+#                 "interval": interval,
+#             },
 #             category=DataCategory.MARKET_DATA,
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
-        )
+#         )
 
 #     def get_intraday_data(
 #         self,
@@ -245,31 +245,31 @@
 ##         response : DataResponse
 ##             Response containing the intraday data.
 #        """"""
-        # Convert times to strings if needed
+#         # Convert times to strings if needed
 #         if isinstance(start_time, datetime):
 #             start_time = start_time.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 #         if isinstance(end_time, datetime):
 #             end_time = end_time.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint="/data/historical-pricing/v1/views/interday",
 #             params={
-                "universe": ric,
-                "fields": fields if isinstance(fields, list) else [fields],
-                "start": start_time,
-                "end": end_time,
-                "interval": interval,
-            },
+#                 "universe": ric,
+#                 "fields": fields if isinstance(fields, list) else [fields],
+#                 "start": start_time,
+#                 "end": end_time,
+#                 "interval": interval,
+#             },
 #             category=DataCategory.MARKET_DATA,
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
-        )
+#         )
 
 #     def get_reference_data(
 #         self, rics: Union[str, List[str]], fields: Union[str, List[str]]
@@ -289,21 +289,21 @@
 ##         response : DataResponse
 ##             Response containing the reference data.
 #        """"""
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint="/data/reference/v1",
 #             params={
-                "universe": rics if isinstance(rics, list) else [rics],
-                "fields": fields if isinstance(fields, list) else [fields],
-            },
+#                 "universe": rics if isinstance(rics, list) else [rics],
+#                 "fields": fields if isinstance(fields, list) else [fields],
+#             },
 #             category=DataCategory.MARKET_DATA,
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
-        )
+#         )
 
 #     def get_news(
 #         self,
@@ -331,30 +331,30 @@
 ##         response : DataResponse
 ##             Response containing the news.
 #        """"""
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if isinstance(date_from, (date, datetime)):
 #             date_from = date_from.strftime("%Y-%m-%d")
 
 #         if isinstance(date_to, (date, datetime)):
 #             date_to = date_to.strftime("%Y-%m-%d")
 
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint="/data/news/v1",
 #             params={
-                "query": query,
-                "dateFrom": date_from,
-                "dateTo": date_to,
-                "count": count,
-            },
+#                 "query": query,
+#                 "dateFrom": date_from,
+#                 "dateTo": date_to,
+#                 "count": count,
+#             },
 #             category=DataCategory.NEWS,
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
-        )
+#         )
 
 #     def get_news_headlines(
 #         self,
@@ -382,30 +382,30 @@
 ##         response : DataResponse
 ##             Response containing the news headlines.
 #        """"""
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if isinstance(date_from, (date, datetime)):
 #             date_from = date_from.strftime("%Y-%m-%d")
 
 #         if isinstance(date_to, (date, datetime)):
 #             date_to = date_to.strftime("%Y-%m-%d")
 
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint="/data/news/v1/headlines",
 #             params={
-                "query": query,
-                "dateFrom": date_from,
-                "dateTo": date_to,
-                "count": count,
-            },
+#                 "query": query,
+#                 "dateFrom": date_from,
+#                 "dateTo": date_to,
+#                 "count": count,
+#             },
 #             category=DataCategory.NEWS,
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
-        )
+#         )
 
 #     def get_news_story(self, story_id: str) -> DataResponse:
 #        """"""
@@ -421,16 +421,16 @@
 ##         response : DataResponse
 ##             Response containing the news story.
 #        """"""
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint=f"/data/news/v1/story/{story_id}", category=DataCategory.NEWS
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
-        )
+#         )
 
 #     def get_fundamental_data(
 #         self, rics: Union[str, List[str]], fields: Union[str, List[str]]
@@ -450,21 +450,21 @@
 ##         response : DataResponse
 ##             Response containing the fundamental data.
 #        """"""
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint="/data/fundamentals/v1",
 #             params={
-                "universe": rics if isinstance(rics, list) else [rics],
-                "fields": fields if isinstance(fields, list) else [fields],
-            },
+#                 "universe": rics if isinstance(rics, list) else [rics],
+#                 "fields": fields if isinstance(fields, list) else [fields],
+#             },
 #             category=DataCategory.FUNDAMENTAL,
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
-        )
+#         )
 
 #     def get_esg_data(
 #         self, rics: Union[str, List[str]], fields: Union[str, List[str]]
@@ -484,21 +484,21 @@
 ##         response : DataResponse
 ##             Response containing the ESG data.
 #        """"""
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint="/data/esg/v1",
 #             params={
-                "universe": rics if isinstance(rics, list) else [rics],
-                "fields": fields if isinstance(fields, list) else [fields],
-            },
+#                 "universe": rics if isinstance(rics, list) else [rics],
+#                 "fields": fields if isinstance(fields, list) else [fields],
+#             },
 #             category=DataCategory.FUNDAMENTAL,
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
-        )
+#         )
 
 #     def get_estimates(
 #         self, rics: Union[str, List[str]], fields: Union[str, List[str]]
@@ -518,21 +518,21 @@
 ##         response : DataResponse
 ##             Response containing the estimates.
 #        """"""
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint="/data/estimates/v1",
 #             params={
-                "universe": rics if isinstance(rics, list) else [rics],
-                "fields": fields if isinstance(fields, list) else [fields],
-            },
+#                 "universe": rics if isinstance(rics, list) else [rics],
+#                 "fields": fields if isinstance(fields, list) else [fields],
+#             },
 #             category=DataCategory.FUNDAMENTAL,
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
-        )
+#         )
 
 #     def get_ownership_data(
 #         self, rics: Union[str, List[str]], fields: Union[str, List[str]]
@@ -552,21 +552,21 @@
 ##         response : DataResponse
 ##             Response containing the ownership data.
 #        """"""
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint="/data/ownership/v1",
 #             params={
-                "universe": rics if isinstance(rics, list) else [rics],
-                "fields": fields if isinstance(fields, list) else [fields],
-            },
+#                 "universe": rics if isinstance(rics, list) else [rics],
+#                 "fields": fields if isinstance(fields, list) else [fields],
+#             },
 #             category=DataCategory.FUNDAMENTAL,
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
-        )
+#         )
 
 #     def search_instruments(self, query: str, limit: int = 10) -> DataResponse:
 #        """"""
@@ -584,18 +584,18 @@
 ##         response : DataResponse
 ##             Response containing the search results.
 #        """"""
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint="/discovery/search/v1",
 #             params={"q": query, "limit": limit},
 #             category=DataCategory.MARKET_DATA,
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
-        )
+#         )
 
 #     def close(self) -> None:
 #        """Close the Refinitiv connector."""

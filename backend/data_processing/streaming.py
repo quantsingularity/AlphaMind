@@ -1,10 +1,10 @@
-#""""""
+# """"""
 ## Streaming data processing utilities for financial applications.
 #
 ## This module provides classes and functions for processing streaming
 ## financial data, including real-time data handling, event processing,
 ## and integration with various streaming platforms.
-#""""""
+# """"""
 
 # from abc import ABC, abstractmethod
 # import asyncio
@@ -25,7 +25,7 @@
 #     Optional,
 #     Tuple,
 #     Union,
-)
+# )
 # import uuid
 
 # import numpy as np
@@ -61,7 +61,7 @@
 #         timestamp: Optional[float] = None,
 #         source: Optional[str] = None,
 #         metadata: Optional[Dict] = None,
-    ):
+#     ):
 #         self.id = str(uuid.uuid4())
 #         self.event_type = event_type
 #         self.data = data
@@ -79,13 +79,13 @@
 ##             Dictionary representation of the event.
 #        """"""
 #         return {
-            "id": self.id,
-            "event_type": self.event_type,
-            "data": self.data,
-            "timestamp": self.timestamp,
-            "source": self.source,
-            "metadata": self.metadata,
-        }
+#             "id": self.id,
+#             "event_type": self.event_type,
+#             "data": self.data,
+#             "timestamp": self.timestamp,
+#             "source": self.source,
+#             "metadata": self.metadata,
+#         }
 
 #     @classmethod
 #     def from_dict(cls, data: Dict) -> "StreamEvent":
@@ -108,7 +108,7 @@
 #             timestamp=data["timestamp"],
 #             source=data["source"],
 #             metadata=data["metadata"],
-        )
+#         )
 
 #         event.id = data["id"]
 
@@ -147,7 +147,7 @@
 #         Add a listener to the data stream.
 
 #         Parameters
-        ----------
+#         ----------
 #         listener : callable
 #             Function to call when an event is received.
 #        """"""
@@ -158,7 +158,7 @@
 #         Remove a listener from the data stream.
 
 #         Parameters
-        ----------
+#         ----------
 #         listener : callable
 #             Listener to remove.
 #        """"""
@@ -170,7 +170,7 @@
 #         Notify all listeners of an event.
 
 #         Parameters
-        ----------
+#         ----------
 #         event : StreamEvent
 #             Event to notify listeners of.
 #        """"""
@@ -189,7 +189,7 @@
 #     with support for various file formats and streaming modes.
 
 #     Parameters
-    ----------
+#     ----------
 #     filepath : str
 #         Path to the file to stream from.
 #     event_type : str, default="file_data"
@@ -255,17 +255,17 @@
 #                                 event_type=self.event_type,
 #                                 data=chunk,
 #                                 source=self.filepath,
-                            )
+#                             )
 
 #                             self.notify_listeners(event)
 #                             chunk = []
 #                             time.sleep(self.delay)
 
-                    # Send remaining lines
+#                     # Send remaining lines
 #                     if chunk and self.running:
 #                         event = StreamEvent(
 #                             event_type=self.event_type, data=chunk, source=self.filepath
-                        )
+#                         )
 
 #                         self.notify_listeners(event)
 
@@ -305,7 +305,7 @@
 #         chunk_size: int = 100,
 #         delay: float = 0.1,
 #         repeat: bool = False,
-    ):
+#     ):
 #         super().__init__()
 #         self.filepath = filepath
 #         self.event_type = event_type
@@ -365,7 +365,7 @@
 #     with support for various data formats and connection options.
 
 #     Parameters
-    ----------
+#     ----------
 #     url : str
 #         URL of the WebSocket server.
 #     event_type : str, default="websocket_data"
@@ -492,7 +492,7 @@
 #         Send a message to the WebSocket server.
 
 #         Parameters
-        ----------
+#         ----------
 #         message : str or dict
 #             Message to send. If a dictionary, it will be converted to JSON.
 #        """"""
@@ -513,7 +513,7 @@
 #     with support for various Kafka configurations and data formats.
 
 #     Parameters
-    ----------
+#     ----------
 #     bootstrap_servers : str
 #         Comma-separated list of Kafka broker addresses.
 #     topic : str
@@ -569,19 +569,19 @@
 ##     def _consume_kafka(self) -> None:
 #        """Consume data from the Kafka topic."""
 #         try:
-            # Import Kafka library
+#             # Import Kafka library
 #             from kafka import KafkaConsumer
 
-            # Create consumer
+#             # Create consumer
 #             self.consumer = KafkaConsumer(
 #                 self.topic,
 #                 bootstrap_servers=self.bootstrap_servers,
 #                 group_id=self.group_id,
 #                 auto_offset_reset=self.auto_offset_reset,
 #                 value_deserializer=lambda x: self._deserialize_message(x),
-            )
+#             )
 
-            # Consume messages
+#             # Consume messages
 #             for message in self.consumer:
 #                 if not self.running:
 #                     break
@@ -592,19 +592,19 @@
 #                     timestamp=message.timestamp / 1000.0,  # Convert to seconds
 #                     source=f"{self.topic}:{message.partition}:{message.offset}",
 #                     metadata={
-                        "topic": message.topic,
-                        "partition": message.partition,
-                        "offset": message.offset,
-                        "key": message.key,
-                    },
-                )
+#                         "topic": message.topic,
+#                         "partition": message.partition,
+#                         "offset": message.offset,
+#                         "key": message.key,
+#                     },
+#                 )
 
 #                 self.notify_listeners(event)
 
 #         except ImportError:
 #             self.logger.error(
-                "Kafka library not available. Install with: pip install kafka-python"
-            )
+#                 "Kafka library not available. Install with: pip install kafka-python"
+#             )
 #         except Exception as e:
 #             self.logger.error(f"Error consuming Kafka messages: {e}")
 
@@ -623,10 +623,10 @@
 ##             Deserialized message.
 #        """"""
 #         try:
-            # Try to parse as JSON
+#             # Try to parse as JSON
 #             return json.loads(message.decode("utf-8"))
 #         except:
-            # Return raw message
+#             # Return raw message
 #             return message
 
 
@@ -652,7 +652,7 @@
 #         host: str = "0.0.0.0",
 #         port: int = 8765,
 #         event_type: str = "websocket_data",
-    ):
+#     ):
 #         super().__init__()
 #         self.host = host
 #         self.port = port
@@ -709,7 +709,7 @@
 #         Handle a WebSocket client connection.
 
 #         Parameters
-        ----------
+#         ----------
 #         websocket : WebSocketServerProtocol
 #             WebSocket connection.
 #         path : str
@@ -756,7 +756,7 @@
 #         Broadcast a message to all connected clients.
 
 #         Parameters
-        ----------
+#         ----------
 #         message : str or dict
 #             Message to broadcast. If a dictionary, it will be converted to JSON.
 #        """"""
@@ -778,7 +778,7 @@
 #     including filtering, transformation, and aggregation.
 
 #     Parameters
-    ----------
+#     ----------
 #     name : str, optional
 #         Name of the processor.
 #         If None, generates a random name.
@@ -798,7 +798,7 @@
 #         Add a data stream to the processor.
 
 #         Parameters
-        ----------
+#         ----------
 #         stream : DataStream
 #             Data stream to add.
 #        """"""
@@ -810,7 +810,7 @@
 #         Remove a data stream from the processor.
 
 #         Parameters
-        ----------
+#         ----------
 #         stream : DataStream
 #             Data stream to remove.
 #        """"""
@@ -823,7 +823,7 @@
 #         Add a downstream processor.
 
 #         Parameters
-        ----------
+#         ----------
 #         processor : StreamProcessor
 #             Processor to add.
 #        """"""
@@ -834,7 +834,7 @@
 #         Remove a downstream processor.
 
 #         Parameters
-        ----------
+#         ----------
 #         processor : StreamProcessor
 #             Processor to remove.
 #        """"""
@@ -846,7 +846,7 @@
 #         Add a filter function.
 
 #         Parameters
-        ----------
+#         ----------
 #         filter_func : callable
 #             Function that takes an event and returns a boolean.
 #             If True, the event is processed; if False, it is discarded.
@@ -863,7 +863,7 @@
 #         Add a transformer function.
 
 #         Parameters
-        ----------
+#         ----------
 #         transformer_func : callable
 #             Function that takes an event and returns a new event or list of events.
 #        """"""
@@ -874,7 +874,7 @@
 #         Add a handler function.
 
 #         Parameters
-        ----------
+#         ----------
 #         handler_func : callable
 #             Function that takes an event and performs an action.
 #        """"""
@@ -895,7 +895,7 @@
 #         Process an event.
 
 #         Parameters
-        ----------
+#         ----------
 #         event : StreamEvent
 #             Event to process.
 #        """"""
@@ -950,7 +950,7 @@
 #     streaming data processing pipelines.
 
 #     Parameters
-    ----------
+#     ----------
 #     name : str, optional
 #         Name of the pipeline.
 #         If None, generates a random name.
@@ -967,7 +967,7 @@
 #         Add a stage to the pipeline.
 
 #         Parameters
-        ----------
+#         ----------
 #         processor : StreamProcessor
 #             Processor to add as a stage.
 #         name : str, optional
@@ -988,7 +988,7 @@
 
 #         self.running = True
 
-        # Start all stages
+#         # Start all stages
 #         for name, processor in self.stages:
 #             self.logger.info(f"Starting pipeline stage: {name}")
 #             processor.start()
@@ -1010,12 +1010,12 @@
 #         Get a stage by name.
 
 #         Parameters
-        ----------
+#         ----------
 #         name : str
 #             Name of the stage.
 
 #         Returns
-        -------
+#         -------
 #         processor : StreamProcessor or None
 #             Processor for the stage, or None if not found.
 #        """"""

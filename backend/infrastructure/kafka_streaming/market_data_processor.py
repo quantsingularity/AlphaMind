@@ -6,10 +6,10 @@
 
 # Define the market data schema
 # market_data_schema = """"""
-{
-    "type": "record",
-    "name": "MarketData",
-    "fields": [
+# {
+#     "type": "record",
+#     "name": "MarketData",
+#     "fields": [
 #         {"name": "timestamp", "type": "long"},
 #         {"name": "symbol", "type": "string"},
 #         {"name": "bid_price", "type": "double"},
@@ -18,9 +18,9 @@
 #         {"name": "ask_size", "type": "double"},
 #         {"name": "volume", "type": "double"},
 #         {"name": "open_interest", "type": "double"},
-    ],
-}
-#""""""
+#     ],
+# }
+# """"""
 #
 #
 ## class MarketDataPipeline:
@@ -66,14 +66,14 @@
 #         mid_price = (tick["ask_price"] + tick["bid_price"]) / 2
 #         imbalance = (tick["bid_size"] - tick["ask_size"]) / (
 #             tick["bid_size"] + tick["ask_size"]
-        )
+#         )
 
 #         return {
-            "spread": spread,
-            "spread_pct": spread / mid_price,
-            "order_imbalance": imbalance,
-            "liquidity_score": self._calculate_liquidity_score(tick),
-        }
+#             "spread": spread,
+#             "spread_pct": spread / mid_price,
+#             "order_imbalance": imbalance,
+#             "liquidity_score": self._calculate_liquidity_score(tick),
+#         }
 
 #     def _calculate_liquidity_score(self, tick):
 #        """Calculate liquidity score based on order book depth and spread"""

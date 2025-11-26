@@ -2,7 +2,7 @@
 #     def __init__(self, n_factors=10, lookback=63):
 #         self.autoencoder = StackedDenoisingAutoencoder(
 #             layers=[256, 128, 64, n_factors], noise=0.1
-        )
+#         )
 #         self.scaler = RobustScaler()
 #         self.lookback = lookback
 
@@ -24,7 +24,7 @@
 #         clf = LassoCV(cv=5)
 #         clf.fit(factors, returns)
 #         return {
-            "r_squared": clf.score(factors, returns),
-            "sharpe_ratio": self._factor_sharpe(clf.coef_),
-            "turnover": self._calculate_turnover(clf.coef_),
-        }
+#             "r_squared": clf.score(factors, returns),
+#             "sharpe_ratio": self._factor_sharpe(clf.coef_),
+#             "turnover": self._calculate_turnover(clf.coef_),
+#         }

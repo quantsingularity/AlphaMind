@@ -23,10 +23,10 @@
 #         self.seq_length = seq_length
 #         self.conv1 = tf.keras.layers.Conv1D(
 #             64, kernel_size=3, strides=2, padding="same"
-        )
+#         )
 #         self.conv2 = tf.keras.layers.Conv1D(
 #             128, kernel_size=3, strides=2, padding="same"
-        )
+#         )
 #         self.flatten = tf.keras.layers.Flatten()
 #         self.dense = tf.keras.layers.Dense(1, activation="sigmoid")
 

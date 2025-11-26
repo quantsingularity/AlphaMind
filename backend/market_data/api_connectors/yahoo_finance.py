@@ -1,10 +1,10 @@
-#""""""
+# """"""
 ## Yahoo Finance API connector for financial data.
 #
 ## This module provides a connector for accessing financial market data
 ## from Yahoo Finance, including stock prices, historical data,
 ## company information, and more.
-#""""""
+# """"""
 
 # from datetime import datetime, timedelta
 # import logging
@@ -23,7 +23,7 @@
 #     DataRequest,
 #     DataResponse,
 #     RateLimiter,
-)
+# )
 
 
 # class YahooFinanceConnector(APIConnector):
@@ -42,24 +42,24 @@
 #    """"""
 
 #     def __init__(self, rapid_api_key: Optional[str] = None):
-        # Create credentials
+#         # Create credentials
 #         credentials = APICredentials(api_key=rapid_api_key)
 
-        # Set base URL based on whether using RapidAPI
+#         # Set base URL based on whether using RapidAPI
 #         if rapid_api_key:
 #             base_url = "https://apidojo-yahoo-finance-v1.p.rapidapi.com"
 
-            # Create rate limiter for RapidAPI
+#             # Create rate limiter for RapidAPI
 #             rate_limiter = RateLimiter(requests_per_second=5, requests_per_day=500)
 #         else:
 #             base_url = "https://query1.finance.yahoo.com"
 
-            # Create rate limiter for unofficial API
+#             # Create rate limiter for unofficial API
 #             rate_limiter = RateLimiter(requests_per_minute=100)
 
 #         super().__init__(
 #             credentials=credentials, base_url=base_url, rate_limiter=rate_limiter
-        )
+#         )
 
 #         self.using_rapid_api = rapid_api_key is not None
 #         self.logger = logging.getLogger(self.__class__.__name__)
@@ -85,7 +85,7 @@
 ##         success : bool
 ##             Whether authentication was successful.
 #        """"""
-        # Test authentication by making a simple request
+#         # Test authentication by making a simple request
 #         response = self.get_quote("AAPL")
 
 #         return response.is_success()
@@ -101,13 +101,13 @@
 #        """"""
 #         if self.using_rapid_api:
 #             return {
-                "X-RapidAPI-Key": self.credentials.api_key,
-                "X-RapidAPI-Host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
-            }
+#                 "X-RapidAPI-Key": self.credentials.api_key,
+#                 "X-RapidAPI-Host": "apidojo-yahoo-finance-v1.p.rapidapi.com",
+#             }
 #         else:
 #             return {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-            }
+#                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+#             }
 
 #     def get_quote(self, symbol: str) -> DataResponse:
 #        """"""
@@ -136,7 +136,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_historical_data(
 #         self,
@@ -170,7 +170,7 @@
 ##         response : DataResponse
 ##             Response containing the historical data.
 #        """"""
-        # Convert dates to Unix timestamps
+#         # Convert dates to Unix timestamps
 #         if period1 is None:
 #             period1 = datetime.now() - timedelta(days=365)
 
@@ -192,12 +192,12 @@
 #         else:
 #             endpoint = "/v8/finance/chart/" + symbol
 #             params = {
-                "period1": period1_timestamp,
-                "period2": period2_timestamp,
-                "interval": interval,
-                "includePrePost": str(include_prepost).lower(),
-                "events": events,
-            }
+#                 "period1": period1_timestamp,
+#                 "period2": period2_timestamp,
+#                 "interval": interval,
+#                 "includePrePost": str(include_prepost).lower(),
+#                 "events": events,
+#             }
 
 #         return self.request(
 #             endpoint=endpoint,
@@ -205,7 +205,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_options_chain(
 #         self, symbol: str, date: Optional[Union[datetime, str]] = None
@@ -250,7 +250,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_company_info(self, symbol: str) -> DataResponse:
 #        """"""
@@ -272,8 +272,8 @@
 #         else:
 #             endpoint = "/v11/finance/quoteSummary/" + symbol
 #             params = {
-                "modules": "assetProfile,summaryProfile,summaryDetail,esgScores,price,incomeStatementHistory,incomeStatementHistoryQuarterly,balanceSheetHistory,balanceSheetHistoryQuarterly,cashflowStatementHistory,cashflowStatementHistoryQuarterly,defaultKeyStatistics,financialData,calendarEvents,secFilings,recommendationTrend,upgradeDowngradeHistory,institutionOwnership,fundOwnership,majorDirectHolders,majorHoldersBreakdown,insiderTransactions,insiderHolders,netSharePurchaseActivity,earnings,earningsHistory,earningsTrend,industryTrend,indexTrend,sectorTrend"
-            }
+#                 "modules": "assetProfile,summaryProfile,summaryDetail,esgScores,price,incomeStatementHistory,incomeStatementHistoryQuarterly,balanceSheetHistory,balanceSheetHistoryQuarterly,cashflowStatementHistory,cashflowStatementHistoryQuarterly,defaultKeyStatistics,financialData,calendarEvents,secFilings,recommendationTrend,upgradeDowngradeHistory,institutionOwnership,fundOwnership,majorDirectHolders,majorHoldersBreakdown,insiderTransactions,insiderHolders,netSharePurchaseActivity,earnings,earningsHistory,earningsTrend,industryTrend,indexTrend,sectorTrend"
+#             }
 
 #         return self.request(
 #             endpoint=endpoint,
@@ -281,7 +281,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_financial_statements(
 #         self, symbol: str, statement_type: str = "income", frequency: str = "annual"
@@ -319,22 +319,22 @@
 
 #             if statement_type == "income":
 #                 module = (
-                    "incomeStatementHistory"
+#                     "incomeStatementHistory"
 #                     if frequency == "annual"
 #                     else "incomeStatementHistoryQuarterly"
-                )
+#                 )
 #             elif statement_type == "balance":
 #                 module = (
-                    "balanceSheetHistory"
+#                     "balanceSheetHistory"
 #                     if frequency == "annual"
 #                     else "balanceSheetHistoryQuarterly"
-                )
+#                 )
 #             elif statement_type == "cash":
 #                 module = (
-                    "cashflowStatementHistory"
+#                     "cashflowStatementHistory"
 #                     if frequency == "annual"
 #                     else "cashflowStatementHistoryQuarterly"
-                )
+#                 )
 #             else:
 #                 raise ValueError(f"Invalid statement type: {statement_type}")
 
@@ -346,7 +346,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_recommendations(self, symbol: str) -> DataResponse:
 #        """"""
@@ -375,7 +375,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_earnings(self, symbol: str) -> DataResponse:
 #        """"""
@@ -404,7 +404,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def search(
 #         self,
@@ -441,11 +441,11 @@
 #         else:
 #             endpoint = "/v1/finance/search"
 #             params = {
-                "q": query,
-                "quotesCount": quote_count,
-                "newsCount": news_count,
-                "enableFuzzyQuery": str(enable_fuzzy_query).lower(),
-            }
+#                 "q": query,
+#                 "quotesCount": quote_count,
+#                 "newsCount": news_count,
+#                 "enableFuzzyQuery": str(enable_fuzzy_query).lower(),
+#             }
 
 #             if quote_type_filter:
 #                 params["quoteType"] = ",".join(quote_type_filter)
@@ -456,7 +456,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_market_summary(self, region: str = "US") -> DataResponse:
 #        """"""
@@ -485,7 +485,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_trending(self, region: str = "US") -> DataResponse:
 #        """"""
@@ -514,7 +514,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_news(
 #         self, category: str = "generalnews", region: str = "US"
@@ -547,7 +547,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.NEWS,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_chart_data(
 #         self, symbol: str, interval: str = "1d", range: str = "1mo"
@@ -572,11 +572,11 @@
 #         if self.using_rapid_api:
 #             endpoint = "/market/get-charts"
 #             params = {
-                "symbol": symbol,
-                "interval": interval,
-                "range": range,
-                "region": "US",
-            }
+#                 "symbol": symbol,
+#                 "interval": interval,
+#                 "range": range,
+#                 "region": "US",
+#             }
 #         else:
 #             endpoint = "/v8/finance/chart/" + symbol
 #             params = {"interval": interval, "range": range}
@@ -587,7 +587,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_insights(self, symbol: str) -> DataResponse:
 #        """"""
@@ -607,8 +607,8 @@
 #             endpoint = "/stock/v2/get-insights"
 #             params = {"symbol": symbol, "region": "US"}
 #         else:
-            # Not directly available in unofficial API
-            # Create a custom request to mimic the RapidAPI endpoint
+#             # Not directly available in unofficial API
+#             # Create a custom request to mimic the RapidAPI endpoint
 #             request = DataRequest(
 #                 provider=self.provider_name,
 #                 endpoint="/v2/finance/insights",
@@ -617,9 +617,9 @@
 #                 headers=self._prepare_headers(),
 #                 category=DataCategory.MARKET_DATA,
 #                 format=DataFormat.JSON,
-            )
+#             )
 
-            # Make a direct request to Yahoo Finance
+#             # Make a direct request to Yahoo Finance
 #             try:
 #                 url = f"https://query1.finance.yahoo.com/ws/insights/v2/finance/insights?symbol={symbol}"
 #                 response = requests.get(url, headers=self._prepare_headers())
@@ -630,18 +630,18 @@
 #                         status_code=response.status_code,
 #                         data=response.json(),
 #                         headers=dict(response.headers),
-                    )
+#                     )
 #                 else:
 #                     return DataResponse(
 #                         request=request,
 #                         status_code=response.status_code,
 #                         data=None,
 #                         error=f"Failed to get insights: {response.text}",
-                    )
+#                     )
 #             except Exception as e:
 #                 return DataResponse(
 #                     request=request, status_code=500, data=None, error=str(e)
-                )
+#                 )
 
 #         return self.request(
 #             endpoint=endpoint,
@@ -649,4 +649,4 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )

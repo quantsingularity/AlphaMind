@@ -1,10 +1,10 @@
-#""""""
+# """"""
 ## Alternative Data Plugin Architecture for AlphaMind
 #
 ## This module provides a flexible plugin system for integrating alternative data sources
 ## such as news, social media, satellite imagery, and other non-traditional data
 ## into trading strategies and analysis with robust retry logic, validation, and logging.
-#""""""
+# """"""
 
 # from abc import ABC, abstractmethod
 # import asyncio
@@ -39,7 +39,7 @@
 #     file_handler = logging.FileHandler("logs/alternative_data.log")
 #     file_handler.setFormatter(
 #         logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s"
+#             "%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s"
 #     logger.addHandler(file_handler)
 # except Exception as e:
 #     logger.warning(f"Could not set up file logging: {e}")
@@ -282,23 +282,23 @@
 #         self.cache = {}
 #         self.cache_expiry = {}
 #         self.retry_settings = {
-            "max_retries": 5,
-            "backoff_factor": 1.5,
-            "initial_wait": 1.0,
-            "max_wait": 60.0,
-        }
+#             "max_retries": 5,
+#             "backoff_factor": 1.5,
+#             "initial_wait": 1.0,
+#             "max_wait": 60.0,
+#         }
 #         self.validation_settings = {
-            "validate_data": True,
-            "schema": {},  # Plugin-specific schema
-            "required_fields": [],  # Plugin-specific required fields
-        }
+#             "validate_data": True,
+#             "schema": {},  # Plugin-specific schema
+#             "required_fields": [],  # Plugin-specific required fields
+#         }
 #         self.health_metrics = {
-            "fetch_count": 0,
-            "error_count": 0,
-            "retry_count": 0,
-            "validation_errors": 0,
-            "last_success": None,
-        }
+#             "fetch_count": 0,
+#             "error_count": 0,
+#             "retry_count": 0,
+#             "validation_errors": 0,
+#             "last_success": None,
+#         }
 
 #         logger.info(
 #             f"Initialized plugin: {self.metadata.name} v{self.metadata.version}"
@@ -337,7 +337,7 @@
 #             self.status = PluginStatus.LOADING
 #             logger.info(f"Initializing plugin: {self.metadata.name}")
 
-            # Update retry and validation settings from config
+#             # Update retry and validation settings from config
 #             if "retry_settings" in self.config:
 #                 for key, value in self.config["retry_settings"].items():
 #                     if key in self.retry_settings:
@@ -348,7 +348,7 @@
 #                     if key in self.validation_settings:
 #                         self.validation_settings[key] = value
 
-            # Validate configuration
+#             # Validate configuration
 #             if not self._validate_config():
 #                 self.status = PluginStatus.ERROR
 #                 self.last_error = "Invalid configuration"
@@ -356,7 +356,7 @@
 #                     f"Plugin {self.metadata.name} initialization failed: Invalid configuration"
 #                 return False
 
-            # Perform any necessary setup
+#             # Perform any necessary setup
 #             setup_success = await self._setup()
 #             if not setup_success:
 #                 self.status = PluginStatus.ERROR
@@ -386,12 +386,12 @@
 #         try:
 #             logger.info(f"Shutting down plugin: {self.metadata.name}")
 
-            # Perform any necessary cleanup
+#             # Perform any necessary cleanup
 #             cleanup_success = await self._cleanup()
 #             if not cleanup_success:
 #                 logger.warning(
 #                     f"Plugin {self.metadata.name} cleanup had issues: {self.last_error}"
-                # Continue with shutdown despite cleanup issues
+#                 # Continue with shutdown despite cleanup issues
 
 #             self.status = PluginStatus.UNLOADED
 #             logger.info(f"Plugin {self.metadata.name} shutdown successfully")
@@ -425,15 +425,15 @@
 #             raise PluginError(
 #                 f"Plugin {self.metadata.name} is not active (status: {self.status.value})"
 
-        # Generate cache key from kwargs
+#         # Generate cache key from kwargs
 #         cache_key = self._generate_cache_key(**kwargs)
 
-        # Check cache if enabled
+#         # Check cache if enabled
 #         if use_cache and cache_key in self.cache:
 #             if (
 #                 cache_key in self.cache_expiry
 #                 and datetime.now() < self.cache_expiry[cache_key]
-            ):
+#             ):
 #                 logger.debug(
 #                     f"Using cached data for {self.metadata.name} (key: {cache_key[:30]}...)"
 #                 return self.cache[cache_key]
@@ -441,7 +441,7 @@
 #                 logger.debug(
 #                     f"Cache expired for {self.metadata.name} (key: {cache_key[:30]}...)"
 
-        # Implement retry logic
+#         # Implement retry logic
 #         retries = 0
 #         max_retries = self.retry_settings["max_retries"]
 #         backoff = self.retry_settings["initial_wait"]
@@ -449,28 +449,28 @@
 
 #         while retries <= max_retries:
 #             try:
-                # Update status during retries
+#                 # Update status during retries
 #                 if retries > 0:
 #                     self.status = PluginStatus.RETRYING
 #                     logger.info(
 #                         f"Retry attempt {retries}/{max_retries} for {self.metadata.name}"
 #                     self.health_metrics["retry_count"] += 1
 
-                # Fetch data
+#                 # Fetch data
 #                 start_time = time.time()
 #                 data = await self.fetch_data(**kwargs)
 #                 elapsed = time.time() - start_time
 
-                # Update metrics
+#                 # Update metrics
 #                 self.last_fetch_time = datetime.now()
 #                 self.health_metrics["fetch_count"] += 1
 #                 self.health_metrics["last_success"] = self.last_fetch_time
 
-                # Reset status if we were retrying
+#                 # Reset status if we were retrying
 #                 if self.status == PluginStatus.RETRYING:
 #                     self.status = PluginStatus.ACTIVE
 
-                # Validate data if enabled
+#                 # Validate data if enabled
 #                 if self.validation_settings["validate_data"]:
 #                     try:
 #                         self._validate_data(data)
@@ -478,18 +478,18 @@
 #                         logger.warning(
 #                             f"Data validation error for {self.metadata.name}: {e}"
 #                         self.health_metrics["validation_errors"] += 1
-                        # Continue despite validation error, but log it
+#                         # Continue despite validation error, but log it
 
-                # Update cache if enabled
+#                 # Update cache if enabled
 #                 if use_cache:
 #                     self.cache[cache_key] = data
 
-                    # Set cache expiry
+#                     # Set cache expiry
 #                     if cache_ttl is not None:
 #                         self.cache_expiry[cache_key] = datetime.now() + timedelta(
 #                             seconds=cache_ttl
 #                     else:
-                        # Default cache TTL based on data frequency
+#                         # Default cache TTL based on data frequency
 #                         default_ttl = self._get_default_cache_ttl()
 #                         self.cache_expiry[cache_key] = datetime.now() + timedelta(
 #                             seconds=default_ttl
@@ -525,29 +525,29 @@
 ##         Returns:
 ##             True if configuration is valid, False otherwise
 #        """"""
-        # Check for required API key if needed
+#         # Check for required API key if needed
 #         if self.metadata.requires_api_key:
 #             if "api_key" not in self.config:
 #                 logger.error(f"API key required for {self.metadata.name}")
 #                 return False
 
-            # Check if API key is valid (not empty)
+#             # Check if API key is valid (not empty)
 #             if not self.config["api_key"]:
 #                 logger.error(f"Empty API key provided for {self.metadata.name}")
 #                 return False
 
-        # Check for required authentication if needed
+#         # Check for required authentication if needed
 #         if self.metadata.requires_authentication:
 #             if "username" not in self.config or "password" not in self.config:
 #                 logger.error(f"Authentication required for {self.metadata.name}")
 #                 return False
 
-            # Check if credentials are valid (not empty)
+#             # Check if credentials are valid (not empty)
 #             if not self.config.get("username") or not self.config.get("password"):
 #                 logger.error(f"Empty credentials provided for {self.metadata.name}")
 #                 return False
 
-        # Plugin-specific configuration validation
+#         # Plugin-specific configuration validation
 #         try:
 #             return self._validate_plugin_config()
 #         except Exception as e:
@@ -577,18 +577,18 @@
 ##         Raises:
 ##             DataValidationError: If validation fails
 #        """"""
-        # Check if data is None
+#         # Check if data is None
 #         if data is None:
 #             raise DataValidationError("Data is None")
 
-        # Check required fields if specified
+#         # Check required fields if specified
 #         if self.validation_settings["required_fields"]:
 #             if isinstance(data, dict):
 #                 missing_fields = [
 #                     field
 #                     for field in self.validation_settings["required_fields"]
 #                     if field not in data
-                ]
+#                 ]
 #                 if missing_fields:
 #                     raise DataValidationError(
 #                         f"Missing required fields: {', '.join(missing_fields)}"
@@ -597,12 +597,12 @@
 #                     field
 #                     for field in self.validation_settings["required_fields"]
 #                     if field not in data.columns
-                ]
+#                 ]
 #                 if missing_columns:
 #                     raise DataValidationError(
 #                         f"Missing required columns: {', '.join(missing_columns)}"
 
-        # Check schema if specified
+#         # Check schema if specified
 #         if self.validation_settings["schema"]:
 #             if isinstance(data, dict):
 #                 for field, field_type in self.validation_settings["schema"].items():
@@ -610,7 +610,7 @@
 #                         raise DataValidationError(
 #                             f"Field {field} has invalid type: {type(data[field])}, expected {field_type}"
 
-        # Plugin-specific data validation
+#         # Plugin-specific data validation
 #         try:
 #             return self._validate_plugin_data(data)
 #         except Exception as e:
@@ -662,14 +662,14 @@
 ##         Returns:
 ##             Cache key
 #        """"""
-        # Sort kwargs by key to ensure consistent cache keys
+#         # Sort kwargs by key to ensure consistent cache keys
 #         sorted_items = sorted(kwargs.items())
 
-        # Convert to string
+#         # Convert to string
 #         key_parts = [f"{k}={v}" for k, v in sorted_items]
 #         key_str = ",".join(key_parts)
 
-        # Add plugin name and version to make keys unique across plugins
+#         # Add plugin name and version to make keys unique across plugins
 #         return f"{self.metadata.name}_v{self.metadata.version}:{key_str}"
 
 #     def _get_default_cache_ttl(self) -> int:
@@ -704,17 +704,17 @@
 ##             Health status dictionary
 #        """"""
 #         status = {
-            "name": self.metadata.name,
-            "version": self.metadata.version,
-            "status": self.status.value,
-            "last_error": self.last_error,
-            "last_fetch_time": (
+#             "name": self.metadata.name,
+#             "version": self.metadata.version,
+#             "status": self.status.value,
+#             "last_error": self.last_error,
+#             "last_fetch_time": (
 #                 self.last_fetch_time.isoformat() if self.last_fetch_time else None
-            ),
-            "cache_size": len(self.cache),
-            "health_metrics": self.health_metrics,
-            "timestamp": datetime.now().isoformat(),
-        }
+#             ),
+#             "cache_size": len(self.cache),
+#             "health_metrics": self.health_metrics,
+#             "timestamp": datetime.now().isoformat(),
+#         }
 
 #         return status
 
@@ -1109,23 +1109,23 @@
 ##     async def _setup(self) -> bool:
 #        """Set up SEC filings plugin."""
 #         try:
-            # Set up validation settings
+#             # Set up validation settings
 #             self.validation_settings["required_fields"] = [
-                "filing_type",
-                "filing_date",
-                "company_name",
-                "ticker",
-            ]
+#                 "filing_type",
+#                 "filing_date",
+#                 "company_name",
+#                 "ticker",
+#             ]
 #             self.validation_settings["schema"] = {
-                "filing_type": str,
-                "filing_date": str,
-                "company_name": str,
-                "ticker": str,
-                "cik": str,
-                "url": str,
-            }
+#                 "filing_type": str,
+#                 "filing_date": str,
+#                 "company_name": str,
+#                 "ticker": str,
+#                 "cik": str,
+#                 "url": str,
+#             }
 
-            # Import required libraries
+#             # Import required libraries
 #             try:
 #                 from sec_edgar_downloader import Downloader
 
@@ -1159,39 +1159,39 @@
 #         if not ticker:
 #             raise ValueError("Ticker is required")
 
-        # Validate filing type
+#         # Validate filing type
 #         valid_filing_types = [
-            "8-K",
-            "10-K",
-            "10-Q",
-            "13F",
-            "SC 13G",
-            "SC 13D",
-            "4",
-            "S-1",
-        ]
+#             "8-K",
+#             "10-K",
+#             "10-Q",
+#             "13F",
+#             "SC 13G",
+#             "SC 13D",
+#             "4",
+#             "S-1",
+#         ]
 #         if filing_type not in valid_filing_types:
 #             raise ValueError(
 #                 f"Invalid filing type: {filing_type}. Must be one of {valid_filing_types}"
 
-        # Download filings
+#         # Download filings
 #         logger.info(f"Downloading {count} {filing_type} filings for {ticker}")
 
-        # This would actually download and process filings
-        # For demonstration, return mock data
+#         # This would actually download and process filings
+#         # For demonstration, return mock data
 #         mock_filings = []
 #         for i in range(count):
 #             filing_date = (datetime.now() - timedelta(days=i * 7)).strftime("%Y-%m-%d")
 #             mock_filings.append(
-                {
-                    "filing_type": filing_type,
-                    "filing_date": filing_date,
-                    "company_name": f"{ticker} Corporation",
-                    "ticker": ticker,
-                    "cik": f"000{i}12345",
-                    "url": f"https://www.sec.gov/Archives/edgar/data/{i}12345/{filing_type.replace(' ', '')}-{filing_date}.html",
-                    "content_summary": f"Sample {filing_type} filing content for {ticker}",
-                }
+#                 {
+#                     "filing_type": filing_type,
+#                     "filing_date": filing_date,
+#                     "company_name": f"{ticker} Corporation",
+#                     "ticker": ticker,
+#                     "cik": f"000{i}12345",
+#                     "url": f"https://www.sec.gov/Archives/edgar/data/{i}12345/{filing_type.replace(' ', '')}-{filing_date}.html",
+#                     "content_summary": f"Sample {filing_type} filing content for {ticker}",
+#                 }
 
 #         logger.info(f"Retrieved {len(mock_filings)} {filing_type} filings for {ticker}")
 #         return mock_filings

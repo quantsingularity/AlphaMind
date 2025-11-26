@@ -1,10 +1,10 @@
-#""""""
+# """"""
 ## Experiment definition and management for A/B testing.
 #
 ## This module provides classes for defining and managing experiments
 ## in the A/B testing framework, including individual experiments and
 ## experiment groups.
-#""""""
+# """"""
 
 # import datetime
 # from enum import Enum
@@ -35,7 +35,7 @@
 #     A/B test experiments in financial applications.
 
 #     Parameters
-    ----------
+#     ----------
 #     name : str
 #         Name of the experiment.
 #     description : str, optional
@@ -76,7 +76,7 @@
 #         Add a variant to the experiment.
 
 #         Parameters
-        ----------
+#         ----------
 #         name : str
 #             Name of the variant.
 #         variant : any
@@ -89,7 +89,7 @@
 #         Add a metric to track in the experiment.
 
 #         Parameters
-        ----------
+#         ----------
 #         metric : str
 #             Name of the metric.
 #        """"""
@@ -101,7 +101,7 @@
 #         Start the experiment.
 
 #         Parameters
-        ----------
+#         ----------
 #         start_date : datetime, optional
 #             Start date of the experiment. If None, uses current time.
 #        """"""
@@ -123,7 +123,7 @@
 #         Complete the experiment.
 
 #         Parameters
-        ----------
+#         ----------
 #         end_date : datetime, optional
 #             End date of the experiment. If None, uses current time.
 #        """"""
@@ -135,7 +135,7 @@
 #         Mark the experiment as failed.
 
 #         Parameters
-        ----------
+#         ----------
 #         reason : str
 #             Reason for failure.
 #        """"""
@@ -153,7 +153,7 @@
 #         Add a result for a variant and metric.
 
 #         Parameters
-        ----------
+#         ----------
 #         variant : str
 #             Name of the variant.
 #         metric : str
@@ -191,7 +191,7 @@
 #         Add a batch of results from a DataFrame.
 
 #         Parameters
-        ----------
+#         ----------
 #         results : DataFrame
 #             DataFrame containing results.
 #         variant_col : str, default="variant"
@@ -225,7 +225,7 @@
 #         Get results for the experiment.
 
 #         Parameters
-        ----------
+#         ----------
 #         metric : str, optional
 #             Name of the metric to get results for.
 #             If None, returns results for all metrics.
@@ -236,7 +236,7 @@
 #             Whether to return results as a DataFrame.
 
 #         Returns
-        -------
+#         -------
 #         results : dict or DataFrame
 #             Results for the experiment.
 #        """"""
@@ -297,7 +297,7 @@
 #         Get summary statistics for the experiment.
 
 #         Parameters
-        ----------
+#         ----------
 #         metric : str, optional
 #             Name of the metric to get statistics for.
 #             If None, returns statistics for all metrics.
@@ -306,7 +306,7 @@
 #             If None, returns statistics for all variants.
 
 #         Returns
-        -------
+#         -------
 #         stats : DataFrame
 #             Summary statistics for the experiment.
 #        """"""
@@ -344,7 +344,7 @@
 #         Convert experiment to dictionary.
 
 #         Returns
-        -------
+#         -------
 #         experiment_dict : dict
 #             Dictionary representation of the experiment.
 #        """"""
@@ -366,12 +366,12 @@
 #         Convert experiment to JSON.
 
 #         Parameters
-        ----------
+#         ----------
 #         include_results : bool, default=False
 #             Whether to include results in the JSON.
 
 #         Returns
-        -------
+#         -------
 #         experiment_json : str
 #             JSON representation of the experiment.
 #        """"""
@@ -399,14 +399,14 @@
 #         Save experiment to file.
 
 #         Parameters
-        ----------
+#         ----------
 #         directory : str
 #             Directory to save the experiment to.
 #         include_results : bool, default=True
 #             Whether to include results in the saved file.
 
 #         Returns
-        -------
+#         -------
 #         filepath : str
 #             Path to the saved file.
 #        """"""
@@ -428,12 +428,12 @@
 #         Load experiment from file.
 
 #         Parameters
-        ----------
+#         ----------
 #         filepath : str
 #             Path to the experiment file.
 
 #         Returns
-        -------
+#         -------
 #         experiment : Experiment
 #             Loaded experiment.
 #        """"""
@@ -488,7 +488,7 @@
 #     multiple related experiments.
 
 #     Parameters
-    ----------
+#     ----------
 #     name : str
 #         Name of the experiment group.
 #     description : str, optional
@@ -507,7 +507,7 @@
 #         Add an experiment to the group.
 
 #         Parameters
-        ----------
+#         ----------
 #         experiment : Experiment
 #             Experiment to add.
 #        """"""
@@ -518,7 +518,7 @@
 #         Remove an experiment from the group.
 
 #         Parameters
-        ----------
+#         ----------
 #         experiment_id : str
 #             ID of the experiment to remove.
 #        """"""
@@ -530,12 +530,12 @@
 #         Get an experiment from the group.
 
 #         Parameters
-        ----------
+#         ----------
 #         experiment_id : str
 #             ID of the experiment to get.
 
 #         Returns
-        -------
+#         -------
 #         experiment : Experiment
 #             Experiment with the specified ID.
 #        """"""
@@ -551,13 +551,13 @@
 #         Get experiments from the group.
 
 #         Parameters
-        ----------
+#         ----------
 #         status : ExperimentStatus, optional
 #             Status to filter experiments by.
 #             If None, returns all experiments.
 
 #         Returns
-        -------
+#         -------
 #         experiments : list
 #             List of experiments.
 #        """"""
@@ -571,7 +571,7 @@
 #         Start all experiments in the group.
 
 #         Parameters
-        ----------
+#         ----------
 #         start_date : datetime, optional
 #             Start date for the experiments. If None, uses current time.
 #        """"""
@@ -596,7 +596,7 @@
 #         Complete all running or paused experiments in the group.
 
 #         Parameters
-        ----------
+#         ----------
 #         end_date : datetime, optional
 #             End date for the experiments. If None, uses current time.
 #        """"""
@@ -611,7 +611,7 @@
 #         Get combined results for all experiments in the group.
 
 #         Parameters
-        ----------
+#         ----------
 #         metric : str, optional
 #             Name of the metric to get results for.
 #             If None, returns results for all metrics.
@@ -619,7 +619,7 @@
 #             Whether to return results as a DataFrame.
 
 #         Returns
-        -------
+#         -------
 #         results : dict or DataFrame
 #             Combined results for all experiments.
 #        """"""
@@ -654,13 +654,13 @@
 #         Get summary statistics for all experiments in the group.
 
 #         Parameters
-        ----------
+#         ----------
 #         metric : str, optional
 #             Name of the metric to get statistics for.
 #             If None, returns statistics for all metrics.
 
 #         Returns
-        -------
+#         -------
 #         stats : DataFrame
 #             Summary statistics for all experiments.
 #        """"""
@@ -684,7 +684,7 @@
 #         Convert experiment group to dictionary.
 
 #         Returns
-        -------
+#         -------
 #         group_dict : dict
 #             Dictionary representation of the experiment group.
 #        """"""
@@ -701,12 +701,12 @@
 #         Convert experiment group to JSON.
 
 #         Parameters
-        ----------
+#         ----------
 #         include_experiments : bool, default=False
 #             Whether to include experiments in the JSON.
 
 #         Returns
-        -------
+#         -------
 #         group_json : str
 #             JSON representation of the experiment group.
 #        """"""
@@ -729,7 +729,7 @@
 #         Save experiment group to file.
 
 #         Parameters
-        ----------
+#         ----------
 #         directory : str
 #             Directory to save the experiment group to.
 #         include_experiments : bool, default=True
@@ -738,7 +738,7 @@
 #             Whether to save individual experiment files.
 
 #         Returns
-        -------
+#         -------
 #         filepath : str
 #             Path to the saved file.
 #        """"""
@@ -768,14 +768,14 @@
 #         Load experiment group from file.
 
 #         Parameters
-        ----------
+#         ----------
 #         filepath : str
 #             Path to the experiment group file.
 #         load_experiments : bool, default=True
 #             Whether to load individual experiment files.
 
 #         Returns
-        -------
+#         -------
 #         group : ExperimentGroup
 #             Loaded experiment group.
 #        """"""

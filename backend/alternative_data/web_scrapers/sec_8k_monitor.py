@@ -1,9 +1,9 @@
-#""""""
+# """"""
 ## SEC 8-K Filing Monitor for AlphaMind
 #
 ## This module monitors and processes SEC 8-K filings for specified tickers,
 ## extracting relevant information and performing sentiment analysis.
-#""""""
+# """"""
 
 # from datetime import datetime
 # import logging
@@ -17,7 +17,7 @@
 # Configure logging
 # logging.basicConfig(
 #     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+# )
 # logger = logging.getLogger(__name__)
 
 

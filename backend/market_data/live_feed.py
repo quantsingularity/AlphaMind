@@ -1,10 +1,10 @@
-#""""""
+# """"""
 ## Live Market Data Feed Module for AlphaMind
 #
 ## This module provides real-time market data integration with various exchanges
 ## and data providers. It handles connection management, data normalization,
 ## and streaming capabilities with robust retry logic, validation, and logging.
-#""""""
+# """"""
 
 # import asyncio
 # from datetime import datetime, timedelta
@@ -32,7 +32,7 @@
 #     file_handler = logging.FileHandler("logs/market_data_feed.log")
 #     file_handler.setFormatter(
 #         logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s"
+#             "%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s"
 #     logger.addHandler(file_handler)
 # except Exception as e:
 #     logger.warning(f"Could not set up file logging: {e}")
@@ -101,22 +101,22 @@
 #
 ##     def _set_defaults(self):
 #        """Set default configuration values."""
-        # Default REST API endpoints
+#         # Default REST API endpoints
 #         self.endpoints = {
-            "binance": "https://api.binance.com/api/v3",
-            "coinbase": "https://api.exchange.coinbase.com",
-            "alpaca": "https://paper-api.alpaca.markets/v2",
-            "iex": "https://cloud.iexapis.com/stable",
-            "polygon": "https://api.polygon.io/v2",
-        }
+#             "binance": "https://api.binance.com/api/v3",
+#             "coinbase": "https://api.exchange.coinbase.com",
+#             "alpaca": "https://paper-api.alpaca.markets/v2",
+#             "iex": "https://cloud.iexapis.com/stable",
+#             "polygon": "https://api.polygon.io/v2",
+#         }
 
-        # Default WebSocket endpoints
+#         # Default WebSocket endpoints
 #         self.streaming_endpoints = {
-            "binance": "wss://stream.binance.com:9443/ws",
-            "coinbase": "wss://ws-feed.exchange.coinbase.com",
-            "alpaca": "wss://paper-api.alpaca.markets/stream",
-            "polygon": "wss://socket.polygon.io/stocks",
-        }
+#             "binance": "wss://stream.binance.com:9443/ws",
+#             "coinbase": "wss://ws-feed.exchange.coinbase.com",
+#             "alpaca": "wss://paper-api.alpaca.markets/stream",
+#             "polygon": "wss://socket.polygon.io/stocks",
+#         }
 
 #         logger.debug("Default configuration values set")
 
@@ -136,16 +136,16 @@
 #             with open(config_path, "r") as f:
 #                 config = json.load(f)
 
-            # Validate configuration structure
+#             # Validate configuration structure
 #             if not isinstance(config, dict):
 #                 raise ValueError("Configuration must be a JSON object")
 
 #             self.api_keys = config.get("api_keys", {})
 #             self.endpoints = config.get("endpoints", self.endpoints)
 #             self.streaming_endpoints = config.get(
-                "streaming_endpoints", self.streaming_endpoints
+#                 "streaming_endpoints", self.streaming_endpoints
 
-            # Validate and merge retry settings
+#             # Validate and merge retry settings
 #             if "retry_settings" in config:
 #                 retry_config = config["retry_settings"]
 #                 if not isinstance(retry_config, dict):
@@ -155,7 +155,7 @@
 #                         if key in self.retry_settings:
 #                             self.retry_settings[key] = value
 
-            # Validate and merge validation settings
+#             # Validate and merge validation settings
 #             if "validation_settings" in config:
 #                 validation_config = config["validation_settings"]
 #                 if not isinstance(validation_config, dict):
@@ -181,15 +181,15 @@
 ##             config_path: Path to save configuration file
 #        """"""
 #         config = {
-            "api_keys": self.api_keys,
-            "endpoints": self.endpoints,
-            "streaming_endpoints": self.streaming_endpoints,
-            "retry_settings": self.retry_settings,
-            "validation_settings": self.validation_settings,
-        }
+#             "api_keys": self.api_keys,
+#             "endpoints": self.endpoints,
+#             "streaming_endpoints": self.streaming_endpoints,
+#             "retry_settings": self.retry_settings,
+#             "validation_settings": self.validation_settings,
+#         }
 
 #         try:
-            # Ensure directory exists
+#             # Ensure directory exists
 #             os.makedirs(os.path.dirname(os.path.abspath(config_path)), exist_ok=True)
 
 #             with open(config_path, "w") as f:

@@ -1,10 +1,10 @@
-#""""""
+# """"""
 ## Configuration management for A/B testing experiments.
 #
 ## This module provides classes for managing experiment configurations,
 ## including parameter definitions, variant configurations, and
 ## experiment settings.
-#""""""
+# """"""
 
 # import copy
 # import datetime
@@ -40,14 +40,14 @@
 #         self.variants = {}
 #         self.metrics = []
 #         self.settings = {
-            "start_date": None,
-            "end_date": None,
-            "sample_size": None,
-            "traffic_allocation": {},
-            "randomization_unit": "user",
-            "randomization_salt": str(uuid.uuid4()),
-            "segment_filters": {},
-        }
+#             "start_date": None,
+#             "end_date": None,
+#             "sample_size": None,
+#             "traffic_allocation": {},
+#             "randomization_unit": "user",
+#             "randomization_salt": str(uuid.uuid4()),
+#             "segment_filters": {},
+#         }
 #         self.creation_date = datetime.datetime.now()
 
 #     def add_parameter(
@@ -75,11 +75,11 @@
 ##             Constraints for the parameter (e.g., min, max, choices).
 #        """"""
 #         self.parameters[name] = {
-            "default_value": default_value,
-            "description": description or "",
-            "type_hint": type_hint or type(default_value).__name__,
-            "constraints": constraints or {},
-        }
+#             "default_value": default_value,
+#             "description": description or "",
+#             "type_hint": type_hint or type(default_value).__name__,
+#             "constraints": constraints or {},
+#         }
 
 #     def add_variant(
 #         self,
@@ -100,18 +100,18 @@
 ##         description : str, optional
 ##             Description of the variant.
 #        """"""
-        # Use default parameter values if not specified
+#         # Use default parameter values if not specified
 #         if parameters is None:
 #             parameters = {
 #                 name: param["default_value"] for name, param in self.parameters.items()
-            }
+#             }
 
-        # Validate parameters
+#         # Validate parameters
 #         for param_name, value in parameters.items():
 #             if param_name not in self.parameters:
 #                 raise ValueError(f"Parameter '{param_name}' not defined in experiment")
 
-            # Validate type
+#             # Validate type
 #             param_def = self.parameters[param_name]
 #             expected_type = param_def["type_hint"]
 
@@ -124,29 +124,29 @@
 #             elif expected_type == "bool" and not isinstance(value, bool):
 #                 raise TypeError(f"Parameter '{param_name}' should be a boolean")
 
-            # Validate constraints
+#             # Validate constraints
 #             constraints = param_def["constraints"]
 
 #             if "min" in constraints and value < constraints["min"]:
 #                 raise ValueError(
 #                     f"Parameter '{param_name}' should be >= {constraints['min']}"
-                )
+#                 )
 
 #             if "max" in constraints and value > constraints["max"]:
 #                 raise ValueError(
 #                     f"Parameter '{param_name}' should be <= {constraints['max']}"
-                )
+#                 )
 
 #             if "choices" in constraints and value not in constraints["choices"]:
 #                 raise ValueError(
 #                     f"Parameter '{param_name}' should be one of {constraints['choices']}"
-                )
+#                 )
 
-        # Add variant
+#         # Add variant
 #         self.variants[name] = {
-            "parameters": parameters,
-            "description": description or "",
-        }
+#             "parameters": parameters,
+#             "description": description or "",
+#         }
 
 #     def add_metric(
 #         self,
@@ -170,13 +170,13 @@
 ##             Minimum detectable effect size.
 #        """"""
 #         self.metrics.append(
-            {
-                "name": name,
-                "description": description or "",
-                "higher_is_better": higher_is_better,
-                "minimum_detectable_effect": minimum_detectable_effect,
-            }
-        )
+#             {
+#                 "name": name,
+#                 "description": description or "",
+#                 "higher_is_better": higher_is_better,
+#                 "minimum_detectable_effect": minimum_detectable_effect,
+#             }
+#         )
 
 #     def set_traffic_allocation(self, allocations: Dict[str, float]) -> None:
 #        """"""
@@ -187,12 +187,12 @@
 ##         allocations : dict
 ##             Dictionary mapping variant names to allocation percentages (0-1).
 #        """"""
-        # Validate variants
+#         # Validate variants
 #         for variant in allocations:
 #             if variant not in self.variants:
 #                 raise ValueError(f"Variant '{variant}' not defined in experiment")
 
-        # Validate allocations
+#         # Validate allocations
 #         total_allocation = sum(allocations.values())
 #         if not (
 #             0.99 <= total_allocation <= 1.01
@@ -279,25 +279,25 @@
 #        """"""
 #         errors = []
 
-        # Check if at least one variant is defined
+#         # Check if at least one variant is defined
 #         if not self.variants:
 #             errors.append("No variants defined")
 
-        # Check if at least one metric is defined
+#         # Check if at least one metric is defined
 #         if not self.metrics:
 #             errors.append("No metrics defined")
 
-        # Check if traffic allocation is defined for all variants
+#         # Check if traffic allocation is defined for all variants
 #         if self.settings["traffic_allocation"]:
 #             for variant in self.variants:
 #                 if variant not in self.settings["traffic_allocation"]:
 #                     errors.append(
 #                         f"No traffic allocation defined for variant '{variant}'"
-                    )
+#                     )
 #         else:
 #             errors.append("No traffic allocation defined")
 
-        # Check if start date is defined
+#         # Check if start date is defined
 #         if self.settings["start_date"] is None:
 #             errors.append("No start date defined")
 
@@ -313,31 +313,31 @@
 ##             Dictionary representation of the experiment configuration.
 #        """"""
 #         config_dict = {
-            "id": self.id,
-            "name": self.name,
-            "description": self.description,
-            "parameters": self.parameters,
-            "variants": self.variants,
-            "metrics": self.metrics,
-            "settings": {
-                "start_date": (
+#             "id": self.id,
+#             "name": self.name,
+#             "description": self.description,
+#             "parameters": self.parameters,
+#             "variants": self.variants,
+#             "metrics": self.metrics,
+#             "settings": {
+#                 "start_date": (
 #                     self.settings["start_date"].isoformat()
 #                     if self.settings["start_date"]
 #                     else None
-                ),
-                "end_date": (
+#                 ),
+#                 "end_date": (
 #                     self.settings["end_date"].isoformat()
 #                     if self.settings["end_date"]
 #                     else None
-                ),
-                "sample_size": self.settings["sample_size"],
-                "traffic_allocation": self.settings["traffic_allocation"],
-                "randomization_unit": self.settings["randomization_unit"],
-                "randomization_salt": self.settings["randomization_salt"],
-                "segment_filters": self.settings["segment_filters"],
-            },
-            "creation_date": self.creation_date.isoformat(),
-        }
+#                 ),
+#                 "sample_size": self.settings["sample_size"],
+#                 "traffic_allocation": self.settings["traffic_allocation"],
+#                 "randomization_unit": self.settings["randomization_unit"],
+#                 "randomization_salt": self.settings["randomization_salt"],
+#                 "segment_filters": self.settings["segment_filters"],
+#             },
+#             "creation_date": self.creation_date.isoformat(),
+#         }
 
 #         return config_dict
 
@@ -374,10 +374,10 @@
 ##         format : str, default="json"
 ##             Format to save the configuration in. Options: "json", "yaml".
 #        """"""
-        # Create directory if it doesn't exist
+#         # Create directory if it doesn't exist
 #         os.makedirs(os.path.dirname(os.path.abspath(filepath)), exist_ok=True)
 
-        # Save to file
+#         # Save to file
 #         if format == "json":
 #             with open(filepath, "w") as f:
 #                 f.write(self.to_json())
@@ -402,7 +402,7 @@
 ##         config : ExperimentConfig
 ##             Loaded experiment configuration.
 #        """"""
-        # Determine format from file extension
+#         # Determine format from file extension
 #         if filepath.endswith(".json"):
 #             with open(filepath, "r") as f:
 #                 data = json.load(f)
@@ -412,25 +412,25 @@
 #         else:
 #             raise ValueError(f"Unsupported file format: {filepath}")
 
-        # Create configuration
+#         # Create configuration
 #         config = cls(name=data["name"], description=data["description"])
 
-        # Set attributes
+#         # Set attributes
 #         config.id = data["id"]
 #         config.parameters = data["parameters"]
 #         config.variants = data["variants"]
 #         config.metrics = data["metrics"]
 
-        # Set settings
+#         # Set settings
 #         if data["settings"]["start_date"]:
 #             config.settings["start_date"] = datetime.datetime.fromisoformat(
 #                 data["settings"]["start_date"]
-            )
+#             )
 
 #         if data["settings"]["end_date"]:
 #             config.settings["end_date"] = datetime.datetime.fromisoformat(
 #                 data["settings"]["end_date"]
-            )
+#             )
 
 #         config.settings["sample_size"] = data["settings"]["sample_size"]
 #         config.settings["traffic_allocation"] = data["settings"]["traffic_allocation"]
@@ -462,13 +462,13 @@
 ##         cloned_config : ExperimentConfig
 ##             Cloned experiment configuration.
 #        """"""
-        # Create new configuration
+#         # Create new configuration
 #         cloned_config = ExperimentConfig(
 #             name=new_name or f"{self.name} (Clone)",
 #             description=new_description or self.description,
-        )
+#         )
 
-        # Copy attributes
+#         # Copy attributes
 #         cloned_config.parameters = copy.deepcopy(self.parameters)
 #         cloned_config.variants = copy.deepcopy(self.variants)
 #         cloned_config.metrics = copy.deepcopy(self.metrics)
@@ -495,7 +495,7 @@
 #         self.storage_dir = storage_dir
 #         self.configs = {}
 
-        # Load existing configurations if storage directory is provided
+#         # Load existing configurations if storage directory is provided
 #         if storage_dir and os.path.exists(storage_dir):
 #             self._load_configs()
 
@@ -516,7 +516,7 @@
 #         Add a configuration to the manager.
 
 #         Parameters
-        ----------
+#         ----------
 #         config : ExperimentConfig
 #             Configuration to add.
 #         save : bool, default=True
@@ -536,12 +536,12 @@
 #         Get a configuration from the manager.
 
 #         Parameters
-        ----------
+#         ----------
 #         config_id : str
 #             ID of the configuration to get.
 
 #         Returns
-        -------
+#         -------
 #         config : ExperimentConfig
 #             Configuration with the specified ID.
 #        """"""
@@ -555,13 +555,13 @@
 #         Get configurations from the manager.
 
 #         Parameters
-        ----------
+#         ----------
 #         name_filter : str, optional
 #             Filter configurations by name.
 #             If None, returns all configurations.
 
 #         Returns
-        -------
+#         -------
 #         configs : list
 #             List of configurations.
 #        """"""
@@ -579,7 +579,7 @@
 #         Update a configuration in the manager.
 
 #         Parameters
-        ----------
+#         ----------
 #         config : ExperimentConfig
 #             Configuration to update.
 #         save : bool, default=True
@@ -599,7 +599,7 @@
 #         Delete a configuration from the manager.
 
 #         Parameters
-        ----------
+#         ----------
 #         config_id : str
 #             ID of the configuration to delete.
 #        """"""
@@ -622,7 +622,7 @@
 #         Export all configurations to files.
 
 #         Parameters
-        ----------
+#         ----------
 #         directory : str
 #             Directory to export configurations to.
 #         format : str, default="json"
@@ -641,12 +641,12 @@
 #         Import configurations from files.
 
 #         Parameters
-        ----------
+#         ----------
 #         directory : str
 #             Directory to import configurations from.
 
 #         Returns
-        -------
+#         -------
 #         count : int
 #             Number of configurations imported.
 #        """"""

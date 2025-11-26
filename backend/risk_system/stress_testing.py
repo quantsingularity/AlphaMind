@@ -24,8 +24,8 @@
 #     def apply_shock(self, portfolio, scenario):
 #         shocked_returns = portfolio @ scenario.T
 #         return pd.DataFrame(
-            {
-                "VaR_99": shocked_returns.quantile(0.01),
-                "Max_Drawdown": shocked_returns.min(),
-                "Leverage_Impact": np.linalg.norm(shocked_returns, ord=2),
-            }
+#             {
+#                 "VaR_99": shocked_returns.quantile(0.01),
+#                 "Max_Drawdown": shocked_returns.min(),
+#                 "Leverage_Impact": np.linalg.norm(shocked_returns, ord=2),
+#             }

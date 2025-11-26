@@ -1,4 +1,4 @@
-#""""""
+# """"""
 ## Bloomberg API connector for financial data.
 #
 ## This module provides a connector for accessing financial market data
@@ -7,7 +7,7 @@
 ## Note: This connector is a stub implementation that defines the interface
 ## for interacting with Bloomberg APIs. Actual implementation requires
 ## Bloomberg Desktop API or Server API access.
-#""""""
+# """"""
 
 # from datetime import date, datetime, timedelta
 # import logging
@@ -25,7 +25,7 @@
 #     DataRequest,
 #     DataResponse,
 #     RateLimiter,
-)
+# )
 
 
 # class BloombergConnector(APIConnector):
@@ -56,25 +56,25 @@
 #         api_secret: Optional[str] = None,
 #         host: str = "localhost",
 #         port: int = 8194,
-    ):
-        # Create credentials
+#     ):
+#         # Create credentials
 #         credentials = APICredentials(api_key=api_key, api_secret=api_secret)
 
-        # Set base URL
+#         # Set base URL
 #         base_url = f"http://{host}:{port}"
 
-        # Create rate limiter
+#         # Create rate limiter
 #         rate_limiter = RateLimiter(requests_per_second=10)
 
 #         super().__init__(
 #             credentials=credentials, base_url=base_url, rate_limiter=rate_limiter
-        )
+#         )
 
 #         self.host = host
 #         self.port = port
 #         self.logger = logging.getLogger(self.__class__.__name__)
 
-        # Placeholder for Bloomberg session
+#         # Placeholder for Bloomberg session
 #         self.session = None
 
 #     @property
@@ -98,10 +98,10 @@
 ##         success : bool
 ##             Whether authentication was successful.
 #        """"""
-        # Stub implementation
+#         # Stub implementation
 #         self.logger.warning(
-            "This is a stub implementation. Actual implementation requires Bloomberg API access."
-        )
+#             "This is a stub implementation. Actual implementation requires Bloomberg API access."
+#         )
 #         return False
 
 #     def _create_request(
@@ -137,7 +137,7 @@
 #             params=params,
 #             category=category,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def _create_error_response(self, request: DataRequest, error: str) -> DataResponse:
 #        """"""
@@ -175,23 +175,23 @@
 ##         response : DataResponse
 ##             Response containing the reference data.
 #        """"""
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint="//blp/refdata",
 #             params={
-                "securities": (
+#                 "securities": (
 #                     securities if isinstance(securities, list) else [securities]
-                ),
-                "fields": fields if isinstance(fields, list) else [fields],
-            },
+#                 ),
+#                 "fields": fields if isinstance(fields, list) else [fields],
+#             },
 #             category=DataCategory.MARKET_DATA,
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Bloomberg API access.",
-        )
+#         )
 
 #     def get_historical_data(
 #         self,
@@ -222,33 +222,33 @@
 ##         response : DataResponse
 ##             Response containing the historical data.
 #        """"""
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if isinstance(start_date, (date, datetime)):
 #             start_date = start_date.strftime("%Y%m%d")
 
 #         if isinstance(end_date, (date, datetime)):
 #             end_date = end_date.strftime("%Y%m%d")
 
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint="//blp/refdata",
 #             params={
-                "securities": (
+#                 "securities": (
 #                     securities if isinstance(securities, list) else [securities]
-                ),
-                "fields": fields if isinstance(fields, list) else [fields],
-                "startDate": start_date,
-                "endDate": end_date,
-                "periodicitySelection": period,
-            },
+#                 ),
+#                 "fields": fields if isinstance(fields, list) else [fields],
+#                 "startDate": start_date,
+#                 "endDate": end_date,
+#                 "periodicitySelection": period,
+#             },
 #             category=DataCategory.MARKET_DATA,
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Bloomberg API access.",
-        )
+#         )
 
 #     def get_intraday_bar_data(
 #         self,
@@ -279,31 +279,31 @@
 ##         response : DataResponse
 ##             Response containing the intraday bar data.
 #        """"""
-        # Convert datetimes to strings if needed
+#         # Convert datetimes to strings if needed
 #         if isinstance(start_datetime, datetime):
 #             start_datetime = start_datetime.strftime("%Y-%m-%dT%H:%M:%S")
 
 #         if isinstance(end_datetime, datetime):
 #             end_datetime = end_datetime.strftime("%Y-%m-%dT%H:%M:%S")
 
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint="//blp/refdata",
 #             params={
-                "security": security,
-                "eventType": event_type,
-                "interval": interval,
-                "startDateTime": start_datetime,
-                "endDateTime": end_datetime,
-            },
+#                 "security": security,
+#                 "eventType": event_type,
+#                 "interval": interval,
+#                 "startDateTime": start_datetime,
+#                 "endDateTime": end_datetime,
+#             },
 #             category=DataCategory.MARKET_DATA,
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Bloomberg API access.",
-        )
+#         )
 
 #     def get_intraday_tick_data(
 #         self,
@@ -331,32 +331,32 @@
 ##         response : DataResponse
 ##             Response containing the intraday tick data.
 #        """"""
-        # Convert datetimes to strings if needed
+#         # Convert datetimes to strings if needed
 #         if isinstance(start_datetime, datetime):
 #             start_datetime = start_datetime.strftime("%Y-%m-%dT%H:%M:%S")
 
 #         if isinstance(end_datetime, datetime):
 #             end_datetime = end_datetime.strftime("%Y-%m-%dT%H:%M:%S")
 
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint="//blp/refdata",
 #             params={
-                "security": security,
-                "eventTypes": (
+#                 "security": security,
+#                 "eventTypes": (
 #                     event_types if isinstance(event_types, list) else [event_types]
-                ),
-                "startDateTime": start_datetime,
-                "endDateTime": end_datetime,
-            },
+#                 ),
+#                 "startDateTime": start_datetime,
+#                 "endDateTime": end_datetime,
+#             },
 #             category=DataCategory.MARKET_DATA,
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Bloomberg API access.",
-        )
+#         )
 
 #     def get_portfolio_data(
 #         self, portfolio: str, fields: Union[str, List[str]]
@@ -376,21 +376,21 @@
 ##         response : DataResponse
 ##             Response containing the portfolio data.
 #        """"""
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint="//blp/refdata",
 #             params={
-                "portfolio": portfolio,
-                "fields": fields if isinstance(fields, list) else [fields],
-            },
+#                 "portfolio": portfolio,
+#                 "fields": fields if isinstance(fields, list) else [fields],
+#             },
 #             category=DataCategory.MARKET_DATA,
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Bloomberg API access.",
-        )
+#         )
 
 #     def get_curve_data(
 #         self, curve: str, points: Optional[List[str]] = None
@@ -410,18 +410,18 @@
 ##         response : DataResponse
 ##             Response containing the curve data.
 #        """"""
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint="//blp/refdata",
 #             params={"curve": curve, "points": points},
 #             category=DataCategory.MARKET_DATA,
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Bloomberg API access.",
-        )
+#         )
 
 #     def get_technical_indicators(
 #         self,
@@ -452,31 +452,31 @@
 ##         response : DataResponse
 ##             Response containing the technical indicators.
 #        """"""
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if isinstance(start_date, (date, datetime)):
 #             start_date = start_date.strftime("%Y%m%d")
 
 #         if isinstance(end_date, (date, datetime)):
 #             end_date = end_date.strftime("%Y%m%d")
 
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint="//blp/refdata",
 #             params={
-                "security": security,
-                "indicator": indicator,
-                "startDate": start_date,
-                "endDate": end_date,
-                "periodicitySelection": period,
-            },
+#                 "security": security,
+#                 "indicator": indicator,
+#                 "startDate": start_date,
+#                 "endDate": end_date,
+#                 "periodicitySelection": period,
+#             },
 #             category=DataCategory.MARKET_DATA,
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Bloomberg API access.",
-        )
+#         )
 
 #     def get_economic_data(
 #         self,
@@ -501,31 +501,31 @@
 ##         response : DataResponse
 ##             Response containing the economic data.
 #        """"""
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if isinstance(start_date, (date, datetime)):
 #             start_date = start_date.strftime("%Y%m%d")
 
 #         if isinstance(end_date, (date, datetime)):
 #             end_date = end_date.strftime("%Y%m%d")
 
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint="//blp/refdata",
 #             params={
-                "securities": (
+#                 "securities": (
 #                     securities if isinstance(securities, list) else [securities]
-                ),
-                "startDate": start_date,
-                "endDate": end_date,
-            },
+#                 ),
+#                 "startDate": start_date,
+#                 "endDate": end_date,
+#             },
 #             category=DataCategory.ECONOMIC,
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Bloomberg API access.",
-        )
+#         )
 
 #     def get_fundamental_data(
 #         self, securities: Union[str, List[str]], fields: Union[str, List[str]]
@@ -545,23 +545,23 @@
 ##         response : DataResponse
 ##             Response containing the fundamental data.
 #        """"""
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint="//blp/refdata",
 #             params={
-                "securities": (
+#                 "securities": (
 #                     securities if isinstance(securities, list) else [securities]
-                ),
-                "fields": fields if isinstance(fields, list) else [fields],
-            },
+#                 ),
+#                 "fields": fields if isinstance(fields, list) else [fields],
+#             },
 #             category=DataCategory.FUNDAMENTAL,
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Bloomberg API access.",
-        )
+#         )
 
 #     def get_market_data(
 #         self, securities: Union[str, List[str]], fields: Union[str, List[str]]
@@ -581,23 +581,23 @@
 ##         response : DataResponse
 ##             Response containing the market data.
 #        """"""
-        # Create request
+#         # Create request
 #         request = self._create_request(
 #             endpoint="//blp/mktdata",
 #             params={
-                "securities": (
+#                 "securities": (
 #                     securities if isinstance(securities, list) else [securities]
-                ),
-                "fields": fields if isinstance(fields, list) else [fields],
-            },
+#                 ),
+#                 "fields": fields if isinstance(fields, list) else [fields],
+#             },
 #             category=DataCategory.MARKET_DATA,
-        )
+#         )
 
-        # Stub implementation
+#         # Stub implementation
 #         return self._create_error_response(
 #             request=request,
 #             error="This is a stub implementation. Actual implementation requires Bloomberg API access.",
-        )
+#         )
 
 #     def close(self) -> None:
 #        """Close the Bloomberg connector."""

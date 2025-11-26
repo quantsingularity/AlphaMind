@@ -1,9 +1,9 @@
-#""""""
+# """"""
 ## Order Management System Module.
 #
 ## This module provides comprehensive order management functionality including
 ## order creation, validation, routing, execution, and lifecycle management.
-#""""""
+# """"""
 
 # from dataclasses import dataclass, field
 # import datetime
@@ -197,7 +197,7 @@
 #
 ##     def _register_default_rules(self) -> None:
 #        """Register default validation rules."""
-        # Basic field validation
+#         # Basic field validation
 #         self.validation_rules.append(self._validate_required_fields)
 #         self.validation_rules.append(self._validate_price_fields)
 #         self.validation_rules.append(self._validate_time_in_force)
@@ -233,10 +233,10 @@
 #                         error_code="VALIDATION_RULE_ERROR",
 #                         message=f"Internal validation error: {str(e)}",
 #                         severity="error",
-                    )
-                )
+#                     )
+#                 )
 
-        # Update order with validation results
+#         # Update order with validation results
 #         order.validation_errors = all_errors
 
 #         if all_errors:
@@ -263,8 +263,8 @@
 #                     error_code="MISSING_INSTRUMENT",
 #                     message="Instrument ID is required",
 #                     field="instrument_id",
-                )
-            )
+#                 )
+#             )
 
 #         if order.quantity <= 0:
 #             errors.append(
@@ -272,8 +272,8 @@
 #                     error_code="INVALID_QUANTITY",
 #                     message="Quantity must be positive",
 #                     field="quantity",
-                )
-            )
+#                 )
+#             )
 
 #         return errors
 
@@ -288,35 +288,35 @@
 #        """"""
 #         errors = []
 
-        # Limit price required for limit orders
+#         # Limit price required for limit orders
 #         if order.order_type in [
 #             OrderType.LIMIT,
 #             OrderType.STOP_LIMIT,
 #             OrderType.ICEBERG,
-        ]:
+#         ]:
 #             if order.limit_price is None or order.limit_price <= 0:
 #                 errors.append(
 #                     OrderValidationError(
 #                         error_code="MISSING_LIMIT_PRICE",
 #                         message=f"Limit price is required for {order.order_type.value} orders",
 #                         field="limit_price",
-                    )
-                )
+#                     )
+#                 )
 
-        # Stop price required for stop orders
+#         # Stop price required for stop orders
 #         if order.order_type in [
 #             OrderType.STOP,
 #             OrderType.STOP_LIMIT,
 #             OrderType.TRAILING_STOP,
-        ]:
+#         ]:
 #             if order.stop_price is None or order.stop_price <= 0:
 #                 errors.append(
 #                     OrderValidationError(
 #                         error_code="MISSING_STOP_PRICE",
 #                         message=f"Stop price is required for {order.order_type.value} orders",
 #                         field="stop_price",
-                    )
-                )
+#                     )
+#                 )
 
 #         return errors
 
@@ -337,8 +337,8 @@
 #                     error_code="MISSING_EXPIRY",
 #                     message="Expiry date is required for GTD orders",
 #                     field="expires_at",
-                )
-            )
+#                 )
+#             )
 
 #         return errors
 
@@ -360,11 +360,11 @@
 ##         Returns:
 ##             Newly created Order object
 #        """"""
-        # Generate order ID if not provided
+#         # Generate order ID if not provided
 #         if "order_id" not in kwargs:
 #             kwargs["order_id"] = str(uuid.uuid4())
 
-        # Convert enum strings to enum values
+#         # Convert enum strings to enum values
 #         if "order_type" in kwargs and isinstance(kwargs["order_type"], str):
 #             kwargs["order_type"] = OrderType(kwargs["order_type"])
 
@@ -374,14 +374,14 @@
 #         if "time_in_force" in kwargs and isinstance(kwargs["time_in_force"], str):
 #             kwargs["time_in_force"] = OrderTimeInForce(kwargs["time_in_force"])
 
-        # Create order object
+#         # Create order object
 #         order = Order(**kwargs)
 
-        # Store order
+#         # Store order
 #         self.orders[order.order_id] = order
 #         logger.info(
 #             f"Created order {order.order_id} for {order.quantity} {order.instrument_id}"
-        )
+#         )
 
 #         return order
 
@@ -422,19 +422,19 @@
 
 #         order = self.orders[order_id]
 
-        # Validate order if not already validated
+#         # Validate order if not already validated
 #         if order.status == OrderStatus.CREATED:
 #             if not self.validate_order(order_id):
 #                 return False
 
-        # Check if order is in a valid state for submission
+#         # Check if order is in a valid state for submission
 #         if order.status not in [OrderStatus.VALIDATED, OrderStatus.CREATED]:
 #             logger.warning(
 #                 f"Cannot submit order {order_id} with status {order.status.value}"
-            )
+#             )
 #             return False
 
-        # Update status to pending
+#         # Update status to pending
 #         order.update_status(OrderStatus.PENDING)
 #         logger.info(f"Submitted order {order_id} for execution")
 
@@ -457,20 +457,20 @@
 
 #         order = self.orders[order_id]
 
-        # Check if order can be cancelled
+#         # Check if order can be cancelled
 #         if order.status in [
 #             OrderStatus.FILLED,
 #             OrderStatus.CANCELLED,
 #             OrderStatus.REJECTED,
 #             OrderStatus.EXPIRED,
 #             OrderStatus.ERROR,
-        ]:
+#         ]:
 #             logger.warning(
 #                 f"Cannot cancel order {order_id} with status {order.status.value}"
-            )
+#             )
 #             return False
 
-        # Update status to cancelled
+#         # Update status to cancelled
 #         order.update_status(OrderStatus.CANCELLED)
 #         logger.info(f"Cancelled order {order_id}")
 
@@ -494,26 +494,26 @@
 
 #         order = self.orders[order_id]
 
-        # Check if order can be filled
+#         # Check if order can be filled
 #         if order.status in [
 #             OrderStatus.CANCELLED,
 #             OrderStatus.REJECTED,
 #             OrderStatus.EXPIRED,
 #             OrderStatus.ERROR,
-        ]:
+#         ]:
 #             logger.warning(
 #                 f"Cannot add fill to order {order_id} with status {order.status.value}"
-            )
+#             )
 #             return False
 
-        # Check if fill would exceed order quantity
+#         # Check if fill would exceed order quantity
 #         if (
 #             order.filled_quantity + fill.quantity > order.quantity + 1e-6
 #         ):  # Account for floating point precision
 #             logger.warning(f"Fill would exceed order quantity for order {order_id}")
 #             return False
 
-        # Add fill to order
+#         # Add fill to order
 #         order.add_fill(fill)
 
 #         return True
@@ -553,7 +553,7 @@
 #             order
 #             for order in self.orders.values()
 #             if order.instrument_id == instrument_id
-        ]
+#         ]
 
 #     def get_active_orders(self) -> List[Order]:
 #        """Get all active (non-terminal) orders."""
@@ -566,10 +566,10 @@
 #             OrderStatus.VALIDATED,
 #             OrderStatus.PENDING,
 #             OrderStatus.PARTIALLY_FILLED,
-        ]
+#         ]
 #         return [
 #             order for order in self.orders.values() if order.status in active_statuses
-        ]
+#         ]
 
 #     def get_order_history(self, order_id: str) -> Dict:
 #        """Get the history of an order including all fills."""
@@ -589,29 +589,29 @@
 #         order = self.orders[order_id]
 
 #         history = {
-            "order_id": order.order_id,
-            "instrument_id": order.instrument_id,
-            "side": order.side.value,
-            "quantity": order.quantity,
-            "order_type": order.order_type.value,
-            "status": order.status.value,
-            "created_at": order.created_at.isoformat(),
-            "updated_at": order.updated_at.isoformat(),
-            "filled_quantity": order.filled_quantity,
-            "average_fill_price": order.average_fill_price,
-            "fills": [],
-        }
+#             "order_id": order.order_id,
+#             "instrument_id": order.instrument_id,
+#             "side": order.side.value,
+#             "quantity": order.quantity,
+#             "order_type": order.order_type.value,
+#             "status": order.status.value,
+#             "created_at": order.created_at.isoformat(),
+#             "updated_at": order.updated_at.isoformat(),
+#             "filled_quantity": order.filled_quantity,
+#             "average_fill_price": order.average_fill_price,
+#             "fills": [],
+#         }
 
 #         for fill in order.fills:
 #             history["fills"].append(
-                {
-                    "fill_id": fill.fill_id,
-                    "timestamp": fill.timestamp.isoformat(),
-                    "quantity": fill.quantity,
-                    "price": fill.price,
-                    "venue": fill.venue,
-                    "fees": fill.fees,
-                }
-            )
+#                 {
+#                     "fill_id": fill.fill_id,
+#                     "timestamp": fill.timestamp.isoformat(),
+#                     "quantity": fill.quantity,
+#                     "price": fill.price,
+#                     "venue": fill.venue,
+#                     "fees": fill.fees,
+#                 }
+#             )
 
 #         return history

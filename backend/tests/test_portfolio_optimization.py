@@ -30,14 +30,14 @@
 ## @pytest.fixture
 ## def optimizer():
 #    """Fixture for a PortfolioOptimizer instance."""
-    # Ensure the optimizer internally compiles its model with the registered loss
+#     # Ensure the optimizer internally compiles its model with the registered loss
 #     opt = PortfolioOptimizer(
 #         n_assets=N_ASSETS, lookback_window=LOOKBACK_WINDOW, hidden_units=HIDDEN_UNITS
-    # We assume the optimizer compiles the model with the custom loss internally.
-    # If not, the test needs to be adjusted or the class needs modification.
-    # For testing save/load, we might need to explicitly compile here if not done in __init__
+#     # We assume the optimizer compiles the model with the custom loss internally.
+#     # If not, the test needs to be adjusted or the class needs modification.
+#     # For testing save/load, we might need to explicitly compile here if not done in __init__
 #     try:
-        # Check if already compiled with the correct loss
+#         # Check if already compiled with the correct loss
 #         if opt.model.loss.__name__ != portfolio_loss.__name__:
 #             opt.model.compile(
 #                 optimizer="adam", loss=portfolio_loss
@@ -65,7 +65,7 @@
 #     assert isinstance(
 #         optimizer.scaler, object
 #     )  # StandardScaler is tricky to assert type directly
-    # Check if the model is compiled with the correct loss
+#     # Check if the model is compiled with the correct loss
 #     assert optimizer.model.loss.__name__ == portfolio_loss.__name__
 
 
@@ -96,9 +96,9 @@
 #     loss = portfolio_loss(y_true, y_pred)
 
 #     assert isinstance(loss, tf.Tensor)
-    # Check if the shape is scalar
+#     # Check if the shape is scalar
 #     assert loss.shape == tf.TensorShape([])
-    # Check the calculation logic
+#     # Check the calculation logic
 #     expected_return_1 = (
 #         0.4 * 0.01 + 0.3 * (-0.005) + 0.3 * 0.02
 #     )  # 0.004 - 0.0015 + 0.006 = 0.0085
@@ -127,7 +127,7 @@
 #    """Test the output of the optimize_portfolio method."""
 #     price_data, volatility_data, macro_data = sample_data
 
-    # Get data for one prediction step
+#     # Get data for one prediction step
 #     recent_price = price_data[-LOOKBACK_WINDOW:]
 #     recent_vol = volatility_data[-LOOKBACK_WINDOW:]
 #     recent_macro = macro_data[-LOOKBACK_WINDOW:]
@@ -170,11 +170,11 @@
 ## def test_save_load_model(optimizer, tmp_path):
 #    """Test saving and loading the model."""
 #     model_path = os.path.join(str(tmp_path), "test_portfolio_model.keras")
-    # Ensure the model is compiled with the registered loss before saving
+#     # Ensure the model is compiled with the registered loss before saving
 #     if (
 #         not hasattr(optimizer.model, "loss")
 #         or optimizer.model.loss.__name__ != portfolio_loss.__name__
-    ):
+#     ):
 #         optimizer.model.compile(
 #             optimizer="adam", loss=portfolio_loss
 #         )  # Removed backslashes
@@ -183,24 +183,24 @@
 
 #     assert os.path.exists(model_path)
 
-    # Load the Keras model directly using tf.keras.models.load_model
-    # The custom loss is registered, so it should load automatically
+#     # Load the Keras model directly using tf.keras.models.load_model
+#     # The custom loss is registered, so it should load automatically
 #     loaded_keras_model = tf.keras.models.load_model(model_path)
 
-    # Create a new optimizer instance and assign the loaded model
+#     # Create a new optimizer instance and assign the loaded model
 #     new_optimizer = PortfolioOptimizer(
 #         n_assets=N_ASSETS, lookback_window=LOOKBACK_WINDOW, hidden_units=HIDDEN_UNITS
 #     new_optimizer.model = loaded_keras_model
 
-    # Check if the loaded model is a Keras model
+#     # Check if the loaded model is a Keras model
 #     assert isinstance(new_optimizer.model, tf.keras.Model)
-    # Check if the loss function is correctly loaded
+#     # Check if the loss function is correctly loaded
 #     assert (
 #         new_optimizer.model.loss.__name__ == portfolio_loss.__name__
 #     )  # Compare by name
 
-    # Optional: Compare weights or predict with both models on same input
-    # Ensure models are built before getting weights
+#     # Optional: Compare weights or predict with both models on same input
+#     # Ensure models are built before getting weights
 #     dummy_price = np.random.rand(1, LOOKBACK_WINDOW, N_ASSETS)
 #     dummy_vol = np.random.rand(1, LOOKBACK_WINDOW, N_ASSETS)
 #     dummy_macro = np.random.rand(1, LOOKBACK_WINDOW, N_MACRO_FACTORS)

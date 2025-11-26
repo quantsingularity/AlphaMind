@@ -28,11 +28,11 @@
 #        """Map physical indicators to economic activity"""
 #         facilities = self._get_company_facilities(ticker)
 #         return pd.concat(
-            [
+#             [
 #                 self.process_geospatial(facil["coordinates"], "2020-01/2023-06")
 #                 for facil in facilities
-            ]
-        )
+#             ]
+#         )
 
 #     def _preprocess_images(self, images):
 #        """Preprocess satellite images for model input"""
@@ -46,29 +46,29 @@
 #
 ##     def _get_company_facilities(self, ticker):
 #        """Get company facility locations from database"""
-        # This would typically query a database or API
-        # Placeholder implementation
+#         # This would typically query a database or API
+#         # Placeholder implementation
 #         if ticker == "AAPL":
 #             return [
-                {
-                    "name": "Apple Park",
-                    "coordinates": [37.3346, -122.0090, 37.3456, -121.9880],
-                },
-                {
-                    "name": "Foxconn Zhengzhou",
-                    "coordinates": [34.7500, 113.6250, 34.7700, 113.6550],
-                },
-            ]
+#                 {
+#                     "name": "Apple Park",
+#                     "coordinates": [37.3346, -122.0090, 37.3456, -121.9880],
+#                 },
+#                 {
+#                     "name": "Foxconn Zhengzhou",
+#                     "coordinates": [34.7500, 113.6250, 34.7700, 113.6550],
+#                 },
+#             ]
 #         elif ticker == "TSLA":
 #             return [
-                {
-                    "name": "Fremont Factory",
-                    "coordinates": [37.4920, -121.9465, 37.4970, -121.9365],
-                },
-                {
-                    "name": "Gigafactory Nevada",
-                    "coordinates": [39.5380, -119.4410, 39.5480, -119.4310],
-                },
-            ]
+#                 {
+#                     "name": "Fremont Factory",
+#                     "coordinates": [37.4920, -121.9465, 37.4970, -121.9365],
+#                 },
+#                 {
+#                     "name": "Gigafactory Nevada",
+#                     "coordinates": [39.5380, -119.4410, 39.5480, -119.4310],
+#                 },
+#             ]
 #         else:
 #             return []

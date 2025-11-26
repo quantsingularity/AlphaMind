@@ -1,9 +1,9 @@
-#""""""
+# """"""
 ## Quandl API connector for financial data.
 #
 ## This module provides a connector for accessing financial market data
 ## from Quandl, including economic data, financial data, and alternative data.
-#""""""
+# """"""
 
 # from datetime import date, datetime, timedelta
 # import logging
@@ -20,7 +20,7 @@
 #     DataProvider,
 #     DataResponse,
 #     RateLimiter,
-)
+# )
 
 
 # class QuandlConnector(APIConnector):
@@ -37,19 +37,19 @@
 #    """"""
 
 #     def __init__(self, api_key: str):
-        # Create credentials
+#         # Create credentials
 #         credentials = APICredentials(api_key=api_key)
 
-        # Set base URL
+#         # Set base URL
 #         base_url = "https://www.quandl.com/api/v3"
 
-        # Create rate limiter
-        # Quandl has a limit of 300 calls per 10 seconds, 2000 calls per 10 minutes
+#         # Create rate limiter
+#         # Quandl has a limit of 300 calls per 10 seconds, 2000 calls per 10 minutes
 #         rate_limiter = RateLimiter(requests_per_second=30)
 
 #         super().__init__(
 #             credentials=credentials, base_url=base_url, rate_limiter=rate_limiter
-        )
+#         )
 
 #         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -74,8 +74,8 @@
 ##         success : bool
 ##             Whether authentication was successful.
 #        """"""
-        # Quandl uses API key for authentication
-        # Test authentication by making a simple request
+#         # Quandl uses API key for authentication
+#         # Test authentication by making a simple request
 #         response = self.get_dataset("WIKI/AAPL", rows=1)
 
 #         return response.is_success()
@@ -143,7 +143,7 @@
 
 #         params = self._add_api_key({"order": order})
 
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if start_date:
 #             if isinstance(start_date, (date, datetime)):
 #                 start_date = start_date.strftime("%Y-%m-%d")
@@ -177,8 +177,8 @@
 #                 DataFormat.JSON
 #                 if format == "json"
 #                 else (DataFormat.CSV if format == "csv" else DataFormat.XML)
-            ),
-        )
+#             ),
+#         )
 
 #     def get_dataset_metadata(self, dataset_code: str) -> DataResponse:
 #        """"""
@@ -202,7 +202,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_database_metadata(self, database_code: str) -> DataResponse:
 #        """"""
@@ -226,7 +226,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def search_datasets(
 #         self,
@@ -266,7 +266,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def list_databases(self, per_page: int = 100, page: int = 1) -> DataResponse:
 #        """"""
@@ -293,7 +293,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_datatable(self, datatable_code: str, format: str = "json") -> DataResponse:
 #        """"""
@@ -319,7 +319,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON if format == "json" else DataFormat.CSV,
-        )
+#         )
 
 #     def get_datatable_with_filters(
 #         self, datatable_code: str, filters: Dict[str, Any], format: str = "json"
@@ -345,7 +345,7 @@
 
 #         params = self._add_api_key()
 
-        # Add filters to params
+#         # Add filters to params
 #         for key, value in filters.items():
 #             if isinstance(value, list):
 #                 params[key] = ",".join(map(str, value))
@@ -357,7 +357,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON if format == "json" else DataFormat.CSV,
-        )
+#         )
 
 #     def get_time_series(
 #         self,
@@ -403,21 +403,21 @@
 #             collapse=collapse,
 #             transform=transform,
 #             rows=limit,
-        )
+#         )
 
 #         if not response.is_success():
 #             self.logger.error(f"Failed to get time series data: {response.error}")
 #             return pd.DataFrame()
 
-        # Extract data from response
+#         # Extract data from response
 #         dataset = response.data.get("dataset", {})
 #         data = dataset.get("data", [])
 #         column_names = dataset.get("column_names", [])
 
-        # Create DataFrame
+#         # Create DataFrame
 #         df = pd.DataFrame(data, columns=column_names)
 
-        # Convert date column to datetime
+#         # Convert date column to datetime
 #         if len(column_names) > 0 and column_names[0].lower() == "date":
 #             df[column_names[0]] = pd.to_datetime(df[column_names[0]])
 
@@ -449,7 +449,7 @@
 ##         df : DataFrame
 ##             DataFrame containing the stock data.
 #        """"""
-        # Try to get data from WIKI database (historical)
+#         # Try to get data from WIKI database (historical)
 #         try:
 #             df = self.get_time_series(
 #                 database_code="WIKI",
@@ -457,14 +457,14 @@
 #                 start_date=start_date,
 #                 end_date=end_date,
 #                 collapse=collapse,
-            )
+#             )
 
 #             if not df.empty:
 #                 return df
 #         except Exception as e:
 #             self.logger.warning(f"Failed to get stock data from WIKI database: {e}")
 
-        # Try to get data from EOD database
+#         # Try to get data from EOD database
 #         try:
 #             df = self.get_time_series(
 #                 database_code="EOD",
@@ -472,14 +472,14 @@
 #                 start_date=start_date,
 #                 end_date=end_date,
 #                 collapse=collapse,
-            )
+#             )
 
 #             if not df.empty:
 #                 return df
 #         except Exception as e:
 #             self.logger.warning(f"Failed to get stock data from EOD database: {e}")
 
-        # Try to get data from EURONEXT database
+#         # Try to get data from EURONEXT database
 #         try:
 #             df = self.get_time_series(
 #                 database_code="EURONEXT",
@@ -487,14 +487,14 @@
 #                 start_date=start_date,
 #                 end_date=end_date,
 #                 collapse=collapse,
-            )
+#             )
 
 #             if not df.empty:
 #                 return df
 #         except Exception as e:
 #             self.logger.warning(f"Failed to get stock data from EURONEXT database: {e}")
 
-        # Return empty DataFrame if all attempts fail
+#         # Return empty DataFrame if all attempts fail
 #         self.logger.error(f"Failed to get stock data for {ticker}")
 #         return pd.DataFrame()
 
@@ -523,21 +523,21 @@
 #        """"""
 #         response = self.get_dataset(
 #             dataset_code=indicator_code, start_date=start_date, end_date=end_date
-        )
+#         )
 
 #         if not response.is_success():
 #             self.logger.error(f"Failed to get economic data: {response.error}")
 #             return pd.DataFrame()
 
-        # Extract data from response
+#         # Extract data from response
 #         dataset = response.data.get("dataset", {})
 #         data = dataset.get("data", [])
 #         column_names = dataset.get("column_names", [])
 
-        # Create DataFrame
+#         # Create DataFrame
 #         df = pd.DataFrame(data, columns=column_names)
 
-        # Convert date column to datetime
+#         # Convert date column to datetime
 #         if len(column_names) > 0 and column_names[0].lower() == "date":
 #             df[column_names[0]] = pd.to_datetime(df[column_names[0]])
 
@@ -568,21 +568,21 @@
 #        """"""
 #         response = self.get_dataset(
 #             dataset_code=symbol, start_date=start_date, end_date=end_date
-        )
+#         )
 
 #         if not response.is_success():
 #             self.logger.error(f"Failed to get futures data: {response.error}")
 #             return pd.DataFrame()
 
-        # Extract data from response
+#         # Extract data from response
 #         dataset = response.data.get("dataset", {})
 #         data = dataset.get("data", [])
 #         column_names = dataset.get("column_names", [])
 
-        # Create DataFrame
+#         # Create DataFrame
 #         df = pd.DataFrame(data, columns=column_names)
 
-        # Convert date column to datetime
+#         # Convert date column to datetime
 #         if len(column_names) > 0 and column_names[0].lower() == "date":
 #             df[column_names[0]] = pd.to_datetime(df[column_names[0]])
 
@@ -611,24 +611,24 @@
 ##         df : DataFrame
 ##             DataFrame containing the forex data.
 #        """"""
-        # Try to get data from CURRFX database
+#         # Try to get data from CURRFX database
 #         try:
 #             dataset_code = f"CURRFX/{currency_pair}"
 
 #             response = self.get_dataset(
 #                 dataset_code=dataset_code, start_date=start_date, end_date=end_date
-            )
+#             )
 
 #             if response.is_success():
-                # Extract data from response
+#                 # Extract data from response
 #                 dataset = response.data.get("dataset", {})
 #                 data = dataset.get("data", [])
 #                 column_names = dataset.get("column_names", [])
 
-                # Create DataFrame
+#                 # Create DataFrame
 #                 df = pd.DataFrame(data, columns=column_names)
 
-                # Convert date column to datetime
+#                 # Convert date column to datetime
 #                 if len(column_names) > 0 and column_names[0].lower() == "date":
 #                     df[column_names[0]] = pd.to_datetime(df[column_names[0]])
 
@@ -636,7 +636,7 @@
 #         except Exception as e:
 #             self.logger.warning(f"Failed to get forex data from CURRFX database: {e}")
 
-        # Return empty DataFrame if all attempts fail
+#         # Return empty DataFrame if all attempts fail
 #         self.logger.error(f"Failed to get forex data for {currency_pair}")
 #         return pd.DataFrame()
 
@@ -665,21 +665,21 @@
 #        """"""
 #         response = self.get_dataset(
 #             dataset_code=commodity_code, start_date=start_date, end_date=end_date
-        )
+#         )
 
 #         if not response.is_success():
 #             self.logger.error(f"Failed to get commodity data: {response.error}")
 #             return pd.DataFrame()
 
-        # Extract data from response
+#         # Extract data from response
 #         dataset = response.data.get("dataset", {})
 #         data = dataset.get("data", [])
 #         column_names = dataset.get("column_names", [])
 
-        # Create DataFrame
+#         # Create DataFrame
 #         df = pd.DataFrame(data, columns=column_names)
 
-        # Convert date column to datetime
+#         # Convert date column to datetime
 #         if len(column_names) > 0 and column_names[0].lower() == "date":
 #             df[column_names[0]] = pd.to_datetime(df[column_names[0]])
 

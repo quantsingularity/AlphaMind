@@ -1,9 +1,9 @@
-#""""""
+# """"""
 ## Real-time Risk Monitoring Module.
 #
 ## This module provides functionality for real-time monitoring of risk metrics,
 ## alerting, and dashboard integration for risk visualization.
-#""""""
+# """"""
 
 # from dataclasses import dataclass
 # import datetime
@@ -392,53 +392,53 @@
 ##             Dictionary containing current risk metrics and alerts
 #        """"""
 #         dashboard_data = {
-            "timestamp": datetime.datetime.now().isoformat(),
-            "metrics": {},
-            "active_alerts": len(self.get_active_alerts()),
-            "alerts_by_severity": {
-                "info": len(self.get_active_alerts(AlertSeverity.INFO)),
-                "warning": len(self.get_active_alerts(AlertSeverity.WARNING)),
-                "critical": len(self.get_active_alerts(AlertSeverity.CRITICAL)),
-                "emergency": len(self.get_active_alerts(AlertSeverity.EMERGENCY)),
-            },
-            "recent_alerts": [],
-        }
+#             "timestamp": datetime.datetime.now().isoformat(),
+#             "metrics": {},
+#             "active_alerts": len(self.get_active_alerts()),
+#             "alerts_by_severity": {
+#                 "info": len(self.get_active_alerts(AlertSeverity.INFO)),
+#                 "warning": len(self.get_active_alerts(AlertSeverity.WARNING)),
+#                 "critical": len(self.get_active_alerts(AlertSeverity.CRITICAL)),
+#                 "emergency": len(self.get_active_alerts(AlertSeverity.EMERGENCY)),
+#             },
+#             "recent_alerts": [],
+#         }
 
-        # Add metric data
+#         # Add metric data
 #         for metric_id, metric in self.metrics.items():
 #             dashboard_data["metrics"][metric_id] = {
-                "name": metric["name"],
-                "description": metric["description"],
-                "current_value": metric["last_value"],
-                "last_updated": (
+#                 "name": metric["name"],
+#                 "description": metric["description"],
+#                 "current_value": metric["last_value"],
+#                 "last_updated": (
 #                     metric["last_updated"].isoformat()
 #                     if metric["last_updated"]
 #                     else None
-                ),
-            }
+#                 ),
+#             }
 
-            # Add threshold information if available
+#             # Add threshold information if available
 #             if metric_id in self.thresholds:
 #                 dashboard_data["metrics"][metric_id]["thresholds"] = {
-                    "warning": self.thresholds[metric_id]["warning"],
-                    "critical": self.thresholds[metric_id]["critical"],
-                    "emergency": self.thresholds[metric_id]["emergency"],
-                }
+#                     "warning": self.thresholds[metric_id]["warning"],
+#                     "critical": self.thresholds[metric_id]["critical"],
+#                     "emergency": self.thresholds[metric_id]["emergency"],
+#                 }
 
-        # Add recent alerts
+#         # Add recent alerts
 #         recent_alerts = sorted(self.alerts, key=lambda a: a.timestamp, reverse=True)[
 #             :10
-        ]
+#         ]
 
 #         for alert in recent_alerts:
 #             dashboard_data["recent_alerts"].append(
-                {
-                    "id": alert.alert_id,
-                    "metric": alert.metric_name,
-                    "severity": alert.severity.value,
-                    "message": alert.message,
-                    "timestamp": alert.timestamp.isoformat(),
-                    "acknowledged": alert.acknowledged,
-                }
+#                 {
+#                     "id": alert.alert_id,
+#                     "metric": alert.metric_name,
+#                     "severity": alert.severity.value,
+#                     "message": alert.message,
+#                     "timestamp": alert.timestamp.isoformat(),
+#                     "acknowledged": alert.acknowledged,
+#                 }
 
 #         return dashboard_data

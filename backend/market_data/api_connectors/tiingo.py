@@ -1,9 +1,9 @@
-#""""""
+# """"""
 ## Tiingo API connector for financial data.
 #
 ## This module provides a connector for accessing financial market data
 ## from Tiingo, including stock prices, fundamentals, and news.
-#""""""
+# """"""
 
 # from datetime import date, datetime, timedelta
 # import logging
@@ -20,7 +20,7 @@
 #     DataProvider,
 #     DataResponse,
 #     RateLimiter,
-)
+# )
 
 
 # class TiingoConnector(APIConnector):
@@ -37,19 +37,19 @@
 #    """"""
 
 #     def __init__(self, api_key: str):
-        # Create credentials
+#         # Create credentials
 #         credentials = APICredentials(api_key=api_key)
 
-        # Set base URL
+#         # Set base URL
 #         base_url = "https://api.tiingo.com"
 
-        # Create rate limiter
-        # Tiingo has a limit of 500 requests per hour
+#         # Create rate limiter
+#         # Tiingo has a limit of 500 requests per hour
 #         rate_limiter = RateLimiter(requests_per_hour=500)
 
 #         super().__init__(
 #             credentials=credentials, base_url=base_url, rate_limiter=rate_limiter
-        )
+#         )
 
 #         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -74,8 +74,8 @@
 ##         success : bool
 ##             Whether authentication was successful.
 #        """"""
-        # Tiingo uses API key for authentication
-        # Test authentication by making a simple request
+#         # Tiingo uses API key for authentication
+#         # Test authentication by making a simple request
 #         response = self.get_ticker_metadata("AAPL")
 
 #         return response.is_success()
@@ -90,9 +90,9 @@
 ##             Headers for API requests.
 #        """"""
 #         return {
-            "Authorization": f"Token {self.credentials.api_key}",
-            "Content-Type": "application/json",
-        }
+#             "Authorization": f"Token {self.credentials.api_key}",
+#             "Content-Type": "application/json",
+#         }
 
 #     def get_ticker_metadata(self, ticker: str) -> DataResponse:
 #        """"""
@@ -115,7 +115,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_ticker_price(
 #         self,
@@ -153,7 +153,7 @@
 
 #         params = {}
 
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if start_date:
 #             if isinstance(start_date, (date, datetime)):
 #                 start_date = start_date.strftime("%Y-%m-%d")
@@ -176,7 +176,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON if fmt == "json" else DataFormat.CSV,
-        )
+#         )
 
 #     def get_intraday_price(
 #         self,
@@ -214,7 +214,7 @@
 
 #         params = {}
 
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if start_date:
 #             if isinstance(start_date, (date, datetime)):
 #                 start_date = start_date.strftime("%Y-%m-%dT%H:%M:%S")
@@ -237,7 +237,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON if fmt == "json" else DataFormat.CSV,
-        )
+#         )
 
 #     def get_ticker_news(
 #         self,
@@ -275,13 +275,13 @@
 
 #         params = {"limit": limit, "offset": offset, "sortBy": sort}
 
-        # Convert tickers to string if needed
+#         # Convert tickers to string if needed
 #         if isinstance(tickers, list):
 #             params["tickers"] = ",".join(tickers)
 #         else:
 #             params["tickers"] = tickers
 
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if start_date:
 #             if isinstance(start_date, (date, datetime)):
 #                 start_date = start_date.strftime("%Y-%m-%d")
@@ -298,7 +298,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.NEWS,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def search_news(
 #         self,
@@ -336,7 +336,7 @@
 
 #         params = {"query": query, "limit": limit, "offset": offset, "sortBy": sort}
 
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if start_date:
 #             if isinstance(start_date, (date, datetime)):
 #                 start_date = start_date.strftime("%Y-%m-%d")
@@ -353,7 +353,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.NEWS,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_fundamentals(
 #         self,
@@ -385,7 +385,7 @@
 
 #         params = {"format": fmt}
 
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if start_date:
 #             if isinstance(start_date, (date, datetime)):
 #                 start_date = start_date.strftime("%Y-%m-%d")
@@ -402,7 +402,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON if fmt == "json" else DataFormat.CSV,
-        )
+#         )
 
 #     def get_fundamentals_definitions(self, fmt: str = "json") -> DataResponse:
 #        """"""
@@ -428,7 +428,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON if fmt == "json" else DataFormat.CSV,
-        )
+#         )
 
 #     def get_fundamentals_metrics(
 #         self,
@@ -460,7 +460,7 @@
 
 #         params = {"format": fmt}
 
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if start_date:
 #             if isinstance(start_date, (date, datetime)):
 #                 start_date = start_date.strftime("%Y-%m-%d")
@@ -477,7 +477,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON if fmt == "json" else DataFormat.CSV,
-        )
+#         )
 
 #     def get_crypto_metadata(
 #         self, tickers: Optional[Union[str, List[str]]] = None
@@ -499,7 +499,7 @@
 
 #         params = {}
 
-        # Convert tickers to string if needed
+#         # Convert tickers to string if needed
 #         if tickers:
 #             if isinstance(tickers, list):
 #                 params["tickers"] = ",".join(tickers)
@@ -512,7 +512,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_crypto_price(
 #         self,
@@ -558,14 +558,14 @@
 #         endpoint = f"tiingo/crypto/prices"
 
 #         params = {
-            "tickers": ticker,
-            "baseCurrency": base_currency,
-            "priceType": crypto_price,
-            "consolidate": str(consolidate).lower(),
-            "format": fmt,
-        }
+#             "tickers": ticker,
+#             "baseCurrency": base_currency,
+#             "priceType": crypto_price,
+#             "consolidate": str(consolidate).lower(),
+#             "format": fmt,
+#         }
 
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if start_date:
 #             if isinstance(start_date, (date, datetime)):
 #                 start_date = start_date.strftime("%Y-%m-%d")
@@ -579,7 +579,7 @@
 #         if resample_freq:
 #             params["resampleFreq"] = resample_freq
 
-        # Convert exchanges to string if needed
+#         # Convert exchanges to string if needed
 #         if exchanges:
 #             if isinstance(exchanges, list):
 #                 params["exchanges"] = ",".join(exchanges)
@@ -592,7 +592,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON if fmt == "json" else DataFormat.CSV,
-        )
+#         )
 
 #     def get_crypto_top_of_book(
 #         self,
@@ -624,13 +624,13 @@
 
 #         params = {"includePrice": str(include_price).lower(), "format": fmt}
 
-        # Convert tickers to string if needed
+#         # Convert tickers to string if needed
 #         if isinstance(tickers, list):
 #             params["tickers"] = ",".join(tickers)
 #         else:
 #             params["tickers"] = tickers
 
-        # Convert exchanges to string if needed
+#         # Convert exchanges to string if needed
 #         if exchanges:
 #             if isinstance(exchanges, list):
 #                 params["exchanges"] = ",".join(exchanges)
@@ -643,7 +643,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON if fmt == "json" else DataFormat.CSV,
-        )
+#         )
 
 #     def get_forex_metadata(
 #         self, tickers: Optional[Union[str, List[str]]] = None
@@ -665,7 +665,7 @@
 
 #         params = {}
 
-        # Convert tickers to string if needed
+#         # Convert tickers to string if needed
 #         if tickers:
 #             if isinstance(tickers, list):
 #                 params["tickers"] = ",".join(tickers)
@@ -678,7 +678,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_forex_price(
 #         self,
@@ -713,7 +713,7 @@
 
 #         params = {"format": fmt}
 
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if start_date:
 #             if isinstance(start_date, (date, datetime)):
 #                 start_date = start_date.strftime("%Y-%m-%d")
@@ -733,7 +733,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON if fmt == "json" else DataFormat.CSV,
-        )
+#         )
 
 #     def get_supported_tickers(self, asset_type: str = "stock") -> DataResponse:
 #        """"""
@@ -763,7 +763,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_supported_exchanges(self, asset_type: str = "crypto") -> DataResponse:
 #        """"""
@@ -789,7 +789,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_supported_markets(self) -> DataResponse:
 #        """"""
@@ -807,4 +807,4 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )

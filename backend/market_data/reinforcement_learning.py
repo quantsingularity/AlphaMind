@@ -1,9 +1,9 @@
-#""""""
+# """"""
 ## Reinforcement Learning Module for AlphaMind
 #
 ## This module provides reinforcement learning capabilities for adaptive trading strategies,
 ## including various RL algorithms, environments, and training utilities.
-#""""""
+# """"""
 
 # from abc import ABC, abstractmethod
 # import asyncio
@@ -97,7 +97,7 @@
 #         action_space: ActionSpace = ActionSpace.DISCRETE,
 #         observation_type: ObservationType = ObservationType.NUMERIC,
 #         random_start: bool = True,
-    ):
+#     ):
 #        """"""
 ##         Initialize trading environment.
 #
@@ -124,14 +124,14 @@
 #         self.observation_type = observation_type
 #         self.random_start = random_start
 
-        # Validate data
+#         # Validate data
 #         self._validate_data()
 
-        # Set up action and observation spaces
+#         # Set up action and observation spaces
 #         self.action_space = self._setup_action_space()
 #         self.observation_space = self._setup_observation_space()
 
-        # Initialize state
+#         # Initialize state
 #         self.reset()
 
 #     def _validate_data(self):
@@ -695,7 +695,7 @@
 
 #     def __init__(
 #         self, input_shape: Tuple[int, ...], num_actions: int, hidden_size: int = 128
-    ):
+#     ):
 #        """"""
 ##         Initialize DQN network.
 #
@@ -706,13 +706,13 @@
 #        """"""
 #         super(DQNNetwork, self).__init__()
 
-        # Determine input size
+#         # Determine input size
 #         if len(input_shape) == 2:
-            # Numeric observations (window_size, features)
+#             # Numeric observations (window_size, features)
 #             input_size = input_shape[0] * input_shape[1]
 #             self.flatten = lambda x: x.view(x.size(0), -1)
 
-            # Create network
+#             # Create network
 #             self.network = nn.Sequential(
 #                 nn.Linear(input_size, hidden_size),
 #                 nn.ReLU(),
@@ -721,10 +721,10 @@
 #                 nn.Linear(hidden_size, num_actions),
 
 #         elif len(input_shape) == 3:
-            # Image-like observations (features, window_size, channels)
+#             # Image-like observations (features, window_size, channels)
 #             self.flatten = lambda x: x  # No flattening needed
 
-            # Create CNN network
+#             # Create CNN network
 #             self.network = nn.Sequential(
 #                 nn.Conv2d(input_shape[0], 32, kernel_size=3, stride=1, padding=1),
 #                 nn.ReLU(),
@@ -735,7 +735,7 @@
 #                 nn.Flatten(),
 #                 nn.Linear(
 #                     64 * (input_shape[1] // 4) * (input_shape[2] // 4), hidden_size
-                ),
+#                 ),
 #                 nn.ReLU(),
 #                 nn.Linear(hidden_size, num_actions),
 
@@ -1073,7 +1073,7 @@
 #         action_dim: int,
 #         hidden_size: int = 128,
 #         action_range: float = 1.0,
-    ):
+#     ):
 #        """"""
 ##         Initialize Actor-Critic network.
 #
@@ -1085,32 +1085,32 @@
 #        """"""
 #         super(ActorCritic, self).__init__()
 
-        # Determine input size
+#         # Determine input size
 #         if len(input_shape) == 2:
-            # Numeric observations (window_size, features)
+#             # Numeric observations (window_size, features)
 #             input_size = input_shape[0] * input_shape[1]
 #             self.flatten = lambda x: x.view(x.size(0), -1)
 
-            # Create shared network
+#             # Create shared network
 #             self.shared = nn.Sequential(nn.Linear(input_size, hidden_size), nn.ReLU())
 
-            # Create actor network
+#             # Create actor network
 #             self.actor = nn.Sequential(
 #                 nn.Linear(hidden_size, hidden_size),
 #                 nn.ReLU(),
 #                 nn.Linear(hidden_size, action_dim * 2),  # Mean and log_std
 
-            # Create critic network
+#             # Create critic network
 #             self.critic = nn.Sequential(
 #                 nn.Linear(hidden_size, hidden_size),
 #                 nn.ReLU(),
 #                 nn.Linear(hidden_size, 1),
 
 #         elif len(input_shape) == 3:
-            # Image-like observations (features, window_size, channels)
+#             # Image-like observations (features, window_size, channels)
 #             self.flatten = lambda x: x  # No flattening needed
 
-            # Create shared CNN network
+#             # Create shared CNN network
 #             self.shared = nn.Sequential(
 #                 nn.Conv2d(input_shape[0], 32, kernel_size=3, stride=1, padding=1),
 #                 nn.ReLU(),
@@ -1121,16 +1121,16 @@
 #                 nn.Flatten(),
 #                 nn.Linear(
 #                     64 * (input_shape[1] // 4) * (input_shape[2] // 4), hidden_size
-                ),
+#                 ),
 #                 nn.ReLU(),
 
-            # Create actor network
+#             # Create actor network
 #             self.actor = nn.Sequential(
 #                 nn.Linear(hidden_size, hidden_size),
 #                 nn.ReLU(),
 #                 nn.Linear(hidden_size, action_dim * 2),  # Mean and log_std
 
-            # Create critic network
+#             # Create critic network
 #             self.critic = nn.Sequential(
 #                 nn.Linear(hidden_size, hidden_size),
 #                 nn.ReLU(),
@@ -1155,12 +1155,12 @@
 #         x = self.flatten(x)
 #         shared_features = self.shared(x)
 
-        # Actor output
+#         # Actor output
 #         actor_output = self.actor(shared_features)
 #         mean, log_std = torch.chunk(actor_output, 2, dim=-1)
 #         log_std = torch.clamp(log_std, -20, 2)
 
-        # Critic output
+#         # Critic output
 #         value = self.critic(shared_features)
 
 #         return (mean, log_std), value
@@ -1189,7 +1189,7 @@
 #             action = normal.rsample()
 #             log_prob = normal.log_prob(action).sum(dim=-1, keepdim=True)
 
-        # Scale action to range
+#         # Scale action to range
 #         scaled_action = torch.tanh(action) * self.action_range
 
 #         return scaled_action, log_prob, value
@@ -1623,7 +1623,7 @@
 #         commission: float = 0.001,
 #         initial_balance: float = 10000.0,
 #         device: str = "auto",
-    ):
+#     ):
 #        """"""
 ##         Initialize RL trader.
 #
@@ -1670,16 +1670,16 @@
 ##         Returns:
 ##             Trading environment
 #        """"""
-        # Set default features if not provided
+#         # Set default features if not provided
 #         if features is None:
-            # Use OHLCV columns if available
+#             # Use OHLCV columns if available
 #             ohlcv_cols = ["open", "high", "low", "close", "volume"]
 #             available_cols = [col for col in ohlcv_cols if col in data.columns]
 
 #             if len(available_cols) > 0:
 #                 features = available_cols
 #             else:
-                # Use all numeric columns except date/time columns
+#                 # Use all numeric columns except date/time columns
 #                 numeric_cols = data.select_dtypes(include=np.number).columns.tolist()
 #                 features = [
 #                     col
@@ -1687,11 +1687,11 @@
 #                     if not any(
 #                         time_col in col.lower()
 #                         for time_col in ["date", "time", "timestamp"]
-                ]
+#                 ]
 
 #         self.features = features
 
-        # Create environment
+#         # Create environment
 #         self.env = TradingEnvironment(
 #             data=data,
 #             features=features,
@@ -1716,7 +1716,7 @@
 #         if self.env is None:
 #             raise ValueError("Environment not created")
 
-        # Get input shape
+#         # Get input shape
 #         if self.observation_type == ObservationType.NUMERIC:
 #             input_shape = (
 #                 self.window_size,
@@ -1726,12 +1726,12 @@
 #             input_shape = (
 #                 len(self.features) + 4,
 #                 self.window_size,
-                1,
+#                 1,
 #             )  # Features + position, balance, equity, pnl
 #         else:
 #             raise ValueError(f"Unsupported observation type: {self.observation_type}")
 
-        # Create agent based on algorithm
+#         # Create agent based on algorithm
 #         if self.algorithm == RLAlgorithm.DQN:
 #             if self.action_space != ActionSpace.DISCRETE:
 #                 raise ValueError("DQN only supports discrete action spaces")
@@ -1743,10 +1743,10 @@
 
 #         elif self.algorithm == RLAlgorithm.PPO:
 #             if self.action_space == ActionSpace.DISCRETE:
-                # For discrete actions, use one-hot encoding
+#                 # For discrete actions, use one-hot encoding
 #                 action_dim = self.env.action_space["n"]
 #             else:
-                # For continuous actions, use scalar
+#                 # For continuous actions, use scalar
 #                 action_dim = 1
 
 #             self.agent = PPOAgent(
@@ -1784,15 +1784,15 @@
 ##         Returns:
 ##             Training metrics
 #        """"""
-        # Create environment if not exists or if new data provided
+#         # Create environment if not exists or if new data provided
 #         if self.env is None or data is not None:
 #             self.create_environment(data, features, max_steps_per_episode)
 
-        # Create agent if not exists
+#         # Create agent if not exists
 #         if self.agent is None:
 #             self.create_agent()
 
-        # Train agent
+#         # Train agent
 #         if self.algorithm == RLAlgorithm.DQN:
 #             metrics = self.agent.train(
 #                 env=self.env,
@@ -1811,7 +1811,7 @@
 #                 render=render,
 #                 verbose=verbose,
 
-        # Save agent if requested
+#         # Save agent if requested
 #         if save_path is not None:
 #             self.save(save_path)
 
@@ -1870,33 +1870,33 @@
 #         if not self.is_trained:
 #             logger.warning("Agent not trained")
 
-        # Create environment for backtesting
+#         # Create environment for backtesting
 #         backtest_env = self.create_environment(
 #             data=data, features=features, random_start=False
 
-        # Reset environment
+#         # Reset environment
 #         state = backtest_env.reset()
 #         done = False
 
-        # Initialize results
+#         # Initialize results
 #         results = {
-            "actions": [],
-            "positions": [],
-            "balances": [],
-            "equities": [],
-            "returns": [],
-            "prices": [],
-        }
+#             "actions": [],
+#             "positions": [],
+#             "balances": [],
+#             "equities": [],
+#             "returns": [],
+#             "prices": [],
+#         }
 
-        # Run backtest
+#         # Run backtest
 #         while not done:
-            # Predict action
+#             # Predict action
 #             action = self.predict(state, deterministic=True)
 
-            # Take step
+#             # Take step
 #             state, _, done, info = backtest_env.step(action)
 
-            # Store results
+#             # Store results
 #             results["actions"].append(action)
 #             results["positions"].append(info["position"])
 #             results["balances"].append(info["balance"])
@@ -1904,44 +1904,44 @@
 #             results["returns"].append(info["pnl"])
 #             results["prices"].append(info["price"])
 
-            # Render if requested
+#             # Render if requested
 #             if render:
 #                 backtest_env.render()
 
-            # Print progress if verbose
+#             # Print progress if verbose
 #             if verbose and backtest_env.current_step % 100 == 0:
 #                 print(
 #                     f"Step {backtest_env.current_step}/{backtest_env.max_steps} | "
 #                     f"Equity: {info['equity']:.2f} | "
 #                     f"Return: {info['total_return']:.2%}"
 
-        # Calculate performance metrics
+#         # Calculate performance metrics
 #         equity_curve = np.array(results["equities"])
 #         returns = np.diff(equity_curve) / equity_curve[:-1]
 
-        # Calculate Sharpe ratio
+#         # Calculate Sharpe ratio
 #         sharpe_ratio = np.mean(returns) / (np.std(returns) + 1e-6) * np.sqrt(252)
 
-        # Calculate maximum drawdown
+#         # Calculate maximum drawdown
 #         peak = np.maximum.accumulate(equity_curve)
 #         drawdown = (peak - equity_curve) / peak
 #         max_drawdown = np.max(drawdown)
 
-        # Calculate win rate
+#         # Calculate win rate
 #         wins = np.sum(np.array(results["returns"]) > 0)
 #         total_trades = len(results["returns"])
 #         win_rate = wins / total_trades if total_trades > 0 else 0.0
 
-        # Add performance metrics to results
+#         # Add performance metrics to results
 #         results["performance"] = {
-            "initial_equity": results["equities"][0],
-            "final_equity": results["equities"][-1],
-            "total_return": (results["equities"][-1] - results["equities"][0])
+#             "initial_equity": results["equities"][0],
+#             "final_equity": results["equities"][-1],
+#             "total_return": (results["equities"][-1] - results["equities"][0])
 #             / results["equities"][0],
-            "sharpe_ratio": sharpe_ratio,
-            "max_drawdown": max_drawdown,
-            "win_rate": win_rate,
-        }
+#             "sharpe_ratio": sharpe_ratio,
+#             "max_drawdown": max_drawdown,
+#             "win_rate": win_rate,
+#         }
 
 #         if verbose:
 #             print(f"Backtest Results:")
@@ -1964,24 +1964,24 @@
 #         if self.agent is None:
 #             raise ValueError("Agent not created")
 
-        # Create directory if not exists
+#         # Create directory if not exists
 #         os.makedirs(os.path.dirname(path), exist_ok=True)
 
-        # Save agent
+#         # Save agent
 #         self.agent.save(path)
 
-        # Save metadata
+#         # Save metadata
 #         metadata = {
-            "algorithm": self.algorithm.value,
-            "observation_type": self.observation_type.value,
-            "action_space": self.action_space.value,
-            "reward_function": self.reward_function.value,
-            "window_size": self.window_size,
-            "commission": self.commission,
-            "initial_balance": self.initial_balance,
-            "features": self.features,
-            "is_trained": self.is_trained,
-        }
+#             "algorithm": self.algorithm.value,
+#             "observation_type": self.observation_type.value,
+#             "action_space": self.action_space.value,
+#             "reward_function": self.reward_function.value,
+#             "window_size": self.window_size,
+#             "commission": self.commission,
+#             "initial_balance": self.initial_balance,
+#             "features": self.features,
+#             "is_trained": self.is_trained,
+#         }
 
 #         with open(f"{path}.meta", "wb") as f:
 #             pickle.dump(metadata, f)
@@ -1993,11 +1993,11 @@
 ##         Args:
 ##             path: Load path
 #        """"""
-        # Load metadata
+#         # Load metadata
 #         with open(f"{path}.meta", "rb") as f:
 #             metadata = pickle.load(f)
 
-        # Set attributes
+#         # Set attributes
 #         self.algorithm = RLAlgorithm(metadata["algorithm"])
 #         self.observation_type = ObservationType(metadata["observation_type"])
 #         self.action_space = ActionSpace(metadata["action_space"])
@@ -2008,19 +2008,19 @@
 #         self.features = metadata["features"]
 #         self.is_trained = metadata["is_trained"]
 
-        # Create dummy environment
+#         # Create dummy environment
 #         dummy_data = pd.DataFrame(
-            {
-                "close": np.ones(self.window_size + 1),
+#             {
+#                 "close": np.ones(self.window_size + 1),
 #                 **{feature: np.ones(self.window_size + 1) for feature in self.features},
-            }
+#             }
 
 #         self.create_environment(dummy_data, self.features)
 
-        # Create agent
+#         # Create agent
 #         self.create_agent()
 
-        # Load agent
+#         # Load agent
 #         self.agent.load(path)
 
 

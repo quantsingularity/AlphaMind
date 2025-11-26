@@ -1,9 +1,9 @@
-#""""""
+# """"""
 ## Exchange API Integration Module for AlphaMind
 #
 ## This module provides integration with various cryptocurrency and traditional exchanges,
 ## enabling real-time trading, order management, and account operations.
-#""""""
+# """"""
 
 # import asyncio
 # import base64
@@ -94,7 +94,7 @@
 
 #     def __init__(
 #         self, exchange_id: str, credentials: Optional[ExchangeCredentials] = None
-    ):
+#     ):
 #        """"""
 ##         Initialize exchange configuration.
 #
@@ -116,43 +116,43 @@
 ##             Dictionary of endpoint types to URLs
 #        """"""
 #         endpoints = {
-            # Default endpoints for common exchanges
-            "binance": {
-                "rest": "https://api.binance.com",
-                "websocket": "wss://stream.binance.com:9443/ws",
-                "test": "https://testnet.binance.vision",
-            },
-            "coinbase": {
-                "rest": "https://api.exchange.coinbase.com",
-                "websocket": "wss://ws-feed.exchange.coinbase.com",
-                "test": "https://api-public.sandbox.exchange.coinbase.com",
-            },
-            "alpaca": {
-                "rest": "https://api.alpaca.markets",
-                "websocket": "wss://stream.data.alpaca.markets/v2",
-                "test": "https://paper-api.alpaca.markets",
-            },
-            "kraken": {
-                "rest": "https://api.kraken.com",
-                "websocket": "wss://ws.kraken.com",
-                "test": "https://demo-futures.kraken.com",
-            },
-            "ftx": {
-                "rest": "https://ftx.com/api",
-                "websocket": "wss://ftx.com/ws",
-                "test": "https://ftx.com/api",  # FTX doesn't have a separate test endpoint
-            },
-            "kucoin": {
-                "rest": "https://api.kucoin.com",
-                "websocket": "wss://push.kucoin.com",  # Requires token from REST API
-                "test": "https://openapi-sandbox.kucoin.com",
-            },
-            "interactive_brokers": {
-                "rest": "http://localhost:5000",  # IB Gateway/TWS with REST API bridge
-                "websocket": "ws://localhost:5000/ws",
-                "test": "http://localhost:5000",  # Use paper trading account in TWS
-            },
-        }
+#             # Default endpoints for common exchanges
+#             "binance": {
+#                 "rest": "https://api.binance.com",
+#                 "websocket": "wss://stream.binance.com:9443/ws",
+#                 "test": "https://testnet.binance.vision",
+#             },
+#             "coinbase": {
+#                 "rest": "https://api.exchange.coinbase.com",
+#                 "websocket": "wss://ws-feed.exchange.coinbase.com",
+#                 "test": "https://api-public.sandbox.exchange.coinbase.com",
+#             },
+#             "alpaca": {
+#                 "rest": "https://api.alpaca.markets",
+#                 "websocket": "wss://stream.data.alpaca.markets/v2",
+#                 "test": "https://paper-api.alpaca.markets",
+#             },
+#             "kraken": {
+#                 "rest": "https://api.kraken.com",
+#                 "websocket": "wss://ws.kraken.com",
+#                 "test": "https://demo-futures.kraken.com",
+#             },
+#             "ftx": {
+#                 "rest": "https://ftx.com/api",
+#                 "websocket": "wss://ftx.com/ws",
+#                 "test": "https://ftx.com/api",  # FTX doesn't have a separate test endpoint
+#             },
+#             "kucoin": {
+#                 "rest": "https://api.kucoin.com",
+#                 "websocket": "wss://push.kucoin.com",  # Requires token from REST API
+#                 "test": "https://openapi-sandbox.kucoin.com",
+#             },
+#             "interactive_brokers": {
+#                 "rest": "http://localhost:5000",  # IB Gateway/TWS with REST API bridge
+#                 "websocket": "ws://localhost:5000/ws",
+#                 "test": "http://localhost:5000",  # Use paper trading account in TWS
+#             },
+#         }
 
 #         return endpoints.get(
 #             self.exchange_id, {"rest": "", "websocket": "", "test": ""}
@@ -165,51 +165,51 @@
 ##             Dictionary of rate limit settings
 #        """"""
 #         rate_limits = {
-            # Default rate limits for common exchanges
-            "binance": {
-                "requests_per_minute": 1200,
-                "orders_per_second": 10,
-                "orders_per_day": 100000,
-            },
-            "coinbase": {
-                "requests_per_minute": 300,
-                "orders_per_second": 5,
-                "orders_per_day": 50000,
-            },
-            "alpaca": {
-                "requests_per_minute": 200,
-                "orders_per_second": 5,
-                "orders_per_day": 10000,
-            },
-            "kraken": {
-                "requests_per_minute": 60,
-                "orders_per_second": 1,
-                "orders_per_day": 5000,
-            },
-            "ftx": {
-                "requests_per_minute": 300,
-                "orders_per_second": 5,
-                "orders_per_day": 50000,
-            },
-            "kucoin": {
-                "requests_per_minute": 180,
-                "orders_per_second": 3,
-                "orders_per_day": 30000,
-            },
-            "interactive_brokers": {
-                "requests_per_minute": 100,
-                "orders_per_second": 5,
-                "orders_per_day": 10000,
-            },
-        }
+#             # Default rate limits for common exchanges
+#             "binance": {
+#                 "requests_per_minute": 1200,
+#                 "orders_per_second": 10,
+#                 "orders_per_day": 100000,
+#             },
+#             "coinbase": {
+#                 "requests_per_minute": 300,
+#                 "orders_per_second": 5,
+#                 "orders_per_day": 50000,
+#             },
+#             "alpaca": {
+#                 "requests_per_minute": 200,
+#                 "orders_per_second": 5,
+#                 "orders_per_day": 10000,
+#             },
+#             "kraken": {
+#                 "requests_per_minute": 60,
+#                 "orders_per_second": 1,
+#                 "orders_per_day": 5000,
+#             },
+#             "ftx": {
+#                 "requests_per_minute": 300,
+#                 "orders_per_second": 5,
+#                 "orders_per_day": 50000,
+#             },
+#             "kucoin": {
+#                 "requests_per_minute": 180,
+#                 "orders_per_second": 3,
+#                 "orders_per_day": 30000,
+#             },
+#             "interactive_brokers": {
+#                 "requests_per_minute": 100,
+#                 "orders_per_second": 5,
+#                 "orders_per_day": 10000,
+#             },
+#         }
 
 #         return rate_limits.get(
 #             self.exchange_id,
-            {
-                "requests_per_minute": 100,
-                "orders_per_second": 1,
-                "orders_per_day": 1000,
-            },
+#             {
+#                 "requests_per_minute": 100,
+#                 "orders_per_second": 1,
+#                 "orders_per_day": 1000,
+#             },
 
 #     def _get_default_options(self) -> Dict[str, Any]:
 #        """"""
@@ -219,19 +219,19 @@
 ##             Dictionary of exchange-specific options
 #        """"""
 #         options = {
-            # Default options for common exchanges
-            "binance": {
-                "recv_window": 5000,
-                "use_test_net": False,
-                "default_type": "spot",  # spot, margin, futures
-            },
-            "coinbase": {"sandbox_mode": False},
-            "alpaca": {"paper_trading": True},
-            "kraken": {"validate_only": False},
-            "ftx": {"subaccount": None},
-            "kucoin": {"passphrase_as_header": True},
-            "interactive_brokers": {"client_id": 0, "timeout": 60},
-        }
+#             # Default options for common exchanges
+#             "binance": {
+#                 "recv_window": 5000,
+#                 "use_test_net": False,
+#                 "default_type": "spot",  # spot, margin, futures
+#             },
+#             "coinbase": {"sandbox_mode": False},
+#             "alpaca": {"paper_trading": True},
+#             "kraken": {"validate_only": False},
+#             "ftx": {"subaccount": None},
+#             "kucoin": {"passphrase_as_header": True},
+#             "interactive_brokers": {"client_id": 0, "timeout": 60},
+#         }
 
 #         return options.get(self.exchange_id, {})
 
@@ -268,15 +268,15 @@
 #         if endpoint_type not in self.endpoints:
 #             raise ValueError(f"Unknown endpoint type: {endpoint_type}")
 
-        # For some exchanges, use test endpoint if test mode is enabled
+#         # For some exchanges, use test endpoint if test mode is enabled
 #         if endpoint_type == "rest" and any(
-            [
+#             [
 #                 self.exchange_id == "binance" and self.options.get("use_test_net"),
 #                 self.exchange_id == "coinbase" and self.options.get("sandbox_mode"),
 #                 self.exchange_id == "alpaca" and self.options.get("paper_trading"),
 #                 self.exchange_id == "kucoin" and self.options.get("use_sandbox"),
-            ]
-        ):
+#             ]
+#         ):
 #             return self.endpoints["test"]
 
 #         return self.endpoints[endpoint_type]
@@ -317,7 +317,7 @@
 #         time_in_force: TimeInForce = TimeInForce.GTC,
 #         exchange_id: Optional[str] = None,
 #         exchange_order_id: Optional[str] = None,
-    ):
+#     ):
 #        """"""
 ##         Initialize an order.
 #
@@ -352,7 +352,7 @@
 #         self.updated_at = self.created_at
 #         self.fills = []
 
-        # Validate order
+#         # Validate order
 #         self._validate()
 
 #     def _validate(self):
@@ -634,7 +634,7 @@
 
 #     async def subscribe_to_trade_updates(
 #         self, callback: Callable[[Dict[str, Any]], None]
-    ):
+#     ):
 #        """"""
 ##         Subscribe to trade updates.
 #
@@ -645,7 +645,7 @@
 
 #     async def subscribe_to_balance_updates(
 #         self, callback: Callable[[Dict[str, Any]], None]
-    ):
+#     ):
 #        """"""
 ##         Subscribe to balance updates.
 #
@@ -659,7 +659,7 @@
 #         symbol: str,
 #         channels: List[str],
 #         callback: Callable[[Dict[str, Any]], None],
-    ):
+#     ):
 #        """"""
 ##         Subscribe to market data.
 #
@@ -680,10 +680,10 @@
 ##         Args:
 ##             order_data: Order data from exchange
 #        """"""
-        # Convert exchange-specific order data to Order object
+#         # Convert exchange-specific order data to Order object
 #         order = self._parse_order_from_exchange(order_data)
 
-        # Notify callbacks
+#         # Notify callbacks
 #         for callback in self.order_updates_callbacks:
 #             try:
 #                 callback(order)
@@ -697,7 +697,7 @@
 ##         Args:
 ##             trade_data: Trade data from exchange
 #        """"""
-        # Notify callbacks
+#         # Notify callbacks
 #         for callback in self.trade_updates_callbacks:
 #             try:
 #                 callback(trade_data)
@@ -711,7 +711,7 @@
 ##         Args:
 ##             balance_data: Balance data from exchange
 #        """"""
-        # Notify callbacks
+#         # Notify callbacks
 #         for callback in self.balance_updates_callbacks:
 #             try:
 #                 callback(balance_data)
@@ -727,7 +727,7 @@
 ##             channel: Data channel
 ##             data: Market data
 #        """"""
-        # Find matching callbacks
+#         # Find matching callbacks
 #         for key, callbacks in self.market_data_callbacks.items():
 #             key_symbol, key_channels = key.split(":", 1)
 #             key_channels = key_channels.split(",")
@@ -750,7 +750,7 @@
 ##             Order object
 #        """"""
 #         raise NotImplementedError(
-            "Subclasses must implement _parse_order_from_exchange"
+#             "Subclasses must implement _parse_order_from_exchange"
 
 
 # class BinanceAPI(ExchangeAPI):
@@ -771,7 +771,7 @@
 #        """Initialize HTTP session and connections."""
 #         await super().initialize()
 
-        # Get listen key for user data stream
+#         # Get listen key for user data stream
 #         if self.config.credentials:
 #             await self._get_listen_key()
 #             await self._start_user_data_stream()
@@ -801,7 +801,7 @@
 #                     self.ws_listen_key = data["listenKey"]
 #                     logger.info("Obtained Binance listen key")
 
-                    # Start timer to keep listen key alive
+#                     # Start timer to keep listen key alive
 #                     if self.ws_listen_key_timer:
 #                         self.ws_listen_key_timer.cancel()
 
@@ -840,7 +840,7 @@
 #                     logger.debug("Pinged Binance listen key")
 #                 else:
 #                     logger.error(f"Failed to ping listen key: {response.status}")
-                    # Try to get a new listen key
+#                     # Try to get a new listen key
 #                     await self._get_listen_key()
 #         except Exception as e:
 #             logger.error(f"Error pinging listen key: {e}")
@@ -883,7 +883,7 @@
 #             self.ws_connections["user_data"] = await websockets.connect(ws_url)
 #             logger.info("Connected to Binance user data stream")
 
-            # Start listening for messages
+#             # Start listening for messages
 #             asyncio.create_task(self._listen_user_data_stream())
 #         except Exception as e:
 #             logger.error(f"Error connecting to user data stream: {e}")
@@ -1564,51 +1564,51 @@
 ## Example usage
 ## async def example_usage():
 #    """Example of how to use the exchange API module."""
-    # Create exchange manager
+#     # Create exchange manager
 #     manager = ExchangeManager()
 
-    # Add Binance exchange
+#     # Add Binance exchange
 #     config = ExchangeConfig("binance")
 #     config.use_testnet(True)  # Use testnet for testing
 
-    # Add credentials if available
+#     # Add credentials if available
 #     if os.environ.get("BINANCE_API_KEY") and os.environ.get("BINANCE_API_SECRET"):
 #         credentials = ExchangeCredentials(
 #             api_key=os.environ["BINANCE_API_KEY"],
 #             api_secret=os.environ["BINANCE_API_SECRET"],
 #         config.credentials = credentials
 
-    # Add exchange to manager
+#     # Add exchange to manager
 #     exchange = manager.add_exchange(config)
 
-    # Initialize manager
+#     # Initialize manager
 #     await manager.initialize()
 
 #     try:
-        # Get exchange info
+#         # Get exchange info
 #         exchange_info = await exchange.get_exchange_info()
 #         print(f"Exchange info: {exchange_info['timezone']}")
 
-        # Get ticker
+#         # Get ticker
 #         ticker = await exchange.get_ticker("BTCUSDT")
 #         print(f"BTC/USDT ticker: {ticker['lastPrice']}")
 
-        # Get orderbook
+#         # Get orderbook
 #         orderbook = await exchange.get_orderbook("BTCUSDT", limit=5)
 #         print(
 #             f"BTC/USDT orderbook: {len(orderbook['bids'])} bids, {len(orderbook['asks'])} asks"
 
-        # If credentials are available, test authenticated endpoints
+#         # If credentials are available, test authenticated endpoints
 #         if config.credentials:
-            # Get account info
+#             # Get account info
 #             account_info = await exchange.get_account_info()
 #             print(f"Account status: {account_info['accountType']}")
 
-            # Get balances
+#             # Get balances
 #             balances = await exchange.get_balances()
 #             print(f"Balances: {len(balances)} assets")
 
-            # Create a test order
+#             # Create a test order
 #             order = Order(
 #                 symbol="BTCUSDT",
 #                 side=OrderSide.BUY,
@@ -1621,7 +1621,7 @@
 #                 created_order = await exchange.create_order(order)
 #                 print(f"Created order: {created_order.exchange_order_id}")
 
-                # Cancel the order
+#                 # Cancel the order
 #                 canceled = await exchange.cancel_order(
 #                     order_id=created_order.exchange_order_id, symbol="BTCUSDT"
 #                 print(f"Order canceled: {canceled}")
@@ -1629,10 +1629,10 @@
 #                 print(f"Error creating/canceling order: {e}")
 
 #     finally:
-        # Close manager
+#         # Close manager
 #         await manager.close()
 
 
 # if __name__ == "__main__":
-    # Run example
+#     # Run example
 #     asyncio.run(example_usage())

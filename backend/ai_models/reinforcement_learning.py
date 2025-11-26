@@ -9,17 +9,17 @@
 #         self.universe = universe
 #         self.action_space = spaces.Box(-1, 1, (len(universe),))
 #         self.observation_space = spaces.Dict(
-            {
-                "prices": spaces.Box(-np.inf, np.inf, (len(universe), 10)),
-                "volumes": spaces.Box(0, np.inf, (len(universe),)),
-                "macro": spaces.Box(-np.inf, np.inf, (5,)),
-            }
-        )
+#             {
+#                 "prices": spaces.Box(-np.inf, np.inf, (len(universe), 10)),
+#                 "volumes": spaces.Box(0, np.inf, (len(universe),)),
+#                 "macro": spaces.Box(-np.inf, np.inf, (5,)),
+#             }
+#         )
 #         self.returns = np.zeros((100, len(universe)))  # Initialize with placeholder
 #         self.current_weights = np.zeros(len(universe))
 
 #     def step(self, action):
-        # Calculate portfolio rebalancing
+#         # Calculate portfolio rebalancing
 #         new_weights = self._normalize_weights(action)
 #         cost = self._transaction_cost(new_weights)
 #         reward = self._sharpe_ratio(new_weights) - cost
@@ -40,13 +40,13 @@
 #
 ##     def _transaction_cost(self, new_weights):
 #        """Calculate transaction costs from rebalancing"""
-        # Calculate turnover (sum of absolute weight changes)
+#         # Calculate turnover (sum of absolute weight changes)
 #         turnover = np.sum(np.abs(new_weights - self.current_weights))
 
-        # Apply transaction cost
+#         # Apply transaction cost
 #         cost = turnover * self.transaction_cost
 
-        # Update current weights
+#         # Update current weights
 #         self.current_weights = new_weights
 
 #         return cost
@@ -64,7 +64,7 @@
 ##     def reset(self):
 #        """Reset environment to initial state"""
 #         self.current_weights = np.zeros(len(self.universe))
-        # Generate random returns for simulation
+#         # Generate random returns for simulation
 #         self.returns = np.random.normal(0.0005, 0.01, (100, len(self.universe)))
 #         return self._get_obs()
 
@@ -72,7 +72,7 @@
 # class PPOAgent:
 #     def __init__(self, env):
 #         self.model = PPO(
-            "MultiInputPolicy",
+#             "MultiInputPolicy",
 #             env,
 #             learning_rate=3e-4,
 #             n_steps=2048,
@@ -80,7 +80,7 @@
 #             n_epochs=10,
 #             gamma=0.99,
 #             gae_lambda=0.95,
-        )
+#         )
 
 #     def train(self, timesteps=1e6):
 #         self.model.learn(total_timesteps=int(timesteps))

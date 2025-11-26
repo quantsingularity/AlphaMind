@@ -19,13 +19,13 @@
 #     level=logging.INFO,
 #     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 #     handlers=[logging.FileHandler("ddpg_trading.log"), logging.StreamHandler()],
-)
+# )
 # logger = logging.getLogger("DDPG_Trading")
 
 # Define experience replay memory
 # Experience = namedtuple(
-    "Experience", ["state", "action", "reward", "next_state", "done"]
-)
+#     "Experience", ["state", "action", "reward", "next_state", "done"]
+# )
 
 
 # class ReplayBuffer:
@@ -59,7 +59,7 @@
 ##     def _flatten_dict_state(self, state):
 #        """Flatten dictionary state for neural network input"""
 #         if isinstance(state, dict):
-            # Flatten the dictionary state
+#             # Flatten the dictionary state
 #             prices = np.array(state["prices"]).flatten()
 #             volumes = np.array(state["volumes"]).flatten()
 #             macro = np.array(state["macro"]).flatten()
@@ -100,19 +100,19 @@
 #     def __init__(self, state_dim, action_dim, hidden_dims=(256, 128), init_w=3e-3):
 #         super(Actor, self).__init__()
 
-        # Build network layers
+#         # Build network layers
 #         self.layers = nn.ModuleList()
 #         prev_dim = state_dim
 
-        # Hidden layers
+#         # Hidden layers
 #         for hidden_dim in hidden_dims:
 #             self.layers.append(nn.Linear(prev_dim, hidden_dim))
 #             prev_dim = hidden_dim
 
-        # Output layer
+#         # Output layer
 #         self.output_layer = nn.Linear(prev_dim, action_dim)
 
-        # Initialize weights
+#         # Initialize weights
 #         self.output_layer.weight.data.uniform_(-init_w, init_w)
 #         self.output_layer.bias.data.uniform_(-init_w, init_w)
 
@@ -132,16 +132,16 @@
 #     def __init__(self, state_dim, action_dim, hidden_dims=(256, 128), init_w=3e-3):
 #         super(Critic, self).__init__()
 
-        # First layer processes only the state
+#         # First layer processes only the state
 #         self.fc1 = nn.Linear(state_dim, hidden_dims[0])
 
-        # Second layer processes both state features and action
+#         # Second layer processes both state features and action
 #         self.fc2 = nn.Linear(hidden_dims[0] + action_dim, hidden_dims[1])
 
-        # Output layer produces Q-value
+#         # Output layer produces Q-value
 #         self.output_layer = nn.Linear(hidden_dims[1], 1)
 
-        # Initialize weights
+#         # Initialize weights
 #         self.output_layer.weight.data.uniform_(-init_w, init_w)
 #         self.output_layer.bias.data.uniform_(-init_w, init_w)
 
@@ -246,26 +246,26 @@
 ##     def _load_config(self, config=None):
 #        """Load configuration with defaults"""
 #         default_config = {
-            "actor_lr": 1e-4,
-            "critic_lr": 1e-3,
-            "actor_hidden_dims": (256, 128),
-            "critic_hidden_dims": (256, 128),
-            "gamma": 0.99,
-            "tau": 0.005,
-            "batch_size": 64,
-            "buffer_capacity": 100000,
-            "noise_sigma": 0.2,
-            "use_cuda": True,
-            "log_interval": 100,
-            "save_interval": 1000,
-            "eval_interval": 1000,
-            "max_episodes": 10000,
-            "max_steps_per_episode": 1000,
-            "warmup_steps": 1000,
-        }
+#             "actor_lr": 1e-4,
+#             "critic_lr": 1e-3,
+#             "actor_hidden_dims": (256, 128),
+#             "critic_hidden_dims": (256, 128),
+#             "gamma": 0.99,
+#             "tau": 0.005,
+#             "batch_size": 64,
+#             "buffer_capacity": 100000,
+#             "noise_sigma": 0.2,
+#             "use_cuda": True,
+#             "log_interval": 100,
+#             "save_interval": 1000,
+#             "eval_interval": 1000,
+#             "max_episodes": 10000,
+#             "max_steps_per_episode": 1000,
+#             "warmup_steps": 1000,
+#         }
 
 #         if config:
-            # Update default config with provided values
+#             # Update default config with provided values
 #             default_config.update(config)
 
 #         return default_config
@@ -293,24 +293,24 @@
 #
 ##     def select_action(self, state, add_noise=True):
 #        """Select action based on current policy with optional exploration noise"""
-        # Flatten state if needed
+#         # Flatten state if needed
 #         flat_state = self._flatten_observation(state)
 #         state_tensor = torch.FloatTensor(flat_state).unsqueeze(0).to(self.device)
 
-        # Set actor to evaluation mode
+#         # Set actor to evaluation mode
 #         self.actor.eval()
 
 #         with torch.no_grad():
 #             action = self.actor(state_tensor).cpu().data.numpy().flatten()
 
-        # Set actor back to training mode
+#         # Set actor back to training mode
 #         self.actor.train()
 
-        # Add exploration noise if required
+#         # Add exploration noise if required
 #         if add_noise:
 #             action += self.noise.sample()
 
-        # Clip action to valid range
+#         # Clip action to valid range
 #         return np.clip(action, -1.0, 1.0)
 
 #     def update(self):
@@ -372,7 +372,7 @@
 
 #         logger.info(
 #             f"Starting training for {max_episodes} episodes, max {max_steps} steps per episode"
-        )
+#         )
 
 #         total_steps = 0
 #         episode_rewards = []
@@ -383,25 +383,25 @@
 #             episode_reward = 0
 
 #             for step in range(1, max_steps + 1):
-                # Select action
+#                 # Select action
 #                 if total_steps < self.config["warmup_steps"]:
-                    # Random actions during warmup
+#                     # Random actions during warmup
 #                     action = self.env.action_space.sample()
 #                 else:
-                    # Policy actions with noise after warmup
+#                     # Policy actions with noise after warmup
 #                     action = self.select_action(state, add_noise=True)
 
-                # Execute action
+#                 # Execute action
 #                 next_state, reward, done, info = self.env.step(action)
 
-                # Store experience
+#                 # Store experience
 #                 self.replay_buffer.add(state, action, reward, next_state, done)
 
-                # Update networks
+#                 # Update networks
 #                 if total_steps >= self.config["warmup_steps"]:
 #                     actor_loss, critic_loss = self.update()
 
-                # Update state and counters
+#                 # Update state and counters
 #                 state = next_state
 #                 episode_reward += reward
 #                 total_steps += 1
@@ -409,40 +409,40 @@
 #                 if done or step == max_steps:
 #                     break
 
-            # Record episode reward
+#             # Record episode reward
 #             episode_rewards.append(episode_reward)
 #             self.rewards_history.append(episode_reward)
 
-            # Logging
+#             # Logging
 #             if episode % self.config["log_interval"] == 0:
 #                 avg_reward = np.mean(episode_rewards[-self.config["log_interval"] :])
 #                 logger.info(
 #                     f"Episode {episode}/{max_episodes} | Avg Reward: {avg_reward:.2f} | Buffer Size: {len(self.replay_buffer)}"
-                )
+#                 )
 
-                # Plot and save metrics
+#                 # Plot and save metrics
 #                 if len(self.rewards_history) > 0:
 #                     self._plot_metrics()
 
-            # Save model
+#             # Save model
 #             if episode % self.config["save_interval"] == 0:
 #                 self.save_model(os.path.join(self.results_dir, f"model_ep{episode}"))
 
-            # Evaluation
+#             # Evaluation
 #             if episode % self.config["eval_interval"] == 0:
 #                 eval_reward = self.evaluate(5)
 #                 logger.info(
 #                     f"Evaluation after episode {episode}: Avg Reward = {eval_reward:.2f}"
-                )
+#                 )
 
-        # Final save
+#         # Final save
 #         self.save_model(os.path.join(self.results_dir, "model_final"))
 
-        # Final evaluation
+#         # Final evaluation
 #         final_eval_reward = self.evaluate(10)
 #         logger.info(f"Final evaluation: Avg Reward = {final_eval_reward:.2f}")
 
-        # Save final metrics
+#         # Save final metrics
 #         self._plot_metrics(final=True)
 
 #         return self.rewards_history
@@ -472,14 +472,14 @@
 #        """Plot and save training metrics"""
 #         plt.figure(figsize=(15, 10))
 
-        # Plot rewards
+#         # Plot rewards
 #         plt.subplot(2, 2, 1)
 #         plt.plot(self.rewards_history)
 #         plt.title("Episode Rewards")
 #         plt.xlabel("Episode")
 #         plt.ylabel("Reward")
 
-        # Plot Q-values
+#         # Plot Q-values
 #         if self.q_values_history:
 #             plt.subplot(2, 2, 2)
 #             plt.plot(self.q_values_history)
@@ -487,7 +487,7 @@
 #             plt.xlabel("Update Step")
 #             plt.ylabel("Q-value")
 
-        # Plot actor loss
+#         # Plot actor loss
 #         if self.actor_losses:
 #             plt.subplot(2, 2, 3)
 #             plt.plot(self.actor_losses)
@@ -495,7 +495,7 @@
 #             plt.xlabel("Update Step")
 #             plt.ylabel("Loss")
 
-        # Plot critic loss
+#         # Plot critic loss
 #         if self.critic_losses:
 #             plt.subplot(2, 2, 4)
 #             plt.plot(self.critic_losses)
@@ -505,7 +505,7 @@
 
 #         plt.tight_layout()
 
-        # Save figure
+#         # Save figure
 #         filename = "final_metrics.png" if final else "metrics.png"
 #         plt.savefig(os.path.join(self.results_dir, filename))
 #         plt.close()
@@ -532,23 +532,23 @@
 #
 ##     def load_model(self, path):
 #        """Load model weights and configuration"""
-        # Load model weights
+#         # Load model weights
 #         self.actor.load_state_dict(
 #             torch.load(os.path.join(path, "actor.pth"), map_location=self.device)
-        )
+#         )
 #         self.critic.load_state_dict(
 #             torch.load(os.path.join(path, "critic.pth"), map_location=self.device)
-        )
+#         )
 #         self.actor_target.load_state_dict(
 #             torch.load(os.path.join(path, "actor_target.pth"), map_location=self.device)
-        )
+#         )
 #         self.critic_target.load_state_dict(
 #             torch.load(
 #                 os.path.join(path, "critic_target.pth"), map_location=self.device
-            )
-        )
+#             )
+#         )
 
-        # Load configuration if exists
+#         # Load configuration if exists
 #         config_path = os.path.join(path, "config.json")
 #         if os.path.exists(config_path):
 #             with open(config_path, "r") as f:
@@ -638,11 +638,11 @@
 #         self.current_weights = np.zeros(self.num_assets)
 #         self.price_history = np.zeros((self.num_assets, self.window_size))
 
-        # Generate random returns for simulation
-        # In a real implementation, this would be replaced with actual market data
+#         # Generate random returns for simulation
+#         # In a real implementation, this would be replaced with actual market data
 #         self.returns = np.random.normal(0.0005, 0.01, (100, self.num_assets))
 
-        # Reset tracking variables
+#         # Reset tracking variables
 #         self.episode_returns = []
 #         self.portfolio_values = [1.0]  # Start with $1
 #         self.actions_history = []
@@ -707,10 +707,10 @@
 #
 ##     def _normalize_weights(self, action):
 #        """Normalize actions to valid portfolio weights"""
-        # Convert actions to weights between -1 and 1
+#         # Convert actions to weights between -1 and 1
 #         weights = np.tanh(action)
 
-        # Ensure weights sum to 1 for fully invested portfolio
+#         # Ensure weights sum to 1 for fully invested portfolio
 #         if np.sum(np.abs(weights)) > 0:
 #             weights = weights / np.sum(np.abs(weights))
 
@@ -728,10 +728,10 @@
 #
 ##     def _calculate_reward(self, portfolio_return):
 #        """Calculate reward based on portfolio performance"""
-        # Simple return-based reward
+#         # Simple return-based reward
 #         reward = portfolio_return * self.reward_scaling
 
-        # Alternative: Sharpe ratio if we have enough history
+#         # Alternative: Sharpe ratio if we have enough history
 #         if len(self.episode_returns) > 10:
 #             returns_array = np.array(self.episode_returns)
 #             sharpe = (np.mean(returns_array) - 0.0001) / (np.std(returns_array) + 1e-6)
@@ -757,7 +757,7 @@
 #             print(f"Current Weights: {self.current_weights}")
 #             print(
 #                 f"Current Return: {self.episode_returns[-1] if self.episode_returns else 0:.4f}"
-            )
+#             )
 #             print("-" * 50)
 
 #         return None
@@ -810,59 +810,59 @@
 #             episode_actions = []
 
 #             while not done:
-                # Select action without exploration noise
+#                 # Select action without exploration noise
 #                 action = self.agent.select_action(state, add_noise=False)
 
-                # Execute action
+#                 # Execute action
 #                 next_state, reward, done, info = self.env.step(action)
 
-                # Record metrics
+#                 # Record metrics
 #                 episode_values.append(info["portfolio_value"])
 #                 episode_returns.append(info["portfolio_return"])
 #                 episode_actions.append(info["weights"])
 
-                # Render if requested
+#                 # Render if requested
 #                 if render:
 #                     self.env.render()
 
-                # Update state
+#                 # Update state
 #                 state = next_state
 
-            # Store episode results
+#             # Store episode results
 #             all_portfolio_values.append(episode_values)
 #             all_returns.append(episode_returns)
 #             all_actions.append(episode_actions)
 
-            # Log episode results
+#             # Log episode results
 #             final_value = episode_values[-1]
 #             episode_sharpe = self._calculate_sharpe_ratio(episode_returns)
 #             self.logger.info(
 #                 f"Episode {episode}/{episodes} | Final Value: ${final_value:.2f} | Sharpe: {episode_sharpe:.2f}"
-            )
+#             )
 
-        # Calculate aggregate metrics
+#         # Calculate aggregate metrics
 #         self._calculate_metrics(all_portfolio_values, all_returns, all_actions)
 
-        # Log final results
+#         # Log final results
 #         self.logger.info(
 #             f"Backtest completed | Total Return: {self.total_return:.2%} | Sharpe: {self.sharpe_ratio:.2f} | Max Drawdown: {self.max_drawdown:.2%}"
-        )
+#         )
 
-        # Plot results
+#         # Plot results
 #         self._plot_results(all_portfolio_values, all_returns, all_actions)
 
 #         return {
-            "portfolio_values": all_portfolio_values,
-            "returns": all_returns,
-            "actions": all_actions,
-            "metrics": {
-                "total_return": self.total_return,
-                "annual_return": self.annual_return,
-                "sharpe_ratio": self.sharpe_ratio,
-                "max_drawdown": self.max_drawdown,
-                "volatility": self.volatility,
-            },
-        }
+#             "portfolio_values": all_portfolio_values,
+#             "returns": all_returns,
+#             "actions": all_actions,
+#             "metrics": {
+#                 "total_return": self.total_return,
+#                 "annual_return": self.annual_return,
+#                 "sharpe_ratio": self.sharpe_ratio,
+#                 "max_drawdown": self.max_drawdown,
+#                 "volatility": self.volatility,
+#             },
+#         }
 
 #     def _calculate_metrics(self, portfolio_values, returns, actions):
 #        """Calculate performance metrics"""
@@ -922,30 +922,30 @@
 #
 ##     def _plot_results(self, portfolio_values, returns, actions):
 #        """Plot backtest results"""
-        # Use the longest episode for plotting
+#         # Use the longest episode for plotting
 #         longest_idx = np.argmax([len(pv) for pv in portfolio_values])
 #         values = portfolio_values[longest_idx]
 #         rets = returns[longest_idx]
 #         acts = actions[longest_idx]
 
-        # Create figure with subplots
+#         # Create figure with subplots
 #         fig, axs = plt.subplots(3, 1, figsize=(12, 15))
 
-        # Plot portfolio value
+#         # Plot portfolio value
 #         axs[0].plot(values)
 #         axs[0].set_title("Portfolio Value")
 #         axs[0].set_xlabel("Trading Day")
 #         axs[0].set_ylabel("Value ($)")
 #         axs[0].grid(True)
 
-        # Plot returns
+#         # Plot returns
 #         axs[1].plot(rets)
 #         axs[1].set_title("Daily Returns")
 #         axs[1].set_xlabel("Trading Day")
 #         axs[1].set_ylabel("Return")
 #         axs[1].grid(True)
 
-        # Plot asset weights over time
+#         # Plot asset weights over time
 #         acts_array = np.array(acts)
 #         for i in range(acts_array.shape[1]):
 #             axs[2].plot(acts_array[:, i], label=f"Asset {i+1}")
@@ -956,14 +956,14 @@
 #         axs[2].legend()
 #         axs[2].grid(True)
 
-        # Add metrics as text
+#         # Add metrics as text
 #         metrics_text = (
 #             f"Total Return: {self.total_return:.2%}\n"
 #             f"Annual Return: {self.annual_return:.2%}\n"
 #             f"Sharpe Ratio: {self.sharpe_ratio:.2f}\n"
 #             f"Volatility: {self.volatility:.2%}\n"
 #             f"Max Drawdown: {self.max_drawdown:.2%}"
-        )
+#         )
 
 #         fig.text(
 #             0.15,
@@ -971,9 +971,9 @@
 #             metrics_text,
 #             fontsize=12,
 #             bbox=dict(facecolor="white", alpha=0.8),
-        )
+#         )
 
-        # Adjust layout and save
+#         # Adjust layout and save
 #         plt.tight_layout()
 #         plt.subplots_adjust(bottom=0.15)
 #         plt.savefig("backtest_results.png")
@@ -1019,47 +1019,47 @@
 #         self.logger.info(f"Starting hyperparameter tuning with {self.n_trials} trials")
 
 #         for trial in range(1, self.n_trials + 1):
-            # Sample random configuration
+#             # Sample random configuration
 #             config = self._sample_config()
 
 #             self.logger.info(f"Trial {trial}/{self.n_trials} | Config: {config}")
 
-            # Create environment and agent
+#             # Create environment and agent
 #             env = self.env_creator()
 #             agent = DDPGAgent(env, config=config)
 
-            # Train agent
+#             # Train agent
 #             rewards = agent.train(
 #                 max_episodes=self.episodes_per_trial, max_steps=self.max_steps
-            )
+#             )
 
-            # Evaluate agent
+#             # Evaluate agent
 #             eval_reward = agent.evaluate(num_episodes=3)
 
-            # Record results
+#             # Record results
 #             result = {
-                "trial": trial,
-                "config": config,
-                "eval_reward": eval_reward,
-                "training_rewards": rewards,
-            }
+#                 "trial": trial,
+#                 "config": config,
+#                 "eval_reward": eval_reward,
+#                 "training_rewards": rewards,
+#             }
 
 #             self.results.append(result)
 
 #             self.logger.info(
 #                 f"Trial {trial} completed | Eval Reward: {eval_reward:.2f}"
-            )
+#             )
 
-        # Find best configuration
+#         # Find best configuration
 #         best_idx = np.argmax([r["eval_reward"] for r in self.results])
 #         best_config = self.results[best_idx]["config"]
 #         best_reward = self.results[best_idx]["eval_reward"]
 
 #         self.logger.info(
 #             f"Tuning completed | Best config: {best_config} | Reward: {best_reward:.2f}"
-        )
+#         )
 
-        # Save results
+#         # Save results
 #         self._save_results()
 
 #         return best_config, self.results
@@ -1073,11 +1073,11 @@
 #
 ##     def _save_results(self):
 #        """Save tuning results"""
-        # Save all results
+#         # Save all results
 #         with open(os.path.join(self.results_dir, "tuning_results.json"), "w") as f:
 #             json.dump(self.results, f, indent=4)
 
-        # Plot results
+#         # Plot results
 #         self._plot_results()
 
 #     def _plot_results(self):

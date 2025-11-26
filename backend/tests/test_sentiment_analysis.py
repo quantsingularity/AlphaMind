@@ -44,12 +44,12 @@
 ## def sample_texts():
 #    """Fixture for sample text data."""
 #     return [
-        "Stock market surges on positive economic news",
-        "Company reports record profits, shares jump",
-        "Market dips amid uncertainty",
-        "Negative outlook for the tech sector",
-        "Neutral report from the central bank",
-    ]
+#         "Stock market surges on positive economic news",
+#         "Company reports record profits, shares jump",
+#         "Market dips amid uncertainty",
+#         "Negative outlook for the tech sector",
+#         "Neutral report from the central bank",
+#     ]
 
 
 # @pytest.fixture
@@ -113,13 +113,13 @@
 ## def test_get_sentiment_score(analyzer, sample_texts):
 #    """Test the output of get_sentiment_score."""
 #     analyzer.prepare_tokenizer(sample_texts)
-    # Mock model predict with known probabilities
+#     # Mock model predict with known probabilities
 #     mock_predictions = np.array(
-        [
+#         [
 #             [0.1, 0.1, 0.8],  # Positive
 #             [0.7, 0.2, 0.1],  # Negative
 #             [0.2, 0.6, 0.2],  # Neutral
-        ]
+#         ]
 #     analyzer.model.predict = lambda x: mock_predictions[: len(x)]
 
 #     scores = analyzer.get_sentiment_score(sample_texts[:3])
@@ -166,10 +166,10 @@
 ## @pytest.fixture
 ## def sample_price_data():
 #    """Fixture for sample price data DataFrame."""
-    # Ensure date column is datetime64[ns]
+#     # Ensure date column is datetime64[ns]
 #     dates = pd.to_datetime(pd.date_range(start="2023-01-01", periods=30, freq="D"))
 #     prices = np.random.rand(30) * 10 + 100
-    # Set date as index for consistency
+#     # Set date as index for consistency
 #     df = pd.DataFrame({"date": dates, "close": prices})
 #     df["date"] = pd.to_datetime(df["date"])
 #     df = df.set_index("date")
@@ -193,7 +193,7 @@
 ## @pytest.fixture
 ## def strategy(analyzer, sample_price_data):
 #    """Fixture for a SentimentBasedStrategy instance."""
-    # Mock analyzer methods for strategy testing
+#     # Mock analyzer methods for strategy testing
 #     analyzer.get_sentiment_score = (
 #         lambda texts: np.random.rand(len(texts)) * 2 - 1
 #     )  # Random scores [-1, 1]
@@ -214,12 +214,12 @@
 #
 ## def test_calculate_signals(strategy, sample_news_data):
 #    """Test the calculate_signals method."""
-    # Ensure price_data has a datetime index
+#     # Ensure price_data has a datetime index
 #     if not isinstance(strategy.price_data.index, pd.DatetimeIndex):
 #         strategy.price_data["date"] = pd.to_datetime(strategy.price_data["date"])
 #         strategy.price_data = strategy.price_data.set_index("date")
 
-    # Ensure news_data date column is datetime
+#     # Ensure news_data date column is datetime
 #     sample_news_data["date"] = pd.to_datetime(sample_news_data["date"])
 
 #     signals_df = strategy.calculate_signals(sample_news_data, lookback_window=5)
@@ -234,8 +234,8 @@
 #     assert "price_signal" in signals_df.columns
 #     assert "combined_signal" in signals_df.columns
 #     assert "position" in signals_df.columns
-    # Check if NaNs are handled (e.g., in rolling means)
-    # The first few rows will have NaNs due to rolling calculations
+#     # Check if NaNs are handled (e.g., in rolling means)
+#     # The first few rows will have NaNs due to rolling calculations
 #     assert not signals_df["sentiment_ma"].iloc[5:].isnull().any()
 #     assert not signals_df["position"].isnull().any()
 

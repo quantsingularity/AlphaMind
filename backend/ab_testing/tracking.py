@@ -1,9 +1,9 @@
-#""""""
+# """"""
 ## Experiment tracking for A/B testing.
 #
 ## This module provides classes for tracking experiments and their results
 ## in the A/B testing framework, including persistent storage and retrieval.
-#""""""
+# """"""
 
 # import datetime
 # from enum import Enum
@@ -50,7 +50,7 @@
 #         value: float,
 #         timestamp: Optional[datetime.datetime] = None,
 #         metadata: Optional[Dict] = None,
-    ):
+#     ):
 #         self.id = str(uuid.uuid4())
 #         self.experiment_id = experiment_id
 #         self.variant = variant
@@ -69,14 +69,14 @@
 ##             Dictionary representation of the result.
 #        """"""
 #         return {
-            "id": self.id,
-            "experiment_id": self.experiment_id,
-            "variant": self.variant,
-            "metric": self.metric,
-            "value": self.value,
-            "timestamp": self.timestamp.isoformat(),
-            "metadata": self.metadata,
-        }
+#             "id": self.id,
+#             "experiment_id": self.experiment_id,
+#             "variant": self.variant,
+#             "metric": self.metric,
+#             "value": self.value,
+#             "timestamp": self.timestamp.isoformat(),
+#             "metadata": self.metadata,
+#         }
 
 #     @classmethod
 #     def from_dict(cls, data: Dict) -> "ExperimentResult":
@@ -99,7 +99,7 @@
 #             metric=data["metric"],
 #             value=data["value"],
 #             metadata=data.get("metadata", {}),
-        )
+#         )
 
 #         result.id = data["id"]
 #         result.timestamp = datetime.datetime.fromisoformat(data["timestamp"])
@@ -126,13 +126,13 @@
 
 #     def __init__(
 #         self, storage_dir: Optional[str] = None, db_path: Optional[str] = None
-    ):
+#     ):
 #         self.storage_dir = storage_dir
 #         self.db_path = db_path
 #         self.experiments = {}
 #         self.in_memory = storage_dir is None
 
-        # Initialize database
+#         # Initialize database
 #         self._init_db()
 
 #     def _init_db(self) -> None:
@@ -161,7 +161,7 @@
 #             end_date TEXT,
 #             creation_date TEXT NOT NULL,
 #             data BLOB
-        )
+#         )
 #        """"""
 #        )
 #
@@ -176,7 +176,7 @@
 #             timestamp TEXT NOT NULL,
 #             metadata BLOB,
 #             FOREIGN KEY (experiment_id) REFERENCES experiments (id)
-        )
+#         )
 #        """"""
 #        )
 #
@@ -215,21 +215,21 @@
 ##         experiment : Experiment
 ##             Experiment to save.
 #        """"""
-        # Save to database
+#         # Save to database
 #         conn = self._get_connection()
 #         cursor = conn.cursor()
 
-        # Serialize experiment data
+#         # Serialize experiment data
 #         data = pickle.dumps(experiment)
 
-        # Insert or update experiment
+#         # Insert or update experiment
 #         cursor.execute(
 #            """"""
 ##         INSERT OR REPLACE INTO experiments
 ##         (id, name, description, status, start_date, end_date, creation_date, data)
 ##         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 #        ""","""
-            (
+#             (
 #                 experiment.id,
 #                 experiment.name,
 #                 experiment.description,
@@ -238,13 +238,13 @@
 #                 experiment.end_date.isoformat() if experiment.end_date else None,
 #                 experiment.creation_date.isoformat(),
 #                 data,
-            ),
-        )
+#             ),
+#         )
 
 #         conn.commit()
 #         conn.close()
 
-        # Save to file if storage directory is specified
+#         # Save to file if storage directory is specified
 #         if self.storage_dir:
 #             os.makedirs(self.storage_dir, exist_ok=True)
 #             experiment.save(self.storage_dir)
@@ -292,7 +292,7 @@
 ##         experiment : Experiment or None
 ##             Loaded experiment, or None if not found.
 #        """"""
-        # Try to load from database
+#         # Try to load from database
 #         conn = self._get_connection()
 #         cursor = conn.cursor()
 
@@ -301,22 +301,22 @@
 ##         SELECT data FROM experiments WHERE id = ?
 #        ""","""
 #             (experiment_id,),
-        )
+#         )
 
 #         row = cursor.fetchone()
 #         conn.close()
 
 #         if row:
-            # Deserialize experiment data
+#             # Deserialize experiment data
 #             experiment = pickle.loads(row[0])
 #             return experiment
 
-        # Try to load from file
+#         # Try to load from file
 #         if self.storage_dir:
 #             for filename in os.listdir(self.storage_dir):
 #                 if filename.startswith(f"{experiment_id}_") and filename.endswith(
-                    ".json"
-                ):
+#                     ".json"
+#                 ):
 #                     filepath = os.path.join(self.storage_dir, filename)
 #                     return Experiment.load(filepath)
 
@@ -383,7 +383,7 @@
 #         Update an experiment in the tracker.
 
 #         Parameters
-        ----------
+#         ----------
 #         experiment : Experiment
 #             Experiment to update.
 #         save : bool, default=True
@@ -399,7 +399,7 @@
 #         Delete an experiment from the tracker.
 
 #         Parameters
-        ----------
+#         ----------
 #         experiment_id : str
 #             ID of the experiment to delete.
 #        """"""
@@ -436,7 +436,7 @@
 #         Add a result to the tracker.
 
 #         Parameters
-        ----------
+#         ----------
 #         result : ExperimentResult
 #             Result to add.
 #         save : bool, default=True
@@ -463,7 +463,7 @@
 #         Save a result to storage.
 
 #         Parameters
-        ----------
+#         ----------
 #         result : ExperimentResult
 #             Result to save.
 #        """"""
@@ -508,7 +508,7 @@
 #         Get results from the tracker.
 
 #         Parameters
-        ----------
+#         ----------
 #         experiment_id : str, optional
 #             ID of the experiment to get results for.
 #             If None, returns results for all experiments.
@@ -528,7 +528,7 @@
 #             Whether to return results as a DataFrame.
 
 #         Returns
-        -------
+#         -------
 #         results : list or DataFrame
 #             Results matching the specified criteria.
 #        """"""
@@ -620,7 +620,7 @@
 #         Get summary statistics for results.
 
 #         Parameters
-        ----------
+#         ----------
 #         experiment_id : str, optional
 #             ID of the experiment to get statistics for.
 #             If None, returns statistics for all experiments.
@@ -632,7 +632,7 @@
 #             If None, returns statistics for all variants.
 
 #         Returns
-        -------
+#         -------
 #         stats : DataFrame
 #             Summary statistics for the results.
 #        """"""
@@ -680,7 +680,7 @@
 #         Export results to a file.
 
 #         Parameters
-        ----------
+#         ----------
 #         filepath : str
 #             Path to save the results to.
 #         experiment_id : str, optional
@@ -713,7 +713,7 @@
 #         Import results from a file.
 
 #         Parameters
-        ----------
+#         ----------
 #         filepath : str
 #             Path to the file to import results from.
 #         format : str, default="csv"
@@ -753,7 +753,7 @@
 #         self.experiments = {}
 
 #         if not self.in_memory:
-            # Clear database
+#             # Clear database
 #             conn = self._get_connection()
 #             cursor = conn.cursor()
 
@@ -763,7 +763,7 @@
 #             conn.commit()
 #             conn.close()
 
-            # Clear files
+#             # Clear files
 #             if self.storage_dir and os.path.exists(self.storage_dir):
 #                 for filename in os.listdir(self.storage_dir):
 #                     if filename.endswith(".json"):

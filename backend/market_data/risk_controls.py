@@ -1,9 +1,9 @@
-#""""""
+# """"""
 ## Advanced Risk Controls Module for AlphaMind
 #
 ## This module provides comprehensive risk management tools for trading strategies,
 ## including position sizing, stop-loss mechanisms, exposure limits, and risk metrics.
-#""""""
+# """"""
 
 # import asyncio
 # from datetime import datetime, timedelta
@@ -21,7 +21,7 @@
 # Configure logging
 # logging.basicConfig(
 #     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+# )
 # logger = logging.getLogger(__name__)
 
 
@@ -187,7 +187,7 @@
 #         value: float,
 #         is_trailing: bool = False,
 #         time_window: Optional[timedelta] = None,
-    ):
+#     ):
 #        """"""
 ##         Initialize stop-loss.
 #
@@ -214,7 +214,7 @@
 #         entry_time: datetime,
 #         is_long: bool,
 #         atr: Optional[float] = None,
-    ):
+#     ):
 #        """"""
 ##         Initialize stop-loss with entry information.
 #
@@ -230,7 +230,7 @@
 #         self.lowest_price = entry_price
 #         self.atr = atr
 
-        # Calculate initial stop price
+#         # Calculate initial stop price
 #         if self.stop_type == StopLossType.FIXED:
 #             self.stop_price = self.value
 #         elif self.stop_type == StopLossType.PERCENT:
@@ -252,8 +252,8 @@
 #             else:
 #                 self.stop_price = entry_price * (1 + self.value)
 #         elif self.stop_type == StopLossType.VOLATILITY:
-            # Volatility-based stop-loss requires historical volatility
-            # For now, use a simple approximation based on ATR
+#             # Volatility-based stop-loss requires historical volatility
+#             # For now, use a simple approximation based on ATR
 #             if atr is None:
 #                 raise ValueError("ATR is required for volatility-based stop-loss")
 
@@ -262,15 +262,15 @@
 #             else:
 #                 self.stop_price = entry_price + (atr * self.value)
 #         elif self.stop_type == StopLossType.TIME:
-            # Time-based stop-loss doesn't have a price level
+#             # Time-based stop-loss doesn't have a price level
 #             self.stop_price = None
 #         elif self.stop_type == StopLossType.CUSTOM:
-            # Custom stop-loss requires external logic
+#             # Custom stop-loss requires external logic
 #             self.stop_price = None
 
 #         logger.info(
 #             f"Initialized stop-loss: type={self.stop_type.value}, price={self.stop_price}"
-        )
+#         )
 
 #     def update(
 #         self,
@@ -294,15 +294,15 @@
 #         if self.entry_price is None:
 #             raise ValueError("Stop-loss not initialized")
 
-        # Update highest and lowest prices
+#         # Update highest and lowest prices
 #         self.highest_price = max(self.highest_price, current_price)
 #         self.lowest_price = min(self.lowest_price, current_price)
 
-        # Update ATR if provided
+#         # Update ATR if provided
 #         if atr is not None:
 #             self.atr = atr
 
-        # Update trailing stop if applicable
+#         # Update trailing stop if applicable
 #         if self.is_trailing:
 #             if is_long:
 #                 new_stop = self.highest_price * (1 - self.value)
@@ -313,7 +313,7 @@
 #                 if new_stop < self.stop_price:
 #                     self.stop_price = new_stop
 
-        # Check if stop-loss is triggered
+#         # Check if stop-loss is triggered
 #         if self.stop_type == StopLossType.TIME:
 #             if self.time_window is None:
 #                 raise ValueError("Time window is required for time-based stop-loss")
@@ -325,13 +325,13 @@
 #             StopLossType.ATR,
 #             StopLossType.TRAILING,
 #             StopLossType.VOLATILITY,
-        ]:
+#         ]:
 #             if is_long:
 #                 return current_price <= self.stop_price
 #             else:
 #                 return current_price >= self.stop_price
 #         elif self.stop_type == StopLossType.CUSTOM:
-            # Custom stop-loss requires external logic
+#             # Custom stop-loss requires external logic
 #             return False
 
 #         return False
@@ -489,7 +489,7 @@
 #         value: float,
 #         max_position_size: Optional[float] = None,
 #         max_risk_per_trade: Optional[float] = None,
-    ):
+#     ):
 #        """"""
 ##         Initialize position sizer.
 #
@@ -534,118 +534,118 @@
 #         position_size = 0.0
 
 #         if self.sizing_method == PositionSizingMethod.FIXED:
-            # Fixed position size
+#             # Fixed position size
 #             position_size = self.value
 
 #         elif self.sizing_method == PositionSizingMethod.PERCENT_EQUITY:
-            # Percentage of equity
+#             # Percentage of equity
 #             position_size = equity * self.value / entry_price
 
 #         elif self.sizing_method == PositionSizingMethod.VOLATILITY:
-            # Volatility-based sizing
+#             # Volatility-based sizing
 #             if volatility is None:
 #                 raise ValueError(
-                    "Volatility is required for volatility-based position sizing"
-                )
+#                     "Volatility is required for volatility-based position sizing"
+#                 )
 
-            # Calculate position size based on target volatility
+#             # Calculate position size based on target volatility
 #             target_volatility = self.value  # e.g., 0.01 for 1% target volatility
 #             position_size = (target_volatility * equity) / (volatility * entry_price)
 
 #         elif self.sizing_method == PositionSizingMethod.KELLY:
-            # Kelly criterion
+#             # Kelly criterion
 #             if win_rate is None or avg_win is None or avg_loss is None:
 #                 raise ValueError(
-                    "Win rate, average win, and average loss are required for Kelly criterion"
-                )
+#                     "Win rate, average win, and average loss are required for Kelly criterion"
+#                 )
 
-            # Kelly formula: f* = (p * b - (1 - p)) / b
-            # where p is win rate, b is win/loss ratio
+#             # Kelly formula: f* = (p * b - (1 - p)) / b
+#             # where p is win rate, b is win/loss ratio
 #             win_loss_ratio = avg_win / abs(avg_loss) if abs(avg_loss) > 0 else 1.0
 #             kelly_fraction = (
 #                 win_rate * win_loss_ratio - (1 - win_rate)
 #             ) / win_loss_ratio
 
-            # Apply Kelly fraction adjustment (value is the fraction of Kelly to use)
+#             # Apply Kelly fraction adjustment (value is the fraction of Kelly to use)
 #             kelly_fraction = kelly_fraction * self.value
 
-            # Ensure Kelly fraction is positive and not too large
+#             # Ensure Kelly fraction is positive and not too large
 #             kelly_fraction = max(0.0, min(kelly_fraction, 1.0))
 
-            # Calculate position size
+#             # Calculate position size
 #             position_size = (kelly_fraction * equity) / entry_price
 
 #         elif self.sizing_method == PositionSizingMethod.OPTIMAL_F:
-            # Optimal f
+#             # Optimal f
 #             if avg_win is None or avg_loss is None:
 #                 raise ValueError(
-                    "Average win and average loss are required for Optimal f"
-                )
+#                     "Average win and average loss are required for Optimal f"
+#                 )
 
-            # Optimal f formula: f* = ((avg_win / abs(avg_loss)) - 1) / (avg_win / abs(avg_loss))
+#             # Optimal f formula: f* = ((avg_win / abs(avg_loss)) - 1) / (avg_win / abs(avg_loss))
 #             win_loss_ratio = avg_win / abs(avg_loss) if abs(avg_loss) > 0 else 1.0
 #             optimal_f = (
 #                 (win_loss_ratio - 1) / win_loss_ratio if win_loss_ratio > 1 else 0.0
-            )
+#             )
 
-            # Apply adjustment (value is the fraction of Optimal f to use)
+#             # Apply adjustment (value is the fraction of Optimal f to use)
 #             optimal_f = optimal_f * self.value
 
-            # Ensure Optimal f is positive and not too large
+#             # Ensure Optimal f is positive and not too large
 #             optimal_f = max(0.0, min(optimal_f, 1.0))
 
-            # Calculate position size
+#             # Calculate position size
 #             position_size = (optimal_f * equity) / entry_price
 
 #         elif self.sizing_method == PositionSizingMethod.RISK_PARITY:
-            # Risk parity
+#             # Risk parity
 #             if volatility is None or correlation is None:
 #                 raise ValueError(
-                    "Volatility and correlation are required for risk parity"
-                )
+#                     "Volatility and correlation are required for risk parity"
+#                 )
 
-            # Risk contribution formula: RC_i = w_i * sigma_i * (w * Sigma * w)^(1/2)
-            # For a single asset, this simplifies to w_i * sigma_i
-            # We want RC_i = target_risk, so w_i = target_risk / sigma_i
+#             # Risk contribution formula: RC_i = w_i * sigma_i * (w * Sigma * w)^(1/2)
+#             # For a single asset, this simplifies to w_i * sigma_i
+#             # We want RC_i = target_risk, so w_i = target_risk / sigma_i
 #             target_risk = self.value  # e.g., 0.01 for 1% target risk
 #             position_size = (target_risk * equity) / (volatility * entry_price)
 
-            # Adjust for correlation (simplified)
+#             # Adjust for correlation (simplified)
 #             position_size = position_size * (1 - correlation)
 
 #         elif self.sizing_method == PositionSizingMethod.FIXED_RISK:
-            # Fixed risk per trade
+#             # Fixed risk per trade
 #             if stop_price is None:
 #                 raise ValueError(
-                    "Stop price is required for fixed risk position sizing"
-                )
+#                     "Stop price is required for fixed risk position sizing"
+#                 )
 
-            # Calculate risk per share
+#             # Calculate risk per share
 #             risk_per_share = abs(entry_price - stop_price)
 
 #             if risk_per_share > 0:
-                # Calculate position size based on risk amount
+#                 # Calculate position size based on risk amount
 #                 risk_amount = equity * self.value  # e.g., 0.01 for 1% risk
 #                 position_size = risk_amount / risk_per_share
 #             else:
 #                 position_size = 0.0
 
 #         elif self.sizing_method == PositionSizingMethod.CUSTOM:
-            # Custom position sizing requires external logic
+#             # Custom position sizing requires external logic
 #             position_size = 0.0
 
-        # Apply maximum position size if specified
+#         # Apply maximum position size if specified
 #         if self.max_position_size is not None:
 #             position_size = min(position_size, self.max_position_size)
 
-        # Apply maximum risk per trade if specified
+#         # Apply maximum risk per trade if specified
 #         if self.max_risk_per_trade is not None and stop_price is not None:
 #             risk_per_share = abs(entry_price - stop_price)
 #             max_position_by_risk = (
 #                 (equity * self.max_risk_per_trade) / risk_per_share
 #                 if risk_per_share > 0
 #                 else float("inf")
-            )
+#             )
 #             position_size = min(position_size, max_position_by_risk)
 
 #         return position_size
@@ -1096,7 +1096,7 @@
 #         position_sizer: Optional[PositionSizer] = None,
 #         risk_limits: Optional[List[RiskLimit]] = None,
 #         metrics_calculator: Optional[RiskMetrics] = None,
-    ):
+#     ):
 #        """"""
 ##         Initialize risk manager.
 #
@@ -1125,7 +1125,7 @@
 #         self.risk_events = []
 #         self.limit_breaches = []
 
-        # Set default position sizer based on risk level
+#         # Set default position sizer based on risk level
 #         if position_sizer is None:
 #             if risk_level == RiskLevel.LOW:
 #                 self.position_sizer = PositionSizer(
@@ -1133,30 +1133,30 @@
 #                     value=0.01,  # 1% of equity
 #                     max_position_size=None,
 #                     max_risk_per_trade=0.005,  # 0.5% max risk per trade
-                )
+#                 )
 #             elif risk_level == RiskLevel.MEDIUM:
 #                 self.position_sizer = PositionSizer(
 #                     sizing_method=PositionSizingMethod.PERCENT_EQUITY,
 #                     value=0.02,  # 2% of equity
 #                     max_position_size=None,
 #                     max_risk_per_trade=0.01,  # 1% max risk per trade
-                )
+#                 )
 #             elif risk_level == RiskLevel.HIGH:
 #                 self.position_sizer = PositionSizer(
 #                     sizing_method=PositionSizingMethod.PERCENT_EQUITY,
 #                     value=0.05,  # 5% of equity
 #                     max_position_size=None,
 #                     max_risk_per_trade=0.02,  # 2% max risk per trade
-                )
+#                 )
 #             else:  # CUSTOM
 #                 self.position_sizer = PositionSizer(
 #                     sizing_method=PositionSizingMethod.FIXED,
 #                     value=1.0,
 #                     max_position_size=None,
 #                     max_risk_per_trade=None,
-                )
+#                 )
 
-        # Set default risk limits based on risk level
+#         # Set default risk limits based on risk level
 #         if not risk_limits:
 #             if risk_level == RiskLevel.LOW:
 #                 self.risk_limits = [
@@ -1176,7 +1176,7 @@
 #                         RiskLimitType.VOLATILITY, 0.1, "alert"
 #                     ),  # 10% max volatility
 #                     RiskLimit(RiskLimitType.LEVERAGE, 1.0, "alert"),  # 1.0 max leverage
-                ]
+#                 ]
 #             elif risk_level == RiskLevel.MEDIUM:
 #                 self.risk_limits = [
 #                     RiskLimit(
@@ -1195,7 +1195,7 @@
 #                         RiskLimitType.VOLATILITY, 0.15, "alert"
 #                     ),  # 15% max volatility
 #                     RiskLimit(RiskLimitType.LEVERAGE, 1.5, "alert"),  # 1.5 max leverage
-                ]
+#                 ]
 #             elif risk_level == RiskLevel.HIGH:
 #                 self.risk_limits = [
 #                     RiskLimit(
@@ -1214,7 +1214,7 @@
 #                         RiskLimitType.VOLATILITY, 0.25, "alert"
 #                     ),  # 25% max volatility
 #                     RiskLimit(RiskLimitType.LEVERAGE, 2.0, "alert"),  # 2.0 max leverage
-                ]
+#                 ]
 
 #     def set_portfolio_value(self, portfolio_value: float, cash: float):
 #        """"""
@@ -1236,7 +1236,7 @@
 #         is_long: bool,
 #         stop_loss: Optional[StopLoss] = None,
 #         take_profit: Optional[TakeProfit] = None,
-    ):
+#     ):
 #        """"""
 ##         Add position.
 #
@@ -1249,38 +1249,38 @@
 ##             take_profit: Take-profit
 #        """"""
 #         self.positions[symbol] = {
-            "symbol": symbol,
-            "quantity": quantity,
-            "entry_price": entry_price,
-            "current_price": entry_price,
-            "is_long": is_long,
-            "entry_time": datetime.now(),
-            "market_value": quantity * entry_price,
-            "unrealized_pnl": 0.0,
-            "unrealized_pnl_percent": 0.0,
-        }
+#             "symbol": symbol,
+#             "quantity": quantity,
+#             "entry_price": entry_price,
+#             "current_price": entry_price,
+#             "is_long": is_long,
+#             "entry_time": datetime.now(),
+#             "market_value": quantity * entry_price,
+#             "unrealized_pnl": 0.0,
+#             "unrealized_pnl_percent": 0.0,
+#         }
 
-        # Initialize stop-loss if provided
+#         # Initialize stop-loss if provided
 #         if stop_loss:
 #             stop_loss.initialize(
 #                 entry_price=entry_price, entry_time=datetime.now(), is_long=is_long
-            )
+#             )
 #             self.stop_losses[symbol] = stop_loss
 
-        # Initialize take-profit if provided
+#         # Initialize take-profit if provided
 #         if take_profit:
 #             take_profit.initialize(
 #                 entry_price=entry_price, is_long=is_long, stop_loss=stop_loss
-            )
+#             )
 #             self.take_profits[symbol] = take_profit
 
 #         logger.info(
 #             f"Added position: {symbol}, quantity={quantity}, entry_price={entry_price}, is_long={is_long}"
-        )
+#         )
 
 #     def update_position(
 #         self, symbol: str, current_price: float, quantity: Optional[float] = None
-    ):
+#     ):
 #        """"""
 ##         Update position.
 #
@@ -1295,50 +1295,50 @@
 
 #         position = self.positions[symbol]
 
-        # Update quantity if provided
+#         # Update quantity if provided
 #         if quantity is not None:
 #             position["quantity"] = quantity
 
-        # Update current price and market value
+#         # Update current price and market value
 #         position["current_price"] = current_price
 #         position["market_value"] = position["quantity"] * current_price
 
-        # Calculate unrealized P&L
+#         # Calculate unrealized P&L
 #         if position["is_long"]:
 #             position["unrealized_pnl"] = position["quantity"] * (
 #                 current_price - position["entry_price"]
-            )
+#             )
 #         else:
 #             position["unrealized_pnl"] = position["quantity"] * (
 #                 position["entry_price"] - current_price
-            )
+#             )
 
-        # Calculate unrealized P&L percent
+#         # Calculate unrealized P&L percent
 #         if position["entry_price"] > 0:
 #             position["unrealized_pnl_percent"] = position["unrealized_pnl"] / (
 #                 position["quantity"] * position["entry_price"]
-            )
+#             )
 
-        # Update stop-loss if exists
+#         # Update stop-loss if exists
 #         if symbol in self.stop_losses:
 #             stop_loss = self.stop_losses[symbol]
 #             is_triggered = stop_loss.update(
 #                 current_price=current_price,
 #                 current_time=datetime.now(),
 #                 is_long=position["is_long"],
-            )
+#             )
 
 #             if is_triggered:
 #                 logger.info(f"Stop-loss triggered for {symbol} at {current_price}")
 #                 self._add_risk_event("stop_loss_triggered", symbol, current_price)
 #                 return True
 
-        # Update take-profit if exists
+#         # Update take-profit if exists
 #         if symbol in self.take_profits:
 #             take_profit = self.take_profits[symbol]
 #             is_triggered = take_profit.update(
 #                 current_price=current_price, is_long=position["is_long"]
-            )
+#             )
 
 #             if is_triggered:
 #                 logger.info(f"Take-profit triggered for {symbol} at {current_price}")
@@ -1390,7 +1390,7 @@
 
 #         return self.position_sizer.calculate_position_size(
 #             equity=self.equity, entry_price=entry_price, stop_price=stop_price, **kwargs
-        )
+#         )
 
 #     def check_risk_limits(self) -> List[RiskLimit]:
 #        """"""
@@ -1407,17 +1407,17 @@
 #             if limit.check(current_value):
 #                 breached_limits.append(limit)
 
-                # Record limit breach
+#                 # Record limit breach
 #                 self._add_limit_breach(limit, current_value)
 
-                # Take action based on limit breach
+#                 # Take action based on limit breach
 #                 self._handle_limit_breach(limit, current_value)
 
 #         return breached_limits
 
 #     def update_returns(
 #         self, returns: pd.Series, benchmark_returns: Optional[pd.Series] = None
-    ):
+#     ):
 #        """"""
 ##         Update returns data.
 #
@@ -1430,7 +1430,7 @@
 #         if benchmark_returns is not None:
 #             self.benchmark_returns = benchmark_returns
 
-        # Update risk metrics calculator
+#         # Update risk metrics calculator
 #         self.metrics_calculator.set_returns(returns, benchmark_returns)
 
 #     def calculate_risk_metrics(
@@ -1453,7 +1453,7 @@
 #         for metric in metrics:
 #             result[metric.value] = self.metrics_calculator.calculate_metric(
 #                 metric, **kwargs
-            )
+#             )
 
 #         return result
 
@@ -1475,7 +1475,7 @@
 #         else:
 #             events = [
 #                 event for event in self.risk_events if event["type"] == event_type
-            ]
+#             ]
 
 #         if limit is not None:
 #             events = events[-limit:]
@@ -1502,7 +1502,7 @@
 #                 breach
 #                 for breach in self.limit_breaches
 #                 if breach["limit_type"] == limit_type.value
-            ]
+#             ]
 
 #         if limit is not None:
 #             breaches = breaches[-limit:]
@@ -1520,52 +1520,52 @@
 ##             Current value
 #        """"""
 #         if limit_type == RiskLimitType.POSITION_SIZE:
-            # Maximum position size as percentage of portfolio
+#             # Maximum position size as percentage of portfolio
 #             if not self.positions:
 #                 return 0.0
 
 #             max_position_value = max(
 #                 position["market_value"] for position in self.positions.values()
-            )
+#             )
 #             return (
 #                 max_position_value / self.portfolio_value
 #                 if self.portfolio_value > 0
 #                 else 0.0
-            )
+#             )
 
 #         elif limit_type == RiskLimitType.EXPOSURE:
-            # Total exposure as percentage of portfolio
+#             # Total exposure as percentage of portfolio
 #             total_exposure = sum(
 #                 position["market_value"] for position in self.positions.values()
-            )
+#             )
 #             return (
 #                 total_exposure / self.portfolio_value
 #                 if self.portfolio_value > 0
 #                 else 0.0
-            )
+#             )
 
 #         elif limit_type == RiskLimitType.CONCENTRATION:
-            # Maximum concentration in single asset
+#             # Maximum concentration in single asset
 #             if not self.positions:
 #                 return 0.0
 
 #             total_exposure = sum(
 #                 position["market_value"] for position in self.positions.values()
-            )
+#             )
 #             max_position_value = max(
 #                 position["market_value"] for position in self.positions.values()
-            )
+#             )
 #             return max_position_value / total_exposure if total_exposure > 0 else 0.0
 
 #         elif limit_type == RiskLimitType.DRAWDOWN:
-            # Maximum drawdown
+#             # Maximum drawdown
 #             if self.returns.empty:
 #                 return 0.0
 
 #             return abs(self.metrics_calculator.calculate_metric(RiskMetric.DRAWDOWN))
 
 #         elif limit_type == RiskLimitType.DAILY_LOSS:
-            # Daily loss as percentage of portfolio
+#             # Daily loss as percentage of portfolio
 #             if self.returns.empty:
 #                 return 0.0
 
@@ -1573,28 +1573,28 @@
 #             return abs(daily_return) if daily_return < 0 else 0.0
 
 #         elif limit_type == RiskLimitType.VAR:
-            # Value at Risk
+#             # Value at Risk
 #             if self.returns.empty:
 #                 return 0.0
 
 #             return abs(self.metrics_calculator.calculate_metric(RiskMetric.VAR))
 
 #         elif limit_type == RiskLimitType.VOLATILITY:
-            # Volatility
+#             # Volatility
 #             if self.returns.empty:
 #                 return 0.0
 
 #             return self.metrics_calculator.calculate_metric(RiskMetric.VOLATILITY)
 
 #         elif limit_type == RiskLimitType.LEVERAGE:
-            # Leverage
+#             # Leverage
 #             total_exposure = sum(
 #                 position["market_value"] for position in self.positions.values()
-            )
+#             )
 #             return total_exposure / self.equity if self.equity > 0 else 0.0
 
 #         elif limit_type == RiskLimitType.CUSTOM:
-            # Custom limit requires external logic
+#             # Custom limit requires external logic
 #             return 0.0
 
 #         return 0.0
@@ -1610,12 +1610,12 @@
 ##             **kwargs: Additional event data
 #        """"""
 #         event = {
-            "type": event_type,
-            "symbol": symbol,
-            "price": price,
-            "time": datetime.now(),
+#             "type": event_type,
+#             "symbol": symbol,
+#             "price": price,
+#             "time": datetime.now(),
 #             **kwargs,
-        }
+#         }
 
 #         self.risk_events.append(event)
 #         logger.info(f"Risk event: {event_type} for {symbol} at {price}")
@@ -1629,17 +1629,17 @@
 ##             current_value: Current value
 #        """"""
 #         breach = {
-            "limit_type": limit.limit_type.value,
-            "limit_value": limit.value,
-            "current_value": current_value,
-            "time": datetime.now(),
-            "action": limit.action,
-        }
+#             "limit_type": limit.limit_type.value,
+#             "limit_value": limit.value,
+#             "current_value": current_value,
+#             "time": datetime.now(),
+#             "action": limit.action,
+#         }
 
 #         self.limit_breaches.append(breach)
 #         logger.warning(
 #             f"Risk limit breach: {limit.limit_type.value}, limit={limit.value}, current={current_value}"
-        )
+#         )
 
 #     def _handle_limit_breach(self, limit: RiskLimit, current_value: float):
 #        """"""
@@ -1652,24 +1652,24 @@
 #         action, custom_action = limit.get_action()
 
 #         if action == "alert":
-            # Just log the breach (already done in _add_limit_breach)
+#             # Just log the breach (already done in _add_limit_breach)
 #             pass
 
 #         elif action == "reduce":
-            # Reduce exposure
+#             # Reduce exposure
 #             self._reduce_exposure(limit.limit_type, limit.value, current_value)
 
 #         elif action == "close":
-            # Close positions
+#             # Close positions
 #             self._close_positions(limit.limit_type)
 
 #         elif action == "custom" and custom_action is not None:
-            # Execute custom action
+#             # Execute custom action
 #             custom_action(limit, current_value, self)
 
 #     def _reduce_exposure(
 #         self, limit_type: RiskLimitType, limit_value: float, current_value: float
-    ):
+#     ):
 #        """"""
 ##         Reduce exposure to comply with risk limit.
 #
@@ -1679,116 +1679,116 @@
 ##             current_value: Current value
 #        """"""
 #         if limit_type == RiskLimitType.POSITION_SIZE:
-            # Reduce largest position
+#             # Reduce largest position
 #             if not self.positions:
 #                 return
 
-            # Find largest position
+#             # Find largest position
 #             largest_position = max(
 #                 self.positions.items(), key=lambda x: x[1]["market_value"]
-            )
+#             )
 #             symbol, position = largest_position
 
-            # Calculate reduction needed
+#             # Calculate reduction needed
 #             max_position_value = limit_value * self.portfolio_value
 #             current_position_value = position["market_value"]
 #             reduction_ratio = (
 #                 max_position_value / current_position_value
 #                 if current_position_value > 0
 #                 else 0.0
-            )
+#             )
 
 #             if reduction_ratio < 1.0:
-                # Reduce position size
+#                 # Reduce position size
 #                 new_quantity = position["quantity"] * reduction_ratio
 #                 self._add_risk_event(
-                    "position_reduced",
+#                     "position_reduced",
 #                     symbol,
 #                     position["current_price"],
 #                     old_quantity=position["quantity"],
 #                     new_quantity=new_quantity,
 #                     reason=f"Position size limit breach: {limit_value:.2%}",
-                )
+#                 )
 
-                # Update position
+#                 # Update position
 #                 self.update_position(symbol, position["current_price"], new_quantity)
 
 #         elif limit_type == RiskLimitType.EXPOSURE:
-            # Reduce overall exposure
+#             # Reduce overall exposure
 #             if not self.positions:
 #                 return
 
-            # Calculate total exposure
+#             # Calculate total exposure
 #             total_exposure = sum(
 #                 position["market_value"] for position in self.positions.values()
-            )
+#             )
 
-            # Calculate reduction needed
+#             # Calculate reduction needed
 #             max_exposure = limit_value * self.portfolio_value
 #             reduction_ratio = (
 #                 max_exposure / total_exposure if total_exposure > 0 else 0.0
-            )
+#             )
 
 #             if reduction_ratio < 1.0:
-                # Reduce all positions proportionally
+#                 # Reduce all positions proportionally
 #                 for symbol, position in self.positions.items():
 #                     new_quantity = position["quantity"] * reduction_ratio
 #                     self._add_risk_event(
-                        "position_reduced",
+#                         "position_reduced",
 #                         symbol,
 #                         position["current_price"],
 #                         old_quantity=position["quantity"],
 #                         new_quantity=new_quantity,
 #                         reason=f"Exposure limit breach: {limit_value:.2%}",
-                    )
+#                     )
 
-                    # Update position
+#                     # Update position
 #                     self.update_position(
 #                         symbol, position["current_price"], new_quantity
-                    )
+#                     )
 
 #         elif limit_type == RiskLimitType.CONCENTRATION:
-            # Reduce concentration in largest position
+#             # Reduce concentration in largest position
 #             if not self.positions:
 #                 return
 
-            # Find largest position
+#             # Find largest position
 #             largest_position = max(
 #                 self.positions.items(), key=lambda x: x[1]["market_value"]
-            )
+#             )
 #             symbol, position = largest_position
 
-            # Calculate total exposure
+#             # Calculate total exposure
 #             total_exposure = sum(
 #                 position["market_value"] for position in self.positions.values()
-            )
+#             )
 
-            # Calculate concentration
+#             # Calculate concentration
 #             concentration = (
 #                 position["market_value"] / total_exposure if total_exposure > 0 else 0.0
-            )
+#             )
 
 #             if concentration > limit_value:
-                # Calculate reduction needed
+#                 # Calculate reduction needed
 #                 new_position_value = limit_value * total_exposure
 #                 reduction_ratio = (
 #                     new_position_value / position["market_value"]
 #                     if position["market_value"] > 0
 #                     else 0.0
-                )
+#                 )
 
-                # Reduce position size
+#                 # Reduce position size
 #                 new_quantity = position["quantity"] * reduction_ratio
 #                 self._add_risk_event(
-                    "position_reduced",
+#                     "position_reduced",
 #                     symbol,
 #                     position["current_price"],
 #                     old_quantity=position["quantity"],
 #                     new_quantity=new_quantity,
 #                     reason=f"Concentration limit breach: {limit_value:.2%}",
-                )
+#                 )
 
-                # Update position
+#                 # Update position
 #                 self.update_position(symbol, position["current_price"], new_quantity)
 
 #     def _close_positions(self, limit_type: RiskLimitType):
@@ -1801,78 +1801,78 @@
 #         if (
 #             limit_type == RiskLimitType.DRAWDOWN
 #             or limit_type == RiskLimitType.DAILY_LOSS
-        ):
-            # Close all positions
+#         ):
+#             # Close all positions
 #             for symbol, position in list(self.positions.items()):
 #                 self._add_risk_event(
-                    "position_closed",
+#                     "position_closed",
 #                     symbol,
 #                     position["current_price"],
 #                     quantity=position["quantity"],
 #                     reason=f"{limit_type.value} limit breach",
-                )
+#                 )
 
-                # Remove position
+#                 # Remove position
 #                 self.remove_position(symbol)
 
 #         elif limit_type == RiskLimitType.POSITION_SIZE:
-            # Close largest position
+#             # Close largest position
 #             if not self.positions:
 #                 return
 
-            # Find largest position
+#             # Find largest position
 #             largest_position = max(
 #                 self.positions.items(), key=lambda x: x[1]["market_value"]
-            )
+#             )
 #             symbol, position = largest_position
 
 #             self._add_risk_event(
-                "position_closed",
+#                 "position_closed",
 #                 symbol,
 #                 position["current_price"],
 #                 quantity=position["quantity"],
 #                 reason=f"Position size limit breach",
-            )
+#             )
 
-            # Remove position
+#             # Remove position
 #             self.remove_position(symbol)
 
 #         elif limit_type == RiskLimitType.LEVERAGE:
-            # Close positions to reduce leverage
+#             # Close positions to reduce leverage
 #             if not self.positions:
 #                 return
 
-            # Sort positions by unrealized P&L (close worst performers first)
+#             # Sort positions by unrealized P&L (close worst performers first)
 #             sorted_positions = sorted(
 #                 self.positions.items(), key=lambda x: x[1]["unrealized_pnl_percent"]
-            )
+#             )
 
-            # Close positions until leverage is below limit
+#             # Close positions until leverage is below limit
 #             for symbol, position in sorted_positions:
 #                 self._add_risk_event(
-                    "position_closed",
+#                     "position_closed",
 #                     symbol,
 #                     position["current_price"],
 #                     quantity=position["quantity"],
 #                     reason=f"Leverage limit breach",
-                )
+#                 )
 
-                # Remove position
+#                 # Remove position
 #                 self.remove_position(symbol)
 
-                # Recalculate leverage
+#                 # Recalculate leverage
 #                 total_exposure = sum(p["market_value"] for p in self.positions.values())
 #                 leverage = total_exposure / self.equity if self.equity > 0 else 0.0
 
-                # Check if leverage is now below limit
+#                 # Check if leverage is now below limit
 #                 limit = next(
-                    (
-                        l
+#                     (
+#                         l
 #                         for l in self.risk_limits
 #                         if l.limit_type == RiskLimitType.LEVERAGE
-                    ),
+#                     ),
 #                     None,
-                )
+#                 )
 #                 if limit is None or leverage <= limit.value:
 #                     break
 

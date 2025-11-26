@@ -1,9 +1,9 @@
-#""""""
+# """"""
 ## Intrinio API connector for financial data.
 #
 ## This module provides a connector for accessing financial market data
 ## from Intrinio, including stock prices, fundamentals, and economic data.
-#""""""
+# """"""
 
 # from datetime import date, datetime, timedelta
 # import logging
@@ -20,7 +20,7 @@
 #     DataProvider,
 #     DataResponse,
 #     RateLimiter,
-)
+# )
 
 
 # class IntrinioConnector(APIConnector):
@@ -39,23 +39,23 @@
 #    """"""
 
 #     def __init__(self, api_key: str, sandbox: bool = False):
-        # Create credentials
+#         # Create credentials
 #         credentials = APICredentials(api_key=api_key)
 
-        # Set base URL based on environment
+#         # Set base URL based on environment
 #         if sandbox:
 #             base_url = "https://sandbox-api.intrinio.com"
 #         else:
 #             base_url = "https://api-v2.intrinio.com"
 
-        # Create rate limiter
-        # Intrinio has different rate limits based on subscription tier
-        # Using a conservative limit of 10 requests per minute
+#         # Create rate limiter
+#         # Intrinio has different rate limits based on subscription tier
+#         # Using a conservative limit of 10 requests per minute
 #         rate_limiter = RateLimiter(requests_per_minute=10)
 
 #         super().__init__(
 #             credentials=credentials, base_url=base_url, rate_limiter=rate_limiter
-        )
+#         )
 
 #         self.sandbox = sandbox
 #         self.logger = logging.getLogger(self.__class__.__name__)
@@ -81,8 +81,8 @@
 ##         success : bool
 ##             Whether authentication was successful.
 #        """"""
-        # Intrinio uses API key for authentication
-        # Test authentication by making a simple request
+#         # Intrinio uses API key for authentication
+#         # Test authentication by making a simple request
 #         response = self.get_company("AAPL")
 
 #         return response.is_success()
@@ -97,9 +97,9 @@
 ##             Headers for API requests.
 #        """"""
 #         return {
-            "Authorization": f"Bearer {self.credentials.api_key}",
-            "Accept": "application/json",
-        }
+#             "Authorization": f"Bearer {self.credentials.api_key}",
+#             "Accept": "application/json",
+#         }
 
 #     def get_company(self, identifier: str) -> DataResponse:
 #        """"""
@@ -122,7 +122,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_company_news(
 #         self, identifier: str, page_size: int = 100, next_page: Optional[str] = None
@@ -157,7 +157,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.NEWS,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_company_fundamentals(
 #         self,
@@ -197,11 +197,11 @@
 #         endpoint = f"companies/{identifier}/fundamentals"
 
 #         params = {
-            "statement": statement,
-            "fiscal_period": fiscal_period,
-            "reported": str(reported_only).lower(),
-            "page_size": page_size,
-        }
+#             "statement": statement,
+#             "fiscal_period": fiscal_period,
+#             "reported": str(reported_only).lower(),
+#             "page_size": page_size,
+#         }
 
 #         if fiscal_year:
 #             params["fiscal_year"] = fiscal_year
@@ -215,7 +215,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_company_metrics(
 #         self,
@@ -256,14 +256,14 @@
 
 #         params = {"frequency": frequency, "page_size": page_size}
 
-        # Convert metrics to string if needed
+#         # Convert metrics to string if needed
 #         if metrics:
 #             if isinstance(metrics, list):
 #                 params["metrics"] = ",".join(metrics)
 #             else:
 #                 params["metrics"] = metrics
 
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if start_date:
 #             if isinstance(start_date, (date, datetime)):
 #                 start_date = start_date.strftime("%Y-%m-%d")
@@ -283,7 +283,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_security_prices(
 #         self,
@@ -321,7 +321,7 @@
 
 #         params = {"frequency": frequency, "page_size": page_size}
 
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if start_date:
 #             if isinstance(start_date, (date, datetime)):
 #                 start_date = start_date.strftime("%Y-%m-%d")
@@ -341,7 +341,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_security_intraday_prices(
 #         self,
@@ -379,7 +379,7 @@
 
 #         params = {"frequency": frequency, "page_size": page_size}
 
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if start_date:
 #             if isinstance(start_date, (date, datetime)):
 #                 start_date = start_date.strftime("%Y-%m-%d")
@@ -399,7 +399,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_security_realtime_price(
 #         self, identifier: str, source: Optional[str] = None
@@ -432,7 +432,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_security_dividends(
 #         self,
@@ -470,7 +470,7 @@
 
 #         params = {"frequency": frequency, "page_size": page_size}
 
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if start_date:
 #             if isinstance(start_date, (date, datetime)):
 #                 start_date = start_date.strftime("%Y-%m-%d")
@@ -490,7 +490,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_security_earnings(
 #         self,
@@ -525,7 +525,7 @@
 
 #         params = {"page_size": page_size}
 
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if start_date:
 #             if isinstance(start_date, (date, datetime)):
 #                 start_date = start_date.strftime("%Y-%m-%d")
@@ -545,7 +545,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_economic_index(self, identifier: str) -> DataResponse:
 #        """"""
@@ -568,7 +568,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_economic_index_data(
 #         self,
@@ -606,7 +606,7 @@
 
 #         params = {"frequency": frequency, "page_size": page_size}
 
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if start_date:
 #             if isinstance(start_date, (date, datetime)):
 #                 start_date = start_date.strftime("%Y-%m-%d")
@@ -626,7 +626,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_stock_market_index(self, identifier: str) -> DataResponse:
 #        """"""
@@ -649,7 +649,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_stock_market_index_data(
 #         self,
@@ -687,7 +687,7 @@
 
 #         params = {"frequency": frequency, "page_size": page_size}
 
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if start_date:
 #             if isinstance(start_date, (date, datetime)):
 #                 start_date = start_date.strftime("%Y-%m-%d")
@@ -707,7 +707,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_forex_currency(self, pair: str) -> DataResponse:
 #        """"""
@@ -730,7 +730,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_forex_currency_prices(
 #         self,
@@ -768,7 +768,7 @@
 
 #         params = {"frequency": frequency, "page_size": page_size}
 
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if start_date:
 #             if isinstance(start_date, (date, datetime)):
 #                 start_date = start_date.strftime("%Y-%m-%d")
@@ -788,7 +788,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_options_chain(
 #         self,
@@ -829,7 +829,7 @@
 
 #         params = {"symbol": symbol, "page_size": page_size}
 
-        # Convert expiration to string if needed
+#         # Convert expiration to string if needed
 #         if expiration:
 #             if isinstance(expiration, (date, datetime)):
 #                 expiration = expiration.strftime("%Y-%m-%d")
@@ -853,7 +853,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_options_expirations(self, symbol: str) -> DataResponse:
 #        """"""
@@ -879,7 +879,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_options_prices(
 #         self,
@@ -914,7 +914,7 @@
 
 #         params = {"page_size": page_size}
 
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if start_date:
 #             if isinstance(start_date, (date, datetime)):
 #                 start_date = start_date.strftime("%Y-%m-%d")
@@ -934,7 +934,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def search_companies(
 #         self, query: str, page_size: int = 100, next_page: Optional[str] = None
@@ -969,7 +969,7 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def search_securities(
 #         self, query: str, page_size: int = 100, next_page: Optional[str] = None
@@ -1004,4 +1004,4 @@
 #             headers=self._prepare_headers(),
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )

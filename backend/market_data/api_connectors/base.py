@@ -1,9 +1,9 @@
-#""""""
+# """"""
 ## Base classes for API connectors to financial data providers.
 #
 ## This module provides abstract base classes and utility functions
 ## for implementing API connectors to financial data providers.
-#""""""
+# """"""
 
 # from abc import ABC, abstractmethod
 # from datetime import datetime, timedelta
@@ -70,7 +70,7 @@
 #     API credentials for financial data providers.
 
 #     Parameters
-    ----------
+#     ----------
 #     api_key : str, optional
 #         API key for authentication.
 #     api_secret : str, optional
@@ -106,7 +106,7 @@
 #         Convert credentials to dictionary.
 
 #         Returns
-        -------
+#         -------
 #         credentials_dict : dict
 #             Dictionary representation of the credentials.
 #        """"""
@@ -125,12 +125,12 @@
 #         Create credentials from dictionary.
 
 #         Parameters
-        ----------
+#         ----------
 #         data : dict
 #             Dictionary representation of the credentials.
 
 #         Returns
-        -------
+#         -------
 #         credentials : APICredentials
 #             Credentials created from the dictionary.
 #        """"""
@@ -149,12 +149,12 @@
 #         Create credentials from environment variables.
 
 #         Parameters
-        ----------
+#         ----------
 #         prefix : str, default=""
 #             Prefix for environment variables.
 
 #         Returns
-        -------
+#         -------
 #         credentials : APICredentials
 #             Credentials created from environment variables.
 #        """"""
@@ -175,12 +175,12 @@
 #         Create credentials from a file.
 
 #         Parameters
-        ----------
+#         ----------
 #         filepath : str
 #             Path to the credentials file.
 
 #         Returns
-        -------
+#         -------
 #         credentials : APICredentials
 #             Credentials created from the file.
 #        """"""
@@ -194,7 +194,7 @@
 #         Save credentials to a file.
 
 #         Parameters
-        ----------
+#         ----------
 #         filepath : str
 #             Path to save the credentials to.
 #        """"""
@@ -210,7 +210,7 @@
 #     to financial data providers.
 
 #     Parameters
-    ----------
+#     ----------
 #     provider : str
 #         Name of the data provider.
 #     endpoint : str
@@ -256,7 +256,7 @@
 #         Convert request to dictionary.
 
 #         Returns
-        -------
+#         -------
 #         request_dict : dict
 #             Dictionary representation of the request.
 #        """"""
@@ -279,12 +279,12 @@
 #         Create request from dictionary.
 
 #         Parameters
-        ----------
+#         ----------
 #         data : dict
 #             Dictionary representation of the request.
 
 #         Returns
-        -------
+#         -------
 #         request : DataRequest
 #             Request created from the dictionary.
 #        """"""
@@ -318,7 +318,7 @@
 #     from financial data providers.
 
 #     Parameters
-    ----------
+#     ----------
 #     request : DataRequest
 #         Request that generated this response.
 #     status_code : int
@@ -354,7 +354,7 @@
 #         Convert response to dictionary.
 
 #         Returns
-        -------
+#         -------
 #         response_dict : dict
 #             Dictionary representation of the response.
 #        """"""
@@ -376,14 +376,14 @@
 #         Create response from dictionary.
 
 #         Parameters
-        ----------
+#         ----------
 #         data : dict
 #             Dictionary representation of the response.
 #         request : DataRequest
 #             Request that generated this response.
 
 #         Returns
-        -------
+#         -------
 #         response : DataResponse
 #             Response created from the dictionary.
 #        """"""
@@ -405,7 +405,7 @@
 #         Check if the response was successful.
 
 #         Returns
-        -------
+#         -------
 #         is_success : bool
 #             Whether the response was successful.
 #        """"""
@@ -416,7 +416,7 @@
 #         Convert response data to DataFrame.
 
 #         Returns
-        -------
+#         -------
 #         df : DataFrame
 #             DataFrame created from the response data.
 #        """"""
@@ -452,7 +452,7 @@
 #     on API requests to financial data providers.
 
 #     Parameters
-    ----------
+#     ----------
 #     requests_per_second : float, optional
 #         Maximum number of requests per second.
 #     requests_per_minute : int, optional
@@ -533,7 +533,7 @@
 #         Enforce a rate limit.
 
 #         Parameters
-        ----------
+#         ----------
 #         timestamps : list
 #             List of timestamps for previous requests.
 #         limit : int or float
@@ -600,7 +600,7 @@
 #         credentials: APICredentials,
 #         base_url: str,
 #         rate_limiter: Optional[RateLimiter] = None,
-    ):
+#     ):
 #         self.credentials = credentials
 #         self.base_url = base_url
 #         self.rate_limiter = rate_limiter
@@ -667,7 +667,7 @@
 ##         response : DataResponse
 ##             Response from the API.
 #        """"""
-        # Create request object
+#         # Create request object
 #         request = DataRequest(
 #             provider=self.provider_name,
 #             endpoint=endpoint,
@@ -677,21 +677,21 @@
 #             headers=headers,
 #             category=category,
 #             format=format,
-        )
+#         )
 
-        # Apply rate limiting if configured
+#         # Apply rate limiting if configured
 #         if self.rate_limiter:
 #             self.rate_limiter.wait()
 
-        # Make the request
+#         # Make the request
 #         try:
 #             url = f"{self.base_url.rstrip('/')}/{endpoint.lstrip('/')}"
 
 #             response = self.session.request(
 #                 method=method, url=url, params=params, json=data, headers=headers
-            )
+#             )
 
-            # Parse response data based on content type
+#             # Parse response data based on content type
 #             content_type = response.headers.get("Content-Type", "")
 
 #             if "application/json" in content_type:
@@ -703,21 +703,21 @@
 #             else:
 #                 response_data = response.text
 
-            # Create response object
+#             # Create response object
 #             return DataResponse(
 #                 request=request,
 #                 status_code=response.status_code,
 #                 data=response_data,
 #                 headers=dict(response.headers),
-            )
+#             )
 
 #         except Exception as e:
 #             self.logger.error(f"Error making request: {e}")
 
-            # Create error response
+#             # Create error response
 #             return DataResponse(
 #                 request=request, status_code=500, data=None, error=str(e)
-            )
+#             )
 
 #     def close(self) -> None:
 #        """Close the API connector."""

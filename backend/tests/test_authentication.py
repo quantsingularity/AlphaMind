@@ -124,9 +124,9 @@
 ## def test_login_success(client):
 #    """Test successful user login."""
 #     client.post(
-        "/api/auth/register", json={"username": "loginuser", "password": "password123"}
+#         "/api/auth/register", json={"username": "loginuser", "password": "password123"}
 #     response = client.post(
-        "/api/auth/login", json={"username": "loginuser", "password": "password123"}
+#         "/api/auth/login", json={"username": "loginuser", "password": "password123"}
 #     assert response.status_code == 200
 #     assert response.json["message"] == "Login successful"
 #     assert "token" in response.json
@@ -148,7 +148,7 @@
 ## def test_login_nonexistent_user(client):
 #    """Test login for a user that does not exist."""
 #     response = client.post(
-        "/api/auth/login", json={"username": "nosuchuser", "password": "password123"}
+#         "/api/auth/login", json={"username": "nosuchuser", "password": "password123"}
 #     assert response.status_code == 401
 #     assert response.json["message"] == "Invalid credentials"
 
@@ -168,7 +168,7 @@
 #     username = "tokenuser_exp"
 #     token = auth_system.generate_token(username)
 #     time.sleep(1.1)  # Wait for slightly longer than the 1-second expiration
-    # Expect ExpiredSignatureError when verifying an expired token
+#     # Expect ExpiredSignatureError when verifying an expired token
 #     with pytest.raises(jwt.ExpiredSignatureError):
 #         auth_system.verify_token(token)
 
@@ -183,12 +183,12 @@
 #
 ## def test_token_required_decorator_success(client, auth_system):
 #    """Test the @token_required decorator with a valid token."""
-    # Register and login to get a valid token
+#     # Register and login to get a valid token
 #     client.post(
-        "/api/auth/register",
+#         "/api/auth/register",
 #         json={"username": "protecteduser", "password": "password123"},
 #     login_response = client.post(
-        "/api/auth/login", json={"username": "protecteduser", "password": "password123"}
+#         "/api/auth/login", json={"username": "protecteduser", "password": "password123"}
 #     token = login_response.json["token"]
 
 #     headers = {"Authorization": f"Bearer {token}"}

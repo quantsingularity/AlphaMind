@@ -1,10 +1,10 @@
-#""""""
+# """"""
 ## Parallel processing utilities for financial data.
 #
 ## This module provides classes and functions for parallel processing
 ## of financial data, including task management, worker pools, and
 ## distributed computing capabilities.
-#""""""
+# """"""
 
 # from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 # from functools import partial
@@ -69,11 +69,11 @@
 #         if not items:
 #             return []
 
-        # Create partial function with additional arguments
+#         # Create partial function with additional arguments
 #         if args or kwargs:
 #             func = partial(func, *args, **kwargs)
 
-        # Execute in parallel
+#         # Execute in parallel
 #         with self.executor_class(max_workers=self.n_workers) as executor:
 #             results = list(executor.map(func, items))
 
@@ -100,11 +100,11 @@
 #         if not funcs:
 #             return []
 
-        # Create partial functions with additional arguments
+#         # Create partial functions with additional arguments
 #         if args or kwargs:
 #             funcs = [partial(func, *args, **kwargs) for func in funcs]
 
-        # Execute in parallel
+#         # Execute in parallel
 #         with self.executor_class(max_workers=self.n_workers) as executor:
 #             futures = [executor.submit(func) for func in funcs]
 #             results = [future.result() for future in as_completed(futures)]
@@ -143,21 +143,21 @@
 #         if df.empty:
 #             return df
 
-        # Create partial function with additional arguments
+#         # Create partial function with additional arguments
 #         if args or kwargs:
 #             func = partial(func, *args, **kwargs)
 
 #         if by is not None:
-            # Group by specified column(s)
+#             # Group by specified column(s)
 #             groups = df.groupby(by)
 #             group_names = list(groups.groups.keys())
 
-            # Process each group in parallel
+#             # Process each group in parallel
 #             with self.executor_class(max_workers=self.n_workers) as executor:
 #                 futures = {
 #                     executor.submit(func, groups.get_group(name)): name
 #                     for name in group_names
-                }
+#                 }
 #                 results = {}
 
 #                 for future in as_completed(futures):
@@ -168,22 +168,22 @@
 #                         self.logger.error(f"Error processing group {name}: {e}")
 #                         results[name] = None
 
-            # Combine results
+#             # Combine results
 #             valid_results = [
 #                 result for result in results.values() if result is not None
-            ]
+#             ]
 #             if not valid_results:
 #                 return pd.DataFrame()
 
 #             return pd.concat(valid_results)
 
 #         else:
-            # Split DataFrame into partitions
+#             # Split DataFrame into partitions
 #             n_rows = len(df)
 #             chunk_size = max(1, n_rows // self.n_workers)
 #             chunks = [df.iloc[i : i + chunk_size] for i in range(0, n_rows, chunk_size)]
 
-            # Process each partition in parallel
+#             # Process each partition in parallel
 #             with self.executor_class(max_workers=self.n_workers) as executor:
 #                 futures = [executor.submit(func, chunk) for chunk in chunks]
 #                 results = []
@@ -194,7 +194,7 @@
 #                     except Exception as e:
 #                         self.logger.error(f"Error processing partition: {e}")
 
-            # Combine results
+#             # Combine results
 #             if not results:
 #                 return pd.DataFrame()
 
@@ -225,14 +225,14 @@
 #         if df.empty:
 #             return df
 
-        # Convert to Dask DataFrame
+#         # Convert to Dask DataFrame
 #         dask_df = dd.from_pandas(df, npartitions=self.n_workers)
 
-        # Create partial function with additional arguments
+#         # Create partial function with additional arguments
 #         if args or kwargs:
 #             func = partial(func, *args, **kwargs)
 
-        # Apply function to each partition
+#         # Apply function to each partition
 #         result_df = dask_df.map_partitions(func).compute()
 
 #         return result_df
@@ -264,21 +264,21 @@
 #         if df.empty:
 #             return pd.Series()
 
-        # Create partial function with additional arguments
+#         # Create partial function with additional arguments
 #         if args or kwargs:
 #             func = partial(func, *args, **kwargs)
 
-        # Get items to process
+#         # Get items to process
 #         if axis == 0:
 #             items = [df.iloc[i] for i in range(len(df))]
 #         else:
 #             items = [df[col] for col in df.columns]
 
-        # Process in parallel
+#         # Process in parallel
 #         with self.executor_class(max_workers=self.n_workers) as executor:
 #             results = list(executor.map(func, items))
 
-        # Create Series with results
+#         # Create Series with results
 #         if axis == 0:
 #             return pd.Series(results, index=df.index)
 #         else:
@@ -337,7 +337,7 @@
 #         if task_id in self.tasks:
 #             raise ValueError(f"Task with ID '{task_id}' already exists")
 
-        # Create partial function with additional arguments
+#         # Create partial function with additional arguments
 #         if args or kwargs:
 #             func = partial(func, *args, **kwargs)
 
@@ -353,34 +353,34 @@
 ##         results : dict
 ##             Dictionary mapping task IDs to results.
 #        """"""
-        # Reset results
+#         # Reset results
 #         self.results = {}
 
-        # Find tasks with no dependencies
+#         # Find tasks with no dependencies
 #         ready_tasks = [
 #             task_id for task_id, deps in self.dependencies.items() if not deps
-        ]
+#         ]
 #         pending_tasks = {
 #             task_id for task_id in self.tasks if task_id not in ready_tasks
-        }
+#         }
 
-        # Execute tasks in parallel
+#         # Execute tasks in parallel
 #         with self.executor_class(max_workers=self.n_workers) as executor:
 #             futures = {}
 
 #             while ready_tasks or futures:
-                # Submit ready tasks
+#                 # Submit ready tasks
 #                 for task_id in ready_tasks:
 #                     func = self.tasks[task_id]
 #                     futures[executor.submit(func)] = task_id
 
 #                 ready_tasks = []
 
-                # Wait for a task to complete
+#                 # Wait for a task to complete
 #                 if futures:
 #                     done, _ = concurrent.futures.wait(
 #                         futures.keys(), return_when=concurrent.futures.FIRST_COMPLETED
-                    )
+#                     )
 
 #                     for future in done:
 #                         task_id = futures.pop(future)
@@ -391,12 +391,12 @@
 #                             self.logger.error(f"Error executing task {task_id}: {e}")
 #                             self.results[task_id] = None
 
-                        # Find tasks that are now ready
+#                         # Find tasks that are now ready
 #                         for pending_id in list(pending_tasks):
 #                             if all(
 #                                 dep in self.results
 #                                 for dep in self.dependencies[pending_id]
-                            ):
+#                             ):
 #                                 ready_tasks.append(pending_id)
 #                                 pending_tasks.remove(pending_id)
 
@@ -436,7 +436,7 @@
 #     for executing tasks in parallel.
 
 #     Parameters
-    ----------
+#     ----------
 #     n_workers : int, optional
 #         Number of worker processes or threads.
 #         If None, uses the number of CPU cores.
@@ -460,7 +460,7 @@
 
 #         self.running = True
 
-        # Create and start workers
+#         # Create and start workers
 #         for _ in range(self.n_workers):
 #             if self.use_threads:
 #                 worker = threading.Thread(target=self._worker_loop)
@@ -492,14 +492,14 @@
 #        """Worker loop for processing tasks."""
 #         while self.running:
 #             try:
-                # Get a task from the queue
+#                 # Get a task from the queue
 #                 task = self.task_queue.get(timeout=1)
 
-                # Check for termination signal
+#                 # Check for termination signal
 #                 if task is None:
 #                     break
 
-                # Execute the task
+#                 # Execute the task
 #                 task_id, func, args, kwargs = task
 
 #                 try:
@@ -509,7 +509,7 @@
 #                     self.result_queue.put((task_id, None, str(e)))
 
 #             except queue.Empty:
-                # No tasks available, continue waiting
+#                 # No tasks available, continue waiting
 #                 continue
 
 #     def submit(self, func: Callable, *args, **kwargs) -> str:
@@ -533,10 +533,10 @@
 #         if not self.running:
 #             self.start()
 
-        # Generate a unique task ID
+#         # Generate a unique task ID
 #         task_id = str(uuid.uuid4())
 
-        # Add the task to the queue
+#         # Add the task to the queue
 #         self.task_queue.put((task_id, func, args, kwargs))
 
 #         return task_id
@@ -565,14 +565,14 @@
 #             raise RuntimeError("Worker pool is not running")
 
 #         if task_id is None:
-            # Get the next available result
+#             # Get the next available result
 #             try:
 #                 return self.result_queue.get(timeout=timeout)
 #             except queue.Empty:
 #                 raise TimeoutError("Timed out waiting for a result")
 
 #         else:
-            # Wait for a specific task to complete
+#             # Wait for a specific task to complete
 #             start_time = time.time()
 
 #             while timeout is None or time.time() - start_time < timeout:
@@ -582,11 +582,11 @@
 #                     if result[0] == task_id:
 #                         return result
 
-                    # Put the result back in the queue
+#                     # Put the result back in the queue
 #                     self.result_queue.put(result)
 
 #                 except queue.Empty:
-                    # No results available, continue waiting
+#                     # No results available, continue waiting
 #                     continue
 
 #             raise TimeoutError(f"Timed out waiting for task {task_id}")
@@ -622,7 +622,7 @@
 #                 task_id, result, error = self.result_queue.get(timeout=1)
 #                 results[task_id] = (result, error)
 #             except queue.Empty:
-                # No results available, continue waiting
+#                 # No results available, continue waiting
 #                 continue
 
 #         return results
@@ -646,13 +646,13 @@
 
 #     def __init__(
 #         self, scheduler: Optional[str] = None, n_workers: Optional[int] = None
-    ):
+#     ):
 #         self.scheduler = scheduler
 #         self.n_workers = n_workers or mp.cpu_count()
 #         self.client = None
 #         self.logger = logging.getLogger(self.__class__.__name__)
 
-        # Initialize Dask client
+#         # Initialize Dask client
 #         self._initialize_client()
 
 #     def _initialize_client(self) -> None:
@@ -680,7 +680,7 @@
 #         Process a DataFrame using Dask for distributed computing.
 
 #         Parameters
-        ----------
+#         ----------
 #         df : DataFrame
 #             DataFrame to process.
 #         func : callable
@@ -691,7 +691,7 @@
 #             Additional keyword arguments to pass to the function.
 
 #         Returns
-        -------
+#         -------
 #         result_df : DataFrame
 #             Processed DataFrame.
 #        """"""
@@ -715,7 +715,7 @@
 #         Submit a function for distributed execution.
 
 #         Parameters
-        ----------
+#         ----------
 #         func : callable
 #             Function to execute.
 #         *args : tuple
@@ -724,7 +724,7 @@
 #             Keyword arguments to pass to the function.
 
 #         Returns
-        -------
+#         -------
 #         future : Future
 #             Future object representing the computation.
 #        """"""
@@ -739,7 +739,7 @@
 #         Apply a function to each item in parallel.
 
 #         Parameters
-        ----------
+#         ----------
 #         func : callable
 #             Function to apply to each item.
 #         items : list
@@ -750,7 +750,7 @@
 #             Additional keyword arguments to pass to the function.
 
 #         Returns
-        -------
+#         -------
 #         results : list
 #             List of results.
 #        """"""

@@ -1,9 +1,9 @@
-#""""""
+# """"""
 ## FRED (Federal Reserve Economic Data) API connector.
 #
 ## This module provides a connector for accessing economic data
 ## from the Federal Reserve Economic Data (FRED) API.
-#""""""
+# """"""
 
 # from datetime import date, datetime, timedelta
 # import logging
@@ -20,7 +20,7 @@
 #     DataProvider,
 #     DataResponse,
 #     RateLimiter,
-)
+# )
 
 
 # class FREDConnector(APIConnector):
@@ -37,19 +37,19 @@
 #    """"""
 
 #     def __init__(self, api_key: str):
-        # Create credentials
+#         # Create credentials
 #         credentials = APICredentials(api_key=api_key)
 
-        # Set base URL
+#         # Set base URL
 #         base_url = "https://api.stlouisfed.org/fred"
 
-        # Create rate limiter
-        # FRED API has a limit of 120 requests per minute
+#         # Create rate limiter
+#         # FRED API has a limit of 120 requests per minute
 #         rate_limiter = RateLimiter(requests_per_minute=120)
 
 #         super().__init__(
 #             credentials=credentials, base_url=base_url, rate_limiter=rate_limiter
-        )
+#         )
 
 #         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -74,8 +74,8 @@
 ##         success : bool
 ##             Whether authentication was successful.
 #        """"""
-        # FRED uses API key for authentication
-        # Test authentication by making a simple request
+#         # FRED uses API key for authentication
+#         # Test authentication by making a simple request
 #         response = self.get_series("GDP")
 
 #         return response.is_success()
@@ -141,7 +141,7 @@
 
 #         params = self._add_api_key({"series_id": series_id})
 
-        # Convert dates to strings if needed
+#         # Convert dates to strings if needed
 #         if observation_start:
 #             if isinstance(observation_start, (date, datetime)):
 #                 observation_start = observation_start.strftime("%Y-%m-%d")
@@ -174,7 +174,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_series_info(self, series_id: str) -> DataResponse:
 #        """"""
@@ -199,7 +199,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def search_series(
 #         self,
@@ -249,7 +249,7 @@
 
 #         params = self._add_api_key(
 #             {"search_text": search_text, "limit": limit, "offset": offset}
-        )
+#         )
 
 #         if search_type:
 #             params["search_type"] = search_type
@@ -281,7 +281,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_series_categories(self, series_id: str) -> DataResponse:
 #        """"""
@@ -306,7 +306,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_series_release(self, series_id: str) -> DataResponse:
 #        """"""
@@ -331,7 +331,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_series_tags(self, series_id: str) -> DataResponse:
 #        """"""
@@ -356,7 +356,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_series_updates(
 #         self,
@@ -394,7 +394,7 @@
 #         if filter_value:
 #             params["filter_value"] = filter_value
 
-        # Convert times to strings if needed
+#         # Convert times to strings if needed
 #         if start_time:
 #             if isinstance(start_time, datetime):
 #                 start_time = start_time.strftime("%Y-%m-%d %H:%M:%S")
@@ -410,7 +410,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_series_vintagedates(
 #         self,
@@ -442,7 +442,7 @@
 
 #         params = self._add_api_key(
 #             {"series_id": series_id, "limit": limit, "offset": offset}
-        )
+#         )
 
 #         if sort_order:
 #             params["sort_order"] = sort_order
@@ -452,7 +452,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_category(self, category_id: int) -> DataResponse:
 #        """"""
@@ -477,7 +477,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_category_children(self, category_id: int) -> DataResponse:
 #        """"""
@@ -502,7 +502,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_category_related(self, category_id: int) -> DataResponse:
 #        """"""
@@ -527,7 +527,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_category_series(
 #         self,
@@ -574,7 +574,7 @@
 
 #         params = self._add_api_key(
 #             {"category_id": category_id, "limit": limit, "offset": offset}
-        )
+#         )
 
 #         if order_by:
 #             params["order_by"] = order_by
@@ -603,7 +603,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_category_tags(
 #         self,
@@ -647,7 +647,7 @@
 
 #         params = self._add_api_key(
 #             {"category_id": category_id, "limit": limit, "offset": offset}
-        )
+#         )
 
 #         if order_by:
 #             params["order_by"] = order_by
@@ -671,7 +671,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_releases(
 #         self,
@@ -714,7 +714,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_release(self, release_id: int) -> DataResponse:
 #        """"""
@@ -739,7 +739,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_release_dates(
 #         self,
@@ -773,15 +773,15 @@
 #         endpoint = "release/dates"
 
 #         params = self._add_api_key(
-            {
-                "release_id": release_id,
-                "limit": limit,
-                "offset": offset,
-                "include_release_date_with_no_data": str(
+#             {
+#                 "release_id": release_id,
+#                 "limit": limit,
+#                 "offset": offset,
+#                 "include_release_date_with_no_data": str(
 #                     include_release_date_with_no_data
 #                 ).lower(),
-            }
-        )
+#             }
+#         )
 
 #         if sort_order:
 #             params["sort_order"] = sort_order
@@ -791,7 +791,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_release_series(
 #         self,
@@ -838,7 +838,7 @@
 
 #         params = self._add_api_key(
 #             {"release_id": release_id, "limit": limit, "offset": offset}
-        )
+#         )
 
 #         if order_by:
 #             params["order_by"] = order_by
@@ -867,7 +867,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_release_sources(self, release_id: int) -> DataResponse:
 #        """"""
@@ -892,7 +892,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_release_tags(
 #         self,
@@ -936,7 +936,7 @@
 
 #         params = self._add_api_key(
 #             {"release_id": release_id, "limit": limit, "offset": offset}
-        )
+#         )
 
 #         if order_by:
 #             params["order_by"] = order_by
@@ -960,7 +960,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_release_related_tags(
 #         self,
@@ -1009,13 +1009,13 @@
 #             tag_names = ";".join(tag_names)
 
 #         params = self._add_api_key(
-            {
-                "release_id": release_id,
-                "tag_names": tag_names,
-                "limit": limit,
-                "offset": offset,
-            }
-        )
+#             {
+#                 "release_id": release_id,
+#                 "tag_names": tag_names,
+#                 "limit": limit,
+#                 "offset": offset,
+#             }
+#         )
 
 #         if order_by:
 #             params["order_by"] = order_by
@@ -1039,7 +1039,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_tags(
 #         self,
@@ -1102,7 +1102,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_related_tags(
 #         self,
@@ -1149,7 +1149,7 @@
 
 #         params = self._add_api_key(
 #             {"tag_names": tag_names, "limit": limit, "offset": offset}
-        )
+#         )
 
 #         if order_by:
 #             params["order_by"] = order_by
@@ -1173,7 +1173,7 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_tags_series(
 #         self,
@@ -1214,7 +1214,7 @@
 
 #         params = self._add_api_key(
 #             {"tag_names": tag_names, "limit": limit, "offset": offset}
-        )
+#         )
 
 #         if order_by:
 #             params["order_by"] = order_by
@@ -1232,4 +1232,4 @@
 #             params=params,
 #             category=DataCategory.ECONOMIC,
 #             format=DataFormat.JSON,
-        )
+#         )

@@ -51,7 +51,7 @@
 #        """Initialize and fit the tokenizer on the training texts"""
 #         self.tokenizer = tf.keras.preprocessing.text.Tokenizer(
 #             num_words=self.vocab_size, oov_token="<OOV>"
-        )
+#         )
 #         self.tokenizer.fit_on_texts(texts)
 
 #     def preprocess_text(self, texts):
@@ -67,14 +67,14 @@
 #
 ##     def train(self, texts, labels, validation_split=0.2, epochs=10, batch_size=32):
 #        """Train the sentiment analysis model"""
-        # Prepare tokenizer if not already done
+#         # Prepare tokenizer if not already done
 #         if self.tokenizer is None:
 #             self.prepare_tokenizer(texts)
 
-        # Preprocess text data
+#         # Preprocess text data
 #         padded_sequences = self.preprocess_text(texts)
 
-        # Train the model
+#         # Train the model
 #         history = self.model.fit(
 #             padded_sequences,
 #             np.array(labels),
@@ -84,9 +84,9 @@
 #             callbacks=[
 #                 tf.keras.callbacks.EarlyStopping(
 #                     monitor="val_loss", patience=3, restore_best_weights=True
-                )
-            ],
-        )
+#                 )
+#             ],
+#         )
 
 #         return history
 
@@ -268,33 +268,33 @@
 #        """Plot backtest results"""
 #         plt.figure(figsize=(14, 10))
 
-        # Plot equity curves
+#         # Plot equity curves
 #         plt.subplot(3, 1, 1)
 #         plt.plot(backtest_data["date"], backtest_data["market_equity"], label="Market")
 #         plt.plot(
 #             backtest_data["date"], backtest_data["strategy_equity"], label="Strategy"
-        )
+#         )
 #         plt.title("Equity Curves")
 #         plt.legend()
 #         plt.grid(True)
 
-        # Plot drawdowns
+#         # Plot drawdowns
 #         plt.subplot(3, 1, 2)
 #         plt.plot(
 #             backtest_data["date"], backtest_data["market_drawdown"], label="Market"
-        )
+#         )
 #         plt.plot(
 #             backtest_data["date"], backtest_data["strategy_drawdown"], label="Strategy"
-        )
+#         )
 #         plt.title("Drawdowns")
 #         plt.legend()
 #         plt.grid(True)
 
-        # Plot sentiment and positions
+#         # Plot sentiment and positions
 #         plt.subplot(3, 1, 3)
 #         plt.plot(
 #             backtest_data["date"], backtest_data["sentiment_ma"], label="Sentiment MA"
-        )
+#         )
 #         plt.plot(backtest_data["date"], backtest_data["position"], label="Position")
 #         plt.title("Sentiment and Positions")
 #         plt.legend()

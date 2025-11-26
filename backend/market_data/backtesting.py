@@ -1,10 +1,10 @@
-#""""""
+# """"""
 ## Backtesting Module for AlphaMind
 #
 ## This module provides comprehensive backtesting capabilities for trading strategies,
 ## including historical data processing, strategy execution simulation, performance
 ## analysis, and visualization tools.
-#""""""
+# """"""
 
 # from datetime import datetime, timedelta
 # from enum import Enum
@@ -21,7 +21,7 @@
 # Configure logging
 # logging.basicConfig(
 #     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+# )
 # logger = logging.getLogger(__name__)
 
 
@@ -65,7 +65,7 @@
 #         stop_price: Optional[float] = None,
 #         time_in_force: str = "GTC",
 #         order_id: Optional[str] = None,
-    ):
+#     ):
 #        """"""
 ##         Initialize a backtest order.
 #
@@ -97,7 +97,7 @@
 #         self.commission = 0.0
 #         self.slippage = 0.0
 
-        # Validate order
+#         # Validate order
 #         self._validate()
 
 #     def _validate(self):
@@ -181,23 +181,23 @@
 ##             Order as dictionary
 #        """"""
 #         return {
-            "order_id": self.order_id,
-            "symbol": self.symbol,
-            "side": self.side.value,
-            "quantity": self.quantity,
-            "order_type": self.order_type.value,
-            "price": self.price,
-            "stop_price": self.stop_price,
-            "time_in_force": self.time_in_force,
-            "status": self.status.value,
-            "filled_quantity": self.filled_quantity,
-            "filled_price": self.filled_price,
-            "filled_time": self.filled_time.isoformat() if self.filled_time else None,
-            "created_time": self.created_time.isoformat(),
-            "updated_time": self.updated_time.isoformat(),
-            "commission": self.commission,
-            "slippage": self.slippage,
-        }
+#             "order_id": self.order_id,
+#             "symbol": self.symbol,
+#             "side": self.side.value,
+#             "quantity": self.quantity,
+#             "order_type": self.order_type.value,
+#             "price": self.price,
+#             "stop_price": self.stop_price,
+#             "time_in_force": self.time_in_force,
+#             "status": self.status.value,
+#             "filled_quantity": self.filled_quantity,
+#             "filled_price": self.filled_price,
+#             "filled_time": self.filled_time.isoformat() if self.filled_time else None,
+#             "created_time": self.created_time.isoformat(),
+#             "updated_time": self.updated_time.isoformat(),
+#             "commission": self.commission,
+#             "slippage": self.slippage,
+#         }
 
 
 # class Position:
@@ -359,15 +359,15 @@
 
 #         self.equity = portfolio_value
 
-        # Record history
+#         # Record history
 #         self.history.append(
-            {
-                "time": datetime.now(),
-                "cash": self.cash,
-                "equity": self.equity,
-                "positions": {s: p.to_dict() for s, p in self.positions.items()},
-            }
-        )
+#             {
+#                 "time": datetime.now(),
+#                 "cash": self.cash,
+#                 "equity": self.equity,
+#                 "positions": {s: p.to_dict() for s, p in self.positions.items()},
+#             }
+#         )
 
 #     def apply_trade(
 #         self,
@@ -376,7 +376,7 @@
 #         quantity: float,
 #         price: float,
 #         commission: float = 0.0,
-    ):
+#     ):
 #        """"""
 ##         Apply a trade to the portfolio.
 #
@@ -392,24 +392,24 @@
 #        """"""
 #         position = self.get_position(symbol)
 
-        # Check if we have enough cash for buys
+#         # Check if we have enough cash for buys
 #         if side == OrderSide.BUY:
 #             cost = quantity * price + commission
 #             if cost > self.cash:
 #                 logger.warning(f"Insufficient cash for trade: {cost} > {self.cash}")
 #                 return False
 
-            # Update cash
+#             # Update cash
 #             self.cash -= cost
 
-        # Apply trade to position
+#         # Apply trade to position
 #         realized_pnl = position.apply_trade(side, quantity, price, commission)
 
-        # Update cash for sells
+#         # Update cash for sells
 #         if side == OrderSide.SELL:
 #             self.cash += quantity * price - commission
 
-        # Remove position if quantity is zero
+#         # Remove position if quantity is zero
 #         if position.quantity == 0:
 #             self.positions.pop(symbol, None)
 
@@ -423,12 +423,12 @@
 ##             Portfolio as dictionary
 #        """"""
 #         return {
-            "initial_cash": self.initial_cash,
-            "cash": self.cash,
-            "equity": self.equity,
-            "positions": {s: p.to_dict() for s, p in self.positions.items()},
-            "positions_count": len(self.positions),
-        }
+#             "initial_cash": self.initial_cash,
+#             "cash": self.cash,
+#             "equity": self.equity,
+#             "positions": {s: p.to_dict() for s, p in self.positions.items()},
+#             "positions_count": len(self.positions),
+#         }
 
 
 # class MarketSimulator:
@@ -605,7 +605,7 @@
 #         slippage_params: Dict = None,
 #         start_date: Optional[str] = None,
 #         end_date: Optional[str] = None,
-    ):
+#     ):
 #        """"""
 ##         Initialize backtesting engine.
 #
@@ -622,12 +622,12 @@
 #         self.portfolio = Portfolio(initial_cash)
 #         self.market_simulator = MarketSimulator(
 #             data, commission_rate, slippage_model, slippage_params
-        )
+#         )
 
-        # Prepare data
+#         # Prepare data
 #         self._prepare_data(start_date, end_date)
 
-        # Initialize state
+#         # Initialize state
 #         self.current_time = None
 #         self.current_bar = {}
 #         self.pending_orders = []
@@ -635,13 +635,13 @@
 #         self.canceled_orders = []
 #         self.rejected_orders = []
 
-        # Performance tracking
+#         # Performance tracking
 #         self.performance = {
-            "equity_curve": [],
-            "returns": [],
-            "drawdowns": [],
-            "trades": [],
-        }
+#             "equity_curve": [],
+#             "returns": [],
+#             "drawdowns": [],
+#             "trades": [],
+#         }
 
 #     def _prepare_data(self, start_date: Optional[str], end_date: Optional[str]):
 #        """"""
@@ -651,7 +651,7 @@
 ##             start_date: Start date for backtest
 ##             end_date: End date for backtest
 #        """"""
-        # Ensure all dataframes have datetime index
+#         # Ensure all dataframes have datetime index
 #         for symbol, df in self.data.items():
 #             if not isinstance(df.index, pd.DatetimeIndex):
 #                 if "timestamp" in df.columns:
@@ -659,9 +659,9 @@
 #                 else:
 #                     raise ValueError(
 #                         f"DataFrame for {symbol} must have datetime index or timestamp column"
-                    )
+#                     )
 
-        # Filter by date range
+#         # Filter by date range
 #         if start_date or end_date:
 #             for symbol, df in self.data.items():
 #                 if start_date:
@@ -669,7 +669,7 @@
 #                 if end_date:
 #                     self.data[symbol] = df[df.index <= pd.to_datetime(end_date)]
 
-        # Get common date range
+#         # Get common date range
 #         all_dates = set()
 #         for df in self.data.values():
 #             all_dates.update(df.index)
@@ -771,33 +771,33 @@
 ##     def _update_performance(self):
 #        """Update performance metrics."""
 #         self.performance["equity_curve"].append(
-            {
-                "time": self.current_time,
-                "equity": self.portfolio.equity,
-                "cash": self.portfolio.cash,
-            }
-        )
+#             {
+#                 "time": self.current_time,
+#                 "equity": self.portfolio.equity,
+#                 "cash": self.portfolio.cash,
+#             }
+#         )
 
-        # Calculate returns
+#         # Calculate returns
 #         if len(self.performance["equity_curve"]) > 1:
 #             prev_equity = self.performance["equity_curve"][-2]["equity"]
 #             curr_equity = self.performance["equity_curve"][-1]["equity"]
 #             returns = (curr_equity / prev_equity) - 1
 #             self.performance["returns"].append(
 #                 {"time": self.current_time, "returns": returns}
-            )
+#             )
 
-        # Calculate drawdowns
+#         # Calculate drawdowns
 #         equity_series = [p["equity"] for p in self.performance["equity_curve"]]
 #         if equity_series:
 #             max_equity = max(equity_series)
 #             current_equity = equity_series[-1]
 #             drawdown = (
 #                 (max_equity - current_equity) / max_equity if max_equity > 0 else 0
-            )
+#             )
 #             self.performance["drawdowns"].append(
 #                 {"time": self.current_time, "drawdown": drawdown}
-            )
+#             )
 
 #     def run(self, strategy_fn: Callable[[Dict, Portfolio, BacktestEngine], None]):
 #        """"""
@@ -809,26 +809,26 @@
 #         for date in self.dates:
 #             self.current_time = date
 
-            # Get current bar data for all symbols
+#             # Get current bar data for all symbols
 #             self.current_bar = {}
 #             for symbol, df in self.data.items():
 #                 if date in df.index:
 #                     self.current_bar[symbol] = df.loc[date]
 
-            # Update portfolio with current prices
+#             # Update portfolio with current prices
 #             current_prices = {s: bar["close"] for s, bar in self.current_bar.items()}
 #             self.portfolio.update(current_prices)
 
-            # Execute strategy
+#             # Execute strategy
 #             strategy_fn(self.current_bar, self.portfolio, self)
 
-            # Process orders
+#             # Process orders
 #             self._process_orders()
 
-            # Update performance metrics
+#             # Update performance metrics
 #             self._update_performance()
 
-        # Calculate final performance statistics
+#         # Calculate final performance statistics
 #         self._calculate_performance_stats()
 
 #     def _calculate_performance_stats(self):
@@ -1092,38 +1092,38 @@
 #             try:
 #                 df = pd.read_csv(file_path)
 
-                # Parse date column
+#                 # Parse date column
 #                 if date_format:
 #                     df[date_column] = pd.to_datetime(
 #                         df[date_column], format=date_format
-                    )
+#                     )
 #                 else:
 #                     df[date_column] = pd.to_datetime(df[date_column])
 
-                # Rename columns if mapping provided
+#                 # Rename columns if mapping provided
 #                 if columns_map:
 #                     df.rename(columns=columns_map, inplace=True)
 
-                # Ensure required columns exist
+#                 # Ensure required columns exist
 #                 required_columns = ["open", "high", "low", "close", "volume"]
 #                 missing_columns = [
 #                     col for col in required_columns if col not in df.columns
-                ]
+#                 ]
 
 #                 if missing_columns:
 #                     logger.warning(f"Missing columns for {symbol}: {missing_columns}")
 
-                    # Fill missing columns with defaults
+#                     # Fill missing columns with defaults
 #                     for col in missing_columns:
 #                         if col == "volume":
 #                             df[col] = 0
 #                         elif col in ["open", "high", "low"] and "close" in df.columns:
 #                             df[col] = df["close"]
 
-                # Set index
+#                 # Set index
 #                 df.set_index(date_column, inplace=True)
 
-                # Sort by date
+#                 # Sort by date
 #                 df.sort_index(inplace=True)
 
 #                 data[symbol] = df
@@ -1162,18 +1162,18 @@
 #             try:
 #                 df = api_client.get_historical_data(
 #                     symbol, interval=interval, start_date=start_date, end_date=end_date
-                )
+#                 )
 
-                # Ensure required columns exist
+#                 # Ensure required columns exist
 #                 required_columns = ["open", "high", "low", "close", "volume"]
 #                 missing_columns = [
 #                     col for col in required_columns if col not in df.columns
-                ]
+#                 ]
 
 #                 if missing_columns:
 #                     logger.warning(f"Missing columns for {symbol}: {missing_columns}")
 
-                    # Fill missing columns with defaults
+#                     # Fill missing columns with defaults
 #                     for col in missing_columns:
 #                         if col == "volume":
 #                             df[col] = 0
@@ -1207,29 +1207,29 @@
 
 #         for symbol, df in data.items():
 #             try:
-                # Ensure DataFrame has datetime index
+#                 # Ensure DataFrame has datetime index
 #                 if not isinstance(df.index, pd.DatetimeIndex):
 #                     raise ValueError(f"DataFrame for {symbol} must have datetime index")
 
-                # Resample
+#                 # Resample
 #                 resampled = df.resample(interval).agg(
-                    {
-                        "open": "first",
-                        "high": "max",
-                        "low": "min",
-                        "close": "last",
-                        "volume": "sum",
-                    }
-                )
+#                     {
+#                         "open": "first",
+#                         "high": "max",
+#                         "low": "min",
+#                         "close": "last",
+#                         "volume": "sum",
+#                     }
+#                 )
 
-                # Drop rows with NaN values
+#                 # Drop rows with NaN values
 #                 resampled.dropna(inplace=True)
 
 #                 resampled_data[symbol] = resampled
 
 #                 logger.info(
 #                     f"Resampled {symbol} data to {interval} interval, resulting in {len(resampled)} bars"
-                )
+#                 )
 
 #             except Exception as e:
 #                 logger.error(f"Error resampling data for {symbol}: {e}")
@@ -1253,14 +1253,14 @@
 #         if not data:
 #             return {}
 
-        # Get all unique dates
+#         # Get all unique dates
 #         all_dates = set()
 #         for df in data.values():
 #             all_dates.update(df.index)
 
 #         all_dates = sorted(all_dates)
 
-        # Reindex all dataframes
+#         # Reindex all dataframes
 #         aligned_data = {}
 
 #         for symbol, df in data.items():
@@ -1271,7 +1271,7 @@
 #             elif fill_method == "bfill":
 #                 reindexed.fillna(method="bfill", inplace=True)
 
-            # Drop rows that still have NaN values
+#             # Drop rows that still have NaN values
 #             reindexed.dropna(inplace=True)
 
 #             aligned_data[symbol] = reindexed
@@ -1296,10 +1296,10 @@
 #     if symbol not in bar_data:
 #         return
 
-    # Get position
+#     # Get position
 #     position = portfolio.get_position(symbol)
 
-    # Calculate moving averages
+#     # Calculate moving averages
 #     if not hasattr(example_strategy, "history"):
 #         example_strategy.history = []
 
@@ -1308,13 +1308,13 @@
 #     if len(example_strategy.history) < 50:
 #         return
 
-    # Calculate moving averages
+#     # Calculate moving averages
 #     short_ma = sum(example_strategy.history[-20:]) / 20
 #     long_ma = sum(example_strategy.history[-50:]) / 50
 
-    # Trading logic
+#     # Trading logic
 #     if short_ma > long_ma and position.quantity <= 0:
-        # Buy signal
+#         # Buy signal
 #         price = bar_data[symbol]["close"]
 #         cash = portfolio.cash
 #         quantity = int(cash * 0.95 / price)  # Use 95% of available cash
@@ -1325,17 +1325,17 @@
 #                 side=OrderSide.BUY,
 #                 quantity=quantity,
 #                 order_type=OrderType.MARKET,
-            )
+#             )
 #             engine.place_order(order)
 
 #     elif short_ma < long_ma and position.quantity > 0:
-        # Sell signal
+#         # Sell signal
 #         order = BacktestOrder(
 #             symbol=symbol,
 #             side=OrderSide.SELL,
 #             quantity=position.quantity,
 #             order_type=OrderType.MARKET,
-        )
+#         )
 #         engine.place_order(order)
 
 

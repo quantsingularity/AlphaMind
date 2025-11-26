@@ -1,10 +1,10 @@
-#""""""
+# """"""
 ## IEX Cloud API connector for financial data.
 #
 ## This module provides a connector for accessing financial market data
 ## from IEX Cloud, including stock prices, company data, market information,
 ## and more.
-#""""""
+# """"""
 
 # from datetime import datetime, timedelta
 # import logging
@@ -21,7 +21,7 @@
 #     DataProvider,
 #     DataResponse,
 #     RateLimiter,
-)
+# )
 
 
 # class IEXCloudConnector(APIConnector):
@@ -50,23 +50,23 @@
 #         api_secret: Optional[str] = None,
 #         sandbox: bool = False,
 #         version: str = "v1",
-    ):
-        # Create credentials
+#     ):
+#         # Create credentials
 #         credentials = APICredentials(api_key=api_key, api_secret=api_secret)
 
-        # Set base URL based on environment
+#         # Set base URL based on environment
 #         if sandbox:
 #             base_url = f"https://sandbox.iexapis.com/{version}"
 #         else:
 #             base_url = f"https://cloud.iexapis.com/{version}"
 
-        # Create rate limiter
-        # IEX Cloud has a limit of 100 requests per second per IP
+#         # Create rate limiter
+#         # IEX Cloud has a limit of 100 requests per second per IP
 #         rate_limiter = RateLimiter(requests_per_second=100)
 
 #         super().__init__(
 #             credentials=credentials, base_url=base_url, rate_limiter=rate_limiter
-        )
+#         )
 
 #         self.sandbox = sandbox
 #         self.version = version
@@ -93,8 +93,8 @@
 ##         success : bool
 ##             Whether authentication was successful.
 #        """"""
-        # IEX Cloud uses API key for authentication
-        # Test authentication by making a simple request
+#         # IEX Cloud uses API key for authentication
+#         # Test authentication by making a simple request
 #         response = self.get_quote("AAPL")
 
 #         return response.is_success()
@@ -141,7 +141,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_historical_prices(
 #         self,
@@ -181,13 +181,13 @@
 #         endpoint = f"stock/{symbol}/chart/{range}"
 
 #         params = self._add_token_param(
-            {
-                "chartByDay": str(chart_by_day).lower(),
-                "chartCloseOnly": str(chart_close_only).lower(),
-                "chartReset": str(chart_reset).lower(),
-                "chartSimplify": str(chart_simplify).lower(),
-            }
-        )
+#             {
+#                 "chartByDay": str(chart_by_day).lower(),
+#                 "chartCloseOnly": str(chart_close_only).lower(),
+#                 "chartReset": str(chart_reset).lower(),
+#                 "chartSimplify": str(chart_simplify).lower(),
+#             }
+#         )
 
 #         if chart_interval is not None:
 #             params["chartInterval"] = chart_interval
@@ -197,7 +197,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_company(self, symbol: str) -> DataResponse:
 #        """"""
@@ -221,7 +221,7 @@
 #             params=params,
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_financials(
 #         self, symbol: str, period: str = "quarter", last: int = 1
@@ -252,7 +252,7 @@
 #             params=params,
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_income_statement(
 #         self, symbol: str, period: str = "quarter", last: int = 1
@@ -283,7 +283,7 @@
 #             params=params,
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_balance_sheet(
 #         self, symbol: str, period: str = "quarter", last: int = 1
@@ -314,7 +314,7 @@
 #             params=params,
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_cash_flow(
 #         self, symbol: str, period: str = "quarter", last: int = 1
@@ -345,7 +345,7 @@
 #             params=params,
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_earnings(self, symbol: str, last: int = 1) -> DataResponse:
 #        """"""
@@ -372,7 +372,7 @@
 #             params=params,
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_dividends(self, symbol: str, range: str = "1m") -> DataResponse:
 #        """"""
@@ -398,7 +398,7 @@
 #             params=params,
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_splits(self, symbol: str, range: str = "1m") -> DataResponse:
 #        """"""
@@ -424,7 +424,7 @@
 #             params=params,
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_news(self, symbol: str, last: int = 10) -> DataResponse:
 #        """"""
@@ -450,7 +450,7 @@
 #             params=params,
 #             category=DataCategory.NEWS,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_peers(self, symbol: str) -> DataResponse:
 #        """"""
@@ -474,7 +474,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_stats(self, symbol: str) -> DataResponse:
 #        """"""
@@ -498,7 +498,7 @@
 #             params=params,
 #             category=DataCategory.FUNDAMENTAL,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_largest_trades(self, symbol: str) -> DataResponse:
 #        """"""
@@ -522,7 +522,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_market_volume(self) -> DataResponse:
 #        """"""
@@ -541,7 +541,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_market_list(
 #         self, list_type: str = "mostactive", list_size: int = 10
@@ -570,7 +570,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_sector_performance(self) -> DataResponse:
 #        """"""
@@ -589,7 +589,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_crypto_quote(self, symbol: str) -> DataResponse:
 #        """"""
@@ -613,7 +613,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_forex_rates(self, symbols: Optional[List[str]] = None) -> DataResponse:
 #        """"""
@@ -641,7 +641,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_options(
 #         self, symbol: str, expiration_date: Optional[str] = None
@@ -673,7 +673,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_batch_quotes(self, symbols: List[str]) -> DataResponse:
 #        """"""
@@ -698,7 +698,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def get_batch_data(
 #         self,
@@ -730,7 +730,7 @@
 
 #         params = self._add_token_param(
 #             {"symbols": ",".join(symbols), "types": ",".join(types)}
-        )
+#         )
 
 #         if range:
 #             params["range"] = range
@@ -743,7 +743,7 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )
 
 #     def search(self, fragment: str) -> DataResponse:
 #        """"""
@@ -767,4 +767,4 @@
 #             params=params,
 #             category=DataCategory.MARKET_DATA,
 #             format=DataFormat.JSON,
-        )
+#         )

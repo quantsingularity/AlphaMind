@@ -1,9 +1,9 @@
-#""""""
+# """"""
 ## Execution Strategy Selection Framework.
 #
 ## This module provides functionality for selecting and managing execution strategies
 ## based on market conditions, order characteristics, and performance metrics.
-#""""""
+# """"""
 
 # from dataclasses import dataclass, field
 # import datetime
@@ -76,12 +76,12 @@
 #        """Register default execution strategies."""
 #         for strategy in ExecutionAlgorithm:
 #             self.strategies[strategy] = {
-                "name": strategy.value,
-                "description": f"Default {strategy.value} strategy",
-                "enabled": True,
-                "parameters": {},
-                "suitability_function": self._default_suitability_function,
-            }
+#                 "name": strategy.value,
+#                 "description": f"Default {strategy.value} strategy",
+#                 "enabled": True,
+#                 "parameters": {},
+#                 "suitability_function": self._default_suitability_function,
+#             }
 
 #     def _default_suitability_function(
 #         self, order_size: float, market_condition: MarketCondition
@@ -95,7 +95,7 @@
 ##         Returns:
 ##             Suitability score (0-100)
 #        """"""
-        # Default implementation returns 50 (neutral score)
+#         # Default implementation returns 50 (neutral score)
 #         return 50.0
 
 #     def register_strategy(
@@ -116,12 +116,12 @@
 ##             enabled: Whether the strategy is enabled
 #        """"""
 #         self.strategies[strategy] = {
-            "name": strategy.value,
-            "description": description,
-            "enabled": enabled,
-            "parameters": parameters or {},
-            "suitability_function": suitability_function,
-        }
+#             "name": strategy.value,
+#             "description": description,
+#             "enabled": enabled,
+#             "parameters": parameters or {},
+#             "suitability_function": suitability_function,
+#         }
 #         logger.info(f"Registered execution strategy: {strategy.value}")
 
 #     def set_market_condition_thresholds(
@@ -208,7 +208,7 @@
 #             except Exception as e:
 #                 logger.error(
 #                     f"Error calculating suitability score for {strategy.value}: {str(e)}"
-                )
+#                 )
 #                 scores[strategy] = 0.0
 
 #         return scores
@@ -228,7 +228,7 @@
 #         scores = self.calculate_strategy_scores(order_size, market_condition)
 
 #         if not scores:
-            # Default to MARKET if no strategies are available
+#             # Default to MARKET if no strategies are available
 #             return ExecutionAlgorithm.MARKET, 0.0
 
 #         best_strategy = max(scores.items(), key=lambda x: x[1])
@@ -312,12 +312,12 @@
 #        """"""
 #         classification = {}
 
-        # Process standard metrics
+#         # Process standard metrics
 #         for metric in ["volatility", "spread", "depth", "volume", "momentum"]:
 #             value = getattr(market_condition, metric)
 #             classification[metric] = self._classify_metric(metric, value)
 
-        # Process additional metrics
+#         # Process additional metrics
 #         for metric, value in market_condition.additional_metrics.items():
 #             classification[metric] = self._classify_metric(metric, value)
 
@@ -342,5 +342,5 @@
 #             if value <= threshold:
 #                 return classification
 
-        # If no threshold is matched, return the highest classification
+#         # If no threshold is matched, return the highest classification
 #         return sorted(thresholds.keys())[-1]

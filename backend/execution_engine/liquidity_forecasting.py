@@ -19,7 +19,7 @@
 #                 self.mu
 #                 + (self.intensity - self.mu) * np.exp(-self.beta * (t - events[-1]))
 #                 + self.alpha
-            )
+#             )
 #         return np.array(events)
 
 #     def forecast_optimal_spread(self, mid_price):

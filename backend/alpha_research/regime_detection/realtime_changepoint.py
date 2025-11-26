@@ -20,4 +20,4 @@
 #             self.history[cp]
 #             for cp in change_points
 #             if cp > len(self.history) - self.jump
-        ]
+#         ]

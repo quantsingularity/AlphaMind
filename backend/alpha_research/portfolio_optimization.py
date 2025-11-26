@@ -318,17 +318,17 @@
 #        """Plot backtest results"""
 #         plt.figure(figsize=(14, 10))
 
-        # Plot portfolio value
+#         # Plot portfolio value
 #         plt.subplot(2, 1, 1)
 #         plt.plot(results["portfolio_value"])
 #         plt.title("Portfolio Value")
 #         plt.grid(True)
 
-        # Plot drawdowns
+#         # Plot drawdowns
 #         plt.subplot(2, 1, 2)
 #         plt.fill_between(
 #             range(len(results)), 0, results["drawdown"], color="red", alpha=0.3
-        )
+#         )
 #         plt.title("Drawdowns")
 #         plt.grid(True)
 
@@ -343,4 +343,4 @@
 #        """Load the model from disk"""
 #         self.model = tf.keras.models.load_model(
 #             filepath, custom_objects={"_portfolio_loss": self._portfolio_loss}
-        )
+#         )
