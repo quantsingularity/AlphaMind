@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from scipy.stats import multivariate_t
+from scipy.stats import multivariate_t, multivariate_normal
 
 
 class ExtremeScenarioGenerator:
@@ -22,7 +22,14 @@ class ExtremeScenarioGenerator:
             )
             return rv.rvs(n_scenarios)
 
-        raise NotImplementedError("Only t-copula is implemented.")
+        elif self.copula == "gaussian":
+            rv = multivariate_normal(
+                mean=np.zeros(len(crisis_corr)),
+                cov=crisis_corr,
+            )
+            return rv.rvs(n_scenarios)
+
+        raise NotImplementedError(f"Copula type '{self.copula}' is not implemented.")
 
     def _create_dependence_matrix(self, base_corr):
         """

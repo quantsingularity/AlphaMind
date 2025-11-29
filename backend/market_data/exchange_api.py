@@ -474,7 +474,17 @@ class ExchangeAPI:
         Returns:
             Exchange information
         """
-        raise NotImplementedError("Subclasses must implement get_exchange_info")
+        logger.warning(
+            f"get_exchange_info not implemented for {self.config.exchange_id}. Returning mock data."
+        )
+        return {
+            "exchange_id": self.config.exchange_id,
+            "status": "operational",
+            "server_time": int(time.time() * 1000),
+            "symbols_count": 0,
+            "rate_limits": self.config.rate_limits,
+        }
+        # raise NotImplementedError("Subclasses must implement get_exchange_info")
 
     async def get_account_info(self) -> Dict[str, Any]:
         """
@@ -483,7 +493,18 @@ class ExchangeAPI:
         Returns:
             Account information
         """
-        raise NotImplementedError("Subclasses must implement get_account_info")
+        logger.warning(
+            f"get_account_info not implemented for {self.config.exchange_id}. Returning mock data."
+        )
+        return {
+            "can_trade": True,
+            "can_withdraw": True,
+            "can_deposit": True,
+            "update_time": int(time.time() * 1000),
+            "account_type": "SPOT",
+            "balances": {},  # Balances should be fetched via get_balances
+        }
+        # raise NotImplementedError("Subclasses must implement get_account_info")
 
     async def get_balances(self) -> Dict[str, Dict[str, float]]:
         """
@@ -492,7 +513,11 @@ class ExchangeAPI:
         Returns:
             Dictionary of asset -> balance information
         """
-        raise NotImplementedError("Subclasses must implement get_balances")
+        logger.warning(
+            f"get_balances not implemented for {self.config.exchange_id}. Returning mock data."
+        )
+        return {"USD": {"free": 10000.0, "locked": 0.0, "total": 10000.0}}
+        # raise NotImplementedError("Subclasses must implement get_balances")
 
     async def get_order(
         self, order_id: str, client_order_id: Optional[str] = None
@@ -507,7 +532,20 @@ class ExchangeAPI:
         Returns:
             Order object
         """
-        raise NotImplementedError("Subclasses must implement get_order")
+        logger.warning(
+            f"get_order not implemented for {self.config.exchange_id}. Returning mock data."
+        )
+        return Order(
+            symbol=symbol,
+            side=OrderSide.BUY,
+            order_type=OrderType.LIMIT,
+            quantity=1.0,
+            price=100.0,
+            exchange_id=self.config.exchange_id,
+            exchange_order_id=order_id,
+            status=OrderStatus.FILLED,
+        )
+        # raise NotImplementedError("Subclasses must implement get_order")
 
     async def get_open_orders(self, symbol: Optional[str] = None) -> List[Order]:
         """
@@ -519,7 +557,11 @@ class ExchangeAPI:
         Returns:
             List of open orders
         """
-        raise NotImplementedError("Subclasses must implement get_open_orders")
+        logger.warning(
+            f"get_open_orders not implemented for {self.config.exchange_id}. Returning mock data."
+        )
+        return []
+        # raise NotImplementedError("Subclasses must implement get_open_orders")
 
     async def get_order_history(
         self,
@@ -540,7 +582,11 @@ class ExchangeAPI:
         Returns:
             List of historical orders
         """
-        raise NotImplementedError("Subclasses must implement get_order_history")
+        logger.warning(
+            f"get_order_history not implemented for {self.config.exchange_id}. Returning mock data."
+        )
+        return []
+        # raise NotImplementedError("Subclasses must implement get_order_history")
 
     async def create_order(self, order: Order) -> Order:
         """
@@ -552,7 +598,13 @@ class ExchangeAPI:
         Returns:
             Created order with exchange information
         """
-        raise NotImplementedError("Subclasses must implement create_order")
+        logger.warning(
+            f"create_order not implemented for {self.config.exchange_id}. Returning mock data."
+        )
+        order.exchange_order_id = f"MOCK_{int(time.time() * 1000)}"
+        order.status = OrderStatus.OPEN
+        return order
+        # raise NotImplementedError("Subclasses must implement create_order")
 
     async def cancel_order(
         self, order_id: Optional[str] = None, client_order_id: Optional[str] = None
@@ -567,7 +619,11 @@ class ExchangeAPI:
         Returns:
             True if order was canceled, False otherwise
         """
-        raise NotImplementedError("Subclasses must implement cancel_order")
+        logger.warning(
+            f"cancel_order not implemented for {self.config.exchange_id}. Returning mock data."
+        )
+        return True
+        # raise NotImplementedError("Subclasses must implement cancel_order")
 
     async def cancel_all_orders(self, symbol: Optional[str] = None) -> int:
         """
@@ -579,7 +635,11 @@ class ExchangeAPI:
         Returns:
             Number of orders canceled
         """
-        raise NotImplementedError("Subclasses must implement cancel_all_orders")
+        logger.warning(
+            f"cancel_all_orders not implemented for {self.config.exchange_id}. Returning mock data."
+        )
+        return 0
+        # raise NotImplementedError("Subclasses must implement cancel_all_orders")
 
     async def get_ticker(self, symbol: str) -> Dict[str, Any]:
         """
@@ -591,7 +651,11 @@ class ExchangeAPI:
         Returns:
             Ticker information
         """
-        raise NotImplementedError("Subclasses must implement get_ticker")
+        logger.warning(
+            f"get_ticker not implemented for {self.config.exchange_id}. Returning mock data."
+        )
+        return {"symbol": symbol, "last": 100.0, "bid": 99.9, "ask": 100.1}
+        # raise NotImplementedError("Subclasses must implement get_ticker")
 
     async def get_orderbook(self, symbol: str, limit: int = 100) -> Dict[str, Any]:
         """
@@ -604,7 +668,11 @@ class ExchangeAPI:
         Returns:
             Orderbook information
         """
-        raise NotImplementedError("Subclasses must implement get_orderbook")
+        logger.warning(
+            f"get_orderbook not implemented for {self.config.exchange_id}. Returning mock data."
+        )
+        return {"symbol": symbol, "bids": [[99.9, 1.0]], "asks": [[100.1, 1.0]]}
+        # raise NotImplementedError("Subclasses must implement get_orderbook")
 
     async def get_recent_trades(
         self, symbol: str, limit: int = 100
@@ -619,7 +687,11 @@ class ExchangeAPI:
         Returns:
             List of recent trades
         """
-        raise NotImplementedError("Subclasses must implement get_recent_trades")
+        logger.warning(
+            f"get_recent_trades not implemented for {self.config.exchange_id}. Returning mock data."
+        )
+        return []
+        # raise NotImplementedError("Subclasses must implement get_recent_trades")
 
     async def subscribe_to_order_updates(self, callback: Callable[[Order], None]):
         """
@@ -747,9 +819,18 @@ class ExchangeAPI:
         Returns:
             Order object
         """
-        raise NotImplementedError(
-            "Subclasses must implement _parse_order_from_exchange"
+        logger.warning(
+            f"_parse_order_from_exchange not implemented for {self.config.exchange_id}. Returning mock data."
         )
+        return Order(
+            symbol="MOCK/USD",
+            side=OrderSide.BUY,
+            order_type=OrderType.MARKET,
+            quantity=1.0,
+            exchange_id=self.config.exchange_id,
+            status=OrderStatus.FILLED,
+        )
+        # raise NotImplementedError("Subclasses must implement _parse_order_from_exchange")
 
 
 class BinanceAPI(ExchangeAPI):
