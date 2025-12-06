@@ -12,8 +12,6 @@ Bloomberg Desktop API or Server API access.
 from datetime import date, datetime
 import logging
 from typing import Any, Dict, List, Optional, Union
-
-
 from .base import (
     APIConnector,
     APICredentials,
@@ -54,27 +52,16 @@ class BloombergConnector(APIConnector):
         api_secret: Optional[str] = None,
         host: str = "localhost",
         port: int = 8194,
-    ):
-        # Create credentials
+    ) -> Any:
         credentials = APICredentials(api_key=api_key, api_secret=api_secret)
-
-        # Set base URL
         base_url = f"http://{host}:{port}"
-
-        # Create rate limiter
-        # Assuming a default rate limit, which can be adjusted.
         rate_limiter = RateLimiter(requests_per_second=10)
-
         super().__init__(
             credentials=credentials, base_url=base_url, rate_limiter=rate_limiter
         )
-
         self.host = host
         self.port = port
         self.logger = logging.getLogger(self.__class__.__name__)
-
-        # Placeholder for Bloomberg session, actual implementation would require
-        # an object from the Bloomberg SDK (e.g., blpapi.Session)
         self.session = None
 
     @property
@@ -98,7 +85,6 @@ class BloombergConnector(APIConnector):
         success : bool
             Whether authentication was successful.
         """
-        # Stub implementation
         self.logger.warning(
             "This is a stub implementation. Actual implementation requires Bloomberg API access."
         )
@@ -175,7 +161,6 @@ class BloombergConnector(APIConnector):
         response : DataResponse
             Response containing the reference data.
         """
-        # Create request
         request = self._create_request(
             endpoint="//blp/refdata",
             params={
@@ -186,8 +171,6 @@ class BloombergConnector(APIConnector):
             },
             category=DataCategory.MARKET_DATA,
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Bloomberg API access.",
@@ -222,14 +205,10 @@ class BloombergConnector(APIConnector):
         response : DataResponse
             Response containing the historical data.
         """
-        # Convert dates to strings if needed
         if isinstance(start_date, (date, datetime)):
             start_date = start_date.strftime("%Y%m%d")
-
         if isinstance(end_date, (date, datetime)):
             end_date = end_date.strftime("%Y%m%d")
-
-        # Create request
         request = self._create_request(
             endpoint="//blp/refdata",
             params={
@@ -243,8 +222,6 @@ class BloombergConnector(APIConnector):
             },
             category=DataCategory.MARKET_DATA,
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Bloomberg API access.",
@@ -279,14 +256,10 @@ class BloombergConnector(APIConnector):
         response : DataResponse
             Response containing the intraday bar data.
         """
-        # Convert datetimes to strings if needed
         if isinstance(start_datetime, datetime):
             start_datetime = start_datetime.strftime("%Y-%m-%dT%H:%M:%S")
-
         if isinstance(end_datetime, datetime):
             end_datetime = end_datetime.strftime("%Y-%m-%dT%H:%M:%S")
-
-        # Create request
         request = self._create_request(
             endpoint="//blp/refdata",
             params={
@@ -298,8 +271,6 @@ class BloombergConnector(APIConnector):
             },
             category=DataCategory.MARKET_DATA,
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Bloomberg API access.",
@@ -331,14 +302,10 @@ class BloombergConnector(APIConnector):
         response : DataResponse
             Response containing the intraday tick data.
         """
-        # Convert datetimes to strings if needed
         if isinstance(start_datetime, datetime):
             start_datetime = start_datetime.strftime("%Y-%m-%dT%H:%M:%S")
-
         if isinstance(end_datetime, datetime):
             end_datetime = end_datetime.strftime("%Y-%m-%dT%H:%M:%S")
-
-        # Create request
         request = self._create_request(
             endpoint="//blp/refdata",
             params={
@@ -351,8 +318,6 @@ class BloombergConnector(APIConnector):
             },
             category=DataCategory.MARKET_DATA,
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Bloomberg API access.",
@@ -376,7 +341,6 @@ class BloombergConnector(APIConnector):
         response : DataResponse
             Response containing the portfolio data.
         """
-        # Create request
         request = self._create_request(
             endpoint="//blp/refdata",
             params={
@@ -385,8 +349,6 @@ class BloombergConnector(APIConnector):
             },
             category=DataCategory.MARKET_DATA,
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Bloomberg API access.",
@@ -410,14 +372,11 @@ class BloombergConnector(APIConnector):
         response : DataResponse
             Response containing the curve data.
         """
-        # Create request
         request = self._create_request(
             endpoint="//blp/refdata",
             params={"curve": curve, "points": points},
             category=DataCategory.MARKET_DATA,
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Bloomberg API access.",
@@ -452,14 +411,10 @@ class BloombergConnector(APIConnector):
         response : DataResponse
             Response containing the technical indicators.
         """
-        # Convert dates to strings if needed
         if isinstance(start_date, (date, datetime)):
             start_date = start_date.strftime("%Y%m%d")
-
         if isinstance(end_date, (date, datetime)):
             end_date = end_date.strftime("%Y%m%d")
-
-        # Create request
         request = self._create_request(
             endpoint="//blp/refdata",
             params={
@@ -471,8 +426,6 @@ class BloombergConnector(APIConnector):
             },
             category=DataCategory.MARKET_DATA,
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Bloomberg API access.",
@@ -501,14 +454,10 @@ class BloombergConnector(APIConnector):
         response : DataResponse
             Response containing the economic data.
         """
-        # Convert dates to strings if needed
         if isinstance(start_date, (date, datetime)):
             start_date = start_date.strftime("%Y%m%d")
-
         if isinstance(end_date, (date, datetime)):
             end_date = end_date.strftime("%Y%m%d")
-
-        # Create request
         request = self._create_request(
             endpoint="//blp/refdata",
             params={
@@ -520,8 +469,6 @@ class BloombergConnector(APIConnector):
             },
             category=DataCategory.ECONOMIC,
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Bloomberg API access.",
@@ -545,7 +492,6 @@ class BloombergConnector(APIConnector):
         response : DataResponse
             Response containing the fundamental data.
         """
-        # Create request
         request = self._create_request(
             endpoint="//blp/refdata",
             params={
@@ -556,8 +502,6 @@ class BloombergConnector(APIConnector):
             },
             category=DataCategory.FUNDAMENTAL,
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Bloomberg API access.",
@@ -581,7 +525,6 @@ class BloombergConnector(APIConnector):
         response : DataResponse
             Response containing the market data.
         """
-        # Create request
         request = self._create_request(
             endpoint="//blp/mktdata",
             params={
@@ -592,8 +535,6 @@ class BloombergConnector(APIConnector):
             },
             category=DataCategory.MARKET_DATA,
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Bloomberg API access.",
@@ -601,10 +542,7 @@ class BloombergConnector(APIConnector):
 
     def close(self) -> None:
         """Close the Bloomberg connector."""
-        # Stub implementation
         self.logger.info("Closing Bloomberg connector.")
-
         if self.session:
             self.logger.info("Closing Bloomberg session.")
-            # In an actual implementation, this is where you would call session.stop() or equivalent
             self.session = None

@@ -8,8 +8,6 @@
 from datetime import date, datetime
 import logging
 from typing import Dict, List, Optional, Union
-
-
 from .base import (
     APIConnector,
     APICredentials,
@@ -34,21 +32,13 @@ class TiingoConnector(APIConnector):
         Tiingo API key.
     """
 
-    def __init__(self, api_key: str):
-        # Create credentials
+    def __init__(self, api_key: str) -> Any:
         credentials = APICredentials(api_key=api_key)
-
-        # Set base URL
         base_url = "https://api.tiingo.com"
-
-        # Create rate limiter
-        # Tiingo has a limit of 500 requests per hour
         rate_limiter = RateLimiter(requests_per_hour=500)
-
         super().__init__(
             credentials=credentials, base_url=base_url, rate_limiter=rate_limiter
         )
-
         self.logger = logging.getLogger(self.__class__.__name__)
 
     @property
@@ -72,10 +62,7 @@ class TiingoConnector(APIConnector):
         success : bool
             Whether authentication was successful.
         """
-        # Tiingo uses API key for authentication
-        # Test authentication by making a simple request
         response = self.get_ticker_metadata("AAPL")
-
         return response.is_success()
 
     def _prepare_headers(self) -> Dict[str, str]:
@@ -107,7 +94,6 @@ class TiingoConnector(APIConnector):
             Response containing the ticker metadata.
         """
         endpoint = f"tiingo/daily/{ticker}"
-
         return self.request(
             endpoint=endpoint,
             headers=self._prepare_headers(),
@@ -148,26 +134,19 @@ class TiingoConnector(APIConnector):
             Response containing the historical price data.
         """
         endpoint = f"tiingo/daily/{ticker}/prices"
-
         params = {}
-
-        # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["startDate"] = start_date
-
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["endDate"] = end_date
-
         params["format"] = fmt
         params["frequency"] = frequency
-
         if resample_freq:
             params["resampleFreq"] = resample_freq
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -209,26 +188,19 @@ class TiingoConnector(APIConnector):
             Response containing the intraday price data.
         """
         endpoint = f"iex/{ticker}"
-
         params = {}
-
-        # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%dT%H:%M:%S")
             params["startDate"] = start_date
-
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%dT%H:%M:%S")
             params["endDate"] = end_date
-
         if resample_freq:
             params["resampleFreq"] = resample_freq
-
         params["format"] = fmt
         params["afterHours"] = str(after_hours).lower()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -270,26 +242,19 @@ class TiingoConnector(APIConnector):
             Response containing the news.
         """
         endpoint = "tiingo/news"
-
         params = {"limit": limit, "offset": offset, "sortBy": sort}
-
-        # Convert tickers to string if needed
         if isinstance(tickers, list):
             params["tickers"] = ",".join(tickers)
         else:
             params["tickers"] = tickers
-
-        # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["startDate"] = start_date
-
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["endDate"] = end_date
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -331,20 +296,15 @@ class TiingoConnector(APIConnector):
             Response containing the search results.
         """
         endpoint = "tiingo/news"
-
         params = {"query": query, "limit": limit, "offset": offset, "sortBy": sort}
-
-        # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["startDate"] = start_date
-
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["endDate"] = end_date
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -380,20 +340,15 @@ class TiingoConnector(APIConnector):
             Response containing the fundamentals data.
         """
         endpoint = f"tiingo/fundamentals/{ticker}/statements"
-
         params = {"format": fmt}
-
-        # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["startDate"] = start_date
-
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["endDate"] = end_date
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -417,9 +372,7 @@ class TiingoConnector(APIConnector):
             Response containing the fundamentals definitions.
         """
         endpoint = "tiingo/fundamentals/definitions"
-
         params = {"format": fmt}
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -455,20 +408,15 @@ class TiingoConnector(APIConnector):
             Response containing the fundamentals metrics.
         """
         endpoint = f"tiingo/fundamentals/{ticker}/daily"
-
         params = {"format": fmt}
-
-        # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["startDate"] = start_date
-
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["endDate"] = end_date
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -494,16 +442,12 @@ class TiingoConnector(APIConnector):
             Response containing the cryptocurrency metadata.
         """
         endpoint = "tiingo/crypto"
-
         params = {}
-
-        # Convert tickers to string if needed
         if tickers:
             if isinstance(tickers, list):
                 params["tickers"] = ",".join(tickers)
             else:
                 params["tickers"] = tickers
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -554,7 +498,6 @@ class TiingoConnector(APIConnector):
             Response containing the historical price data.
         """
         endpoint = f"tiingo/crypto/prices"
-
         params = {
             "tickers": ticker,
             "baseCurrency": base_currency,
@@ -562,28 +505,21 @@ class TiingoConnector(APIConnector):
             "consolidate": str(consolidate).lower(),
             "format": fmt,
         }
-
-        # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["startDate"] = start_date
-
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["endDate"] = end_date
-
         if resample_freq:
             params["resampleFreq"] = resample_freq
-
-        # Convert exchanges to string if needed
         if exchanges:
             if isinstance(exchanges, list):
                 params["exchanges"] = ",".join(exchanges)
             else:
                 params["exchanges"] = exchanges
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -619,22 +555,16 @@ class TiingoConnector(APIConnector):
             Response containing the top of book data.
         """
         endpoint = "tiingo/crypto/top"
-
         params = {"includePrice": str(include_price).lower(), "format": fmt}
-
-        # Convert tickers to string if needed
         if isinstance(tickers, list):
             params["tickers"] = ",".join(tickers)
         else:
             params["tickers"] = tickers
-
-        # Convert exchanges to string if needed
         if exchanges:
             if isinstance(exchanges, list):
                 params["exchanges"] = ",".join(exchanges)
             else:
                 params["exchanges"] = exchanges
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -660,16 +590,12 @@ class TiingoConnector(APIConnector):
             Response containing the forex metadata.
         """
         endpoint = "tiingo/fx"
-
         params = {}
-
-        # Convert tickers to string if needed
         if tickers:
             if isinstance(tickers, list):
                 params["tickers"] = ",".join(tickers)
             else:
                 params["tickers"] = tickers
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -708,23 +634,17 @@ class TiingoConnector(APIConnector):
             Response containing the historical price data.
         """
         endpoint = f"tiingo/fx/{ticker}/prices"
-
         params = {"format": fmt}
-
-        # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["startDate"] = start_date
-
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["endDate"] = end_date
-
         if resample_freq:
             params["resampleFreq"] = resample_freq
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -755,7 +675,6 @@ class TiingoConnector(APIConnector):
             endpoint = "tiingo/fx/supported/pairs"
         else:
             raise ValueError(f"Invalid asset type: {asset_type}")
-
         return self.request(
             endpoint=endpoint,
             headers=self._prepare_headers(),
@@ -781,7 +700,6 @@ class TiingoConnector(APIConnector):
             endpoint = "tiingo/crypto/supported/exchanges"
         else:
             raise ValueError(f"Invalid asset type: {asset_type}")
-
         return self.request(
             endpoint=endpoint,
             headers=self._prepare_headers(),
@@ -799,7 +717,6 @@ class TiingoConnector(APIConnector):
             Response containing the supported markets.
         """
         endpoint = "tiingo/utilities/supported/markets"
-
         return self.request(
             endpoint=endpoint,
             headers=self._prepare_headers(),

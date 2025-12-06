@@ -8,11 +8,9 @@ and portfolios, calculating various risk metrics, and monitoring risk limits.
 from dataclasses import dataclass
 import logging
 from typing import Dict, Tuple
-
 import numpy as np
 import pandas as pd
 
-# Configure logging
 logger = logging.getLogger(__name__)
 
 
@@ -36,16 +34,16 @@ class RiskLimit:
             (is_breached, severity) where severity is 'none', 'soft', or 'hard'
         """
         if value > self.hard_limit:
-            return True, "hard"
+            return (True, "hard")
         elif value > self.soft_limit:
-            return True, "soft"
-        return False, "none"
+            return (True, "soft")
+        return (False, "none")
 
 
 class PositionRisk:
     """Manages risk calculations for individual positions."""
 
-    def __init__(self, position_id: str, instrument_type: str):
+    def __init__(self, position_id: str, instrument_type: str) -> Any:
         """
         Initialize position risk calculator.
 
@@ -131,26 +129,21 @@ class PositionRisk:
             dict: {metric_name: (is_breached, severity)}
         """
         results = {}
-
         for metric_name, value in self.risk_metrics.items():
             if metric_name in self.risk_limits:
                 is_breached, severity = self.risk_limits[metric_name].is_breached(value)
                 results[metric_name] = (is_breached, severity)
-
                 if is_breached:
                     logger.warning(
-                        f"Risk limit breach for {metric_name} on position {self.position_id}: "
-                        f"{value} exceeds {severity} limit of "
-                        f"{self.risk_limits[metric_name].soft_limit if severity == 'soft' else self.risk_limits[metric_name].hard_limit}"
+                        f"Risk limit breach for {metric_name} on position {self.position_id}: {value} exceeds {severity} limit of {(self.risk_limits[metric_name].soft_limit if severity == 'soft' else self.risk_limits[metric_name].hard_limit)}"
                     )
-
         return results
 
 
 class PortfolioRiskAggregator:
     """Aggregates risk across multiple positions in a portfolio."""
 
-    def __init__(self, portfolio_id: str):
+    def __init__(self, portfolio_id: str) -> Any:
         """
         Initialize portfolio risk aggregator.
 
@@ -226,7 +219,7 @@ class PortfolioRiskAggregator:
         """
         try:
             sum_of_vars = np.sum(individual_vars)
-            div_benefit = 1 - (portfolio_var / sum_of_vars)
+            div_benefit = 1 - portfolio_var / sum_of_vars
             self.portfolio_risk_metrics["diversification_benefit"] = div_benefit
             return div_benefit
         except Exception as e:
@@ -238,21 +231,16 @@ class PortfolioRiskAggregator:
     def check_portfolio_limits(self) -> Dict[str, Tuple[bool, str]]:
         """Check portfolio-level risk limits."""
         results = {}
-
         for metric_name, value in self.portfolio_risk_metrics.items():
             if metric_name in self.portfolio_risk_limits:
                 is_breached, severity = self.portfolio_risk_limits[
                     metric_name
                 ].is_breached(value)
                 results[metric_name] = (is_breached, severity)
-
                 if is_breached:
                     logger.warning(
-                        f"Portfolio risk limit breach for {metric_name} on portfolio {self.portfolio_id}: "
-                        f"{value} exceeds {severity} limit of "
-                        f"{self.portfolio_risk_limits[metric_name].soft_limit if severity == 'soft' else self.portfolio_risk_limits[metric_name].hard_limit}"
+                        f"Portfolio risk limit breach for {metric_name} on portfolio {self.portfolio_id}: {value} exceeds {severity} limit of {(self.portfolio_risk_limits[metric_name].soft_limit if severity == 'soft' else self.portfolio_risk_limits[metric_name].hard_limit)}"
                     )
-
         return results
 
     def generate_risk_report(self) -> Dict:
@@ -268,11 +256,9 @@ class PortfolioRiskAggregator:
             "portfolio_limit_breaches": self.check_portfolio_limits(),
             "positions": {},
         }
-
         for position_id, position in self.positions.items():
             report["positions"][position_id] = {
                 "metrics": position.risk_metrics.copy(),
                 "limit_breaches": position.check_limits(),
             }
-
         return report

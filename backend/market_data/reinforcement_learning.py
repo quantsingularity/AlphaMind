@@ -1,30 +1,20 @@
 """"""
 
-## Reinforcement Learning Module for AlphaMind
-#
-## This module provides reinforcement learning capabilities for adaptive trading strategies,
-## including various RL algorithms, environments, and training utilities.
-# """"""
-
 from abc import ABC
 from collections import deque
 from enum import Enum
 import logging
 import random
 from typing import Any, Dict, List, Optional, Tuple, Union
-
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-
 from core.logging import get_logger
 
 logger = get_logger(__name__)
-
-# Configure logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
@@ -34,42 +24,42 @@ logger = logging.getLogger(__name__)
 class ActionSpace(Enum):
     """Types of action spaces for RL environments."""
 
-    DISCRETE = "discrete"  # Discrete action space (e.g., buy, sell, hold)
-    CONTINUOUS = "continuous"  # Continuous action space (e.g., portfolio weights)
-    MIXED = "mixed"  # Mixed action space (e.g., discrete action type with continuous parameters)
+    DISCRETE = "discrete"
+    CONTINUOUS = "continuous"
+    MIXED = "mixed"
 
 
 class ObservationType(Enum):
     """Types of observations for RL environments."""
 
-    NUMERIC = "numeric"  # Numeric features
-    CATEGORICAL = "categorical"  # Categorical features
-    IMAGE = "image"  # Image data
-    TEXT = "text"  # Text data
-    MIXED = "mixed"  # Mixed data types
+    NUMERIC = "numeric"
+    CATEGORICAL = "categorical"
+    IMAGE = "image"
+    TEXT = "text"
+    MIXED = "mixed"
 
 
 class RLAlgorithm(Enum):
     """Types of reinforcement learning algorithms."""
 
-    DQN = "dqn"  # Deep Q-Network
-    DDPG = "ddpg"  # Deep Deterministic Policy Gradient
-    PPO = "ppo"  # Proximal Policy Optimization
-    SAC = "sac"  # Soft Actor-Critic
-    A2C = "a2c"  # Advantage Actor-Critic
-    TD3 = "td3"  # Twin Delayed DDPG
-    CUSTOM = "custom"  # Custom algorithm
+    DQN = "dqn"
+    DDPG = "ddpg"
+    PPO = "ppo"
+    SAC = "sac"
+    A2C = "a2c"
+    TD3 = "td3"
+    CUSTOM = "custom"
 
 
 class RewardFunction(Enum):
     """Types of reward functions for RL environments."""
 
-    RETURNS = "returns"  # Portfolio returns
-    SHARPE = "sharpe"  # Sharpe ratio
-    SORTINO = "sortino"  # Sortino ratio
-    CALMAR = "calmar"  # Calmar ratio
-    PROFIT_FACTOR = "profit_factor"  # Profit factor
-    CUSTOM = "custom"  # Custom reward function
+    RETURNS = "returns"
+    SHARPE = "sharpe"
+    SORTINO = "sortino"
+    CALMAR = "calmar"
+    PROFIT_FACTOR = "profit_factor"
+    CUSTOM = "custom"
 
 
 class TradingAction(Enum):
@@ -95,7 +85,7 @@ class TradingEnvironment(ABC):
         action_space: ActionSpace = ActionSpace.DISCRETE,
         observation_type: ObservationType = ObservationType.NUMERIC,
         random_start: bool = True,
-    ):
+    ) -> Any:
         """
         Initialize trading environment.
 
@@ -114,38 +104,27 @@ class TradingEnvironment(ABC):
         self.data = data
         self.features = features
         self.window_size = window_size
-        self.max_steps = max_steps or (len(data) - window_size - 1)
+        self.max_steps = max_steps or len(data) - window_size - 1
         self.commission = commission
         self.reward_function = reward_function
         self.initial_balance = initial_balance
         self.action_space_type = action_space
         self.observation_type = observation_type
         self.random_start = random_start
-
-        # Validate data
         self._validate_data()
-
-        # Set up action and observation spaces
         self.action_space = self._setup_action_space()
         self.observation_space = self._setup_observation_space()
-
-        # Initialize state
         self.reset()
 
-    def _validate_data(self):
+    def _validate_data(self) -> Any:
         """Validate input data."""
         if self.data is None or len(self.data) == 0:
             raise ValueError("Data cannot be empty")
-
         for feature in self.features:
             if feature not in self.data.columns:
                 raise ValueError(f"Feature '{feature}' not found in data")
-
-        # Ensure data has a price column
         if "close" not in self.data.columns and "price" not in self.data.columns:
             raise ValueError("Data must have a 'close' or 'price' column")
-
-        # Use 'close' as price if available, otherwise use 'price'
         self.price_col = "close" if "close" in self.data.columns else "price"
 
     def _setup_action_space(self) -> Dict[str, Any]:
@@ -156,33 +135,18 @@ class TradingEnvironment(ABC):
             Action space configuration
         """
         if self.action_space_type == ActionSpace.DISCRETE:
-            # Discrete actions: buy, sell, hold
             return {
                 "type": "discrete",
-                "n": 3,  # Number of actions
+                "n": 3,
                 "actions": [a.value for a in TradingAction],
             }
         elif self.action_space_type == ActionSpace.CONTINUOUS:
-            # Continuous actions: portfolio weights
-            return {
-                "type": "continuous",
-                "shape": (1,),  # Position size as a fraction of portfolio
-                "low": -1.0,  # Short position
-                "high": 1.0,  # Long position
-            }
+            return {"type": "continuous", "shape": (1,), "low": -1.0, "high": 1.0}
         elif self.action_space_type == ActionSpace.MIXED:
-            # Mixed actions: discrete action type with continuous parameters
             return {
                 "type": "mixed",
-                "discrete": {
-                    "n": 3,  # Number of discrete actions
-                    "actions": [a.value for a in TradingAction],
-                },
-                "continuous": {
-                    "shape": (1,),  # Position size as a fraction of portfolio
-                    "low": 0.0,
-                    "high": 1.0,
-                },
+                "discrete": {"n": 3, "actions": [a.value for a in TradingAction]},
+                "continuous": {"shape": (1,), "low": 0.0, "high": 1.0},
             }
         else:
             raise ValueError(f"Unsupported action space type: {self.action_space_type}")
@@ -195,24 +159,15 @@ class TradingEnvironment(ABC):
             Observation space configuration
         """
         if self.observation_type == ObservationType.NUMERIC:
-            # Numeric features
             return {
                 "type": "numeric",
-                "shape": (
-                    self.window_size,
-                    len(self.features) + 4,
-                ),  # Features + position, balance, equity, pnl
+                "shape": (self.window_size, len(self.features) + 4),
                 "features": self.features + ["position", "balance", "equity", "pnl"],
             }
         elif self.observation_type == ObservationType.IMAGE:
-            # Image-like representation (e.g., for CNN)
             return {
                 "type": "image",
-                "shape": (
-                    len(self.features) + 4,
-                    self.window_size,
-                    1,
-                ),  # Features + position, balance, equity, pnl
+                "shape": (len(self.features) + 4, self.window_size, 1),
                 "features": self.features + ["position", "balance", "equity", "pnl"],
             }
         else:
@@ -225,24 +180,17 @@ class TradingEnvironment(ABC):
         Returns:
             Initial observation
         """
-        # Reset position and balance
         self.position = 0.0
         self.balance = self.initial_balance
         self.equity = self.initial_balance
         self.pnl = 0.0
-
-        # Reset step counter
         self.current_step = 0
-
-        # Set starting point
         if self.random_start and len(self.data) > self.window_size + self.max_steps:
             self.start_idx = random.randint(
                 0, len(self.data) - self.window_size - self.max_steps - 1
             )
         else:
             self.start_idx = 0
-
-        # Initialize history
         self.history = {
             "positions": [],
             "balances": [],
@@ -251,8 +199,6 @@ class TradingEnvironment(ABC):
             "actions": [],
             "rewards": [],
         }
-
-        # Get initial observation
         return self._get_observation()
 
     def step(
@@ -267,31 +213,15 @@ class TradingEnvironment(ABC):
         Returns:
             Tuple of (observation, reward, done, info)
         """
-        # Parse action
         action_taken = self._parse_action(action)
-
-        # Execute action
         self._execute_action(action_taken)
-
-        # Move to next step
         self.current_step += 1
-
-        # Check if episode is done
         done = self.current_step >= self.max_steps
-
-        # Get observation
         observation = self._get_observation()
-
-        # Calculate reward
         reward = self._calculate_reward()
-
-        # Update history
         self._update_history(action_taken, reward)
-
-        # Get info
         info = self._get_info()
-
-        return observation, reward, done, info
+        return (observation, reward, done, info)
 
     def _parse_action(self, action: Union[int, float, np.ndarray]) -> Dict[str, Any]:
         """
@@ -304,34 +234,25 @@ class TradingEnvironment(ABC):
             Parsed action
         """
         if self.action_space_type == ActionSpace.DISCRETE:
-            # Discrete action
             if isinstance(action, np.ndarray):
                 action = action.item()
-
             if action == TradingAction.BUY.value:
                 return {"type": "buy", "size": 1.0}
             elif action == TradingAction.SELL.value:
                 return {"type": "sell", "size": 1.0}
-            else:  # HOLD
+            else:
                 return {"type": "hold", "size": 0.0}
-
         elif self.action_space_type == ActionSpace.CONTINUOUS:
-            # Continuous action
             if isinstance(action, np.ndarray):
                 action = action.item()
-
-            # Clip action to valid range
             action = max(min(action, 1.0), -1.0)
-
             if action > 0:
                 return {"type": "buy", "size": action}
             elif action < 0:
                 return {"type": "sell", "size": -action}
             else:
                 return {"type": "hold", "size": 0.0}
-
         elif self.action_space_type == ActionSpace.MIXED:
-            # Mixed action
             if isinstance(action, tuple):
                 action_type, action_size = action
             elif isinstance(action, np.ndarray):
@@ -341,69 +262,44 @@ class TradingEnvironment(ABC):
                 raise ValueError(
                     f"Invalid action format for mixed action space: {action}"
                 )
-
-            # Clip action size to valid range
             action_size = max(min(action_size, 1.0), 0.0)
-
             if action_type == TradingAction.BUY.value:
                 return {"type": "buy", "size": action_size}
             elif action_type == TradingAction.SELL.value:
                 return {"type": "sell", "size": action_size}
-            else:  # HOLD
+            else:
                 return {"type": "hold", "size": 0.0}
-
         else:
             raise ValueError(f"Unsupported action space type: {self.action_space_type}")
 
-    def _execute_action(self, action: Dict[str, Any]):
+    def _execute_action(self, action: Dict[str, Any]) -> Any:
         """
         Execute trading action.
 
         Args:
             action: Parsed action
         """
-        # Get current price
         current_idx = self.start_idx + self.window_size + self.current_step
         current_price = self.data.iloc[current_idx][self.price_col]
-
-        # Calculate position value
         position_value = self.position * current_price
-
         if action["type"] == "buy":
-            # Calculate buy amount
             if self.position <= 0:
-                # If no position or short position, close it first
                 self.balance += position_value * (1 - self.commission)
                 self.position = 0
-
-            # Calculate new position
             buy_amount = self.balance * action["size"]
             buy_amount_with_commission = buy_amount * (1 + self.commission)
-
             if buy_amount_with_commission <= self.balance:
-                # Update balance and position
                 self.balance -= buy_amount_with_commission
                 self.position += buy_amount / current_price
-
         elif action["type"] == "sell":
-            # Calculate sell amount
             if self.position >= 0:
-                # If long position, close it first
                 self.balance += position_value * (1 - self.commission)
                 self.position = 0
-
-            # Calculate new position
             sell_amount = self.balance * action["size"]
             sell_size = sell_amount / current_price
-
-            # Update balance and position
             self.position -= sell_size
             self.balance -= sell_amount * self.commission
-
-        # Update equity
-        self.equity = self.balance + (self.position * current_price)
-
-        # Update PnL
+        self.equity = self.balance + self.position * current_price
         if self.current_step > 0:
             prev_equity = self.history["equities"][-1]
             self.pnl = self.equity - prev_equity
@@ -417,18 +313,11 @@ class TradingEnvironment(ABC):
         Returns:
             Observation
         """
-        # Get data window
         start = self.start_idx + self.current_step
         end = start + self.window_size
         data_window = self.data.iloc[start:end].copy()
-
-        # Extract features
         features = data_window[self.features].values
-
-        # Normalize features
         features = self._normalize_features(features)
-
-        # Add position, balance, equity, and pnl
         if self.current_step > 0:
             positions = np.array(
                 [self.history["positions"][-self.window_size :] + [self.position]]
@@ -445,26 +334,17 @@ class TradingEnvironment(ABC):
             balances = np.ones((1, self.window_size)) * self.initial_balance
             equities = np.ones((1, self.window_size)) * self.initial_balance
             pnls = np.zeros((1, self.window_size))
-
-        # Normalize additional features
-        positions = positions / (np.max(np.abs(positions)) + 1e-6)
+        positions = positions / (np.max(np.abs(positions)) + 1e-06)
         balances = balances / self.initial_balance
         equities = equities / self.initial_balance
-        pnls = pnls / (np.max(np.abs(pnls)) + 1e-6)
-
-        # Combine features
+        pnls = pnls / (np.max(np.abs(pnls)) + 1e-06)
         if self.observation_type == ObservationType.NUMERIC:
-            # For numeric observations, stack features horizontally
             observation = np.column_stack(
                 [features, positions.T, balances.T, equities.T, pnls.T]
             )
         elif self.observation_type == ObservationType.IMAGE:
-            # For image observations, stack features vertically
             observation = np.vstack([features.T, positions, balances, equities, pnls])
-
-            # Add channel dimension
             observation = observation.reshape(observation.shape + (1,))
-
         return observation
 
     def _normalize_features(self, features: np.ndarray) -> np.ndarray:
@@ -477,18 +357,15 @@ class TradingEnvironment(ABC):
         Returns:
             Normalized features
         """
-        # Simple min-max normalization for each feature
         for i in range(features.shape[1]):
             feature_min = np.min(features[:, i])
             feature_max = np.max(features[:, i])
-
             if feature_max > feature_min:
                 features[:, i] = (features[:, i] - feature_min) / (
                     feature_max - feature_min
                 )
             else:
                 features[:, i] = 0.0
-
         return features
 
     def _calculate_reward(self) -> float:
@@ -500,79 +377,55 @@ class TradingEnvironment(ABC):
         """
         if self.current_step == 0:
             return 0.0
-
         if self.reward_function == RewardFunction.RETURNS:
-            # Simple returns
             prev_equity = self.history["equities"][-1]
             return (self.equity - prev_equity) / prev_equity
-
         elif self.reward_function == RewardFunction.SHARPE:
-            # Sharpe ratio (approximation)
             if len(self.history["returns"]) < 2:
                 return 0.0
-
             returns = np.array(self.history["returns"]) / np.array(
                 self.history["equities"][:-1]
             )
             mean_return = np.mean(returns)
-            std_return = np.std(returns) + 1e-6
-
+            std_return = np.std(returns) + 1e-06
             return mean_return / std_return
-
         elif self.reward_function == RewardFunction.SORTINO:
-            # Sortino ratio (approximation)
             if len(self.history["returns"]) < 2:
                 return 0.0
-
             returns = np.array(self.history["returns"]) / np.array(
                 self.history["equities"][:-1]
             )
             mean_return = np.mean(returns)
-
-            # Calculate downside deviation
             negative_returns = returns[returns < 0]
             if len(negative_returns) == 0:
-                downside_std = 1e-6
+                downside_std = 1e-06
             else:
-                downside_std = np.std(negative_returns) + 1e-6
-
+                downside_std = np.std(negative_returns) + 1e-06
             return mean_return / downside_std
-
         elif self.reward_function == RewardFunction.CALMAR:
-            # Calmar ratio (approximation)
             if len(self.history["equities"]) < 2:
                 return 0.0
-
             returns = np.array(self.history["returns"]) / np.array(
                 self.history["equities"][:-1]
             )
             mean_return = np.mean(returns)
-
-            # Calculate maximum drawdown
             equity_curve = np.array(self.history["equities"])
             peak = np.maximum.accumulate(equity_curve)
             drawdown = (peak - equity_curve) / peak
-            max_drawdown = np.max(drawdown) + 1e-6
-
+            max_drawdown = np.max(drawdown) + 1e-06
             return mean_return / max_drawdown
-
         elif self.reward_function == RewardFunction.PROFIT_FACTOR:
-            # Profit factor
             if len(self.history["returns"]) < 2:
                 return 0.0
-
             returns = np.array(self.history["returns"])
             positive_returns = np.sum(returns[returns > 0])
-            negative_returns = np.abs(np.sum(returns[returns < 0])) + 1e-6
-
+            negative_returns = np.abs(np.sum(returns[returns < 0])) + 1e-06
             return positive_returns / negative_returns
-
         else:
-            # Default to returns
             prev_equity = self.history["equities"][-1]
             return (self.equity - prev_equity) / prev_equity
 
-    def _update_history(self, action: Dict[str, Any], reward: float):
+    def _update_history(self, action: Dict[str, Any], reward: float) -> Any:
         """
         Update history with current state.
 
@@ -596,7 +449,6 @@ class TradingEnvironment(ABC):
         """
         current_idx = self.start_idx + self.window_size + self.current_step
         current_price = self.data.iloc[current_idx][self.price_col]
-
         return {
             "step": self.current_step,
             "price": current_price,
@@ -607,7 +459,7 @@ class TradingEnvironment(ABC):
             "total_return": (self.equity - self.initial_balance) / self.initial_balance,
         }
 
-    def render(self, mode: str = "human"):
+    def render(self, mode: str = "human") -> Any:
         """
         Render the environment.
 
@@ -617,7 +469,6 @@ class TradingEnvironment(ABC):
         if mode == "human":
             current_idx = self.start_idx + self.window_size + self.current_step
             current_price = self.data.iloc[current_idx][self.price_col]
-
             logger.info(f"Step: {self.current_step}")
             logger.info(f"Price: {current_price:.2f}")
             logger.info(f"Position: {self.position:.6f}")
@@ -629,14 +480,14 @@ class TradingEnvironment(ABC):
             )
             logger.info("-" * 50)
 
-    def close(self):
+    def close(self) -> Any:
         """Close environment and release resources."""
 
 
 class ReplayBuffer:
     """Experience replay buffer for RL algorithms."""
 
-    def __init__(self, capacity: int):
+    def __init__(self, capacity: int) -> Any:
         """
         Initialize replay buffer.
 
@@ -652,7 +503,7 @@ class ReplayBuffer:
         reward: float,
         next_state: np.ndarray,
         done: bool,
-    ):
+    ) -> Any:
         """
         Add experience to buffer.
 
@@ -692,7 +543,7 @@ class DQNNetwork(nn.Module):
 
     def __init__(
         self, input_shape: Tuple[int, ...], num_actions: int, hidden_size: int = 128
-    ):
+    ) -> Any:
         """
         Initialize DQN network.
 
@@ -702,14 +553,9 @@ class DQNNetwork(nn.Module):
             hidden_size: Size of hidden layers
         """
         super(DQNNetwork, self).__init__()
-
-        # Determine input size
         if len(input_shape) == 2:
-            # Numeric observations (window_size, features)
             input_size = input_shape[0] * input_shape[1]
             self.flatten = lambda x: x.view(x.size(0), -1)
-
-            # Create network
             self.network = nn.Sequential(
                 nn.Linear(input_size, hidden_size),
                 nn.ReLU(),
@@ -717,12 +563,8 @@ class DQNNetwork(nn.Module):
                 nn.ReLU(),
                 nn.Linear(hidden_size, num_actions),
             )
-
         elif len(input_shape) == 3:
-            # Image-like observations (features, window_size, channels)
-            self.flatten = lambda x: x  # No flattening needed
-
-            # Create CNN network
+            self.flatten = lambda x: x
             self.network = nn.Sequential(
                 nn.Conv2d(input_shape[0], 32, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(),
@@ -737,7 +579,6 @@ class DQNNetwork(nn.Module):
                 nn.ReLU(),
                 nn.Linear(hidden_size, num_actions),
             )
-
         else:
             raise ValueError(f"Unsupported input shape: {input_shape}")
 
@@ -772,7 +613,7 @@ class DQNAgent:
         buffer_capacity: int = 10000,
         batch_size: int = 64,
         device: str = "auto",
-    ):
+    ) -> Any:
         """
         Initialize DQN agent.
 
@@ -790,13 +631,10 @@ class DQNAgent:
             batch_size: Training batch size
             device: Device to use (auto, cpu, cuda)
         """
-        # Set device
         if device == "auto":
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         else:
             self.device = torch.device(device)
-
-        # Create networks
         self.policy_net = DQNNetwork(input_shape, num_actions, hidden_size).to(
             self.device
         )
@@ -805,14 +643,8 @@ class DQNAgent:
         )
         self.target_net.load_state_dict(self.policy_net.state_dict())
         self.target_net.eval()
-
-        # Create optimizer
         self.optimizer = optim.Adam(self.policy_net.parameters(), lr=learning_rate)
-
-        # Create replay buffer
         self.replay_buffer = ReplayBuffer(buffer_capacity)
-
-        # Set hyperparameters
         self.num_actions = num_actions
         self.gamma = gamma
         self.epsilon = epsilon_start
@@ -820,8 +652,6 @@ class DQNAgent:
         self.epsilon_decay = epsilon_decay
         self.target_update = target_update
         self.batch_size = batch_size
-
-        # Initialize counters
         self.steps_done = 0
         self.episodes_done = 0
 
@@ -837,10 +667,8 @@ class DQNAgent:
             Selected action
         """
         if training and random.random() < self.epsilon:
-            # Random action
             return random.randrange(self.num_actions)
         else:
-            # Greedy action
             with torch.no_grad():
                 state_tensor = torch.FloatTensor(state).unsqueeze(0).to(self.device)
                 q_values = self.policy_net(state_tensor)
@@ -855,46 +683,25 @@ class DQNAgent:
         """
         if len(self.replay_buffer) < self.batch_size:
             return None
-
-        # Sample batch
         batch = self.replay_buffer.sample(self.batch_size)
-
-        # Unpack batch
         states, actions, rewards, next_states, dones = zip(*batch)
-
-        # Convert to tensors
         states = torch.FloatTensor(np.array(states)).to(self.device)
         actions = torch.LongTensor(np.array(actions)).to(self.device)
         rewards = torch.FloatTensor(np.array(rewards)).to(self.device)
         next_states = torch.FloatTensor(np.array(next_states)).to(self.device)
         dones = torch.FloatTensor(np.array(dones)).to(self.device)
-
-        # Compute Q-values
         q_values = self.policy_net(states).gather(1, actions.unsqueeze(1)).squeeze(1)
-
-        # Compute target Q-values
         with torch.no_grad():
             next_q_values = self.target_net(next_states).max(1)[0]
             target_q_values = rewards + self.gamma * next_q_values * (1 - dones)
-
-        # Compute loss
         loss = F.smooth_l1_loss(q_values, target_q_values)
-
-        # Update network
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
-
-        # Update target network
         if self.steps_done % self.target_update == 0:
             self.target_net.load_state_dict(self.policy_net.state_dict())
-
-        # Update epsilon
         self.epsilon = max(self.epsilon_end, self.epsilon * self.epsilon_decay)
-
-        # Update counter
         self.steps_done += 1
-
         return loss.item()
 
     def train(

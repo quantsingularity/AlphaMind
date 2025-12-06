@@ -8,8 +8,6 @@
 from datetime import date, datetime
 import logging
 from typing import Any, Dict, List, Optional, Union
-
-
 from .base import (
     APIConnector,
     APICredentials,
@@ -34,22 +32,13 @@ class PolygonConnector(APIConnector):
         Polygon.io API key.
     """
 
-    def __init__(self, api_key: str):
-        # Create credentials
+    def __init__(self, api_key: str) -> Any:
         credentials = APICredentials(api_key=api_key)
-
-        # Set base URL
         base_url = "https://api.polygon.io"
-
-        # Create rate limiter
-        # Polygon.io has different rate limits based on subscription tier
-        # Using a conservative limit of 5 requests per second
         rate_limiter = RateLimiter(requests_per_second=5)
-
         super().__init__(
             credentials=credentials, base_url=base_url, rate_limiter=rate_limiter
         )
-
         self.logger = logging.getLogger(self.__class__.__name__)
 
     @property
@@ -73,10 +62,7 @@ class PolygonConnector(APIConnector):
         success : bool
             Whether authentication was successful.
         """
-        # Polygon.io uses API key for authentication
-        # Test authentication by making a simple request
         response = self.get_ticker_details("AAPL")
-
         return response.is_success()
 
     def _add_api_key(self, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
@@ -113,7 +99,6 @@ class PolygonConnector(APIConnector):
         """
         endpoint = f"v3/reference/tickers/{ticker}"
         params = self._add_api_key()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -163,27 +148,19 @@ class PolygonConnector(APIConnector):
             Response containing the tickers.
         """
         endpoint = "v3/reference/tickers"
-
         params = self._add_api_key({"sort": sort, "order": order, "limit": limit})
-
         if market:
             params["market"] = market
-
         if exchange:
             params["exchange"] = exchange
-
         if type:
             params["type"] = type
-
         if active is not None:
             params["active"] = str(active).lower()
-
         if ticker_gte:
             params["ticker.gte"] = ticker_gte
-
         if ticker_lte:
             params["ticker.lte"] = ticker_lte
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -227,15 +204,11 @@ class PolygonConnector(APIConnector):
             endpoint = f"v2/reference/news?ticker={ticker}"
         else:
             endpoint = "v2/reference/news"
-
         params = self._add_api_key({"limit": limit, "order": order, "sort": sort})
-
         if published_utc_gte:
             params["published_utc.gte"] = published_utc_gte
-
         if published_utc_lte:
             params["published_utc.lte"] = published_utc_lte
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -254,7 +227,6 @@ class PolygonConnector(APIConnector):
         """
         endpoint = "v3/reference/tickers/types"
         params = self._add_api_key()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -273,7 +245,6 @@ class PolygonConnector(APIConnector):
         """
         endpoint = "v1/marketstatus/now"
         params = self._add_api_key()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -292,7 +263,6 @@ class PolygonConnector(APIConnector):
         """
         endpoint = "v1/marketstatus/upcoming"
         params = self._add_api_key()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -311,7 +281,6 @@ class PolygonConnector(APIConnector):
         """
         endpoint = "v3/reference/exchanges"
         params = self._add_api_key()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -335,7 +304,6 @@ class PolygonConnector(APIConnector):
         """
         endpoint = f"v3/reference/conditions?asset_class={asset_class}"
         params = self._add_api_key()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -360,9 +328,7 @@ class PolygonConnector(APIConnector):
             Response containing the previous close.
         """
         endpoint = f"v2/aggs/ticker/{ticker}/prev"
-
         params = self._add_api_key({"adjusted": str(adjusted).lower()})
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -408,19 +374,14 @@ class PolygonConnector(APIConnector):
         response : DataResponse
             Response containing the aggregates.
         """
-        # Convert dates to strings if needed
         if isinstance(from_date, (date, datetime)):
             from_date = from_date.strftime("%Y-%m-%d")
-
         if isinstance(to_date, (date, datetime)):
             to_date = to_date.strftime("%Y-%m-%d")
-
         endpoint = f"v2/aggs/ticker/{ticker}/range/{multiplier}/{timespan}/{from_date}/{to_date}"
-
         params = self._add_api_key(
             {"adjusted": str(adjusted).lower(), "sort": sort, "limit": limit}
         )
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -451,16 +412,12 @@ class PolygonConnector(APIConnector):
         response : DataResponse
             Response containing the grouped daily data.
         """
-        # Convert date to string if needed
         if isinstance(date, (date, datetime)):
             date = date.strftime("%Y-%m-%d")
-
         endpoint = f"v2/aggs/grouped/locale/us/market/stocks/{date}"
-
         params = self._add_api_key(
             {"adjusted": str(adjusted).lower(), "include_otc": str(include_otc).lower()}
         )
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -488,14 +445,10 @@ class PolygonConnector(APIConnector):
         response : DataResponse
             Response containing the daily open/close.
         """
-        # Convert date to string if needed
         if isinstance(date, (date, datetime)):
             date = date.strftime("%Y-%m-%d")
-
         endpoint = f"v1/open-close/{ticker}/{date}"
-
         params = self._add_api_key({"adjusted": str(adjusted).lower()})
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -519,7 +472,6 @@ class PolygonConnector(APIConnector):
         """
         endpoint = f"v2/last/nbbo/{ticker}"
         params = self._add_api_key()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -543,7 +495,6 @@ class PolygonConnector(APIConnector):
         """
         endpoint = f"v2/last/trade/{ticker}"
         params = self._add_api_key()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -567,7 +518,6 @@ class PolygonConnector(APIConnector):
         """
         endpoint = f"v2/snapshot/locale/us/markets/stocks/tickers/{ticker}"
         params = self._add_api_key()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -592,7 +542,6 @@ class PolygonConnector(APIConnector):
         tickers_str = ",".join(tickers)
         endpoint = f"v2/snapshot/locale/us/markets/stocks/tickers?tickers={tickers_str}"
         params = self._add_api_key()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -619,9 +568,7 @@ class PolygonConnector(APIConnector):
             Response containing the gainers or losers.
         """
         endpoint = f"v2/snapshot/locale/us/markets/stocks/{direction}"
-
         params = self._add_api_key({"limit": limit})
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -640,7 +587,6 @@ class PolygonConnector(APIConnector):
         """
         endpoint = "v3/reference/currencies"
         params = self._add_api_key()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -669,7 +615,6 @@ class PolygonConnector(APIConnector):
         ticker = f"C:{from_currency}{to_currency}"
         endpoint = f"v1/last_quote/currencies/{ticker}"
         params = self._add_api_key()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -698,7 +643,6 @@ class PolygonConnector(APIConnector):
         ticker = f"X:{from_currency}{to_currency}"
         endpoint = f"v1/last/crypto/{ticker}"
         params = self._add_api_key()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -742,7 +686,6 @@ class PolygonConnector(APIConnector):
             Response containing the options contracts.
         """
         endpoint = "v3/reference/options/contracts"
-
         params = self._add_api_key(
             {
                 "underlying_ticker": underlying_ticker,
@@ -751,16 +694,12 @@ class PolygonConnector(APIConnector):
                 "order": order,
             }
         )
-
         if expiration_date:
             params["expiration_date"] = expiration_date
-
         if contract_type:
             params["contract_type"] = contract_type
-
         if strike_price:
             params["strike_price"] = strike_price
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -784,7 +723,6 @@ class PolygonConnector(APIConnector):
         """
         endpoint = f"v2/last/trade/{options_ticker}"
         params = self._add_api_key()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -837,7 +775,6 @@ class PolygonConnector(APIConnector):
             Response containing the technical indicators.
         """
         endpoint = f"v1/indicators/{indicator_type}/{ticker}"
-
         params = self._add_api_key(
             {
                 "timespan": timespan,
@@ -849,10 +786,8 @@ class PolygonConnector(APIConnector):
                 "limit": limit,
             }
         )
-
         if timestamp:
             params["timestamp"] = timestamp
-
         return self.request(
             endpoint=endpoint,
             params=params,

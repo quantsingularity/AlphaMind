@@ -13,19 +13,15 @@ import logging
 import os
 import time
 from typing import Any, Callable, Dict, List, Optional
-
 import aiohttp
 from confluent_kafka import Producer
 import websockets
 
-# Configure logging with more detailed format
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s",
 )
 logger = logging.getLogger(__name__)
-
-# Add file handler for persistent logging
 try:
     os.makedirs("logs", exist_ok=True)
     file_handler = logging.FileHandler("logs/market_data_feed.log")
@@ -50,7 +46,7 @@ class ConnectionError(Exception):
 class MarketDataConfig:
     """Configuration for market data connections and processing."""
 
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: Optional[str] = None) -> Any:
         """
         Initialize market data configuration.
 
@@ -64,7 +60,7 @@ class MarketDataConfig:
             "max_retries": 5,
             "backoff_factor": 1.5,
             "initial_wait": 1.0,
-            "max_wait": 60.0,  # Maximum wait time between retries
+            "max_wait": 60.0,
         }
         self.validation_settings = {
             "validate_responses": True,
@@ -88,17 +84,14 @@ class MarketDataConfig:
                 "volume": float,
             },
         }
-
         if config_path:
             self.load_from_file(config_path)
         else:
             self._set_defaults()
-
         logger.info("Market data configuration initialized")
 
-    def _set_defaults(self):
+    def _set_defaults(self) -> Any:
         """Set default configuration values."""
-        # Default REST API endpoints
         self.endpoints = {
             "binance": "https://api.binance.com/api/v3",
             "coinbase": "https://api.exchange.coinbase.com",
@@ -106,18 +99,15 @@ class MarketDataConfig:
             "iex": "https://cloud.iexapis.com/stable",
             "polygon": "https://api.polygon.io/v2",
         }
-
-        # Default WebSocket endpoints
         self.streaming_endpoints = {
             "binance": "wss://stream.binance.com:9443/ws",
             "coinbase": "wss://ws-feed.exchange.coinbase.com",
             "alpaca": "wss://paper-api.alpaca.markets/stream",
             "polygon": "wss://socket.polygon.io/stocks",
         }
-
         logger.debug("Default configuration values set")
 
-    def load_from_file(self, config_path: str):
+    def load_from_file(self, config_path: str) -> Any:
         """
         Load configuration from a JSON file with validation.
 
@@ -128,22 +118,16 @@ class MarketDataConfig:
             logger.error(f"Configuration file not found: {config_path}")
             self._set_defaults()
             return
-
         try:
             with open(config_path, "r") as f:
                 config = json.load(f)
-
-            # Validate configuration structure
             if not isinstance(config, dict):
                 raise ValueError("Configuration must be a JSON object")
-
             self.api_keys = config.get("api_keys", {})
             self.endpoints = config.get("endpoints", self.endpoints)
             self.streaming_endpoints = config.get(
                 "streaming_endpoints", self.streaming_endpoints
             )
-
-            # Validate and merge retry settings
             if "retry_settings" in config:
                 retry_config = config["retry_settings"]
                 if not isinstance(retry_config, dict):
@@ -152,8 +136,6 @@ class MarketDataConfig:
                     for key, value in retry_config.items():
                         if key in self.retry_settings:
                             self.retry_settings[key] = value
-
-            # Validate and merge validation settings
             if "validation_settings" in config:
                 validation_config = config["validation_settings"]
                 if not isinstance(validation_config, dict):
@@ -162,7 +144,6 @@ class MarketDataConfig:
                     for key, value in validation_config.items():
                         if key in self.validation_settings:
                             self.validation_settings[key] = value
-
             logger.info(f"Loaded market data configuration from {config_path}")
         except json.JSONDecodeError as e:
             logger.error(f"Invalid JSON in configuration file {config_path}: {e}")
@@ -171,7 +152,7 @@ class MarketDataConfig:
             logger.error(f"Failed to load configuration from {config_path}: {e}")
             self._set_defaults()
 
-    def save_to_file(self, config_path: str):
+    def save_to_file(self, config_path: str) -> Any:
         """
         Save configuration to a JSON file.
 
@@ -185,11 +166,8 @@ class MarketDataConfig:
             "retry_settings": self.retry_settings,
             "validation_settings": self.validation_settings,
         }
-
         try:
-            # Ensure directory exists
             os.makedirs(os.path.dirname(os.path.abspath(config_path)), exist_ok=True)
-
             with open(config_path, "w") as f:
                 json.dump(config, f, indent=2)
             logger.info(f"Saved market data configuration to {config_path}")
@@ -202,7 +180,7 @@ class MarketDataConfig:
 class MarketDataFeed:
     """Base class for market data feeds."""
 
-    def __init__(self, config: MarketDataConfig):
+    def __init__(self, config: MarketDataConfig) -> Any:
         """
         Initialize market data feed.
 
@@ -226,14 +204,13 @@ class MarketDataFeed:
             "messages_processed": 0,
             "validation_errors": 0,
         }
-
         logger.info("Market data feed instance created")
 
     async def initialize(self):
         """Initialize HTTP session and connections with error handling."""
         try:
             self.session = aiohttp.ClientSession(
-                timeout=aiohttp.ClientTimeout(total=30),  # 30 second timeout
+                timeout=aiohttp.ClientTimeout(total=30),
                 headers={"User-Agent": "AlphaMind/1.0"},
             )
             logger.info("Market data feed HTTP session initialized")
@@ -245,8 +222,6 @@ class MarketDataFeed:
     async def close(self):
         """Close all connections and resources with error handling."""
         close_errors = []
-
-        # Close HTTP session
         if self.session:
             try:
                 await self.session.close()
@@ -255,10 +230,8 @@ class MarketDataFeed:
                 error_msg = f"Error closing HTTP session: {e}"
                 logger.error(error_msg)
                 close_errors.append(error_msg)
-
-        # Close WebSocket connections
         for provider, ws in self.ws_connections.items():
-            if ws and not ws.closed:
+            if ws and (not ws.closed):
                 try:
                     await ws.close()
                     logger.info(f"WebSocket connection to {provider} closed")
@@ -266,9 +239,7 @@ class MarketDataFeed:
                     error_msg = f"Error closing WebSocket connection to {provider}: {e}"
                     logger.error(error_msg)
                     close_errors.append(error_msg)
-
         self.running = False
-
         if close_errors:
             logger.warning(f"Market data feed closed with {len(close_errors)} errors")
             return False
@@ -299,15 +270,11 @@ class MarketDataFeed:
             initialized = await self.initialize()
             if not initialized:
                 raise ConnectionError(f"Failed to initialize session for {provider}")
-
         base_url = self.config.endpoints.get(provider)
         if not base_url:
             raise ValueError(f"Unknown provider: {provider}")
-
         url = f"{base_url}/{endpoint.lstrip('/')}"
         headers = {}
-
-        # Add API key if available
         if provider in self.config.api_keys:
             if provider == "alpaca":
                 headers["APCA-API-KEY-ID"] = self.config.api_keys[provider]["key"]
@@ -320,29 +287,22 @@ class MarketDataFeed:
                 params["apiKey"] = self.config.api_keys[provider]
             else:
                 headers["X-API-Key"] = self.config.api_keys[provider]
-
-        # Implement enhanced retry logic
         retries = 0
         max_retries = self.config.retry_settings["max_retries"]
         backoff = self.config.retry_settings["initial_wait"]
         max_wait = self.config.retry_settings["max_wait"]
-
         while retries <= max_retries:
             try:
                 start_time = time.time()
                 logger.debug(
-                    f"Fetching data from {provider}/{endpoint} (attempt {retries+1}/{max_retries+1})"
+                    f"Fetching data from {provider}/{endpoint} (attempt {retries + 1}/{max_retries + 1})"
                 )
-
                 async with self.session.get(
                     url, params=params, headers=headers
                 ) as response:
                     elapsed = time.time() - start_time
-
                     if response.status == 200:
                         data = await response.json()
-
-                        # Validate response data
                         if self.config.validation_settings["validate_responses"]:
                             try:
                                 self._validate_response_data(data, provider, endpoint)
@@ -351,23 +311,19 @@ class MarketDataFeed:
                                     f"Data validation error for {provider}/{endpoint}: {e}"
                                 )
                                 self.data_stats["validation_errors"] += 1
-                                # Continue despite validation error, but log it
-
                         logger.info(
                             f"Successfully fetched data from {provider}/{endpoint} in {elapsed:.2f}s"
                         )
                         self.health_status["last_successful_fetch"] = datetime.now()
                         return data
-
-                    elif response.status == 429:  # Rate limited
+                    elif response.status == 429:
                         retry_after = int(response.headers.get("Retry-After", backoff))
                         logger.warning(
                             f"Rate limited by {provider}, retrying after {retry_after}s"
                         )
                         await asyncio.sleep(retry_after)
                         retries += 1
-
-                    elif response.status >= 500:  # Server error
+                    elif response.status >= 500:
                         logger.warning(
                             f"Server error from {provider}: {response.status}, retrying..."
                         )
@@ -377,44 +333,36 @@ class MarketDataFeed:
                             max_wait,
                         )
                         retries += 1
-
                     else:
                         error_text = await response.text()
                         logger.error(
                             f"Error response from {provider}: {response.status}, {error_text}"
                         )
                         response.raise_for_status()
-
             except aiohttp.ClientError as e:
                 logger.error(f"Connection error fetching data from {provider}: {e}")
                 self.health_status["connection_errors"] += 1
-
                 if retries >= max_retries:
                     raise ConnectionError(
                         f"Failed to connect to {provider} after {max_retries} retries: {e}"
                     )
-
                 await asyncio.sleep(backoff)
                 backoff = min(
                     backoff * self.config.retry_settings["backoff_factor"], max_wait
                 )
                 retries += 1
-
             except json.JSONDecodeError as e:
                 logger.error(f"Invalid JSON response from {provider}: {e}")
                 self.health_status["data_errors"] += 1
-
                 if retries >= max_retries:
                     raise DataValidationError(
                         f"Invalid JSON from {provider} after {max_retries} retries: {e}"
                     )
-
                 await asyncio.sleep(backoff)
                 backoff = min(
                     backoff * self.config.retry_settings["backoff_factor"], max_wait
                 )
                 retries += 1
-
         raise ConnectionError(
             f"Failed to fetch data from {provider}/{endpoint} after {max_retries} retries"
         )
@@ -434,33 +382,26 @@ class MarketDataFeed:
         Raises:
             DataValidationError: If validation fails
         """
-        # Basic validation - check if data is not None
         if data is None:
             raise DataValidationError("Response data is None")
-
-        # Provider-specific validation
         if provider == "binance":
             if endpoint.endswith("/ticker/24hr"):
                 if isinstance(data, list):
                     for item in data:
                         if not all(
-                            k in item for k in ["symbol", "lastPrice", "volume"]
+                            (k in item for k in ["symbol", "lastPrice", "volume"])
                         ):
                             raise DataValidationError(
                                 "Missing required fields in Binance ticker data"
                             )
-                else:
-                    if not all(k in data for k in ["symbol", "lastPrice", "volume"]):
-                        raise DataValidationError(
-                            "Missing required fields in Binance ticker data"
-                        )
-
+                elif not all((k in data for k in ["symbol", "lastPrice", "volume"])):
+                    raise DataValidationError(
+                        "Missing required fields in Binance ticker data"
+                    )
         elif provider == "alpaca":
             if endpoint.endswith("/bars"):
                 if not isinstance(data, dict) or "bars" not in data:
                     raise DataValidationError("Invalid Alpaca bars response format")
-
-        # Type validation for common fields
         if isinstance(data, dict):
             for field, expected_type in self.config.validation_settings[
                 "type_validation"
@@ -468,7 +409,6 @@ class MarketDataFeed:
                 if field in data:
                     if not isinstance(data[field], expected_type):
                         try:
-                            # Attempt conversion for numeric types
                             if expected_type in (int, float) and isinstance(
                                 data[field], (int, float, str)
                             ):
@@ -481,7 +421,6 @@ class MarketDataFeed:
                             raise DataValidationError(
                                 f"Field {field} has invalid type and cannot be converted"
                             )
-
         return True
 
     async def subscribe_to_stream(
@@ -506,17 +445,11 @@ class MarketDataFeed:
         if provider not in self.config.streaming_endpoints:
             logger.error(f"Streaming not supported for provider: {provider}")
             return False
-
-        # Validate symbols
-        if not symbols or not all(isinstance(s, str) for s in symbols):
+        if not symbols or not all((isinstance(s, str) for s in symbols)):
             logger.error(f"Invalid symbols list for {provider}: {symbols}")
             return False
-
-        # Store callback
         callback_key = f"{provider}_{channel}_{','.join(symbols)}"
         self.callbacks[callback_key] = callback
-
-        # Connect to WebSocket if not already connected
         if provider not in self.ws_connections or self.ws_connections[provider].closed:
             try:
                 await self._connect_websocket(provider, symbols, channel)
@@ -546,10 +479,7 @@ class MarketDataFeed:
             ConnectionError: If connection fails after retries
         """
         ws_url = self.config.streaming_endpoints[provider]
-
-        # Format subscription message based on provider
         if provider == "binance":
-            # For Binance, we need to connect to individual streams
             streams = [f"{symbol.lower()}@{channel}" for symbol in symbols]
             ws_url = f"{ws_url}/stream?streams={'/'.join(streams)}"
             subscription_msg = None
@@ -565,44 +495,31 @@ class MarketDataFeed:
                 "key": self.config.api_keys[provider]["key"],
                 "secret": self.config.api_keys[provider]["secret"],
             }
-            # After authentication, we'll send the subscription message
         elif provider == "polygon":
             subscription_msg = {
                 "action": "auth",
                 "params": self.config.api_keys[provider],
             }
-            # After authentication, we'll send the subscription message
         else:
             raise ValueError(f"Unsupported streaming provider: {provider}")
-
-        # Implement retry logic for WebSocket connection
         retries = 0
         max_retries = self.config.retry_settings["max_retries"]
         backoff = self.config.retry_settings["initial_wait"]
         max_wait = self.config.retry_settings["max_wait"]
-
         while retries <= max_retries:
             try:
-                # Connect to WebSocket
                 logger.info(
-                    f"Connecting to {provider} WebSocket (attempt {retries+1}/{max_retries+1})"
+                    f"Connecting to {provider} WebSocket (attempt {retries + 1}/{max_retries + 1})"
                 )
                 self.ws_connections[provider] = await websockets.connect(
-                    ws_url,
-                    ping_interval=30,  # Send ping every 30 seconds
-                    ping_timeout=10,  # Wait 10 seconds for pong response
-                    close_timeout=5,  # Wait 5 seconds for close handshake
+                    ws_url, ping_interval=30, ping_timeout=10, close_timeout=5
                 )
                 logger.info(f"Connected to {provider} WebSocket")
-
-                # Send subscription message if needed
                 if subscription_msg:
                     await self.ws_connections[provider].send(
                         json.dumps(subscription_msg)
                     )
                     logger.info(f"Sent subscription to {provider}")
-
-                # For providers that require a second message after auth
                 if provider == "alpaca":
                     sub_msg = {
                         "action": "subscribe",
@@ -627,27 +544,20 @@ class MarketDataFeed:
                     logger.info(
                         f"Sent {channel} subscription to Polygon for {len(symbols)} symbols"
                     )
-
-                # Start listening for messages
                 self.running = True
                 asyncio.create_task(self._listen_for_messages(provider))
-
-                # Reset connection errors counter on successful connection
                 self.health_status["reconnect_attempts"] = 0
                 return
-
             except Exception as e:
                 retries += 1
                 self.health_status["reconnect_attempts"] += 1
                 logger.error(
-                    f"Error connecting to {provider} WebSocket (attempt {retries}/{max_retries+1}): {e}"
+                    f"Error connecting to {provider} WebSocket (attempt {retries}/{max_retries + 1}): {e}"
                 )
-
                 if retries > max_retries:
                     raise ConnectionError(
                         f"Failed to connect to {provider} WebSocket after {max_retries} attempts"
                     )
-
                 wait_time = min(backoff, max_wait)
                 logger.info(
                     f"Retrying connection to {provider} in {wait_time:.1f} seconds..."
@@ -667,65 +577,43 @@ class MarketDataFeed:
         ws = self.ws_connections[provider]
         reconnect_delay = self.config.retry_settings["initial_wait"]
         max_reconnect_delay = self.config.retry_settings["max_wait"]
-
         while self.running:
             try:
                 message = await ws.recv()
                 self.data_stats["messages_received"] += 1
-
                 try:
                     data = json.loads(message)
-
-                    # Process message based on provider
                     try:
                         normalized_data = self._normalize_data(provider, data)
-
-                        # Find matching callbacks and invoke them
                         for key, callback in self.callbacks.items():
                             if key.startswith(f"{provider}_"):
                                 try:
                                     callback(normalized_data)
                                 except Exception as e:
                                     logger.error(f"Error in callback for {key}: {e}")
-
-                        # Publish to Kafka if configured
                         if self.kafka_producer:
                             self._publish_to_kafka(provider, normalized_data)
-
                         self.data_stats["messages_processed"] += 1
-
                     except Exception as e:
                         logger.error(f"Error normalizing {provider} data: {e}")
                         self.data_stats["validation_errors"] += 1
-
                 except json.JSONDecodeError as e:
                     logger.error(f"Invalid JSON from {provider} WebSocket: {e}")
                     self.data_stats["validation_errors"] += 1
-
-                # Reset reconnect delay on successful message
                 reconnect_delay = self.config.retry_settings["initial_wait"]
-
             except websockets.exceptions.ConnectionClosed as e:
                 logger.warning(f"{provider} WebSocket connection closed: {e}")
                 break
-
             except Exception as e:
                 logger.error(f"Error processing {provider} message: {e}")
-
-                # Brief pause to prevent tight loop on persistent errors
                 await asyncio.sleep(0.1)
-
-        # Connection closed or error occurred, attempt reconnect if still running
         if self.running:
             logger.info(
                 f"Attempting to reconnect to {provider} WebSocket in {reconnect_delay:.1f} seconds..."
             )
             await asyncio.sleep(reconnect_delay)
-
-            # Find symbols and channels for this provider
             symbols = []
-            channel = "trades"  # Default
-
+            channel = "trades"
             for key in self.callbacks.keys():
                 if key.startswith(f"{provider}_"):
                     parts = key.split("_")
@@ -733,13 +621,11 @@ class MarketDataFeed:
                         channel = parts[1]
                         if len(parts) >= 3:
                             symbols.extend(parts[2].split(","))
-
             if symbols:
                 try:
                     await self._connect_websocket(provider, list(set(symbols)), channel)
                 except Exception as e:
                     logger.error(f"Failed to reconnect to {provider} WebSocket: {e}")
-                    # Increase reconnect delay for next attempt
                     reconnect_delay = min(
                         reconnect_delay * self.config.retry_settings["backoff_factor"],
                         max_reconnect_delay,
@@ -766,10 +652,9 @@ class MarketDataFeed:
             "timestamp": int(time.time() * 1000),
             "received_at": datetime.now().isoformat(),
         }
-
         try:
             if provider == "binance":
-                if "data" in data:  # Combined stream format
+                if "data" in data:
                     stream_data = data["data"]
                     if "e" in stream_data and stream_data["e"] == "trade":
                         normalized.update(
@@ -801,7 +686,7 @@ class MarketDataFeed:
                         raise DataValidationError(
                             f"Unknown Binance stream type: {data}"
                         )
-                elif "e" in data and data["e"] == "trade":  # Individual stream format
+                elif "e" in data and data["e"] == "trade":
                     normalized.update(
                         {
                             "type": "trade",
@@ -814,7 +699,6 @@ class MarketDataFeed:
                     )
                 else:
                     raise DataValidationError(f"Unknown Binance data format: {data}")
-
             elif provider == "coinbase":
                 if data.get("type") == "match":
                     normalized.update(
@@ -855,10 +739,8 @@ class MarketDataFeed:
                     raise DataValidationError(
                         f"Unknown Coinbase data format or type: {data.get('type')}"
                     )
-
             elif provider == "alpaca":
-                if isinstance(data, list) and data and data[0].get("T") == "t":
-                    # Alpaca sends a list of data points
+                if isinstance(data, list) and data and (data[0].get("T") == "t"):
                     item = data[0]
                     normalized.update(
                         {
@@ -866,13 +748,12 @@ class MarketDataFeed:
                             "symbol": item["S"],
                             "price": float(item["p"]),
                             "quantity": float(item["s"]),
-                            "timestamp": item["t"]
-                            // 1000000,  # Convert nanoseconds to milliseconds
+                            "timestamp": item["t"] // 1000000,
                             "trade_id": item.get("i"),
                             "exchange": item.get("x"),
                         }
                     )
-                elif isinstance(data, list) and data and data[0].get("T") == "q":
+                elif isinstance(data, list) and data and (data[0].get("T") == "q"):
                     item = data[0]
                     normalized.update(
                         {
@@ -886,7 +767,7 @@ class MarketDataFeed:
                             "exchange": item.get("x"),
                         }
                     )
-                elif isinstance(data, list) and data and data[0].get("T") == "b":
+                elif isinstance(data, list) and data and (data[0].get("T") == "b"):
                     item = data[0]
                     normalized.update(
                         {
@@ -902,16 +783,13 @@ class MarketDataFeed:
                         }
                     )
                 elif data.get("T") == "subscription":
-                    # Subscription response, not actual data
                     return {"type": "subscription_status", "provider": provider}
                 elif data.get("T") == "success" or data.get("T") == "error":
-                    # Auth success/error message
                     return {"type": "auth_status", "provider": provider}
                 else:
                     raise DataValidationError(f"Unknown Alpaca data format: {data}")
-
             elif provider == "polygon":
-                if isinstance(data, list) and data and data[0].get("ev") == "T":
+                if isinstance(data, list) and data and (data[0].get("ev") == "T"):
                     item = data[0]
                     normalized.update(
                         {
@@ -924,7 +802,7 @@ class MarketDataFeed:
                             "exchange": item.get("x"),
                         }
                     )
-                elif isinstance(data, list) and data and data[0].get("ev") == "Q":
+                elif isinstance(data, list) and data and (data[0].get("ev") == "Q"):
                     item = data[0]
                     normalized.update(
                         {
@@ -942,11 +820,8 @@ class MarketDataFeed:
                     return {"type": "status", "provider": provider}
                 else:
                     raise DataValidationError(f"Unknown Polygon data format: {data}")
-
-            # Apply general validation after normalization
             self._validate_data_format(normalized)
             return normalized
-
         except KeyError as e:
             raise DataValidationError(
                 f"Missing key in {provider} data during normalization: {e}"
@@ -956,12 +831,10 @@ class MarketDataFeed:
                 f"Value conversion error in {provider} data during normalization: {e}"
             )
 
-    def _validate_data_format(self, normalized_data: Dict):
+    def _validate_data_format(self, normalized_data: Dict) -> Any:
         """Perform validation on normalized data format."""
         data_type = normalized_data.get("type")
-
         if data_type not in self.config.validation_settings["required_fields"]:
-            # Allow non-standard types like 'heartbeat', 'auth_status', etc. to pass if they don't need validation
             if data_type not in [
                 "heartbeat",
                 "auth_status",
@@ -972,21 +845,17 @@ class MarketDataFeed:
                     f"Unknown normalized data type: {data_type}. Skipping detailed validation."
                 )
             return
-
         required_fields = self.config.validation_settings["required_fields"][data_type]
         missing_fields = [f for f in required_fields if f not in normalized_data]
         if missing_fields:
             raise DataValidationError(
                 f"Normalized data type '{data_type}' missing required fields: {', '.join(missing_fields)}"
             )
-
-        # Re-apply type checking just in case
         for field, expected_type in self.config.validation_settings[
             "type_validation"
         ].items():
             if field in normalized_data:
                 if not isinstance(normalized_data[field], expected_type):
-                    # Attempt safe conversion for numbers that might be strings/ints
                     if expected_type in (int, float) and isinstance(
                         normalized_data[field], (int, float, str)
                     ):
@@ -999,25 +868,24 @@ class MarketDataFeed:
                                 f"Field {field} in normalized data has unexpected type {type(normalized_data[field])} and cannot be converted to {expected_type}"
                             )
                     elif isinstance(expected_type, tuple) and any(
-                        isinstance(normalized_data[field], t) for t in expected_type
+                        (isinstance(normalized_data[field], t) for t in expected_type)
                     ):
-                        pass  # Already handled by any()
+                        pass
                     else:
                         raise DataValidationError(
                             f"Field {field} in normalized data has unexpected type {type(normalized_data[field])}, expected {expected_type}"
                         )
 
-    def set_kafka_producer(self, producer: Producer):
+    def set_kafka_producer(self, producer: Producer) -> Any:
         """Set the confluent_kafka Producer instance."""
         self.kafka_producer = producer
         logger.info("Kafka producer set for market data feed")
 
-    def _publish_to_kafka(self, provider: str, data: Dict):
+    def _publish_to_kafka(self, provider: str, data: Dict) -> Any:
         """Publish normalized data to Kafka."""
         if not self.kafka_producer:
             logger.warning("Kafka producer not configured.")
             return
-
         topic = (
             f"alphamind-market-data-{provider.lower()}-{data.get('type', 'general')}"
         )
@@ -1028,11 +896,11 @@ class MarketDataFeed:
                 key=data.get("symbol", "N/A").encode("utf-8"),
                 callback=self._delivery_report,
             )
-            self.kafka_producer.poll(0)  # Trigger any callbacks
+            self.kafka_producer.poll(0)
         except Exception as e:
             logger.error(f"Failed to publish message to Kafka topic {topic}: {e}")
 
-    def _delivery_report(self, err, msg):
+    def _delivery_report(self, err: Any, msg: Any) -> Any:
         """Kafka delivery report callback."""
         if err is not None:
             logger.error(f"Message delivery failed: {err}")
@@ -1066,76 +934,3 @@ class MarketDataFeed:
                 "validation_errors": self.data_stats["validation_errors"],
             },
         }
-
-
-# Example usage (uncomment and run in an async environment)
-# async def trade_callback(data: Dict):
-#     if data.get("type") == "trade":
-#         print(
-#             f"[{data['received_at']}][{data['provider']}] TRADE: {data['symbol']} @ {data['price']} x {data['quantity']}"
-#         )
-#     elif data.get("type") == "heartbeat":
-#         logger.debug(f"Received heartbeat from {data['provider']}")
-#     elif data.get("type") == "auth_status":
-#         logger.info(f"Auth status from {data['provider']}: {data}")
-
-# async def main():
-#     # Note: This requires a config.json with appropriate API keys for non-public data
-#     config = MarketDataConfig(config_path="config.json")
-#     feed = MarketDataFeed(config)
-
-#     if not await feed.initialize():
-#         return
-
-#     # Optional: Set up Kafka Producer
-#     # try:
-#     #     producer = Producer({'bootstrap.servers': 'localhost:9092'})
-#     #     feed.set_kafka_producer(producer)
-#     # except Exception as e:
-#     #     logger.warning(f"Could not initialize Kafka producer: {e}")
-
-#     # Example REST fetch
-#     try:
-#         binance_ticker = await feed.fetch_data(
-#             "binance", "/ticker/24hr", params={"symbol": "BTCUSDT"}
-#         )
-#         print(f"Binance BTCUSDT 24hr Ticker: {binance_ticker}")
-#     except Exception as e:
-#         print(f"Error fetching Binance data: {e}")
-
-#     # Example streaming subscription (Binance)
-#     try:
-#         await feed.subscribe_to_stream(
-#             "binance", ["BTCUSDT", "ETHUSDT"], trade_callback, channel="trade"
-#         )
-#     except Exception as e:
-#         print(f"Error subscribing to Binance stream: {e}")
-
-#     # Example streaming subscription (Coinbase)
-#     try:
-#         await feed.subscribe_to_stream(
-#             "coinbase", ["BTC-USD", "ETH-USD"], trade_callback, channel="matches"
-#         )
-#     except Exception as e:
-#         print(f"Error subscribing to Coinbase stream: {e}")
-
-
-#     # Keep the main task alive to receive stream messages
-#     print("Listening for streaming data... Press Ctrl+C to stop.")
-#     try:
-#         while feed.running:
-#             await asyncio.sleep(1)
-#     except asyncio.CancelledError:
-#         pass
-#     finally:
-#         await feed.close()
-
-# if __name__ == "__main__":
-#     try:
-#         # Set up asyncio loop
-#         loop = asyncio.get_event_loop()
-#         loop.run_until_complete(main())
-#     except KeyboardInterrupt:
-#         print("Program interrupted by user.")
-#     except Exception as e:
-#         logger.critical(f"Unhandled error in main execution: {e}")

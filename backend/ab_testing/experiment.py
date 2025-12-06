@@ -12,7 +12,6 @@ import json
 import os
 from typing import Any, Dict, List, Optional, Union
 import uuid
-
 import pandas as pd
 
 
@@ -57,7 +56,7 @@ class Experiment:
         metrics: Optional[List[str]] = None,
         start_date: Optional[datetime.datetime] = None,
         end_date: Optional[datetime.datetime] = None,
-    ):
+    ) -> Any:
         self.id = str(uuid.uuid4())
         self.name = name
         self.description = description or ""
@@ -164,18 +163,13 @@ class Experiment:
         """
         if variant not in self.variants:
             raise ValueError(f"Variant '{variant}' not found in experiment")
-
         if metric not in self.metrics:
             raise ValueError(f"Metric '{metric}' not found in experiment")
-
         timestamp = timestamp or datetime.datetime.now()
-
         if metric not in self.results:
             self.results[metric] = {}
-
         if variant not in self.results[metric]:
             self.results[metric][variant] = []
-
         self.results[metric][variant].append({"value": value, "timestamp": timestamp})
 
     def add_results_batch(
@@ -206,11 +200,9 @@ class Experiment:
             variant = row[variant_col]
             metric = row[metric_col]
             value = row[value_col]
-
             timestamp = None
             if timestamp_col and timestamp_col in row:
                 timestamp = row[timestamp_col]
-
             self.add_result(variant, metric, value, timestamp)
 
     def get_results(
@@ -240,38 +232,27 @@ class Experiment:
         """
         if metric and metric not in self.results:
             raise ValueError(f"No results found for metric '{metric}'")
-
-        if variant and not any(
-            variant in self.results.get(m, {}) for m in self.results
+        if variant and (
+            not any((variant in self.results.get(m, {}) for m in self.results))
         ):
             raise ValueError(f"No results found for variant '{variant}'")
-
-        # Filter results by metric and variant
         filtered_results = {}
-
         if metric:
             metrics = [metric]
         else:
             metrics = list(self.results.keys())
-
         for m in metrics:
             if m not in self.results:
                 continue
-
             filtered_results[m] = {}
-
             if variant:
                 variants = [variant] if variant in self.results[m] else []
             else:
                 variants = list(self.results[m].keys())
-
             for v in variants:
                 filtered_results[m][v] = self.results[m][v]
-
-        # Convert to DataFrame if requested
         if as_dataframe:
             data = []
-
             for m, variants in filtered_results.items():
                 for v, values in variants.items():
                     for result in values:
@@ -283,9 +264,7 @@ class Experiment:
                                 "timestamp": result["timestamp"],
                             }
                         )
-
             return pd.DataFrame(data)
-
         return filtered_results
 
     def get_summary_statistics(
@@ -308,18 +287,12 @@ class Experiment:
         stats : DataFrame
             Summary statistics for the experiment.
         """
-        # Get results as DataFrame
         results_df = self.get_results(metric, variant, as_dataframe=True)
-
         if results_df.empty:
             return pd.DataFrame()
-
-        # Calculate statistics
         stats = []
-
         for (m, v), group in results_df.groupby(["metric", "variant"]):
             values = group["value"]
-
             stats.append(
                 {
                     "metric": m,
@@ -334,7 +307,6 @@ class Experiment:
                     "max": values.max(),
                 }
             )
-
         return pd.DataFrame(stats)
 
     def to_dict(self) -> Dict:
@@ -374,22 +346,16 @@ class Experiment:
             JSON representation of the experiment.
         """
         data = self.to_dict()
-
         if include_results:
-            # Convert results to serializable format
             results_dict = {}
-
             for metric, variants in self.results.items():
                 results_dict[metric] = {}
-
                 for variant, values in variants.items():
                     results_dict[metric][variant] = [
                         {"value": v["value"], "timestamp": v["timestamp"].isoformat()}
                         for v in values
                     ]
-
             data["results"] = results_dict
-
         return json.dumps(data, indent=2)
 
     def save(self, directory: str, include_results: bool = True) -> str:
@@ -409,19 +375,14 @@ class Experiment:
             Path to the saved file.
         """
         os.makedirs(directory, exist_ok=True)
-
-        # Create filename
         filename = f"{self.id}_{self.name.replace(' ', '_')}.json"
         filepath = os.path.join(directory, filename)
-
-        # Save to file
         with open(filepath, "w") as f:
             f.write(self.to_json(include_results=include_results))
-
         return filepath
 
     @classmethod
-    def load(cls, filepath: str) -> "Experiment":
+    def load(cls: Any, filepath: str) -> "Experiment":
         """
         Load experiment from file.
 
@@ -437,33 +398,23 @@ class Experiment:
         """
         with open(filepath, "r") as f:
             data = json.load(f)
-
-        # Create experiment
         experiment = cls(
             name=data["name"], description=data["description"], metrics=data["metrics"]
         )
-
-        # Set attributes
         experiment.id = data["id"]
         experiment.variants = data["variants"]
-
         if data["start_date"]:
             experiment.start_date = datetime.datetime.fromisoformat(data["start_date"])
-
         if data["end_date"]:
             experiment.end_date = datetime.datetime.fromisoformat(data["end_date"])
-
         experiment.status = ExperimentStatus(data["status"])
         experiment.creation_date = datetime.datetime.fromisoformat(
             data["creation_date"]
         )
         experiment.metadata = data["metadata"]
-
-        # Load results if available
         if "results" in data:
             for metric, variants in data["results"].items():
                 experiment.results[metric] = {}
-
                 for variant, values in variants.items():
                     experiment.results[metric][variant] = [
                         {
@@ -474,7 +425,6 @@ class Experiment:
                         }
                         for v in values
                     ]
-
         return experiment
 
 
@@ -493,7 +443,7 @@ class ExperimentGroup:
         Description of the experiment group.
     """
 
-    def __init__(self, name: str, description: Optional[str] = None):
+    def __init__(self, name: str, description: Optional[str] = None) -> Any:
         self.id = str(uuid.uuid4())
         self.name = name
         self.description = description or ""
@@ -539,7 +489,6 @@ class ExperimentGroup:
         """
         if experiment_id not in self.experiments:
             raise ValueError(f"Experiment with ID '{experiment_id}' not found in group")
-
         return self.experiments[experiment_id]
 
     def get_experiments(
@@ -561,7 +510,6 @@ class ExperimentGroup:
         """
         if status is None:
             return list(self.experiments.values())
-
         return [e for e in self.experiments.values() if e.status == status]
 
     def start_all(self, start_date: Optional[datetime.datetime] = None) -> None:
@@ -623,28 +571,22 @@ class ExperimentGroup:
         """
         if as_dataframe:
             dfs = []
-
             for experiment in self.experiments.values():
                 df = experiment.get_results(metric=metric, as_dataframe=True)
-
                 if not df.empty:
                     df["experiment_id"] = experiment.id
                     df["experiment_name"] = experiment.name
                     dfs.append(df)
-
             if dfs:
                 return pd.concat(dfs, ignore_index=True)
             else:
                 return pd.DataFrame()
-
         else:
             combined_results = {}
-
             for experiment_id, experiment in self.experiments.items():
                 combined_results[experiment_id] = experiment.get_results(
                     metric=metric, as_dataframe=False
                 )
-
             return combined_results
 
     def get_summary_statistics(self, metric: Optional[str] = None) -> pd.DataFrame:
@@ -663,15 +605,12 @@ class ExperimentGroup:
             Summary statistics for all experiments.
         """
         dfs = []
-
         for experiment in self.experiments.values():
             df = experiment.get_summary_statistics(metric=metric)
-
             if not df.empty:
                 df["experiment_id"] = experiment.id
                 df["experiment_name"] = experiment.name
                 dfs.append(df)
-
         if dfs:
             return pd.concat(dfs, ignore_index=True)
         else:
@@ -709,12 +648,10 @@ class ExperimentGroup:
             JSON representation of the experiment group.
         """
         data = self.to_dict()
-
         if include_experiments:
             data["experiments"] = {
                 exp_id: exp.to_dict() for exp_id, exp in self.experiments.items()
             }
-
         return json.dumps(data, indent=2)
 
     def save(
@@ -741,27 +678,21 @@ class ExperimentGroup:
             Path to the saved file.
         """
         os.makedirs(directory, exist_ok=True)
-
-        # Create filename
         filename = f"{self.id}_{self.name.replace(' ', '_')}.json"
         filepath = os.path.join(directory, filename)
-
-        # Save individual experiments if requested
         if save_experiments:
             experiments_dir = os.path.join(directory, f"{self.id}_experiments")
             os.makedirs(experiments_dir, exist_ok=True)
-
             for experiment in self.experiments.values():
                 experiment.save(experiments_dir)
-
-        # Save group to file
         with open(filepath, "w") as f:
             f.write(self.to_json(include_experiments=include_experiments))
-
         return filepath
 
     @classmethod
-    def load(cls, filepath: str, load_experiments: bool = True) -> "ExperimentGroup":
+    def load(
+        cls: Any, filepath: str, load_experiments: bool = True
+    ) -> "ExperimentGroup":
         """
         Load experiment group from file.
 
@@ -779,15 +710,9 @@ class ExperimentGroup:
         """
         with open(filepath, "r") as f:
             data = json.load(f)
-
-        # Create group
         group = cls(name=data["name"], description=data["description"])
-
-        # Set attributes
         group.id = data["id"]
         group.creation_date = datetime.datetime.fromisoformat(data["creation_date"])
-
-        # Load experiments if available
         if "experiments" in data and load_experiments:
             for exp_id, exp_data in data["experiments"].items():
                 experiment = Experiment(
@@ -795,11 +720,9 @@ class ExperimentGroup:
                     description=exp_data["description"],
                     metrics=exp_data["metrics"],
                 )
-                # Set additional attributes for the experiment
                 experiment.id = exp_id
                 experiment.creation_date = datetime.datetime.fromisoformat(
                     exp_data["creation_date"]
                 )
                 group.experiments[exp_id] = experiment
-
         return group

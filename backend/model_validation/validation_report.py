@@ -11,7 +11,6 @@ from io import StringIO
 import json
 from typing import Any, Dict, List, Optional, Tuple, Union
 import uuid
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -47,7 +46,7 @@ class ValidationReport:
         task_type: str = "regression",
         feature_names: Optional[List[str]] = None,
         target_name: Optional[str] = None,
-    ):
+    ) -> Any:
         self.model_name = model_name
         self.model = model
         self.task_type = task_type
@@ -55,8 +54,6 @@ class ValidationReport:
         self.target_name = target_name or "Target"
         self.report_id = str(uuid.uuid4())[:8]
         self.creation_time = datetime.now()
-
-        # Initialize report sections
         self.sections = {
             "model_info": {},
             "performance_metrics": {},
@@ -65,8 +62,6 @@ class ValidationReport:
             "diagnostics": {},
             "warnings": [],
         }
-
-        # Store model info
         self._store_model_info()
 
     def _store_model_info(self) -> None:
@@ -78,14 +73,11 @@ class ValidationReport:
             "report_id": self.report_id,
             "creation_time": self.creation_time.strftime("%Y-%m-%d %H:%M:%S"),
         }
-
-        # Try to extract model parameters
         try:
             if hasattr(self.model, "get_params"):
                 model_info["parameters"] = self.model.get_params()
         except:
             model_info["parameters"] = "Could not extract model parameters"
-
         self.sections["model_info"] = model_info
 
     def add_performance_metrics(
@@ -114,7 +106,6 @@ class ValidationReport:
         """
         from .metrics import calculate_metrics
 
-        # Calculate metrics
         metrics = calculate_metrics(
             y_true,
             y_pred,
@@ -122,8 +113,6 @@ class ValidationReport:
             task_type=self.task_type,
             custom_metrics=custom_metrics,
         )
-
-        # Store metrics
         self.sections["performance_metrics"][dataset_name] = metrics
 
     def add_cross_validation_results(
@@ -140,7 +129,6 @@ class ValidationReport:
         cv_method : str, default="k-fold"
             Cross-validation method used.
         """
-        # Calculate summary statistics
         cv_summary = {}
         for metric, values in cv_results.items():
             cv_summary[metric] = {
@@ -150,8 +138,6 @@ class ValidationReport:
                 "max": np.max(values),
                 "values": values,
             }
-
-        # Store cross-validation results
         self.sections["cross_validation"] = {
             "method": cv_method,
             "n_folds": len(next(iter(cv_results.values()))),
@@ -167,7 +153,6 @@ class ValidationReport:
         importance_values : DataFrame
             DataFrame containing feature importance values.
         """
-        # Store feature importance
         self.sections["feature_importance"] = importance_values.to_dict(
             orient="records"
         )
@@ -188,11 +173,7 @@ class ValidationReport:
                 "Residual analysis is only applicable for regression models"
             )
             return
-
-        # Calculate residuals
         residuals = y_true - y_pred
-
-        # Calculate residual statistics
         residual_stats = {
             "mean": np.mean(residuals),
             "std": np.std(residuals),
@@ -201,15 +182,11 @@ class ValidationReport:
             "skewness": float(pd.Series(residuals).skew()),
             "kurtosis": float(pd.Series(residuals).kurtosis()),
         }
-
-        # Check for normality
         from scipy import stats
 
         _, p_value = stats.shapiro(residuals)
         residual_stats["shapiro_p_value"] = p_value
         residual_stats["is_normal"] = p_value > 0.05
-
-        # Store residual analysis
         self.sections["diagnostics"]["residual_analysis"] = residual_stats
 
     def add_confusion_matrix(
@@ -232,17 +209,11 @@ class ValidationReport:
                 "Confusion matrix is only applicable for classification models"
             )
             return
-
         from sklearn.metrics import confusion_matrix
 
-        # Calculate confusion matrix
         cm = confusion_matrix(y_true, y_pred)
-
-        # Normalize if requested
         if normalize:
             cm = cm.astype("float") / cm.sum(axis=1)[:, np.newaxis]
-
-        # Store confusion matrix
         self.sections["diagnostics"]["confusion_matrix"] = {
             "matrix": cm.tolist(),
             "normalized": normalize,
@@ -264,14 +235,10 @@ class ValidationReport:
                 "ROC curve is only applicable for classification models"
             )
             return
-
         from sklearn.metrics import auc, roc_curve
 
-        # Calculate ROC curve
         fpr, tpr, thresholds = roc_curve(y_true, y_score)
         roc_auc = auc(fpr, tpr)
-
-        # Store ROC curve
         self.sections["diagnostics"]["roc_curve"] = {
             "fpr": fpr.tolist(),
             "tpr": tpr.tolist(),
@@ -297,14 +264,10 @@ class ValidationReport:
                 "Precision-recall curve is only applicable for classification models"
             )
             return
-
         from sklearn.metrics import average_precision_score, precision_recall_curve
 
-        # Calculate precision-recall curve
         precision, recall, thresholds = precision_recall_curve(y_true, y_score)
         ap = average_precision_score(y_true, y_score)
-
-        # Store precision-recall curve
         self.sections["diagnostics"]["precision_recall_curve"] = {
             "precision": precision.tolist(),
             "recall": recall.tolist(),
@@ -327,7 +290,6 @@ class ValidationReport:
         test_scores : array-like
             Scores on test sets.
         """
-        # Store learning curve
         self.sections["diagnostics"]["learning_curve"] = {
             "train_sizes": train_sizes.tolist(),
             "train_scores_mean": np.mean(train_scores, axis=1).tolist(),
@@ -356,13 +318,9 @@ class ValidationReport:
                 "Calibration curve is only applicable for classification models"
             )
             return
-
         from sklearn.calibration import calibration_curve
 
-        # Calculate calibration curve
         prob_true, prob_pred = calibration_curve(y_true, y_prob, n_bins=n_bins)
-
-        # Store calibration curve
         self.sections["diagnostics"]["calibration_curve"] = {
             "prob_true": prob_true.tolist(),
             "prob_pred": prob_pred.tolist(),
@@ -380,7 +338,6 @@ class ValidationReport:
         content : any
             Content of the section.
         """
-        # Convert content to JSON-serializable format if possible
         try:
             json.dumps(content)
             self.sections[section_name] = content
@@ -423,28 +380,19 @@ class ValidationReport:
         self, output_file: Optional[str] = None
     ) -> Union[str, None]:
         """Generate JSON report."""
-        # Convert to JSON
         report_json = json.dumps(self.sections, indent=2)
-
-        # Save to file if specified
         if output_file:
             with open(output_file, "w") as f:
                 f.write(report_json)
             return None
-
         return report_json
 
     def _generate_markdown_report(
         self, output_file: Optional[str] = None, include_plots: bool = True
     ) -> Union[str, None]:
         """Generate Markdown report."""
-        # Initialize report
         report = StringIO()
-
-        # Add title
         report.write(f"# Model Validation Report: {self.model_name}\n\n")
-
-        # Add model info
         report.write("## Model Information\n\n")
         model_info = self.sections["model_info"]
         report.write(f"- **Model Name:** {model_info['model_name']}\n")
@@ -452,8 +400,6 @@ class ValidationReport:
         report.write(f"- **Task Type:** {model_info['task_type']}\n")
         report.write(f"- **Report ID:** {model_info['report_id']}\n")
         report.write(f"- **Creation Time:** {model_info['creation_time']}\n\n")
-
-        # Add parameters if available
         if "parameters" in model_info and isinstance(model_info["parameters"], dict):
             report.write("### Model Parameters\n\n")
             report.write("| Parameter | Value |\n")
@@ -461,64 +407,44 @@ class ValidationReport:
             for param, value in model_info["parameters"].items():
                 report.write(f"| {param} | {value} |\n")
             report.write("\n")
-
-        # Add performance metrics
         if self.sections["performance_metrics"]:
             report.write("## Performance Metrics\n\n")
-
             for dataset, metrics in self.sections["performance_metrics"].items():
                 report.write(f"### {dataset.capitalize()} Set\n\n")
                 report.write("| Metric | Value |\n")
                 report.write("|--------|------:|\n")
-
                 for metric, value in metrics.items():
                     if isinstance(value, (int, float)):
                         report.write(f"| {metric} | {value:.4f} |\n")
                     else:
                         report.write(f"| {metric} | {value} |\n")
-
                 report.write("\n")
-
-        # Add cross-validation results
         if self.sections["cross_validation"]:
             cv = self.sections["cross_validation"]
             report.write("## Cross-Validation Results\n\n")
             report.write(f"- **Method:** {cv['method']}\n")
             report.write(f"- **Number of Folds:** {cv['n_folds']}\n\n")
-
             report.write("| Metric | Mean | Std | Min | Max |\n")
             report.write("|--------|-----:|----:|----:|----:|\n")
-
             for metric, stats in cv["metrics"].items():
                 report.write(
-                    f"| {metric} | {stats['mean']:.4f} | {stats['std']:.4f} | "
-                    f"{stats['min']:.4f} | {stats['max']:.4f} |\n"
+                    f"| {metric} | {stats['mean']:.4f} | {stats['std']:.4f} | {stats['min']:.4f} | {stats['max']:.4f} |\n"
                 )
-
             report.write("\n")
-
-        # Add feature importance
         if self.sections["feature_importance"]:
             report.write("## Feature Importance\n\n")
             report.write("| Feature | Importance |\n")
             report.write("|---------|----------:|\n")
-
             for item in self.sections["feature_importance"]:
                 feature = item["Feature"]
                 importance = item["Importance"]
                 report.write(f"| {feature} | {importance:.4f} |\n")
-
             report.write("\n")
-
-        # Add diagnostics
         if self.sections["diagnostics"]:
             report.write("## Model Diagnostics\n\n")
-
-            # Add residual analysis
             if "residual_analysis" in self.sections["diagnostics"]:
                 report.write("### Residual Analysis\n\n")
                 ra = self.sections["diagnostics"]["residual_analysis"]
-
                 report.write("| Statistic | Value |\n")
                 report.write("|-----------|------:|\n")
                 report.write(f"| Mean | {ra['mean']:.4f} |\n")
@@ -529,81 +455,57 @@ class ValidationReport:
                 report.write(f"| Kurtosis | {ra['kurtosis']:.4f} |\n")
                 report.write(f"| Shapiro p-value | {ra['shapiro_p_value']:.4f} |\n")
                 report.write(f"| Is Normal | {ra['is_normal']} |\n\n")
-
-            # Add confusion matrix
             if "confusion_matrix" in self.sections["diagnostics"]:
                 report.write("### Confusion Matrix\n\n")
                 cm = self.sections["diagnostics"]["confusion_matrix"]
-
                 report.write("```\n")
                 for row in cm["matrix"]:
                     report.write(
                         " ".join(
-                            f"{x:.4f}" if cm["normalized"] else f"{x}" for x in row
+                            (f"{x:.4f}" if cm["normalized"] else f"{x}" for x in row)
                         )
                         + "\n"
                     )
                 report.write("```\n\n")
-
-            # Add ROC curve
             if "roc_curve" in self.sections["diagnostics"]:
                 report.write("### ROC Curve\n\n")
                 roc = self.sections["diagnostics"]["roc_curve"]
                 report.write(f"- **AUC:** {roc['auc']:.4f}\n\n")
-
-            # Add precision-recall curve
             if "precision_recall_curve" in self.sections["diagnostics"]:
                 report.write("### Precision-Recall Curve\n\n")
                 pr = self.sections["diagnostics"]["precision_recall_curve"]
                 report.write(
                     f"- **Average Precision:** {pr['average_precision']:.4f}\n\n"
                 )
-
-            # Add learning curve
             if "learning_curve" in self.sections["diagnostics"]:
                 report.write("### Learning Curve\n\n")
                 lc = self.sections["diagnostics"]["learning_curve"]
-
                 report.write(
                     "| Train Size | Train Score | Train Std | Test Score | Test Std |\n"
                 )
                 report.write(
                     "|----------:|-----------:|---------:|----------:|--------:|\n"
                 )
-
                 for i, size in enumerate(lc["train_sizes"]):
                     report.write(
-                        f"| {size} | {lc['train_scores_mean'][i]:.4f} | {lc['train_scores_std'][i]:.4f} | "
-                        f"{lc['test_scores_mean'][i]:.4f} | {lc['test_scores_std'][i]:.4f} |\n"
+                        f"| {size} | {lc['train_scores_mean'][i]:.4f} | {lc['train_scores_std'][i]:.4f} | {lc['test_scores_mean'][i]:.4f} | {lc['test_scores_std'][i]:.4f} |\n"
                     )
-
                 report.write("\n")
-
-            # Add calibration curve
             if "calibration_curve" in self.sections["diagnostics"]:
                 report.write("### Calibration Curve\n\n")
                 cc = self.sections["diagnostics"]["calibration_curve"]
-
                 report.write("| Predicted Probability | True Probability |\n")
                 report.write("|----------------------:|----------------:|\n")
-
                 for i in range(len(cc["prob_pred"])):
                     report.write(
                         f"| {cc['prob_pred'][i]:.4f} | {cc['prob_true'][i]:.4f} |\n"
                     )
-
                 report.write("\n")
-
-        # Add warnings
         if self.sections["warnings"]:
             report.write("## Warnings\n\n")
-
             for warning in self.sections["warnings"]:
                 report.write(f"- {warning}\n")
-
             report.write("\n")
-
-        # Add custom sections
         for section_name, content in self.sections.items():
             if section_name not in [
                 "model_info",
@@ -614,7 +516,6 @@ class ValidationReport:
                 "warnings",
             ]:
                 report.write(f"## {section_name}\n\n")
-
                 if isinstance(content, dict):
                     for key, value in content.items():
                         report.write(f"- **{key}:** {value}\n")
@@ -623,71 +524,33 @@ class ValidationReport:
                         report.write(f"- {item}\n")
                 else:
                     report.write(f"{content}\n")
-
                 report.write("\n")
-
-        # Get report as string
         report_str = report.getvalue()
-
-        # Save to file if specified
         if output_file:
             with open(output_file, "w") as f:
                 f.write(report_str)
             return None
-
         return report_str
 
     def _generate_html_report(
         self, output_file: Optional[str] = None, include_plots: bool = True
     ) -> Union[str, None]:
         """Generate HTML report."""
-        # First generate markdown report
         md_report = self._generate_markdown_report(None, include_plots)
-
-        # Convert markdown to HTML
         try:
             import markdown
 
             html_report = markdown.markdown(md_report, extensions=["tables"])
-
-            # Add basic styling
-            html_report = f"""
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Model Validation Report: {self.model_name}</title>
-                <style>
-                    body {{ font-family: Arial, sans-serif; line-height: 1.6; max-width: 1200px; margin: 0 auto; padding: 20px; }}
-                    h1, h2, h3 {{ color: #333; }}
-                    table {{ border-collapse: collapse; width: 100%; margin-bottom: 20px; }}
-                    th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
-                    th {{ background-color: #f2f2f2; }}
-                    tr:nth-child(even) {{ background-color: #f9f9f9; }}
-                    .warning {{ color: #e74c3c; }}
-                </style>
-            </head>
-            <body>
-                {html_report}
-            </body>
-            </html>
-            """
-
-            # Save to file if specified
+            html_report = f'\n            <!DOCTYPE html>\n            <html>\n            <head>\n                <meta charset="UTF-8">\n                <meta name="viewport" content="width=device-width, initial-scale=1.0">\n                <title>Model Validation Report: {self.model_name}</title>\n                <style>\n                    body {{ font-family: Arial, sans-serif; line-height: 1.6; max-width: 1200px; margin: 0 auto; padding: 20px; }}\n                    h1, h2, h3 {{ color: #333; }}\n                    table {{ border-collapse: collapse; width: 100%; margin-bottom: 20px; }}\n                    th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}\n                    th {{ background-color: #f2f2f2; }}\n                    tr:nth-child(even) {{ background-color: #f9f9f9; }}\n                    .warning {{ color: #e74c3c; }}\n                </style>\n            </head>\n            <body>\n                {html_report}\n            </body>\n            </html>\n            '
             if output_file:
                 with open(output_file, "w") as f:
                     f.write(html_report)
                 return None
-
             return html_report
-
         except ImportError:
-            # If markdown package is not available, fall back to markdown
             if output_file:
                 self._generate_markdown_report(output_file, include_plots)
                 return None
-
             return md_report
 
     def plot_performance_comparison(
@@ -718,62 +581,33 @@ class ValidationReport:
         """
         if not self.sections["performance_metrics"]:
             raise ValueError("No performance metrics available")
-
-        # Use all datasets if not specified
         if datasets is None:
             datasets = list(self.sections["performance_metrics"].keys())
-
-        # Filter datasets that exist
         datasets = [d for d in datasets if d in self.sections["performance_metrics"]]
-
         if not datasets:
             raise ValueError("No valid datasets specified")
-
-        # Get all metrics from first dataset
         all_metrics = list(self.sections["performance_metrics"][datasets[0]].keys())
-
-        # Use all metrics if not specified
         if metrics is None:
             metrics = all_metrics
-
-        # Filter metrics that exist
         metrics = [m for m in metrics if m in all_metrics]
-
         if not metrics:
             raise ValueError("No valid metrics specified")
-
-        # Create data for plotting
         data = []
         for dataset in datasets:
             for metric in metrics:
                 value = self.sections["performance_metrics"][dataset].get(metric)
                 if value is not None and isinstance(value, (int, float)):
                     data.append({"Dataset": dataset, "Metric": metric, "Value": value})
-
-        # Convert to DataFrame
         df = pd.DataFrame(data)
-
-        # Create figure
         fig, ax = plt.subplots(figsize=figsize)
-
-        # Plot grouped bar chart
         sns.barplot(x="Metric", y="Value", hue="Dataset", data=df, ax=ax)
-
-        # Add labels and title
         ax.set_xlabel("Metric")
         ax.set_ylabel("Value")
         ax.set_title(title or f"Performance Metrics Comparison: {self.model_name}")
-
-        # Rotate x-tick labels if there are many metrics
         if len(metrics) > 4:
             plt.xticks(rotation=45, ha="right")
-
-        # Add legend
         ax.legend(title="Dataset")
-
-        # Adjust layout
         plt.tight_layout()
-
         return fig
 
     def plot_cross_validation_results(
@@ -801,63 +635,34 @@ class ValidationReport:
         """
         if not self.sections["cross_validation"]:
             raise ValueError("No cross-validation results available")
-
         cv = self.sections["cross_validation"]
-
-        # Get all metrics
         all_metrics = list(cv["metrics"].keys())
-
-        # Use all metrics if not specified
         if metrics is None:
             metrics = all_metrics
-
-        # Filter metrics that exist
         metrics = [m for m in metrics if m in all_metrics]
-
         if not metrics:
             raise ValueError("No valid metrics specified")
-
-        # Create figure
         fig, axes = plt.subplots(1, len(metrics), figsize=figsize)
-
-        # Handle single metric case
         if len(metrics) == 1:
             axes = [axes]
-
-        # Plot each metric
         for i, metric in enumerate(metrics):
             ax = axes[i]
-
-            # Get metric data
             values = cv["metrics"][metric]["values"]
             mean = cv["metrics"][metric]["mean"]
             cv["metrics"][metric]["std"]
-
-            # Plot values
             ax.boxplot(values)
-
-            # Add mean line
             ax.axhline(mean, color="red", linestyle="--", label=f"Mean: {mean:.4f}")
-
-            # Add labels
             ax.set_title(f"{metric}")
             ax.set_ylabel("Value")
             ax.set_xlabel("Fold")
-
-            # Add legend
             ax.legend()
-
-        # Add overall title
         if title:
             fig.suptitle(title, fontsize=16)
         else:
             fig.suptitle(f"Cross-Validation Results: {self.model_name}", fontsize=16)
-
-        # Adjust layout
         plt.tight_layout()
         if title:
             plt.subplots_adjust(top=0.9)
-
         return fig
 
     def plot_feature_importance(
@@ -889,5 +694,3 @@ class ValidationReport:
         fig : Figure
             Matplotlib figure.
         """
-        # Logic for plotting feature importance would go here
-        # (Assuming implementation similar to FeatureImportance.plot)

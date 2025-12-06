@@ -11,11 +11,9 @@ import json
 import logging
 import time
 from typing import Any, Callable, Dict, List, Optional
-
 import aiohttp
 import websockets
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
@@ -54,10 +52,10 @@ class OrderStatus(Enum):
 class TimeInForce(Enum):
     """Time in force options for orders."""
 
-    GTC = "gtc"  # Good Till Canceled
-    IOC = "ioc"  # Immediate or Cancel
-    FOK = "fok"  # Fill or Kill
-    DAY = "day"  # Day Order
+    GTC = "gtc"
+    IOC = "ioc"
+    FOK = "fok"
+    DAY = "day"
 
 
 class ExchangeCredentials:
@@ -69,7 +67,7 @@ class ExchangeCredentials:
         api_secret: str,
         passphrase: Optional[str] = None,
         additional_params: Optional[Dict[str, str]] = None,
-    ):
+    ) -> Any:
         """
         Initialize exchange credentials.
 
@@ -90,7 +88,7 @@ class ExchangeConfig:
 
     def __init__(
         self, exchange_id: str, credentials: Optional[ExchangeCredentials] = None
-    ):
+    ) -> Any:
         """
         Initialize exchange configuration.
 
@@ -112,7 +110,6 @@ class ExchangeConfig:
             Dictionary of endpoint types to URLs
         """
         endpoints = {
-            # Default endpoints for common exchanges
             "binance": {
                 "rest": "https://api.binance.com",
                 "websocket": "wss://stream.binance.com:9443/ws",
@@ -136,20 +133,19 @@ class ExchangeConfig:
             "ftx": {
                 "rest": "https://ftx.com/api",
                 "websocket": "wss://ftx.com/ws",
-                "test": "https://ftx.com/api",  # FTX doesn't have a separate test endpoint
+                "test": "https://ftx.com/api",
             },
             "kucoin": {
                 "rest": "https://api.kucoin.com",
-                "websocket": "wss://push.kucoin.com",  # Requires token from REST API
+                "websocket": "wss://push.kucoin.com",
                 "test": "https://openapi-sandbox.kucoin.com",
             },
             "interactive_brokers": {
-                "rest": "http://localhost:5000",  # IB Gateway/TWS with REST API bridge
+                "rest": "http://localhost:5000",
                 "websocket": "ws://localhost:5000/ws",
-                "test": "http://localhost:5000",  # Use paper trading account in TWS
+                "test": "http://localhost:5000",
             },
         }
-
         return endpoints.get(
             self.exchange_id, {"rest": "", "websocket": "", "test": ""}
         )
@@ -162,7 +158,6 @@ class ExchangeConfig:
             Dictionary of rate limit settings
         """
         rate_limits = {
-            # Default rate limits for common exchanges
             "binance": {
                 "requests_per_minute": 1200,
                 "orders_per_second": 10,
@@ -199,7 +194,6 @@ class ExchangeConfig:
                 "orders_per_day": 10000,
             },
         }
-
         return rate_limits.get(
             self.exchange_id,
             {
@@ -217,11 +211,10 @@ class ExchangeConfig:
             Dictionary of exchange-specific options
         """
         options = {
-            # Default options for common exchanges
             "binance": {
                 "recv_window": 5000,
                 "use_test_net": False,
-                "default_type": "spot",  # spot, margin, futures
+                "default_type": "spot",
             },
             "coinbase": {"sandbox_mode": False},
             "alpaca": {"paper_trading": True},
@@ -230,10 +223,9 @@ class ExchangeConfig:
             "kucoin": {"passphrase_as_header": True},
             "interactive_brokers": {"client_id": 0, "timeout": 60},
         }
-
         return options.get(self.exchange_id, {})
 
-    def use_testnet(self, enabled: bool = True):
+    def use_testnet(self, enabled: bool = True) -> Any:
         """
         Configure to use test network instead of production.
 
@@ -250,7 +242,6 @@ class ExchangeConfig:
             self.options["validate_only"] = enabled
         elif self.exchange_id == "kucoin":
             self.options["use_sandbox"] = enabled
-
         logger.info(f"Set test network mode to {enabled} for {self.exchange_id}")
 
     def get_api_url(self, endpoint_type: str = "rest") -> str:
@@ -265,8 +256,6 @@ class ExchangeConfig:
         """
         if endpoint_type not in self.endpoints:
             raise ValueError(f"Unknown endpoint type: {endpoint_type}")
-
-        # For some exchanges, use test endpoint if test mode is enabled
         if endpoint_type == "rest" and any(
             [
                 self.exchange_id == "binance" and self.options.get("use_test_net"),
@@ -276,7 +265,6 @@ class ExchangeConfig:
             ]
         ):
             return self.endpoints["test"]
-
         return self.endpoints[endpoint_type]
 
 
@@ -285,7 +273,7 @@ class ExchangeAPIError(Exception):
 
     def __init__(
         self, message: str, code: Optional[int] = None, response: Optional[Any] = None
-    ):
+    ) -> Any:
         """
         Initialize exchange API error.
 
@@ -315,7 +303,7 @@ class Order:
         time_in_force: TimeInForce = TimeInForce.GTC,
         exchange_id: Optional[str] = None,
         exchange_order_id: Optional[str] = None,
-    ):
+    ) -> Any:
         """
         Initialize an order.
 
@@ -341,7 +329,6 @@ class Order:
         self.time_in_force = time_in_force
         self.exchange_id = exchange_id
         self.exchange_order_id = exchange_order_id
-
         self.status = OrderStatus.PENDING
         self.filled_quantity = 0.0
         self.remaining_quantity = quantity
@@ -349,18 +336,15 @@ class Order:
         self.created_at = datetime.now()
         self.updated_at = self.created_at
         self.fills = []
-
-        # Validate order
         self._validate()
 
-    def _validate(self):
+    def _validate(self) -> Any:
         """Validate order parameters."""
         if (
             self.order_type in [OrderType.LIMIT, OrderType.STOP_LIMIT]
             and self.price is None
         ):
             raise ValueError(f"Price is required for {self.order_type.value} orders")
-
         if (
             self.order_type
             in [OrderType.STOP, OrderType.STOP_LIMIT, OrderType.TRAILING_STOP]
@@ -370,38 +354,32 @@ class Order:
                 f"Stop price is required for {self.order_type.value} orders"
             )
 
-    def update_from_exchange(self, exchange_data: Dict[str, Any]):
+    def update_from_exchange(self, exchange_data: Dict[str, Any]) -> Any:
         """
         Update order with data from exchange.
 
         Args:
             exchange_data: Order data from exchange
         """
-        # Common fields across exchanges
         if "status" in exchange_data:
             status_str = exchange_data["status"].lower()
             for status in OrderStatus:
                 if status.value == status_str:
                     self.status = status
                     break
-
         if "filled_quantity" in exchange_data:
             self.filled_quantity = float(exchange_data["filled_quantity"])
             self.remaining_quantity = self.quantity - self.filled_quantity
-
         if "average_price" in exchange_data:
             self.average_price = (
                 float(exchange_data["average_price"])
                 if exchange_data["average_price"]
                 else 0.0
             )
-
         if "exchange_order_id" in exchange_data:
             self.exchange_order_id = exchange_data["exchange_order_id"]
-
         if "updated_at" in exchange_data:
             self.updated_at = exchange_data["updated_at"]
-
         if "fills" in exchange_data:
             self.fills = exchange_data["fills"]
 
@@ -436,7 +414,7 @@ class Order:
 class ExchangeAPI:
     """Base class for exchange API implementations."""
 
-    def __init__(self, config: ExchangeConfig):
+    def __init__(self, config: ExchangeConfig) -> Any:
         """
         Initialize exchange API.
 
@@ -460,11 +438,9 @@ class ExchangeAPI:
         """Close all connections and resources."""
         if self.session:
             await self.session.close()
-
         for ws in self.ws_connections.values():
-            if ws and not ws.closed:
+            if ws and (not ws.closed):
                 await ws.close()
-
         logger.info(f"Closed {self.config.exchange_id} API")
 
     async def get_exchange_info(self) -> Dict[str, Any]:
@@ -484,7 +460,6 @@ class ExchangeAPI:
             "symbols_count": 0,
             "rate_limits": self.config.rate_limits,
         }
-        # raise NotImplementedError("Subclasses must implement get_exchange_info")
 
     async def get_account_info(self) -> Dict[str, Any]:
         """
@@ -502,9 +477,8 @@ class ExchangeAPI:
             "can_deposit": True,
             "update_time": int(time.time() * 1000),
             "account_type": "SPOT",
-            "balances": {},  # Balances should be fetched via get_balances
+            "balances": {},
         }
-        # raise NotImplementedError("Subclasses must implement get_account_info")
 
     async def get_balances(self) -> Dict[str, Dict[str, float]]:
         """
@@ -517,7 +491,6 @@ class ExchangeAPI:
             f"get_balances not implemented for {self.config.exchange_id}. Returning mock data."
         )
         return {"USD": {"free": 10000.0, "locked": 0.0, "total": 10000.0}}
-        # raise NotImplementedError("Subclasses must implement get_balances")
 
     async def get_order(
         self, order_id: str, client_order_id: Optional[str] = None
@@ -545,7 +518,6 @@ class ExchangeAPI:
             exchange_order_id=order_id,
             status=OrderStatus.FILLED,
         )
-        # raise NotImplementedError("Subclasses must implement get_order")
 
     async def get_open_orders(self, symbol: Optional[str] = None) -> List[Order]:
         """
@@ -561,7 +533,6 @@ class ExchangeAPI:
             f"get_open_orders not implemented for {self.config.exchange_id}. Returning mock data."
         )
         return []
-        # raise NotImplementedError("Subclasses must implement get_open_orders")
 
     async def get_order_history(
         self,
@@ -586,7 +557,6 @@ class ExchangeAPI:
             f"get_order_history not implemented for {self.config.exchange_id}. Returning mock data."
         )
         return []
-        # raise NotImplementedError("Subclasses must implement get_order_history")
 
     async def create_order(self, order: Order) -> Order:
         """
@@ -604,7 +574,6 @@ class ExchangeAPI:
         order.exchange_order_id = f"MOCK_{int(time.time() * 1000)}"
         order.status = OrderStatus.OPEN
         return order
-        # raise NotImplementedError("Subclasses must implement create_order")
 
     async def cancel_order(
         self, order_id: Optional[str] = None, client_order_id: Optional[str] = None
@@ -623,7 +592,6 @@ class ExchangeAPI:
             f"cancel_order not implemented for {self.config.exchange_id}. Returning mock data."
         )
         return True
-        # raise NotImplementedError("Subclasses must implement cancel_order")
 
     async def cancel_all_orders(self, symbol: Optional[str] = None) -> int:
         """
@@ -639,7 +607,6 @@ class ExchangeAPI:
             f"cancel_all_orders not implemented for {self.config.exchange_id}. Returning mock data."
         )
         return 0
-        # raise NotImplementedError("Subclasses must implement cancel_all_orders")
 
     async def get_ticker(self, symbol: str) -> Dict[str, Any]:
         """
@@ -655,7 +622,6 @@ class ExchangeAPI:
             f"get_ticker not implemented for {self.config.exchange_id}. Returning mock data."
         )
         return {"symbol": symbol, "last": 100.0, "bid": 99.9, "ask": 100.1}
-        # raise NotImplementedError("Subclasses must implement get_ticker")
 
     async def get_orderbook(self, symbol: str, limit: int = 100) -> Dict[str, Any]:
         """
@@ -672,7 +638,6 @@ class ExchangeAPI:
             f"get_orderbook not implemented for {self.config.exchange_id}. Returning mock data."
         )
         return {"symbol": symbol, "bids": [[99.9, 1.0]], "asks": [[100.1, 1.0]]}
-        # raise NotImplementedError("Subclasses must implement get_orderbook")
 
     async def get_recent_trades(
         self, symbol: str, limit: int = 100
@@ -691,7 +656,6 @@ class ExchangeAPI:
             f"get_recent_trades not implemented for {self.config.exchange_id}. Returning mock data."
         )
         return []
-        # raise NotImplementedError("Subclasses must implement get_recent_trades")
 
     async def subscribe_to_order_updates(self, callback: Callable[[Order], None]):
         """
@@ -743,52 +707,49 @@ class ExchangeAPI:
             self.market_data_callbacks[key] = []
         self.market_data_callbacks[key].append(callback)
 
-    def _handle_order_update(self, order_data: Dict[str, Any]):
+    def _handle_order_update(self, order_data: Dict[str, Any]) -> Any:
         """
         Handle order update from exchange.
 
         Args:
             order_data: Order data from exchange
         """
-        # Convert exchange-specific order data to Order object
         order = self._parse_order_from_exchange(order_data)
-
-        # Notify callbacks
         for callback in self.order_updates_callbacks:
             try:
                 callback(order)
             except Exception as e:
                 logger.error(f"Error in order update callback: {e}")
 
-    def _handle_trade_update(self, trade_data: Dict[str, Any]):
+    def _handle_trade_update(self, trade_data: Dict[str, Any]) -> Any:
         """
         Handle trade update from exchange.
 
         Args:
             trade_data: Trade data from exchange
         """
-        # Notify callbacks
         for callback in self.trade_updates_callbacks:
             try:
                 callback(trade_data)
             except Exception as e:
                 logger.error(f"Error in trade update callback: {e}")
 
-    def _handle_balance_update(self, balance_data: Dict[str, Any]):
+    def _handle_balance_update(self, balance_data: Dict[str, Any]) -> Any:
         """
         Handle balance update from exchange.
 
         Args:
             balance_data: Balance data from exchange
         """
-        # Notify callbacks
         for callback in self.balance_updates_callbacks:
             try:
                 callback(balance_data)
             except Exception as e:
                 logger.error(f"Error in balance update callback: {e}")
 
-    def _handle_market_data(self, symbol: str, channel: str, data: Dict[str, Any]):
+    def _handle_market_data(
+        self, symbol: str, channel: str, data: Dict[str, Any]
+    ) -> Any:
         """
         Handle market data from exchange.
 
@@ -797,11 +758,9 @@ class ExchangeAPI:
             channel: Data channel
             data: Market data
         """
-        # Find matching callbacks
         for key, callbacks in self.market_data_callbacks.items():
             key_symbol, key_channels = key.split(":", 1)
             key_channels = key_channels.split(",")
-
             if key_symbol == symbol and channel in key_channels:
                 for callback in callbacks:
                     try:
@@ -830,13 +789,12 @@ class ExchangeAPI:
             exchange_id=self.config.exchange_id,
             status=OrderStatus.FILLED,
         )
-        # raise NotImplementedError("Subclasses must implement _parse_order_from_exchange")
 
 
 class BinanceAPI(ExchangeAPI):
     """Binance exchange API implementation."""
 
-    def __init__(self, config: ExchangeConfig):
+    def __init__(self, config: ExchangeConfig) -> Any:
         """
         Initialize Binance API.
 
@@ -850,28 +808,22 @@ class BinanceAPI(ExchangeAPI):
     async def initialize(self):
         """Initialize HTTP session and connections."""
         await super().initialize()
-
-        # Get listen key for user data stream
         if self.config.credentials:
             await self._get_listen_key()
             await self._start_user_data_stream()
 
     async def close(self):
         """Close all connections and resources."""
-        # Close user data stream
         if self.ws_listen_key:
             await self._close_listen_key()
-
         await super().close()
 
     async def _get_listen_key(self):
         """Get listen key for user data stream."""
         if not self.config.credentials:
             return
-
         endpoint = "/api/v3/userDataStream"
         headers = {"X-MBX-APIKEY": self.config.credentials.api_key}
-
         try:
             async with self.session.post(
                 f"{self.config.get_api_url()}{endpoint}", headers=headers
@@ -880,11 +832,8 @@ class BinanceAPI(ExchangeAPI):
                     data = await response.json()
                     self.ws_listen_key = data["listenKey"]
                     logger.info("Obtained Binance listen key")
-
-                    # Start timer to keep listen key alive
                     if self.ws_listen_key_timer:
                         self.ws_listen_key_timer.cancel()
-
                     self.ws_listen_key_timer = asyncio.create_task(
                         self._keep_listen_key_alive()
                     )
@@ -897,7 +846,7 @@ class BinanceAPI(ExchangeAPI):
         """Keep listen key alive by sending periodic requests."""
         while True:
             try:
-                await asyncio.sleep(30 * 60)  # Ping every 30 minutes
+                await asyncio.sleep(30 * 60)
                 await self._ping_listen_key()
             except asyncio.CancelledError:
                 break
@@ -908,11 +857,9 @@ class BinanceAPI(ExchangeAPI):
         """Ping listen key to keep it alive."""
         if not self.ws_listen_key:
             return
-
         endpoint = "/api/v3/userDataStream"
         headers = {"X-MBX-APIKEY": self.config.credentials.api_key}
         params = {"listenKey": self.ws_listen_key}
-
         try:
             async with self.session.put(
                 f"{self.config.get_api_url()}{endpoint}", headers=headers, params=params
@@ -921,7 +868,6 @@ class BinanceAPI(ExchangeAPI):
                     logger.debug("Pinged Binance listen key")
                 else:
                     logger.error(f"Failed to ping listen key: {response.status}")
-                    # Try to get a new listen key
                     await self._get_listen_key()
         except Exception as e:
             logger.error(f"Error pinging listen key: {e}")
@@ -930,11 +876,9 @@ class BinanceAPI(ExchangeAPI):
         """Close listen key."""
         if not self.ws_listen_key:
             return
-
         endpoint = "/api/v3/userDataStream"
         headers = {"X-MBX-APIKEY": self.config.credentials.api_key}
         params = {"listenKey": self.ws_listen_key}
-
         try:
             async with self.session.delete(
                 f"{self.config.get_api_url()}{endpoint}", headers=headers, params=params
@@ -945,26 +889,19 @@ class BinanceAPI(ExchangeAPI):
                     logger.error(f"Failed to close listen key: {response.status}")
         except Exception as e:
             logger.error(f"Error closing listen key: {e}")
-
-        # Cancel timer
         if self.ws_listen_key_timer:
             self.ws_listen_key_timer.cancel()
             self.ws_listen_key_timer = None
-
         self.ws_listen_key = None
 
     async def _start_user_data_stream(self):
         """Start user data stream for real-time updates."""
         if not self.ws_listen_key:
             return
-
         ws_url = f"{self.config.get_api_url('websocket')}/{self.ws_listen_key}"
-
         try:
             self.ws_connections["user_data"] = await websockets.connect(ws_url)
             logger.info("Connected to Binance user data stream")
-
-            # Start listening for messages
             asyncio.create_task(self._listen_user_data_stream())
         except Exception as e:
             logger.error(f"Error connecting to user data stream: {e}")
@@ -974,28 +911,21 @@ class BinanceAPI(ExchangeAPI):
         ws = self.ws_connections.get("user_data")
         if not ws:
             return
-
         try:
             while not ws.closed:
                 message = await ws.recv()
                 data = json.loads(message)
-
                 event_type = data.get("e")
                 if event_type == "executionReport":
-                    # Order update
                     self._handle_order_update(data)
                 elif event_type == "outboundAccountPosition":
-                    # Balance update
                     self._handle_balance_update(data)
                 elif event_type == "balanceUpdate":
-                    # Balance update from deposit or withdrawal
                     self._handle_balance_update(data)
         except websockets.exceptions.ConnectionClosed:
             logger.warning("Binance user data stream connection closed")
         except Exception as e:
             logger.error(f"Error in user data stream: {e}")
-
-        # Try to reconnect
         await asyncio.sleep(5)
         await self._start_user_data_stream()
 

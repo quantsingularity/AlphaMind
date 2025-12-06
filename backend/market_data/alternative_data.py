@@ -1,12 +1,6 @@
 """"""
 
-## Alternative Data Plugin Architecture for AlphaMind
-#
-## This module provides a flexible plugin system for integrating alternative data sources
-## such as news, social media, satellite imagery, and other non-traditional data
-## into trading strategies and analysis with robust retry logic, validation, and logging.
-""""""
-
+""
 from abc import ABC, abstractmethod
 import asyncio
 from datetime import datetime, timedelta
@@ -19,18 +13,14 @@ import sys
 import time
 import traceback
 from typing import Any, Dict, List, Optional, Type
-
 import pandas as pd
 
-# Configure enhanced logging
 os.makedirs("logs", exist_ok=True)
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s",
 )
 logger = logging.getLogger(__name__)
-
-# Add file handler for persistent logging
 try:
     file_handler = logging.FileHandler("logs/alternative_data.log")
     file_handler.setFormatter(
@@ -63,21 +53,21 @@ class DataSourceType(Enum):
     TRANSACTION = "transaction"
     WEB_TRAFFIC = "web_traffic"
     SUPPLY_CHAIN = "supply_chain"
-    SEC_FILINGS = "sec_filings"  # Added SEC filings as a specific type
+    SEC_FILINGS = "sec_filings"
     CUSTOM = "custom"
 
 
 class DataFrequency(Enum):
     """Data update frequency."""
 
-    REAL_TIME = "real_time"  # Continuous updates
-    INTRADAY = "intraday"  # Multiple times per day
-    DAILY = "daily"  # Once per day
-    WEEKLY = "weekly"  # Once per week
-    MONTHLY = "monthly"  # Once per month
-    QUARTERLY = "quarterly"  # Once per quarter
-    ANNUAL = "annual"  # Once per year
-    CUSTOM = "custom"  # Custom frequency
+    REAL_TIME = "real_time"
+    INTRADAY = "intraday"
+    DAILY = "daily"
+    WEEKLY = "weekly"
+    MONTHLY = "monthly"
+    QUARTERLY = "quarterly"
+    ANNUAL = "annual"
+    CUSTOM = "custom"
 
 
 class DataFormat(Enum):
@@ -100,7 +90,7 @@ class PluginStatus(Enum):
     ERROR = "error"
     LOADING = "loading"
     UNLOADED = "unloaded"
-    RETRYING = "retrying"  # Added status for retry operations
+    RETRYING = "retrying"
 
 
 class PluginMetadata:
@@ -121,7 +111,7 @@ class PluginMetadata:
         rate_limit: Optional[int] = None,
         documentation_url: Optional[str] = None,
         tags: Optional[List[str]] = None,
-    ):
+    ) -> Any:
         """
         Initialize plugin metadata.
 
@@ -140,7 +130,6 @@ class PluginMetadata:
             documentation_url: URL to plugin documentation
             tags: List of tags for categorization
         """
-        # Validate inputs
         if not name or not isinstance(name, str):
             raise ValueError("Plugin name must be a non-empty string")
         if not version or not isinstance(version, str):
@@ -155,7 +144,6 @@ class PluginMetadata:
             raise ValueError("Invalid frequency, must be a DataFrequency enum")
         if not isinstance(output_format, DataFormat):
             raise ValueError("Invalid output_format, must be a DataFormat enum")
-
         self.name = name
         self.version = version
         self.description = description
@@ -171,7 +159,6 @@ class PluginMetadata:
         self.tags = tags or []
         self.created_at = datetime.now()
         self.updated_at = self.created_at
-
         logger.debug(f"Created metadata for plugin: {name} v{version}")
 
     def to_dict(self) -> Dict[str, Any]:
@@ -200,7 +187,7 @@ class PluginMetadata:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "PluginMetadata":
+    def from_dict(cls: Any, data: Dict[str, Any]) -> "PluginMetadata":
         """
         Create metadata from dictionary with validation.
 
@@ -213,7 +200,6 @@ class PluginMetadata:
         Raises:
             ValueError: If required fields are missing or invalid
         """
-        # Validate required fields
         required_fields = [
             "name",
             "version",
@@ -228,7 +214,6 @@ class PluginMetadata:
             raise ValueError(
                 f"Missing required fields in metadata: {', '.join(missing_fields)}"
             )
-
         try:
             metadata = cls(
                 name=data["name"],
@@ -245,13 +230,10 @@ class PluginMetadata:
                 documentation_url=data.get("documentation_url"),
                 tags=data.get("tags", []),
             )
-
             if "created_at" in data:
                 metadata.created_at = datetime.fromisoformat(data["created_at"])
-
             if "updated_at" in data:
                 metadata.updated_at = datetime.fromisoformat(data["updated_at"])
-
             return metadata
         except (ValueError, KeyError) as e:
             logger.error(f"Error creating metadata from dictionary: {e}")
@@ -261,7 +243,7 @@ class PluginMetadata:
 class DataSourcePlugin(ABC):
     """Base class for data source plugins."""
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: Optional[Dict[str, Any]] = None) -> Any:
         """
         Initialize data source plugin.
 
@@ -283,8 +265,8 @@ class DataSourcePlugin(ABC):
         }
         self.validation_settings = {
             "validate_data": True,
-            "schema": {},  # Plugin-specific schema
-            "required_fields": [],  # Plugin-specific required fields
+            "schema": {},
+            "required_fields": [],
         }
         self.health_metrics = {
             "fetch_count": 0,
@@ -293,7 +275,6 @@ class DataSourcePlugin(ABC):
             "validation_errors": 0,
             "last_success": None,
         }
-
         logger.info(
             f"Initialized plugin: {self.metadata.name} v{self.metadata.version}"
         )
@@ -329,19 +310,14 @@ class DataSourcePlugin(ABC):
         try:
             self.status = PluginStatus.LOADING
             logger.info(f"Initializing plugin: {self.metadata.name}")
-
-            # Update retry and validation settings from config
             if "retry_settings" in self.config:
                 for key, value in self.config["retry_settings"].items():
                     if key in self.retry_settings:
                         self.retry_settings[key] = value
-
             if "validation_settings" in self.config:
                 for key, value in self.config["validation_settings"].items():
                     if key in self.validation_settings:
                         self.validation_settings[key] = value
-
-            # Validate configuration
             if not self._validate_config():
                 self.status = PluginStatus.ERROR
                 self.last_error = "Invalid configuration"
@@ -349,8 +325,6 @@ class DataSourcePlugin(ABC):
                     f"Plugin {self.metadata.name} initialization failed: Invalid configuration"
                 )
                 return False
-
-            # Perform any necessary setup
             setup_success = await self._setup()
             if not setup_success:
                 self.status = PluginStatus.ERROR
@@ -360,7 +334,6 @@ class DataSourcePlugin(ABC):
                     f"Plugin {self.metadata.name} setup failed: {self.last_error}"
                 )
                 return False
-
             self.status = PluginStatus.ACTIVE
             logger.info(f"Plugin {self.metadata.name} initialized successfully")
             return True
@@ -380,15 +353,11 @@ class DataSourcePlugin(ABC):
         """
         try:
             logger.info(f"Shutting down plugin: {self.metadata.name}")
-
-            # Perform any necessary cleanup
             cleanup_success = await self._cleanup()
             if not cleanup_success:
                 logger.warning(
                     f"Plugin {self.metadata.name} cleanup had issues: {self.last_error}"
                 )
-                # Continue with shutdown despite cleanup issues
-
             self.status = PluginStatus.UNLOADED
             logger.info(f"Plugin {self.metadata.name} shutdown successfully")
             return True
@@ -421,11 +390,7 @@ class DataSourcePlugin(ABC):
             raise PluginError(
                 f"Plugin {self.metadata.name} is not active (status: {self.status.value})"
             )
-
-        # Generate cache key from kwargs
         cache_key = self._generate_cache_key(**kwargs)
-
-        # Check cache if enabled
         if use_cache and cache_key in self.cache:
             if (
                 cache_key in self.cache_expiry
@@ -439,38 +404,26 @@ class DataSourcePlugin(ABC):
                 logger.debug(
                     f"Cache expired for {self.metadata.name} (key: {cache_key[:30]}...)"
                 )
-
-        # Implement retry logic
         retries = 0
         max_retries = self.retry_settings["max_retries"]
         backoff = self.retry_settings["initial_wait"]
         max_wait = self.retry_settings["max_wait"]
-
         while retries <= max_retries:
             try:
-                # Update status during retries
                 if retries > 0:
                     self.status = PluginStatus.RETRYING
                     logger.info(
                         f"Retry attempt {retries}/{max_retries} for {self.metadata.name}"
                     )
                     self.health_metrics["retry_count"] += 1
-
-                # Fetch data
                 start_time = time.time()
                 data = await self.fetch_data(**kwargs)
                 elapsed = time.time() - start_time
-
-                # Update metrics
                 self.last_fetch_time = datetime.now()
                 self.health_metrics["fetch_count"] += 1
                 self.health_metrics["last_success"] = self.last_fetch_time
-
-                # Reset status if we were retrying
                 if self.status == PluginStatus.RETRYING:
                     self.status = PluginStatus.ACTIVE
-
-                # Validate data if enabled
                 if self.validation_settings["validate_data"]:
                     try:
                         self._validate_data(data)
@@ -479,38 +432,29 @@ class DataSourcePlugin(ABC):
                             f"Data validation error for {self.metadata.name}: {e}"
                         )
                         self.health_metrics["validation_errors"] += 1
-                        # Continue despite validation error, but log it
-
-                # Update cache if enabled
                 if use_cache:
                     self.cache[cache_key] = data
-
-                    # Set cache expiry
                     if cache_ttl is not None:
                         self.cache_expiry[cache_key] = datetime.now() + timedelta(
                             seconds=cache_ttl
                         )
                     else:
-                        # Default cache TTL based on data frequency
                         default_ttl = self._get_default_cache_ttl()
                         self.cache_expiry[cache_key] = datetime.now() + timedelta(
                             seconds=default_ttl
                         )
-
                 logger.info(
                     f"Successfully fetched data from {self.metadata.name} in {elapsed:.2f}s"
                 )
                 return data
-
             except Exception as e:
                 retries += 1
                 self.health_metrics["error_count"] += 1
                 self.last_error = str(e)
-
                 if retries <= max_retries:
                     wait_time = min(backoff, max_wait)
                     logger.warning(
-                        f"Error fetching data from {self.metadata.name} (attempt {retries}/{max_retries+1}): {e}"
+                        f"Error fetching data from {self.metadata.name} (attempt {retries}/{max_retries + 1}): {e}"
                     )
                     logger.info(f"Retrying in {wait_time:.1f} seconds...")
                     await asyncio.sleep(wait_time)
@@ -533,29 +477,20 @@ class DataSourcePlugin(ABC):
         Returns:
             True if configuration is valid, False otherwise
         """
-        # Check for required API key if needed
         if self.metadata.requires_api_key:
             if "api_key" not in self.config:
                 logger.error(f"API key required for {self.metadata.name}")
                 return False
-
-            # Check if API key is valid (not empty)
             if not self.config.get("api_key"):
                 logger.error(f"Empty API key provided for {self.metadata.name}")
                 return False
-
-        # Check for required authentication if needed
         if self.metadata.requires_authentication:
             if "username" not in self.config or "password" not in self.config:
                 logger.error(f"Authentication required for {self.metadata.name}")
                 return False
-
-            # Check if credentials are valid (not empty)
             if not self.config.get("username") or not self.config.get("password"):
                 logger.error(f"Empty credentials provided for {self.metadata.name}")
                 return False
-
-        # Plugin-specific configuration validation
         try:
             return self._validate_plugin_config()
         except Exception as e:
@@ -585,11 +520,8 @@ class DataSourcePlugin(ABC):
         Raises:
             DataValidationError: If validation fails
         """
-        # Check if data is None
         if data is None:
             raise DataValidationError("Data is None")
-
-        # Check required fields if specified
         if self.validation_settings["required_fields"]:
             if isinstance(data, dict):
                 missing_fields = [
@@ -611,17 +543,13 @@ class DataSourcePlugin(ABC):
                     raise DataValidationError(
                         f"Missing required columns: {', '.join(missing_columns)}"
                     )
-
-        # Check schema if specified
         if self.validation_settings["schema"]:
             if isinstance(data, dict):
                 for field, field_type in self.validation_settings["schema"].items():
-                    if field in data and not isinstance(data[field], field_type):
+                    if field in data and (not isinstance(data[field], field_type)):
                         raise DataValidationError(
                             f"Field {field} has invalid type: {type(data[field])}, expected {field_type}"
                         )
-
-        # Plugin-specific data validation
         try:
             return self._validate_plugin_data(data)
         except Exception as e:
@@ -673,14 +601,9 @@ class DataSourcePlugin(ABC):
         Returns:
             Cache key
         """
-        # Sort kwargs by key to ensure consistent cache keys
         sorted_items = sorted(kwargs.items())
-
-        # Convert to string
         key_parts = [f"{k}={v}" for k, v in sorted_items]
         key_str = ",".join(key_parts)
-
-        # Add plugin name and version to make keys unique across plugins
         return f"{self.metadata.name}_v{self.metadata.version}:{key_str}"
 
     def _get_default_cache_ttl(self) -> int:
@@ -691,21 +614,21 @@ class DataSourcePlugin(ABC):
             Cache TTL in seconds
         """
         if self.metadata.frequency == DataFrequency.REAL_TIME:
-            return 60  # 1 minute
+            return 60
         elif self.metadata.frequency == DataFrequency.INTRADAY:
-            return 300  # 5 minutes
+            return 300
         elif self.metadata.frequency == DataFrequency.DAILY:
-            return 86400  # 1 day
+            return 86400
         elif self.metadata.frequency == DataFrequency.WEEKLY:
-            return 604800  # 1 week
+            return 604800
         elif self.metadata.frequency == DataFrequency.MONTHLY:
-            return 2592000  # 30 days
+            return 2592000
         elif self.metadata.frequency == DataFrequency.QUARTERLY:
-            return 7776000  # 90 days
+            return 7776000
         elif self.metadata.frequency == DataFrequency.ANNUAL:
-            return 31536000  # 365 days
+            return 31536000
         else:
-            return 3600  # 1 hour default
+            return 3600
 
     def get_health_status(self) -> Dict[str, Any]:
         """
@@ -726,14 +649,13 @@ class DataSourcePlugin(ABC):
             "health_metrics": self.health_metrics,
             "timestamp": datetime.now().isoformat(),
         }
-
         return status
 
 
 class PluginManager:
     """Manager for data source plugins with enhanced error handling and monitoring."""
 
-    def __init__(self, plugin_dir: Optional[str] = None):
+    def __init__(self, plugin_dir: Optional[str] = None) -> Any:
         """
         Initialize plugin manager.
 
@@ -749,7 +671,6 @@ class PluginManager:
             "total_plugins": 0,
             "last_discovery": None,
         }
-
         logger.info(
             f"Initialized plugin manager"
             + (f" with plugin directory: {plugin_dir}" if plugin_dir else "")
@@ -763,14 +684,10 @@ class PluginManager:
             List of discovered plugin names
         """
         discovered = []
-
         try:
-            # Discover built-in plugins
             builtin_plugins = await self._discover_builtin_plugins()
             discovered.extend(builtin_plugins)
             logger.info(f"Discovered {len(builtin_plugins)} built-in plugins")
-
-            # Discover plugins from directory if specified
             if self.plugin_dir:
                 if not os.path.exists(self.plugin_dir):
                     logger.warning(
@@ -782,13 +699,9 @@ class PluginManager:
                     logger.info(
                         f"Discovered {len(directory_plugins)} plugins from directory: {self.plugin_dir}"
                     )
-
-            # Update health status
             self.health_status["total_plugins"] = len(self.plugin_classes)
             self.health_status["last_discovery"] = datetime.now()
-
             return discovered
-
         except Exception as e:
             logger.error(f"Error discovering plugins: {e}")
             logger.debug(traceback.format_exc())
@@ -802,10 +715,6 @@ class PluginManager:
             List of discovered plugin names
         """
         discovered = []
-
-        # This would be implemented to discover built-in plugins
-        # For now, just return an empty list
-
         return discovered
 
     async def _discover_directory_plugins(self) -> List[str]:
@@ -816,41 +725,27 @@ class PluginManager:
             List of discovered plugin names
         """
         discovered = []
-
         if not self.plugin_dir or not os.path.exists(self.plugin_dir):
             return discovered
-
         try:
-            # Add plugin directory to path
             if self.plugin_dir not in sys.path:
                 sys.path.insert(0, self.plugin_dir)
-
-            # Scan for Python files
             for file in os.listdir(self.plugin_dir):
-                if file.endswith(".py") and not file.startswith("__"):
-                    module_name = file[:-3]  # Remove .py extension
-
+                if file.endswith(".py") and (not file.startswith("__")):
+                    module_name = file[:-3]
                     try:
-                        # Import module
                         module = importlib.import_module(module_name)
-
-                        # Find plugin classes
                         for name, obj in inspect.getmembers(module):
                             if (
                                 inspect.isclass(obj)
                                 and issubclass(obj, DataSourcePlugin)
-                                and obj != DataSourcePlugin
+                                and (obj != DataSourcePlugin)
                             ):
-
-                                # Create temporary instance to get metadata
                                 try:
                                     temp_instance = obj({})
                                     metadata = temp_instance._get_metadata()
-
-                                    # Register plugin class
                                     self.plugin_classes[metadata.name] = obj
                                     discovered.append(metadata.name)
-
                                     logger.info(
                                         f"Discovered plugin: {metadata.name} v{metadata.version} ({module_name}.{name})"
                                     )
@@ -858,12 +753,9 @@ class PluginManager:
                                     logger.error(
                                         f"Error initializing plugin class {module_name}.{name}: {e}"
                                     )
-
                     except Exception as e:
                         logger.error(f"Error importing module {module_name}: {e}")
-
             return discovered
-
         except Exception as e:
             logger.error(f"Error discovering plugins from directory: {e}")
             return discovered

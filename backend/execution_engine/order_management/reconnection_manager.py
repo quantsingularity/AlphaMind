@@ -15,7 +15,6 @@ import threading
 import time
 from typing import Any, Callable, Dict, Optional
 
-# Configure logging
 logger = logging.getLogger(__name__)
 
 
@@ -52,11 +51,11 @@ class ReconnectionConfig:
         max_delay: float = 60.0,
         backoff_factor: float = 2.0,
         jitter: float = 0.1,
-        max_attempts: int = 0,  # 0 means unlimited
+        max_attempts: int = 0,
         circuit_break_threshold: int = 5,
         circuit_break_timeout: float = 300.0,
         health_check_interval: float = 30.0,
-    ):
+    ) -> Any:
         """
         Initialize reconnection configuration.
 
@@ -86,7 +85,7 @@ class ReconnectionManager:
     exponential backoff, jitter, and circuit breaking.
     """
 
-    def __init__(self, config: Optional[ReconnectionConfig] = None):
+    def __init__(self, config: Optional[ReconnectionConfig] = None) -> Any:
         """
         Initialize reconnection manager.
 
@@ -108,7 +107,6 @@ class ReconnectionManager:
         self.on_give_up_callback = None
         self.last_connection_time = None
         self.disconnect_time = None
-
         logger.info("Reconnection manager initialized")
 
     def start(
@@ -134,7 +132,6 @@ class ReconnectionManager:
                 f"Reconnection manager for {self.connection_id} is already running"
             )
             return
-
         self.connection_id = connection_id
         self.connect_callback = connect_callback
         self.health_check_callback = health_check_callback
@@ -142,22 +139,17 @@ class ReconnectionManager:
         self.on_give_up_callback = on_give_up_callback
         self.is_running = True
         self.state = ReconnectionState.IDLE
-
-        # Start health check timer if a health check callback is provided
         if self.health_check_callback:
             self._start_health_check_timer()
-
         logger.info(f"Reconnection manager started for connection {connection_id}")
 
     def stop(self) -> None:
         """Stop the reconnection manager."""
         if not self.is_running:
             return
-
         self.is_running = False
         self._cancel_timers()
         self.state = ReconnectionState.IDLE
-
         logger.info(f"Reconnection manager stopped for connection {self.connection_id}")
 
     def connection_lost(self) -> None:
@@ -170,17 +162,12 @@ class ReconnectionManager:
                 f"Reconnection manager for {self.connection_id} is not running"
             )
             return
-
         self.disconnect_time = datetime.datetime.now()
         logger.info(
             f"Connection lost for {self.connection_id}, initiating reconnection"
         )
-
-        # Reset current delay to initial value if this is a new disconnection
-        # (not a continuation of failed reconnection attempts)
         if self.state == ReconnectionState.IDLE:
             self.current_delay = self.config.initial_delay
-
         self._attempt_reconnection()
 
     def connection_established(self) -> None:
@@ -189,8 +176,6 @@ class ReconnectionManager:
         This will reset the reconnection state.
         """
         self.last_connection_time = datetime.datetime.now()
-
-        # Calculate downtime if we were previously disconnected
         if self.disconnect_time:
             downtime = (
                 self.last_connection_time - self.disconnect_time
@@ -200,13 +185,10 @@ class ReconnectionManager:
                 f"Connection {self.connection_id} restored after {downtime:.2f}s downtime"
             )
             self.disconnect_time = None
-
-        # Reset reconnection state
         self.state = ReconnectionState.IDLE
         self.current_delay = self.config.initial_delay
         self.stats.consecutive_failures = 0
         self._cancel_timers()
-
         logger.info(
             f"Connection established for {self.connection_id}, reconnection state reset"
         )
@@ -215,8 +197,6 @@ class ReconnectionManager:
         """Attempt to reconnect with the current settings."""
         if not self.is_running:
             return
-
-        # Check if circuit breaker is open
         if self.state == ReconnectionState.CIRCUIT_OPEN:
             if datetime.datetime.now() < self.circuit_break_until:
                 logger.info(
@@ -229,8 +209,6 @@ class ReconnectionManager:
                 )
                 self.state = ReconnectionState.IDLE
                 self.stats.consecutive_failures = 0
-
-        # Check if max attempts has been reached
         if (
             self.config.max_attempts > 0
             and self.stats.total_attempts >= self.config.max_attempts
@@ -241,28 +219,19 @@ class ReconnectionManager:
             if self.on_give_up_callback:
                 self.on_give_up_callback()
             return
-
-        # Update state and stats
         self.state = ReconnectionState.ATTEMPTING
         self.stats.total_attempts += 1
         self.stats.last_attempt_time = datetime.datetime.now()
-
         logger.info(
             f"Attempting reconnection for {self.connection_id} (attempt {self.stats.total_attempts})"
         )
-
         try:
-            # Call the connect callback
             start_time = time.time()
             success = self.connect_callback()
             elapsed = time.time() - start_time
-
             if success:
-                # Successful reconnection
                 self.stats.successful_reconnects += 1
                 self.stats.last_success_time = datetime.datetime.now()
-
-                # Update average reconnect time
                 if self.stats.successful_reconnects == 1:
                     self.stats.average_reconnect_time = elapsed
                 else:
@@ -271,19 +240,13 @@ class ReconnectionManager:
                         * (self.stats.successful_reconnects - 1)
                         + elapsed
                     ) / self.stats.successful_reconnects
-
                 logger.info(
                     f"Reconnection successful for {self.connection_id} in {elapsed:.2f}s"
                 )
-
-                # Reset state
                 self.connection_established()
-
-                # Call the on_reconnect callback if provided
                 if self.on_reconnect_callback:
                     self.on_reconnect_callback(True)
             else:
-                # Failed reconnection
                 self._handle_reconnection_failure()
         except Exception as e:
             logger.error(
@@ -296,48 +259,32 @@ class ReconnectionManager:
         self.stats.failed_attempts += 1
         self.stats.consecutive_failures += 1
         self.stats.last_failure_time = datetime.datetime.now()
-
         logger.warning(
             f"Reconnection failed for {self.connection_id} (consecutive failures: {self.stats.consecutive_failures})"
         )
-
-        # Check if circuit breaker should be triggered
         if self.stats.consecutive_failures >= self.config.circuit_break_threshold:
             self.state = ReconnectionState.CIRCUIT_OPEN
             self.circuit_break_until = datetime.datetime.now() + datetime.timedelta(
                 seconds=self.config.circuit_break_timeout
             )
-
             logger.warning(
                 f"Circuit breaker triggered for {self.connection_id}, pausing reconnection attempts until {self.circuit_break_until}"
             )
-
-            # Schedule next attempt after circuit breaker timeout
             self._schedule_reconnection(self.config.circuit_break_timeout)
         else:
-            # Calculate next backoff delay with jitter
             self.state = ReconnectionState.BACKOFF
             jitter_amount = self.current_delay * self.config.jitter
             actual_delay = self.current_delay + random.uniform(
                 -jitter_amount, jitter_amount
             )
-            actual_delay = max(
-                self.config.initial_delay, actual_delay
-            )  # Ensure delay is not less than initial
-
+            actual_delay = max(self.config.initial_delay, actual_delay)
             logger.info(
                 f"Backing off for {actual_delay:.2f}s before next reconnection attempt for {self.connection_id}"
             )
-
-            # Schedule next attempt
             self._schedule_reconnection(actual_delay)
-
-            # Increase delay for next attempt using exponential backoff
             self.current_delay = min(
                 self.current_delay * self.config.backoff_factor, self.config.max_delay
             )
-
-        # Call the on_reconnect callback if provided
         if self.on_reconnect_callback:
             self.on_reconnect_callback(False)
 
@@ -349,7 +296,6 @@ class ReconnectionManager:
             delay: Delay in seconds
         """
         self._cancel_timers()
-
         self.reconnect_timer = threading.Timer(delay, self._attempt_reconnection)
         self.reconnect_timer.daemon = True
         self.reconnect_timer.start()
@@ -358,7 +304,6 @@ class ReconnectionManager:
         """Start the health check timer."""
         if not self.health_check_callback or not self.is_running:
             return
-
         self.health_check_timer = threading.Timer(
             self.config.health_check_interval, self._perform_health_check
         )
@@ -369,15 +314,12 @@ class ReconnectionManager:
         """Perform a health check on the connection."""
         if not self.is_running or not self.health_check_callback:
             return
-
         try:
-            # Only perform health check if we're in IDLE state (connected)
             if self.state == ReconnectionState.IDLE:
                 logger.debug(
                     f"Performing health check for connection {self.connection_id}"
                 )
                 is_healthy = self.health_check_callback()
-
                 if not is_healthy:
                     logger.warning(
                         f"Health check failed for connection {self.connection_id}, initiating reconnection"
@@ -387,10 +329,8 @@ class ReconnectionManager:
             logger.error(
                 f"Error during health check for {self.connection_id}: {str(e)}"
             )
-            # Treat exception during health check as a failed check
             self.connection_lost()
         finally:
-            # Schedule next health check if still running
             if self.is_running:
                 self._start_health_check_timer()
 
@@ -399,7 +339,6 @@ class ReconnectionManager:
         if self.reconnect_timer:
             self.reconnect_timer.cancel()
             self.reconnect_timer = None
-
         if self.health_check_timer:
             self.health_check_timer.cancel()
             self.health_check_timer = None

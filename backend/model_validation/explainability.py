@@ -7,7 +7,6 @@ SHAP values, and permutation importance.
 """
 
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -30,7 +29,7 @@ class FeatureImportance:
         List of feature names. If None, uses X0, X1, etc.
     """
 
-    def __init__(self, model: Any, feature_names: Optional[List[str]] = None):
+    def __init__(self, model: Any, feature_names: Optional[List[str]] = None) -> Any:
         self.model = model
         self.feature_names = feature_names
         self.importance_values = None
@@ -55,67 +54,42 @@ class FeatureImportance:
             DataFrame containing feature importance values.
         """
         if method == "auto":
-            # Try to automatically detect the appropriate method
             if hasattr(self.model, "feature_importances_"):
                 method = "native"
             elif hasattr(self.model, "coef_"):
                 method = "coefficients"
             else:
                 raise ValueError(
-                    "Could not automatically detect feature importance method. "
-                    "Please specify method explicitly or use PermutationImportance/ShapExplainer."
+                    "Could not automatically detect feature importance method. Please specify method explicitly or use PermutationImportance/ShapExplainer."
                 )
-
-        # Extract importance based on method
         if method == "native":
             if not hasattr(self.model, "feature_importances_"):
                 raise ValueError("Model does not have feature_importances_ attribute")
-
             importance = self.model.feature_importances_
-
         elif method == "coefficients":
             if not hasattr(self.model, "coef_"):
                 raise ValueError("Model does not have coef_ attribute")
-
-            # Handle different coefficient shapes
             if len(self.model.coef_.shape) == 1:
-                # Binary classification or regression
                 importance = np.abs(self.model.coef_)
             else:
-                # Multiclass classification
                 importance = np.mean(np.abs(self.model.coef_), axis=0)
-
         elif method in ["permutation", "shap"]:
             raise ValueError(
-                f"Method '{method}' requires separate class: "
-                "use PermutationImportance or ShapExplainer."
+                f"Method '{method}' requires separate class: use PermutationImportance or ShapExplainer."
             )
-
         else:
             raise ValueError(f"Unsupported method: {method}")
-
-        # Create feature names if not provided
         if self.feature_names is None:
             self.feature_names = [f"X{i}" for i in range(len(importance))]
-
-        # Ensure feature names match importance length
         if len(self.feature_names) != len(importance):
             raise ValueError(
-                f"Length of feature_names ({len(self.feature_names)}) does not match "
-                f"length of importance values ({len(importance)})"
+                f"Length of feature_names ({len(self.feature_names)}) does not match length of importance values ({len(importance)})"
             )
-
-        # Create DataFrame
         importance_df = pd.DataFrame(
             {"Feature": self.feature_names, "Importance": importance}
         )
-
-        # Sort by importance
         importance_df = importance_df.sort_values("Importance", ascending=False)
-
-        # Store importance values
         self.importance_values = importance_df
-
         return importance_df
 
     def plot(
@@ -149,25 +123,15 @@ class FeatureImportance:
         """
         if self.importance_values is None:
             raise ValueError(
-                "No importance values available. Run extract_importance() or "
-                "use the PermutationImportance class."
+                "No importance values available. Run extract_importance() or use the PermutationImportance class."
             )
-
-        # Select top N features if specified
         if top_n is not None:
             df = self.importance_values.head(top_n)
         else:
             df = self.importance_values
-
-        # Create figure
         fig, ax = plt.subplots(figsize=figsize)
-
-        # Plot bars
         bars = ax.barh(df["Feature"], df["Importance"], color=color)
-
-        # Add error bars if available
         if "Std" in df.columns:
-            # Ensure features are in the same order as df
             df_reordered = df.sort_values("Importance", ascending=False)
             ax.errorbar(
                 df_reordered["Importance"],
@@ -177,31 +141,22 @@ class FeatureImportance:
                 ecolor="black",
                 capsize=3,
             )
-
-        # Add values to bars if requested
         if show_values:
-            # Handle potential empty DataFrame
             if not df.empty and df["Importance"].abs().max() > 0:
                 max_importance = df["Importance"].abs().max()
             else:
-                max_importance = 1.0  # Default scale if no importance or empty
-
+                max_importance = 1.0
             for bar in bars:
                 ax.text(
-                    bar.get_width() + (0.01 * max_importance),
+                    bar.get_width() + 0.01 * max_importance,
                     bar.get_y() + bar.get_height() / 2,
                     f"{bar.get_width():.4f}",
                     va="center",
                 )
-
-        # Add labels and title
         ax.set_xlabel("Importance")
         ax.set_ylabel("Feature")
         ax.set_title(title or "Feature Importance")
-
-        # Adjust layout
         plt.tight_layout()
-
         return fig
 
 
@@ -220,7 +175,7 @@ class PartialDependence:
         List of feature names. If None, uses X0, X1, etc.
     """
 
-    def __init__(self, model: Any, feature_names: Optional[List[str]] = None):
+    def __init__(self, model: Any, feature_names: Optional[List[str]] = None) -> Any:
         self.model = model
         self.feature_names = feature_names
         self.pdp_results = {}
@@ -268,14 +223,12 @@ class PartialDependence:
             if self.feature_names is None:
                 self.feature_names = [f"X{i}" for i in range(X.shape[1])]
 
-        # Map feature names to indices for computation
         def map_features_to_indices(f):
             if isinstance(f, str):
                 return self.feature_names.index(f)
             elif isinstance(f, int):
                 return f
             elif isinstance(f, tuple) and len(f) == 2:
-                # Map tuple of feature names to tuple of indices
                 return (self.feature_names.index(f[0]), self.feature_names.index(f[1]))
             else:
                 raise ValueError(f"Invalid feature specification: {f}")
@@ -288,43 +241,31 @@ class PartialDependence:
                 )
             else:
                 feature_indices_for_compute.append(map_features_to_indices(f))
-
-        # Compute partial dependence for each feature/pair
         for feature, idxs in zip(features, feature_indices_for_compute):
-            # Determine the key to store results
             if isinstance(feature, str):
                 result_key = feature
             elif isinstance(feature, int):
                 result_key = self.feature_names[feature]
             elif isinstance(feature, tuple):
-                # Use the feature names as the key
                 result_key = f"{feature[0]}_{feature[1]}"
-
-            # Compute partial dependence
             pdp_result = partial_dependence(
                 self.model,
                 X_np,
-                [idxs],  # partial_dependence expects a list of feature indices/tuples
+                [idxs],
                 grid_resolution=grid_resolution,
                 percentiles=percentiles,
                 method=method,
             )
-
-            # Store results
             if isinstance(idxs, int):
-                # 1D PDP
                 self.pdp_results[result_key] = {
                     "values": pdp_result["values"][0],
                     "predictions": pdp_result["average"][0],
                 }
             elif isinstance(idxs, tuple):
-                # 2D PDP / Interaction
                 self.pdp_results[result_key] = {
-                    # values will be a list of 2 arrays (grid points for each feature)
                     "values": [pdp_result["values"][0], pdp_result["values"][1]],
-                    "predictions": pdp_result["average"][0],  # 2D array
+                    "predictions": pdp_result["average"][0],
                 }
-
         return self.pdp_results
 
     def plot(
@@ -369,69 +310,39 @@ class PartialDependence:
             raise ValueError(
                 "No partial dependence results available. Run compute() first."
             )
-
-        # Filter for 1D PDPs
         one_d_pdp_results = {
             k: v
             for k, v in self.pdp_results.items()
             if isinstance(v["values"], np.ndarray) and v["values"].ndim == 1
         }
-
-        # Use all 1D features if not specified
         if features is None:
             features = list(one_d_pdp_results.keys())
-
-        # Filter features that have been computed
         features = [f for f in features if f in one_d_pdp_results]
-
         if not features:
             raise ValueError("No valid 1D features specified for plotting.")
-
-        # Calculate grid layout
         n_features = len(features)
         nrows = (n_features + ncols - 1) // ncols
-
-        # Create figure
         fig, axes = plt.subplots(nrows, ncols, figsize=figsize)
-
-        # Flatten axes for easy indexing
         if nrows == 1 and ncols == 1:
             axes = np.array([axes])
         axes = axes.flatten()
-
         for i, feature in enumerate(features):
             ax = axes[i]
-
-            # Get PDP data
             results = one_d_pdp_results[feature]
             values = results["values"]
             predictions = results["predictions"]
-
-            # Plot PDP
             ax.plot(values, predictions, color=line_color, linewidth=2)
-
-            # Add labels
             ax.set_xlabel(feature)
             ax.set_ylabel("Partial Dependence")
             ax.set_title(f"Partial Dependence of {feature}")
-
-            # Add grid
             ax.grid(True, linestyle="--", alpha=0.7)
-
-        # Hide unused subplots
         for i in range(n_features, len(axes)):
             axes[i].set_visible(False)
-
-        # Add overall title
         if title:
             fig.suptitle(title, fontsize=16)
-
-        # Adjust layout
         plt.tight_layout()
         if title:
-            # Make space for suptitle
             plt.subplots_adjust(top=0.9)
-
         return fig
 
     def plot_interaction(
@@ -466,65 +377,41 @@ class PartialDependence:
             raise ValueError(
                 "No partial dependence results available. Run compute() first."
             )
-
-        # Check if both features are available
         feature1, feature2 = feature_pair
         interaction_key_fwd = f"{feature1}_{feature2}"
         interaction_key_rev = f"{feature2}_{feature1}"
-
         if interaction_key_fwd in self.pdp_results:
             interaction_key = interaction_key_fwd
         elif interaction_key_rev in self.pdp_results:
             interaction_key = interaction_key_rev
-            # Swap feature names to match the order in the key for labels
-            feature1, feature2 = feature2, feature1
+            feature1, feature2 = (feature2, feature1)
         else:
             raise ValueError(
-                f"Interaction for {feature_pair} (and reverse) not computed. "
-                "Ensure you called compute() with the tuple."
+                f"Interaction for {feature_pair} (and reverse) not computed. Ensure you called compute() with the tuple."
             )
-
         results = self.pdp_results[interaction_key]
-
-        # Ensure it's a 2D result
         if not (
             isinstance(results["values"], list)
             and len(results["values"]) == 2
-            and results["predictions"].ndim == 2
+            and (results["predictions"].ndim == 2)
         ):
             raise ValueError(
                 f"Stored result for key {interaction_key} is not a 2D partial dependence result."
             )
-
-        # Get PDP data
         values1 = results["values"][0]
         values2 = results["values"][1]
         predictions = results["predictions"]
-
-        # Create meshgrid for plotting
         X1, X2 = np.meshgrid(values1, values2)
-
-        # Create figure
         fig, ax = plt.subplots(figsize=figsize)
-
-        # Plot contour
-        # Note the .T (transpose) is usually needed for correct orientation with matplotlib's contourf
         contour = ax.contourf(X1, X2, predictions.T, cmap=cmap)
-
-        # Add colorbar
         cbar = fig.colorbar(contour, ax=ax)
         cbar.set_label("Partial Dependence")
-
-        # Add labels
         ax.set_xlabel(feature1)
         ax.set_ylabel(feature2)
         ax.set_title(
             title or f"Partial Dependence Interaction: {feature1} vs {feature2}"
         )
-
-        # Adjust layout
         plt.tight_layout()
-
         return fig
 
 
@@ -543,12 +430,11 @@ class ShapExplainer:
         List of feature names. If None, uses X0, X1, etc.
     """
 
-    def __init__(self, model: Any, feature_names: Optional[List[str]] = None):
+    def __init__(self, model: Any, feature_names: Optional[List[str]] = None) -> Any:
         self.model = model
         self.feature_names = feature_names
         self.explainer = None
         self.shap_values = None
-        # Store original data as a DataFrame for plotting features by name
         self.data = None
 
     def compute_shap(
@@ -587,89 +473,59 @@ class ShapExplainer:
             import shap
         except ImportError:
             raise ImportError(
-                "SHAP package is required for SHAP explanations. "
-                "Install it with: pip install shap"
+                "SHAP package is required for SHAP explanations. Install it with: pip install shap"
             )
-
-        # Convert to DataFrame if needed, and set feature names
         if isinstance(X, pd.DataFrame):
-            # Store feature names if not provided
             if self.feature_names is None:
                 self.feature_names = X.columns.tolist()
             X_data = X
             X_np = X.values
         else:
-            # Create feature names if not provided
             if self.feature_names is None:
                 self.feature_names = [f"X{i}" for i in range(X.shape[1])]
             X_data = pd.DataFrame(X, columns=self.feature_names)
             X_np = X
-
-        # Store data for later use (as DataFrame)
         self.data = X_data
-
-        # Set random state
         if random_state is not None:
             np.random.seed(random_state)
-
-        # Select algorithm if auto
         if algorithm == "auto":
-            # Simple checks for common model types
             is_tree = hasattr(self.model, "estimators_") or hasattr(self.model, "tree_")
-            is_linear = hasattr(self.model, "coef_") and not is_tree
-
-            # Placeholder for deep learning check (implementation depends on framework)
+            is_linear = hasattr(self.model, "coef_") and (not is_tree)
             is_deep = False
-
             if is_tree:
                 algorithm = "tree"
             elif is_linear:
                 algorithm = "linear"
             elif is_deep:
-                # Default to Gradient if deep learning detected
                 algorithm = "gradient"
             else:
                 algorithm = "kernel"
-
-        # Create explainer based on algorithm
         if algorithm == "tree":
             self.explainer = shap.TreeExplainer(self.model)
         elif algorithm == "linear":
-            # LinearExplainer can take the full data or a background
             self.explainer = shap.LinearExplainer(self.model, X_np)
         elif algorithm == "kernel":
-            # Select background samples
             if X_np.shape[0] > 0:
-                # Use shap.sample to get background data from X
                 background_samples = shap.sample(
                     X_np, n_background, random_state=random_state
                 )
             else:
                 raise ValueError("X must not be empty for KernelExplainer.")
-
-            # KernelExplainer typically takes the model's prediction function and background data
             self.explainer = shap.KernelExplainer(
                 self.model.predict, background_samples
             )
-            # Use data for explaining, not background
         elif algorithm in ["deep", "gradient"]:
-            # Deep/Gradient explainers are for deep learning models; using X_np as background
             background = X_np
             if algorithm == "deep":
                 self.explainer = shap.DeepExplainer(self.model, background)
-            else:  # gradient
+            else:
                 self.explainer = shap.GradientExplainer(self.model, background)
         else:
             raise ValueError(f"Unsupported algorithm: {algorithm}")
-
-        # Compute SHAP values
         if algorithm in ["kernel", "deep", "gradient"]:
-            # Kernel/Deep/Gradient explainer calls
             self.shap_values = self.explainer.shap_values(X_np)
         else:
-            # Tree/Linear explainer calls
             self.shap_values = self.explainer.shap_values(X_np)
-
         return self.shap_values
 
     def plot_summary(
@@ -697,29 +553,19 @@ class ShapExplainer:
             import shap
         except ImportError:
             raise ImportError(
-                "SHAP package is required for SHAP explanations. "
-                "Install it with: pip install shap"
+                "SHAP package is required for SHAP explanations. Install it with: pip install shap"
             )
-
         if self.shap_values is None or self.data is None:
             raise ValueError("No SHAP values available. Run compute_shap() first.")
-
-        # Handle multiclass classification
         if isinstance(self.shap_values, list):
             if class_index is None:
                 class_index = 0
-
             if class_index >= len(self.shap_values):
                 raise ValueError(f"Class index {class_index} out of range")
-
             shap_values = self.shap_values[class_index]
         else:
             shap_values = self.shap_values
-
-        # shap_data is the data used for coloring the dot plot
         shap_data = self.data
-
-        # Plot summary based on type
         if plot_type == "bar":
             shap.summary_plot(
                 shap_values,
@@ -729,11 +575,7 @@ class ShapExplainer:
                 plot_type="bar",
                 show=False,
             )
-        elif plot_type in [
-            "dot",
-            "violin",
-            "beeswarm",
-        ]:  # "beeswarm" is an alias for "dot"
+        elif plot_type in ["dot", "violin", "beeswarm"]:
             shap.summary_plot(
                 shap_values,
                 shap_data,
@@ -744,7 +586,6 @@ class ShapExplainer:
             )
         else:
             raise ValueError(f"Unsupported plot type: {plot_type}")
-
         plt.tight_layout()
         plt.show()
 
@@ -773,19 +614,14 @@ class ShapExplainer:
             import shap
         except ImportError:
             raise ImportError(
-                "SHAP package is required for SHAP explanations. "
-                "Install it with: pip install shap"
+                "SHAP package is required for SHAP explanations. Install it with: pip install shap"
             )
-
         if self.shap_values is None or self.data is None:
             raise ValueError("No SHAP values available. Run compute_shap() first.")
-
-        # Handle multiclass classification (use first class by default)
         if isinstance(self.shap_values, list):
             shap_values = self.shap_values[0]
         else:
             shap_values = self.shap_values
-
         shap.dependence_plot(
             feature,
             shap_values,
@@ -820,51 +656,38 @@ class ShapExplainer:
             import shap
         except ImportError:
             raise ImportError(
-                "SHAP package is required for SHAP explanations. "
-                "Install it with: pip install shap"
+                "SHAP package is required for SHAP explanations. Install it with: pip install shap"
             )
-
         if self.shap_values is None or self.explainer is None or self.data is None:
             raise ValueError(
                 "No SHAP values or explainer available. Run compute_shap() first."
             )
-
-        # Handle multiclass classification
         if isinstance(self.shap_values, list):
             if class_index is None:
                 class_index = 0
-
             if class_index >= len(self.shap_values):
                 raise ValueError(f"Class index {class_index} out of range")
-
             shap_values = self.shap_values[class_index]
-            # Expected value for a list of SHAP values is usually a list/array
             if (
                 isinstance(self.explainer.expected_value, list)
                 or getattr(self.explainer.expected_value, "ndim", 0) > 0
             ):
                 expected_value = self.explainer.expected_value[class_index]
-            else:  # Single expected value for all classes
+            else:
                 expected_value = self.explainer.expected_value
         else:
             shap_values = self.shap_values
             expected_value = self.explainer.expected_value
-
-        # Get sample data: extract the row using the correct indexer
         if isinstance(self.data, pd.DataFrame):
-            # Extract as a pandas Series to keep feature names
             sample_data = self.data.iloc[sample_index]
         else:
-            # Fallback for numpy array
             sample_data = self.data[sample_index]
-
-        # shap.force_plot supports feature names when sample data is a pandas object
         shap.force_plot(
             expected_value,
             shap_values[sample_index],
-            sample_data,  # Pass the sample data (Series/array)
+            sample_data,
             feature_names=self.feature_names,
-            matplotlib=True,  # Use matplotlib backend for non-interactive rendering if needed
+            matplotlib=True,
             show=False,
         )
         plt.tight_layout()
@@ -886,7 +709,7 @@ class PermutationImportance:
         List of feature names. If None, uses X0, X1, etc.
     """
 
-    def __init__(self, model: Any, feature_names: Optional[List[str]] = None):
+    def __init__(self, model: Any, feature_names: Optional[List[str]] = None) -> Any:
         self.model = model
         self.feature_names = feature_names
         self.importance_values = None
@@ -923,7 +746,6 @@ class PermutationImportance:
         importance_df : DataFrame
             DataFrame containing permutation importance values.
         """
-        # Calculate permutation importance
         perm_importance = sk_permutation_importance(
             self.model,
             X,
@@ -933,15 +755,11 @@ class PermutationImportance:
             random_state=random_state,
             n_jobs=n_jobs,
         )
-
-        # Create feature names if not provided
         if self.feature_names is None:
             if isinstance(X, pd.DataFrame):
                 self.feature_names = X.columns.tolist()
             else:
                 self.feature_names = [f"X{i}" for i in range(X.shape[1])]
-
-        # Create DataFrame
         importance_df = pd.DataFrame(
             {
                 "Feature": self.feature_names,
@@ -949,13 +767,8 @@ class PermutationImportance:
                 "Std": perm_importance.importances_std,
             }
         )
-
-        # Sort by importance
         importance_df = importance_df.sort_values("Importance", ascending=False)
-
-        # Store importance values
         self.importance_values = importance_df
-
         return importance_df
 
     def plot(
@@ -995,20 +808,12 @@ class PermutationImportance:
         """
         if self.importance_values is None:
             raise ValueError("No importance values available. Run compute() first.")
-
-        # Select top N features if specified
         if top_n is not None:
             df = self.importance_values.head(top_n)
         else:
             df = self.importance_values
-
-        # Create figure
         fig, ax = plt.subplots(figsize=figsize)
-
-        # Plot bars
         bars = ax.barh(df["Feature"], df["Importance"], color=color)
-
-        # Add error bars
         ax.errorbar(
             df["Importance"],
             df["Feature"],
@@ -1017,28 +822,20 @@ class PermutationImportance:
             ecolor="black",
             capsize=3,
         )
-
-        # Add values to bars if requested
         if show_values:
             if not df.empty and df["Importance"].abs().max() > 0:
                 max_importance = df["Importance"].abs().max()
             else:
                 max_importance = 1.0
-
             for bar in bars:
                 ax.text(
-                    bar.get_width() + (0.01 * max_importance),
+                    bar.get_width() + 0.01 * max_importance,
                     bar.get_y() + bar.get_height() / 2,
                     f"{bar.get_width():.4f}",
                     va="center",
                 )
-
-        # Add labels and title
         ax.set_xlabel("Importance (Mean Decrease in Score)")
         ax.set_ylabel("Feature")
         ax.set_title(title or "Permutation Feature Importance")
-
-        # Adjust layout
         plt.tight_layout()
-
         return fig

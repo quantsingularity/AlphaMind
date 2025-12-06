@@ -7,8 +7,6 @@ forex data, and more.
 """
 
 import logging
-
-
 from .base import (
     APIConnector,
     APICredentials,
@@ -36,25 +34,16 @@ class AlphaVantageConnector(APIConnector):
         Whether to use premium API features.
     """
 
-    def __init__(self, api_key: str, premium: bool = False):
-        # Create credentials
+    def __init__(self, api_key: str, premium: bool = False) -> Any:
         credentials = APICredentials(api_key=api_key)
-
-        # Set base URL
         base_url = "https://www.alphavantage.co/query"
-
-        # Create rate limiter based on subscription level
         if premium:
-            # Premium API: 75 requests per minute, 300 requests per day
             rate_limiter = RateLimiter(requests_per_minute=75, requests_per_day=300)
         else:
-            # Free API: 5 requests per minute, 500 requests per day
             rate_limiter = RateLimiter(requests_per_minute=5, requests_per_day=500)
-
         super().__init__(
             credentials=credentials, base_url=base_url, rate_limiter=rate_limiter
         )
-
         self.premium = premium
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -79,10 +68,7 @@ class AlphaVantageConnector(APIConnector):
         success : bool
             Whether authentication was successful.
         """
-        # Alpha Vantage uses API key for authentication
-        # Test authentication by making a simple request
         response = self.get_stock_quote("AAPL")
-
         return response.is_success()
 
     def get_stock_quote(self, symbol: str) -> DataResponse:
@@ -104,7 +90,6 @@ class AlphaVantageConnector(APIConnector):
             "symbol": symbol,
             "apikey": self.credentials.api_key,
         }
-
         return self.request(
             endpoint="",
             params=params,
@@ -141,7 +126,6 @@ class AlphaVantageConnector(APIConnector):
         response : DataResponse
             Response containing the time series data.
         """
-        # Determine function based on interval and adjusted
         if interval == "intraday":
             function = "TIME_SERIES_INTRADAY"
         elif interval == "daily":
@@ -156,7 +140,6 @@ class AlphaVantageConnector(APIConnector):
             )
         else:
             raise ValueError(f"Invalid interval: {interval}")
-
         params = {
             "function": function,
             "symbol": symbol,
@@ -164,11 +147,8 @@ class AlphaVantageConnector(APIConnector):
             "datatype": datatype,
             "apikey": self.credentials.api_key,
         }
-
-        # Add interval parameter for intraday data
         if interval == "intraday":
-            params["interval"] = "5min"  # Default to 5-minute intervals
-
+            params["interval"] = "5min"
         return self.request(
             endpoint="",
             params=params,
@@ -217,7 +197,6 @@ class AlphaVantageConnector(APIConnector):
             "datatype": datatype,
             "apikey": self.credentials.api_key,
         }
-
         return self.request(
             endpoint="",
             params=params,
@@ -247,7 +226,6 @@ class AlphaVantageConnector(APIConnector):
             "to_currency": to_currency,
             "apikey": self.credentials.api_key,
         }
-
         return self.request(
             endpoint="",
             params=params,
@@ -284,7 +262,6 @@ class AlphaVantageConnector(APIConnector):
         response : DataResponse
             Response containing the forex time series data.
         """
-        # Determine function based on interval
         if interval == "intraday":
             function = "FX_INTRADAY"
         elif interval == "daily":
@@ -295,7 +272,6 @@ class AlphaVantageConnector(APIConnector):
             function = "FX_MONTHLY"
         else:
             raise ValueError(f"Invalid interval: {interval}")
-
         params = {
             "function": function,
             "from_symbol": from_currency,
@@ -304,11 +280,8 @@ class AlphaVantageConnector(APIConnector):
             "datatype": datatype,
             "apikey": self.credentials.api_key,
         }
-
-        # Add interval parameter for intraday data
         if interval == "intraday":
-            params["interval"] = "5min"  # Default to 5-minute intervals
-
+            params["interval"] = "5min"
         return self.request(
             endpoint="",
             params=params,
@@ -338,7 +311,6 @@ class AlphaVantageConnector(APIConnector):
             "to_currency": to_currency,
             "apikey": self.credentials.api_key,
         }
-
         return self.request(
             endpoint="",
             params=params,
@@ -375,7 +347,6 @@ class AlphaVantageConnector(APIConnector):
         response : DataResponse
             Response containing the cryptocurrency time series data.
         """
-        # Determine function based on interval
         if interval == "intraday":
             function = "CRYPTO_INTRADAY"
         elif interval == "daily":
@@ -386,7 +357,6 @@ class AlphaVantageConnector(APIConnector):
             function = "DIGITAL_CURRENCY_MONTHLY"
         else:
             raise ValueError(f"Invalid interval: {interval}")
-
         params = {
             "function": function,
             "symbol": symbol,
@@ -394,11 +364,8 @@ class AlphaVantageConnector(APIConnector):
             "datatype": datatype,
             "apikey": self.credentials.api_key,
         }
-
-        # Add interval parameter for intraday data
         if interval == "intraday":
-            params["interval"] = "5min"  # Default to 5-minute intervals
-
+            params["interval"] = "5min"
         return self.request(
             endpoint="",
             params=params,
@@ -416,7 +383,6 @@ class AlphaVantageConnector(APIConnector):
             Response containing the sector performance data.
         """
         params = {"function": "SECTOR", "apikey": self.credentials.api_key}
-
         return self.request(
             endpoint="",
             params=params,
@@ -450,7 +416,6 @@ class AlphaVantageConnector(APIConnector):
             "datatype": datatype,
             "apikey": self.credentials.api_key,
         }
-
         return self.request(
             endpoint="",
             params=params,
@@ -480,7 +445,6 @@ class AlphaVantageConnector(APIConnector):
             "datatype": datatype,
             "apikey": self.credentials.api_key,
         }
-
         return self.request(
             endpoint="",
             params=params,
@@ -507,7 +471,6 @@ class AlphaVantageConnector(APIConnector):
             "symbol": symbol,
             "apikey": self.credentials.api_key,
         }
-
         return self.request(
             endpoint="",
             params=params,
@@ -534,7 +497,6 @@ class AlphaVantageConnector(APIConnector):
             "symbol": symbol,
             "apikey": self.credentials.api_key,
         }
-
         return self.request(
             endpoint="",
             params=params,
@@ -561,7 +523,6 @@ class AlphaVantageConnector(APIConnector):
             "symbol": symbol,
             "apikey": self.credentials.api_key,
         }
-
         return self.request(
             endpoint="",
             params=params,
@@ -588,7 +549,6 @@ class AlphaVantageConnector(APIConnector):
             "symbol": symbol,
             "apikey": self.credentials.api_key,
         }
-
         return self.request(
             endpoint="",
             params=params,
@@ -615,7 +575,6 @@ class AlphaVantageConnector(APIConnector):
             "symbol": symbol,
             "apikey": self.credentials.api_key,
         }
-
         return self.request(
             endpoint="",
             params=params,

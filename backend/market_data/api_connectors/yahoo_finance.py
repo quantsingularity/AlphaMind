@@ -9,9 +9,7 @@
 from datetime import datetime, timedelta
 import logging
 from typing import Dict, List, Optional, Union
-
 import requests
-
 from .base import (
     APIConnector,
     APICredentials,
@@ -39,26 +37,17 @@ class YahooFinanceConnector(APIConnector):
         If None, uses the unofficial API.
     """
 
-    def __init__(self, rapid_api_key: Optional[str] = None):
-        # Create credentials
+    def __init__(self, rapid_api_key: Optional[str] = None) -> Any:
         credentials = APICredentials(api_key=rapid_api_key)
-
-        # Set base URL based on whether using RapidAPI
         if rapid_api_key:
             base_url = "https://apidojo-yahoo-finance-v1.p.rapidapi.com"
-
-            # Create rate limiter for RapidAPI
             rate_limiter = RateLimiter(requests_per_second=5, requests_per_day=500)
         else:
             base_url = "https://query1.finance.yahoo.com"
-
-            # Create rate limiter for unofficial API
             rate_limiter = RateLimiter(requests_per_minute=100)
-
         super().__init__(
             credentials=credentials, base_url=base_url, rate_limiter=rate_limiter
         )
-
         self.using_rapid_api = rapid_api_key is not None
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -83,9 +72,7 @@ class YahooFinanceConnector(APIConnector):
         success : bool
             Whether authentication was successful.
         """
-        # Test authentication by making a simple request
         response = self.get_quote("AAPL")
-
         return response.is_success()
 
     def _prepare_headers(self) -> Dict[str, str]:
@@ -127,7 +114,6 @@ class YahooFinanceConnector(APIConnector):
         else:
             endpoint = "/v7/finance/quote"
             params = {"symbols": symbol}
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -168,22 +154,16 @@ class YahooFinanceConnector(APIConnector):
         response : DataResponse
             Response containing the historical data.
         """
-        # Convert dates to Unix timestamps
         if period1 is None:
             period1 = datetime.now() - timedelta(days=365)
-
         if period2 is None:
             period2 = datetime.now()
-
         if isinstance(period1, str):
             period1 = datetime.fromisoformat(period1)
-
         if isinstance(period2, str):
             period2 = datetime.fromisoformat(period2)
-
         period1_timestamp = int(period1.timestamp())
         period2_timestamp = int(period2.timestamp())
-
         if self.using_rapid_api:
             endpoint = "/stock/v3/get-historical-data"
             params = {"symbol": symbol, "region": "US"}
@@ -196,7 +176,6 @@ class YahooFinanceConnector(APIConnector):
                 "includePrePost": str(include_prepost).lower(),
                 "events": events,
             }
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -226,22 +205,17 @@ class YahooFinanceConnector(APIConnector):
         if self.using_rapid_api:
             endpoint = "/market/v2/get-options"
             params = {"symbol": symbol, "region": "US"}
-
             if date is not None:
                 if isinstance(date, str):
                     date = datetime.fromisoformat(date)
-
                 params["date"] = date.strftime("%Y-%m-%d")
         else:
             endpoint = "/v7/finance/options/" + symbol
             params = {}
-
             if date is not None:
                 if isinstance(date, str):
                     date = datetime.fromisoformat(date)
-
                 params["date"] = int(date.timestamp())
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -272,7 +246,6 @@ class YahooFinanceConnector(APIConnector):
             params = {
                 "modules": "assetProfile,summaryProfile,summaryDetail,esgScores,price,incomeStatementHistory,incomeStatementHistoryQuarterly,balanceSheetHistory,balanceSheetHistoryQuarterly,cashflowStatementHistory,cashflowStatementHistoryQuarterly,defaultKeyStatistics,financialData,calendarEvents,secFilings,recommendationTrend,upgradeDowngradeHistory,institutionOwnership,fundOwnership,majorDirectHolders,majorHoldersBreakdown,insiderTransactions,insiderHolders,netSharePurchaseActivity,earnings,earningsHistory,earningsTrend,industryTrend,indexTrend,sectorTrend"
             }
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -310,11 +283,9 @@ class YahooFinanceConnector(APIConnector):
                 endpoint = "/stock/v2/get-cash-flow"
             else:
                 raise ValueError(f"Invalid statement type: {statement_type}")
-
             params = {"symbol": symbol, "region": "US"}
         else:
             endpoint = "/v11/finance/quoteSummary/" + symbol
-
             if statement_type == "income":
                 module = (
                     "incomeStatementHistory"
@@ -335,9 +306,7 @@ class YahooFinanceConnector(APIConnector):
                 )
             else:
                 raise ValueError(f"Invalid statement type: {statement_type}")
-
             params = {"modules": module}
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -366,7 +335,6 @@ class YahooFinanceConnector(APIConnector):
         else:
             endpoint = "/v11/finance/quoteSummary/" + symbol
             params = {"modules": "recommendationTrend,upgradeDowngradeHistory"}
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -395,7 +363,6 @@ class YahooFinanceConnector(APIConnector):
         else:
             endpoint = "/v11/finance/quoteSummary/" + symbol
             params = {"modules": "earnings,earningsHistory,earningsTrend"}
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -444,10 +411,8 @@ class YahooFinanceConnector(APIConnector):
                 "newsCount": news_count,
                 "enableFuzzyQuery": str(enable_fuzzy_query).lower(),
             }
-
             if quote_type_filter:
                 params["quoteType"] = ",".join(quote_type_filter)
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -476,7 +441,6 @@ class YahooFinanceConnector(APIConnector):
         else:
             endpoint = "/v6/finance/quote/marketSummary"
             params = {"lang": "en", "region": region}
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -505,7 +469,6 @@ class YahooFinanceConnector(APIConnector):
         else:
             endpoint = "/v1/finance/trending/" + region
             params = {}
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -538,7 +501,6 @@ class YahooFinanceConnector(APIConnector):
         else:
             endpoint = "/v2/finance/news"
             params = {"category": category, "region": region}
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -578,7 +540,6 @@ class YahooFinanceConnector(APIConnector):
         else:
             endpoint = "/v8/finance/chart/" + symbol
             params = {"interval": interval, "range": range}
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -605,8 +566,6 @@ class YahooFinanceConnector(APIConnector):
             endpoint = "/stock/v2/get-insights"
             params = {"symbol": symbol, "region": "US"}
         else:
-            # Not directly available in unofficial API
-            # Create a custom request to mimic the RapidAPI endpoint
             request = DataRequest(
                 provider=self.provider_name,
                 endpoint="/v2/finance/insights",
@@ -616,12 +575,9 @@ class YahooFinanceConnector(APIConnector):
                 category=DataCategory.MARKET_DATA,
                 format=DataFormat.JSON,
             )
-
-            # Make a direct request to Yahoo Finance
             try:
                 url = f"https://query1.finance.yahoo.com/ws/insights/v2/finance/insights?symbol={symbol}"
                 response = requests.get(url, headers=self._prepare_headers())
-
                 if response.status_code == 200:
                     return DataResponse(
                         request=request,
@@ -640,7 +596,6 @@ class YahooFinanceConnector(APIConnector):
                 return DataResponse(
                     request=request, status_code=500, data=None, error=str(e)
                 )
-
         return self.request(
             endpoint=endpoint,
             params=params,

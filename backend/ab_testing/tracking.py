@@ -11,9 +11,7 @@ import pickle
 import sqlite3
 from typing import Dict, List, Optional, Union
 import uuid
-
 import pandas as pd
-
 from .experiment import Experiment, ExperimentStatus
 
 
@@ -48,7 +46,7 @@ class ExperimentResult:
         value: float,
         timestamp: Optional[datetime.datetime] = None,
         metadata: Optional[Dict] = None,
-    ):
+    ) -> Any:
         self.id = str(uuid.uuid4())
         self.experiment_id = experiment_id
         self.variant = variant
@@ -76,7 +74,7 @@ class ExperimentResult:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict) -> "ExperimentResult":
+    def from_dict(cls: Any, data: Dict) -> "ExperimentResult":
         """Create result from dictionary.
 
         Parameters
@@ -96,10 +94,8 @@ class ExperimentResult:
             value=data["value"],
             metadata=data.get("metadata", {}),
         )
-
         result.id = data["id"]
         result.timestamp = datetime.datetime.fromisoformat(data["timestamp"])
-
         return result
 
 
@@ -122,60 +118,27 @@ class ExperimentTracker:
 
     def __init__(
         self, storage_dir: Optional[str] = None, db_path: Optional[str] = None
-    ):
+    ) -> Any:
         self.storage_dir = storage_dir
         self.db_path = db_path
         self.experiments = {}
         self.in_memory = storage_dir is None
-
-        # Initialize database
         self._init_db()
 
     def _init_db(self) -> None:
         """Initialize the database for storing results."""
         if self.db_path:
-            # Create directory if it doesn't exist
             os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
-
-            # Connect to database
             conn = sqlite3.connect(self.db_path)
         else:
-            # Use in-memory database
             conn = sqlite3.connect(":memory:")
-
-        # Create tables
         cursor = conn.cursor()
-
         cursor.execute(
-            """
-        CREATE TABLE IF NOT EXISTS experiments (
-            id TEXT PRIMARY KEY,
-            name TEXT NOT NULL,
-            description TEXT,
-            status TEXT NOT NULL,
-            start_date TEXT,
-            end_date TEXT,
-            creation_date TEXT NOT NULL,
-            data BLOB
+            "\n        CREATE TABLE IF NOT EXISTS experiments (\n            id TEXT PRIMARY KEY,\n            name TEXT NOT NULL,\n            description TEXT,\n            status TEXT NOT NULL,\n            start_date TEXT,\n            end_date TEXT,\n            creation_date TEXT NOT NULL,\n            data BLOB\n        )\n        "
         )
-        """
-        )
-
         cursor.execute(
-            """
-        CREATE TABLE IF NOT EXISTS results (
-            id TEXT PRIMARY KEY,
-            experiment_id TEXT NOT NULL,
-            variant TEXT NOT NULL,
-            metric TEXT NOT NULL,
-            value REAL NOT NULL,
-            timestamp TEXT NOT NULL,
-            metadata BLOB,
-            FOREIGN KEY (experiment_id) REFERENCES experiments (id)
+            "\n        CREATE TABLE IF NOT EXISTS results (\n            id TEXT PRIMARY KEY,\n            experiment_id TEXT NOT NULL,\n            variant TEXT NOT NULL,\n            metric TEXT NOT NULL,\n            value REAL NOT NULL,\n            timestamp TEXT NOT NULL,\n            metadata BLOB,\n            FOREIGN KEY (experiment_id) REFERENCES experiments (id)\n        )\n        "
         )
-        """
-        )
-
         conn.commit()
         conn.close()
 
@@ -197,8 +160,7 @@ class ExperimentTracker:
             Whether to save the experiment to storage.
         """
         self.experiments[experiment.id] = experiment
-
-        if save and not self.in_memory:
+        if save and (not self.in_memory):
             self._save_experiment(experiment)
 
     def _save_experiment(self, experiment: Experiment) -> None:
@@ -209,20 +171,11 @@ class ExperimentTracker:
         experiment : Experiment
             Experiment to save.
         """
-        # Save to database
         conn = self._get_connection()
         cursor = conn.cursor()
-
-        # Serialize experiment data
         data = pickle.dumps(experiment)
-
-        # Insert or update experiment
         cursor.execute(
-            """
-         INSERT OR REPLACE INTO experiments
-         (id, name, description, status, start_date, end_date, creation_date, data)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """,
+            "\n         INSERT OR REPLACE INTO experiments\n         (id, name, description, status, start_date, end_date, creation_date, data)\n         VALUES (?, ?, ?, ?, ?, ?, ?, ?)\n        ",
             (
                 experiment.id,
                 experiment.name,
@@ -234,11 +187,8 @@ class ExperimentTracker:
                 data,
             ),
         )
-
         conn.commit()
         conn.close()
-
-        # Save to file if storage directory is specified
         if self.storage_dir:
             os.makedirs(self.storage_dir, exist_ok=True)
             experiment.save(self.storage_dir)
@@ -262,13 +212,11 @@ class ExperimentTracker:
         """
         if experiment_id in self.experiments:
             return self.experiments[experiment_id]
-
-        if load_if_needed and not self.in_memory:
+        if load_if_needed and (not self.in_memory):
             experiment = self._load_experiment(experiment_id)
             if experiment:
                 self.experiments[experiment_id] = experiment
                 return experiment
-
         raise ValueError(f"Experiment with ID '{experiment_id}' not found")
 
     def _load_experiment(self, experiment_id: str) -> Optional[Experiment]:
@@ -284,26 +232,17 @@ class ExperimentTracker:
         experiment : Experiment or None
             Loaded experiment, or None if not found.
         """
-        # Try to load from database
         conn = self._get_connection()
         cursor = conn.cursor()
-
         cursor.execute(
-            """
-         SELECT data FROM experiments WHERE id = ?
-        """,
+            "\n         SELECT data FROM experiments WHERE id = ?\n        ",
             (experiment_id,),
         )
-
         row = cursor.fetchone()
         conn.close()
-
         if row:
-            # Deserialize experiment data
             experiment = pickle.loads(row[0])
             return experiment
-
-        # Try to load from file
         if self.storage_dir:
             for filename in os.listdir(self.storage_dir):
                 if filename.startswith(f"{experiment_id}_") and filename.endswith(
@@ -311,7 +250,6 @@ class ExperimentTracker:
                 ):
                     filepath = os.path.join(self.storage_dir, filename)
                     return Experiment.load(filepath)
-
         return None
 
     def get_experiments(
@@ -332,31 +270,23 @@ class ExperimentTracker:
         experiments : list
             List of experiments.
         """
-        if load_all and not self.in_memory:
+        if load_all and (not self.in_memory):
             self._load_all_experiments()
-
         if status is None:
             return list(self.experiments.values())
-
         return [e for e in self.experiments.values() if e.status == status]
 
     def _load_all_experiments(self) -> None:
         """Load all experiments from storage."""
-        # Load from database
         conn = self._get_connection()
         cursor = conn.cursor()
-
         cursor.execute("SELECT id, data FROM experiments")
-
         for row in cursor.fetchall():
             experiment_id, data = row
             if experiment_id not in self.experiments:
                 experiment = pickle.loads(data)
                 self.experiments[experiment_id] = experiment
-
         conn.close()
-
-        # Load from files
         if self.storage_dir and os.path.exists(self.storage_dir):
             for filename in os.listdir(self.storage_dir):
                 if filename.endswith(".json"):
@@ -366,7 +296,6 @@ class ExperimentTracker:
                         if experiment.id not in self.experiments:
                             self.experiments[experiment.id] = experiment
                     except:
-                        # Skip files that can't be loaded
                         pass
 
     def update_experiment(self, experiment: Experiment, save: bool = True) -> None:
@@ -380,8 +309,7 @@ class ExperimentTracker:
             Whether to save the experiment to storage.
         """
         self.experiments[experiment.id] = experiment
-
-        if save and not self.in_memory:
+        if save and (not self.in_memory):
             self._save_experiment(experiment)
 
     def delete_experiment(self, experiment_id: str) -> None:
@@ -394,21 +322,15 @@ class ExperimentTracker:
         """
         if experiment_id in self.experiments:
             del self.experiments[experiment_id]
-
         if not self.in_memory:
-            # Delete from database
             conn = self._get_connection()
             cursor = conn.cursor()
-
             cursor.execute("DELETE FROM experiments WHERE id = ?", (experiment_id,))
             cursor.execute(
                 "DELETE FROM results WHERE experiment_id = ?", (experiment_id,)
             )
-
             conn.commit()
             conn.close()
-
-            # Delete from file
             if self.storage_dir:
                 for filename in os.listdir(self.storage_dir):
                     if filename.startswith(f"{experiment_id}_") and filename.endswith(
@@ -430,20 +352,16 @@ class ExperimentTracker:
         save : bool, default=True
             Whether to save the result to storage.
         """
-        # Add result to experiment
         try:
             experiment = self.get_experiment(result.experiment_id)
             experiment.add_result(
                 result.variant, result.metric, result.value, result.timestamp
             )
-
-            if save and not self.in_memory:
+            if save and (not self.in_memory):
                 self._save_experiment(experiment)
         except ValueError:
-            # Experiment not found, just save the result
             pass
-
-        if save and not self.in_memory:
+        if save and (not self.in_memory):
             self._save_result(result)
 
     def _save_result(self, result: ExperimentResult) -> None:
@@ -454,20 +372,11 @@ class ExperimentTracker:
         result : ExperimentResult
             Result to save.
         """
-        # Save to database
         conn = self._get_connection()
         cursor = conn.cursor()
-
-        # Serialize metadata
         metadata = pickle.dumps(result.metadata)
-
-        # Insert or update result
         cursor.execute(
-            """
-         INSERT OR REPLACE INTO results
-         (id, experiment_id, variant, metric, value, timestamp, metadata)
-         VALUES (?, ?, ?, ?, ?, ?, ?)
-        """,
+            "\n         INSERT OR REPLACE INTO results\n         (id, experiment_id, variant, metric, value, timestamp, metadata)\n         VALUES (?, ?, ?, ?, ?, ?, ?)\n        ",
             (
                 result.id,
                 result.experiment_id,
@@ -478,7 +387,6 @@ class ExperimentTracker:
                 metadata,
             ),
         )
-
         conn.commit()
         conn.close()
 
@@ -518,47 +426,33 @@ class ExperimentTracker:
         results : list or DataFrame
             Results matching the specified criteria.
         """
-        # Build query
         query = "SELECT id, experiment_id, variant, metric, value, timestamp, metadata FROM results"
         params = []
-
         conditions = []
         if experiment_id:
             conditions.append("experiment_id = ?")
             params.append(experiment_id)
-
         if variant:
             conditions.append("variant = ?")
             params.append(variant)
-
         if metric:
             conditions.append("metric = ?")
             params.append(metric)
-
         if start_date:
             conditions.append("timestamp >= ?")
             params.append(start_date.isoformat())
-
         if end_date:
             conditions.append("timestamp <= ?")
             params.append(end_date.isoformat())
-
         if conditions:
             query += " WHERE " + " AND ".join(conditions)
-
         query += " ORDER BY timestamp"
-
-        # Execute query
         conn = self._get_connection()
         cursor = conn.cursor()
-
         cursor.execute(query, params)
-
-        # Process results
         results = []
         for row in cursor.fetchall():
             result_id, exp_id, var, met, val, ts, meta = row
-
             result = ExperimentResult(
                 experiment_id=exp_id,
                 variant=var,
@@ -566,20 +460,13 @@ class ExperimentTracker:
                 value=val,
                 timestamp=datetime.datetime.fromisoformat(ts),
             )
-
             result.id = result_id
-
             if meta:
                 result.metadata = pickle.loads(meta)
-
             results.append(result)
-
         conn.close()
-
-        # Convert to DataFrame if requested
         if as_dataframe:
             data = []
-
             for result in results:
                 data.append(
                     {
@@ -591,9 +478,7 @@ class ExperimentTracker:
                         "timestamp": result.timestamp,
                     }
                 )
-
             return pd.DataFrame(data)
-
         return results
 
     def get_summary_statistics(
@@ -621,25 +506,19 @@ class ExperimentTracker:
         stats : DataFrame
             Summary statistics for the results.
         """
-        # Get results as DataFrame
         results_df = self.get_results(
             experiment_id=experiment_id,
             metric=metric,
             variant=variant,
             as_dataframe=True,
         )
-
         if results_df.empty:
             return pd.DataFrame()
-
-        # Calculate statistics
         stats = []
-
         for (exp_id, met, var), group in results_df.groupby(
             ["experiment_id", "metric", "variant"]
         ):
             values = group["value"]
-
             stats.append(
                 {
                     "experiment_id": exp_id,
@@ -655,7 +534,6 @@ class ExperimentTracker:
                     "max": values.max(),
                 }
             )
-
         return pd.DataFrame(stats)
 
     def export_results(
@@ -673,16 +551,10 @@ class ExperimentTracker:
         format : str, default="csv"
             Format to export results in. Options: "csv", "json", "excel".
         """
-        # Get results as DataFrame
         results_df = self.get_results(experiment_id=experiment_id, as_dataframe=True)
-
         if results_df.empty:
             raise ValueError("No results to export")
-
-        # Create directory if it doesn't exist
         os.makedirs(os.path.dirname(os.path.abspath(filepath)), exist_ok=True)
-
-        # Export results
         if format == "csv":
             results_df.to_csv(filepath, index=False)
         elif format == "json":
@@ -702,7 +574,6 @@ class ExperimentTracker:
         format : str, default="csv"
             Format of the file. Options: "csv", "json", "excel".
         """
-        # Import results
         if format == "csv":
             results_df = pd.read_csv(filepath)
         elif format == "json":
@@ -711,12 +582,8 @@ class ExperimentTracker:
             results_df = pd.read_excel(filepath)
         else:
             raise ValueError(f"Unsupported format: {format}")
-
-        # Convert timestamp column to datetime
         if "timestamp" in results_df.columns:
             results_df["timestamp"] = pd.to_datetime(results_df["timestamp"])
-
-        # Add results to tracker
         for _, row in results_df.iterrows():
             result = ExperimentResult(
                 experiment_id=row["experiment_id"],
@@ -725,28 +592,20 @@ class ExperimentTracker:
                 value=row["value"],
                 timestamp=row.get("timestamp"),
             )
-
             if "id" in row:
                 result.id = row["id"]
-
             self.add_result(result)
 
     def clear(self) -> None:
         """Clear all experiments and results from the tracker."""
         self.experiments = {}
-
         if not self.in_memory:
-            # Clear database
             conn = self._get_connection()
             cursor = conn.cursor()
-
             cursor.execute("DELETE FROM experiments")
             cursor.execute("DELETE FROM results")
-
             conn.commit()
             conn.close()
-
-            # Clear files
             if self.storage_dir and os.path.exists(self.storage_dir):
                 for filename in os.listdir(self.storage_dir):
                     if filename.endswith(".json"):

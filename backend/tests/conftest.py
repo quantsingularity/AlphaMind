@@ -2,30 +2,22 @@ import os
 import sys
 import pytest
 
-
-# Dynamically add backend/ to Python path
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 BACKEND_PATH = os.path.join(BASE_DIR, "..", "backend")
-
 if BACKEND_PATH not in sys.path:
     sys.path.append(BACKEND_PATH)
 
 
-# ============================================================
-# Market Data Fixture
-# ============================================================
-
-
 @pytest.fixture
-def sample_market_data():
+def sample_market_data() -> Any:
     """Fixture providing sample market data for testing."""
     return {
         "tickers": ["AAPL", "MSFT", "GOOGL", "AMZN"],
         "prices": {
-            "AAPL": [150.25, 151.30, 149.80, 152.50, 153.65],
-            "MSFT": [290.10, 292.15, 289.75, 295.20, 297.30],
-            "GOOGL": [2750.25, 2780.50, 2745.30, 2790.10, 2810.25],
-            "AMZN": [3350.50, 3375.25, 3340.10, 3390.75, 3410.20],
+            "AAPL": [150.25, 151.3, 149.8, 152.5, 153.65],
+            "MSFT": [290.1, 292.15, 289.75, 295.2, 297.3],
+            "GOOGL": [2750.25, 2780.5, 2745.3, 2790.1, 2810.25],
+            "AMZN": [3350.5, 3375.25, 3340.1, 3390.75, 3410.2],
         },
         "volumes": {
             "AAPL": [5000000, 6200000, 4800000, 5500000, 6000000],
@@ -43,16 +35,7 @@ def sample_market_data():
     }
 
 
-# ============================================================
-# Mock Auth Token Fixture
-# ============================================================
-
-
 @pytest.fixture
-def mock_authentication_token():
+def mock_authentication_token() -> Any:
     """Fixture providing a mock authentication JWT token."""
-    return (
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9."
-        "eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkFscGhhTWluZCBUZXN0IFVzZXIiLCJpYXQiOjE1MTYyMzkwMjJ9."
-        "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-    )
+    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkFscGhhTWluZCBUZXN0IFVzZXIiLCJpYXQiOjE1MTYyMzkwMjJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"

@@ -4,7 +4,6 @@ import json
 import logging
 from typing import Any, Dict, Optional, Union
 
-# --- 1. Configure Logging ---
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -12,13 +11,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger("AlphaMind.Core")
 
-# --- 2. Standard Data Structures ---
-
 
 class MarketData:
     """Standard container for processed market and alternative data."""
 
-    def __init__(self, data: pd.DataFrame, source: str = "combined"):
+    def __init__(self, data: pd.DataFrame, source: str = "combined") -> Any:
         """
         Args:
             data: A Pandas DataFrame containing time series data (e.g., price, volume, sentiment).
@@ -48,7 +45,7 @@ class Signal:
         position: int,
         confidence: float,
         timestamp: datetime.datetime,
-    ):
+    ) -> Any:
         """
         Args:
             ticker: The asset symbol (e.g., 'AAPL').
@@ -71,13 +68,10 @@ class Signal:
         }
 
 
-# --- 3. Configuration Management ---
-
-
 class ConfigManager:
     """Handles loading and accessing global configuration settings."""
 
-    def __init__(self, config_path: str = "config.json"):
+    def __init__(self, config_path: str = "config.json") -> Any:
         self.config_path = config_path
         self._config: Dict[str, Any] = self._load_config()
 
@@ -109,16 +103,13 @@ class ConfigManager:
         return value
 
 
-# --- 4. Base Module (Abstract Class) ---
-
-
 class BaseModule(abc.ABC):
     """
     Abstract base class for all functional modules in the AlphaMind system.
     Enforces a standard lifecycle and interface for configuration and execution.
     """
 
-    def __init__(self, module_name: str, config_manager: ConfigManager):
+    def __init__(self, module_name: str, config_manager: ConfigManager) -> Any:
         self.module_name = module_name
         self.config = config_manager
         self.logger = logging.getLogger(f"AlphaMind.{module_name}")
@@ -158,32 +149,26 @@ class BaseModule(abc.ABC):
         return None
 
 
-# --- Example Usage (Not part of the module itself) ---
 if __name__ == "__main__":
-    # Simulate a configuration file for demonstration
     temp_config = {
         "GLOBAL": {"TICKERS": ["AAPL", "MSFT"]},
         "API": {"SENTINEL_KEY": "dummy_key", "MAX_RETRIES": 5},
     }
     with open("config.json", "w") as f:
         json.dump(temp_config, f)
-
     config = ConfigManager()
-
-    # Example of accessing a nested key
     tickers = config.get("GLOBAL.TICKERS")
     logger.info(f"\nLoaded Tickers: {tickers}")
 
-    # Example of a concrete module implementation
     class DataFetcher(BaseModule):
-        def configure(self):
+
+        def configure(self) -> Any:
             super().configure()
             self.logger.info(f"Using key: {self.config.get('API.SENTINEL_KEY', 'N/A')}")
             return True
 
-        def run(self, input_data=None):
+        def run(self, input_data: Any = None) -> Any:
             super().run()
-            # Simulate fetching data
             data = pd.DataFrame(
                 {"close": [100, 101, 102]},
                 index=pd.to_datetime(["2025-01-01", "2025-01-02", "2025-01-03"]),
@@ -193,9 +178,7 @@ if __name__ == "__main__":
     fetcher = DataFetcher("DataFetcher", config)
     fetcher.configure()
     data = fetcher.run()
-
     if data:
         logger.info(f"\nLatest Data Point: {data.get_latest()}")
-
     signal = Signal("AAPL", 1, 0.95, datetime.datetime.now())
     logger.info(f"Generated Signal: {signal.to_dict()}")

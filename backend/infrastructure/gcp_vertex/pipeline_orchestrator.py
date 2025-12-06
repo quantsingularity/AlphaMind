@@ -2,10 +2,11 @@ from google.cloud import aiplatform
 
 
 class VertexPipelineOrchestrator:
-    def __init__(self, project, location):
+
+    def __init__(self, project: Any, location: Any) -> Any:
         aiplatform.init(project=project, location=location)
 
-    def run_alpha_pipeline(self, parameters):
+    def run_alpha_pipeline(self, parameters: Any) -> Any:
         job = aiplatform.PipelineJob(
             display_name="alpha_research_pipeline",
             template_path="gs://quant_ai-pipelines/alpha_pipeline.json",
@@ -13,7 +14,7 @@ class VertexPipelineOrchestrator:
         )
         job.submit()
 
-    def monitor_job(self, job_id):
+    def monitor_job(self, job_id: Any) -> Any:
         job = aiplatform.PipelineJob.get(job_id)
         return {
             "state": job.state,

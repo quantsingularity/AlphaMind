@@ -11,8 +11,6 @@ from enum import Enum
 import logging
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-
-# Configure logging
 logger = logging.getLogger(__name__)
 
 
@@ -63,7 +61,7 @@ class ExecutionMetrics:
 class StrategySelector:
     """Selects optimal execution strategies based on market conditions and order characteristics."""
 
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize strategy selector."""
         self.strategies = {}
         self.historical_performance = {}
@@ -94,7 +92,6 @@ class StrategySelector:
         Returns:
             Suitability score (0-100)
         """
-        # Default implementation returns 50 (neutral score)
         return 50.0
 
     def register_strategy(
@@ -145,10 +142,8 @@ class StrategySelector:
             metrics: ExecutionMetrics object
         """
         strategy = metrics.strategy
-
         if strategy not in self.historical_performance:
             self.historical_performance[strategy] = []
-
         self.historical_performance[strategy].append(metrics)
         logger.info(f"Recorded performance metrics for {strategy.value} strategy")
 
@@ -171,12 +166,9 @@ class StrategySelector:
         """
         if strategy not in self.historical_performance:
             return []
-
         metrics = self.historical_performance[strategy]
-
         if start_time is None and end_time is None:
             return metrics
-
         filtered = []
         for m in metrics:
             if start_time and m.timestamp < start_time:
@@ -184,7 +176,6 @@ class StrategySelector:
             if end_time and m.timestamp > end_time:
                 continue
             filtered.append(m)
-
         return filtered
 
     def calculate_strategy_scores(
@@ -201,11 +192,9 @@ class StrategySelector:
             Dictionary mapping strategies to suitability scores
         """
         scores = {}
-
         for strategy, config in self.strategies.items():
             if not config["enabled"]:
                 continue
-
             try:
                 score = config["suitability_function"](order_size, market_condition)
                 scores[strategy] = score
@@ -214,7 +203,6 @@ class StrategySelector:
                     f"Error calculating suitability score for {strategy.value}: {str(e)}"
                 )
                 scores[strategy] = 0.0
-
         return scores
 
     def select_best_strategy(
@@ -231,13 +219,10 @@ class StrategySelector:
             Tuple of (best_strategy, score)
         """
         scores = self.calculate_strategy_scores(order_size, market_condition)
-
         if not scores:
-            # Default to MARKET if no strategies are available
-            return ExecutionAlgorithm.MARKET, 0.0
-
+            return (ExecutionAlgorithm.MARKET, 0.0)
         best_strategy = max(scores.items(), key=lambda x: x[1])
-        return best_strategy[0], best_strategy[1]
+        return (best_strategy[0], best_strategy[1])
 
     def get_strategy_parameters(self, strategy: ExecutionAlgorithm) -> Dict[str, Any]:
         """
@@ -254,7 +239,6 @@ class StrategySelector:
         """
         if strategy not in self.strategies:
             raise KeyError(f"Strategy {strategy.value} not registered")
-
         return self.strategies[strategy]["parameters"].copy()
 
     def update_strategy_parameters(
@@ -272,7 +256,6 @@ class StrategySelector:
         """
         if strategy not in self.strategies:
             raise KeyError(f"Strategy {strategy.value} not registered")
-
         self.strategies[strategy]["parameters"].update(parameters)
         logger.info(f"Updated parameters for {strategy.value} strategy")
 
@@ -288,7 +271,6 @@ class StrategySelector:
         """
         if strategy not in self.strategies:
             raise KeyError(f"Strategy {strategy.value} not registered")
-
         self.strategies[strategy]["enabled"] = True
         logger.info(f"Enabled {strategy.value} strategy")
 
@@ -304,7 +286,6 @@ class StrategySelector:
         """
         if strategy not in self.strategies:
             raise KeyError(f"Strategy {strategy.value} not registered")
-
         self.strategies[strategy]["enabled"] = False
         logger.info(f"Disabled {strategy.value} strategy")
 
@@ -321,16 +302,11 @@ class StrategySelector:
             Dictionary mapping metric names to classifications (e.g., {"volatility": "high"})
         """
         classification = {}
-
-        # Process standard metrics
         for metric in ["volatility", "spread", "depth", "volume", "momentum"]:
             value = getattr(market_condition, metric)
             classification[metric] = self._classify_metric(metric, value)
-
-        # Process additional metrics
         for metric, value in market_condition.additional_metrics.items():
             classification[metric] = self._classify_metric(metric, value)
-
         return classification
 
     def _classify_metric(self, metric: str, value: float) -> str:
@@ -346,33 +322,9 @@ class StrategySelector:
         """
         if metric not in self.market_condition_thresholds:
             return "unknown"
-
-        # Get thresholds for the metric
         thresholds = self.market_condition_thresholds[metric]
-
-        # Sort thresholds by value to classify correctly (e.g., low <= 0.1, medium <= 0.3)
-        # Note: The expected structure for thresholds should be designed such that
-        # higher values correspond to higher classifications. E.g., for volatility,
-        # {"low": 0.1, "medium": 0.3} means 'low' if value <= 0.1, 'medium' if value <= 0.3,
-        # and 'high' (or the next level) otherwise.
-
-        # We need to sort by the threshold value itself (x[1])
         sorted_thresholds = sorted(thresholds.items(), key=lambda x: x[1])
-
         for classification, threshold in sorted_thresholds:
             if value <= threshold:
                 return classification
-
-        # If the value is higher than all defined thresholds,
-        # return the classification corresponding to the highest threshold value.
-        # This assumes the highest key in the sorted list represents the "boundary" for the next level.
-        # To be precise, if the structure is {"low": 0.1, "medium": 0.3, "high": 0.5}, and value is 0.6,
-        # it should be considered "high". The implementation below handles this by:
-        # 1. If value is 0.05, it hits "low" (<=0.1) and returns.
-        # 2. If value is 0.2, it misses "low", hits "medium" (<=0.3) and returns.
-        # 3. If value is 0.6, it misses all. The final return should be the classification
-        #    corresponding to the highest band (e.g., "high" if 0.5 was the boundary to "high").
-
-        # Given the logic above, if the loop finishes, the value is greater than all thresholds.
-        # We should return the highest classification label available (which is the last one in the sorted list).
         return sorted_thresholds[-1][0] if sorted_thresholds else "above_all_thresholds"

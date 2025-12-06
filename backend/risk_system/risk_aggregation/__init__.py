@@ -19,7 +19,7 @@ class RiskAggregator:
     (e.g., market risk, credit risk, liquidity risk).
     """
 
-    def __init__(self):
+    def __init__(self) -> Any:
         self.aggregated_data: Dict[str, Any] = {}
         logger.info("RiskAggregator initialized.")
 
@@ -38,10 +38,7 @@ class RiskAggregator:
         """
         if not risk_reports:
             return {"total_risk": 0.0, "count": 0}
-
-        # Simple aggregation: sum up a 'VaR' metric if present
-        total_var = sum(report.get("VaR", 0.0) for report in risk_reports)
-
+        total_var = sum((report.get("VaR", 0.0) for report in risk_reports))
         self.aggregated_data = {
             "total_var": total_var,
             "number_of_reports": len(risk_reports),
@@ -72,17 +69,7 @@ def calculate_portfolio_var(
     ):
         logger.error("Invalid or empty portfolio returns provided for VaR calculation.")
         return 0.0
-
-    # Ensure returns are a numpy array for quantile calculation
     returns_array = np.asarray(portfolio_returns)
-
-    # Calculate the percentile corresponding to the confidence level
-    # For 99% VaR, we look at the 1st percentile (1 - 0.99 = 0.01)
     percentile = 1.0 - confidence_level
-
-    # VaR is the negative of the percentile of the returns distribution
-    # We use interpolation='lower' to be conservative
     var_value = -np.quantile(returns_array, percentile, interpolation="lower")
-
-    # VaR is typically reported as a positive loss value
     return max(0.0, var_value)

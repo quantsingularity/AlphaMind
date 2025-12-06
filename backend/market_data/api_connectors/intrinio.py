@@ -1,8 +1,6 @@
 from datetime import date, datetime
 import logging
 from typing import Dict, List, Optional, Union
-
-
 from .base import (
     APIConnector,
     APICredentials,
@@ -29,25 +27,16 @@ class IntrinioConnector(APIConnector):
         Whether to use the sandbox environment.
     """
 
-    def __init__(self, api_key: str, sandbox: bool = False):
-        # Create credentials
+    def __init__(self, api_key: str, sandbox: bool = False) -> Any:
         credentials = APICredentials(api_key=api_key)
-
-        # Set base URL based on environment
         if sandbox:
             base_url = "https://sandbox-api.intrinio.com"
         else:
             base_url = "https://api-v2.intrinio.com"
-
-        # Create rate limiter
-        # Intrinio has different rate limits based on subscription tier
-        # Using a conservative limit of 10 requests per minute
         rate_limiter = RateLimiter(requests_per_minute=10)
-
         super().__init__(
             credentials=credentials, base_url=base_url, rate_limiter=rate_limiter
         )
-
         self.sandbox = sandbox
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -72,10 +61,7 @@ class IntrinioConnector(APIConnector):
         success : bool
             Whether authentication was successful.
         """
-        # Intrinio uses API key for authentication
-        # Test authentication by making a simple request
         response = self.get_company("AAPL")
-
         return response.is_success()
 
     def _prepare_headers(self) -> Dict[str, str]:
@@ -107,7 +93,6 @@ class IntrinioConnector(APIConnector):
             Response containing the company information.
         """
         endpoint = f"companies/{identifier}"
-
         return self.request(
             endpoint=endpoint,
             headers=self._prepare_headers(),
@@ -136,12 +121,9 @@ class IntrinioConnector(APIConnector):
             Response containing the company news.
         """
         endpoint = f"companies/{identifier}/news"
-
         params = {"page_size": page_size}
-
         if next_page:
             params["next_page"] = next_page
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -186,20 +168,16 @@ class IntrinioConnector(APIConnector):
             Response containing the company fundamentals.
         """
         endpoint = f"companies/{identifier}/fundamentals"
-
         params = {
             "statement": statement,
             "fiscal_period": fiscal_period,
             "reported": str(reported_only).lower(),
             "page_size": page_size,
         }
-
         if fiscal_year:
             params["fiscal_year"] = fiscal_year
-
         if next_page:
             params["next_page"] = next_page
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -244,30 +222,22 @@ class IntrinioConnector(APIConnector):
             Response containing the company metrics.
         """
         endpoint = f"companies/{identifier}/historical_data"
-
         params = {"frequency": frequency, "page_size": page_size}
-
-        # Convert metrics to string if needed
         if metrics:
             if isinstance(metrics, list):
                 params["metrics"] = ",".join(metrics)
             else:
                 params["metrics"] = metrics
-
-        # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["start_date"] = start_date
-
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["end_date"] = end_date
-
         if next_page:
             params["next_page"] = next_page
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -309,23 +279,17 @@ class IntrinioConnector(APIConnector):
             Response containing the historical prices.
         """
         endpoint = f"securities/{identifier}/prices"
-
         params = {"frequency": frequency, "page_size": page_size}
-
-        # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["start_date"] = start_date
-
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["end_date"] = end_date
-
         if next_page:
             params["next_page"] = next_page
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -367,23 +331,17 @@ class IntrinioConnector(APIConnector):
             Response containing the intraday prices.
         """
         endpoint = f"securities/{identifier}/prices/intraday"
-
         params = {"frequency": frequency, "page_size": page_size}
-
-        # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["start_date"] = start_date
-
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["end_date"] = end_date
-
         if next_page:
             params["next_page"] = next_page
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -411,12 +369,9 @@ class IntrinioConnector(APIConnector):
             Response containing the real-time price.
         """
         endpoint = f"securities/{identifier}/prices/realtime"
-
         params = {}
-
         if source:
             params["source"] = source
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -458,23 +413,17 @@ class IntrinioConnector(APIConnector):
             Response containing the dividends.
         """
         endpoint = f"securities/{identifier}/dividends"
-
         params = {"frequency": frequency, "page_size": page_size}
-
-        # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["start_date"] = start_date
-
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["end_date"] = end_date
-
         if next_page:
             params["next_page"] = next_page
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -513,23 +462,17 @@ class IntrinioConnector(APIConnector):
             Response containing the earnings.
         """
         endpoint = f"securities/{identifier}/earnings"
-
         params = {"page_size": page_size}
-
-        # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["start_date"] = start_date
-
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["end_date"] = end_date
-
         if next_page:
             params["next_page"] = next_page
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -553,7 +496,6 @@ class IntrinioConnector(APIConnector):
             Response containing the economic index information.
         """
         endpoint = f"indices/economic/{identifier}"
-
         return self.request(
             endpoint=endpoint,
             headers=self._prepare_headers(),
@@ -594,23 +536,17 @@ class IntrinioConnector(APIConnector):
             Response containing the economic index data.
         """
         endpoint = f"indices/economic/{identifier}/data"
-
         params = {"frequency": frequency, "page_size": page_size}
-
-        # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["start_date"] = start_date
-
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["end_date"] = end_date
-
         if next_page:
             params["next_page"] = next_page
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -634,7 +570,6 @@ class IntrinioConnector(APIConnector):
             Response containing the stock market index information.
         """
         endpoint = f"indices/stock_market/{identifier}"
-
         return self.request(
             endpoint=endpoint,
             headers=self._prepare_headers(),
@@ -675,23 +610,17 @@ class IntrinioConnector(APIConnector):
             Response containing the stock market index data.
         """
         endpoint = f"indices/stock_market/{identifier}/data"
-
         params = {"frequency": frequency, "page_size": page_size}
-
-        # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["start_date"] = start_date
-
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["end_date"] = end_date
-
         if next_page:
             params["next_page"] = next_page
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -715,7 +644,6 @@ class IntrinioConnector(APIConnector):
             Response containing the forex currency pair information.
         """
         endpoint = f"forex/currencies/{pair}"
-
         return self.request(
             endpoint=endpoint,
             headers=self._prepare_headers(),
@@ -756,23 +684,17 @@ class IntrinioConnector(APIConnector):
             Response containing the forex currency pair prices.
         """
         endpoint = f"forex/currencies/{pair}/prices"
-
         params = {"frequency": frequency, "page_size": page_size}
-
-        # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["start_date"] = start_date
-
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["end_date"] = end_date
-
         if next_page:
             params["next_page"] = next_page
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -817,27 +739,19 @@ class IntrinioConnector(APIConnector):
             Response containing the options chain.
         """
         endpoint = f"options/chain"
-
         params = {"symbol": symbol, "page_size": page_size}
-
-        # Convert expiration to string if needed
         if expiration:
             if isinstance(expiration, (date, datetime)):
                 expiration = expiration.strftime("%Y-%m-%d")
             params["expiration"] = expiration
-
         if strike:
             params["strike"] = strike
-
         if type:
             params["type"] = type
-
         if moneyness:
             params["moneyness"] = moneyness
-
         if next_page:
             params["next_page"] = next_page
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -861,9 +775,7 @@ class IntrinioConnector(APIConnector):
             Response containing the options expirations.
         """
         endpoint = f"options/expirations"
-
         params = {"symbol": symbol}
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -902,23 +814,17 @@ class IntrinioConnector(APIConnector):
             Response containing the historical option prices.
         """
         endpoint = f"options/prices/{identifier}"
-
         params = {"page_size": page_size}
-
-        # Convert dates to strings if needed
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
             params["start_date"] = start_date
-
         if end_date:
             if isinstance(end_date, (date, datetime)):
                 end_date = end_date.strftime("%Y-%m-%d")
             params["end_date"] = end_date
-
         if next_page:
             params["next_page"] = next_page
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -948,12 +854,9 @@ class IntrinioConnector(APIConnector):
             Response containing the search results.
         """
         endpoint = "companies/search"
-
         params = {"query": query, "page_size": page_size}
-
         if next_page:
             params["next_page"] = next_page
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -983,12 +886,9 @@ class IntrinioConnector(APIConnector):
             Response containing the search results.
         """
         endpoint = "securities/search"
-
         params = {"query": query, "page_size": page_size}
-
         if next_page:
             params["next_page"] = next_page
-
         return self.request(
             endpoint=endpoint,
             params=params,

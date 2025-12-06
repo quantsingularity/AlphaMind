@@ -12,7 +12,6 @@ import json
 import os
 from typing import Any, Dict, List, Optional
 import uuid
-
 import yaml
 
 
@@ -32,7 +31,7 @@ class ExperimentConfig:
         Description of the experiment.
     """
 
-    def __init__(self, name: str, description: Optional[str] = None):
+    def __init__(self, name: str, description: Optional[str] = None) -> Any:
         self.id = str(uuid.uuid4())
         self.name = name
         self.description = description or ""
@@ -100,49 +99,36 @@ class ExperimentConfig:
         description : str, optional
             Description of the variant.
         """
-        # Use default parameter values if not specified
         if parameters is None:
             parameters = {
                 name: param["default_value"] for name, param in self.parameters.items()
             }
-
-        # Validate parameters
         for param_name, value in parameters.items():
             if param_name not in self.parameters:
                 raise ValueError(f"Parameter '{param_name}' not defined in experiment")
-
-            # Validate type
             param_def = self.parameters[param_name]
             expected_type = param_def["type_hint"]
-
-            if expected_type == "int" and not isinstance(value, int):
+            if expected_type == "int" and (not isinstance(value, int)):
                 raise TypeError(f"Parameter '{param_name}' should be an integer")
-            elif expected_type == "float" and not isinstance(value, (int, float)):
+            elif expected_type == "float" and (not isinstance(value, (int, float))):
                 raise TypeError(f"Parameter '{param_name}' should be a float")
-            elif expected_type == "str" and not isinstance(value, str):
+            elif expected_type == "str" and (not isinstance(value, str)):
                 raise TypeError(f"Parameter '{param_name}' should be a string")
-            elif expected_type == "bool" and not isinstance(value, bool):
+            elif expected_type == "bool" and (not isinstance(value, bool)):
                 raise TypeError(f"Parameter '{param_name}' should be a boolean")
-
-            # Validate constraints
             constraints = param_def["constraints"]
-
             if "min" in constraints and value < constraints["min"]:
                 raise ValueError(
                     f"Parameter '{param_name}' should be >= {constraints['min']}"
                 )
-
             if "max" in constraints and value > constraints["max"]:
                 raise ValueError(
                     f"Parameter '{param_name}' should be <= {constraints['max']}"
                 )
-
             if "choices" in constraints and value not in constraints["choices"]:
                 raise ValueError(
                     f"Parameter '{param_name}' should be one of {constraints['choices']}"
                 )
-
-        # Add variant
         self.variants[name] = {
             "parameters": parameters,
             "description": description or "",
@@ -187,18 +173,12 @@ class ExperimentConfig:
         allocations : dict
             Dictionary mapping variant names to allocation percentages (0-1).
         """
-        # Validate variants
         for variant in allocations:
             if variant not in self.variants:
                 raise ValueError(f"Variant '{variant}' not defined in experiment")
-
-        # Validate allocations
         total_allocation = sum(allocations.values())
-        if not (
-            0.99 <= total_allocation <= 1.01
-        ):  # Allow for small floating-point errors
+        if not 0.99 <= total_allocation <= 1.01:
             raise ValueError(f"Total allocation should be 1.0, got {total_allocation}")
-
         self.settings["traffic_allocation"] = allocations
 
     def set_experiment_duration(
@@ -223,10 +203,8 @@ class ExperimentConfig:
             If None but end_date is provided, ignored.
         """
         start_date = start_date or datetime.datetime.now()
-
         if end_date is None and duration_days is not None:
             end_date = start_date + datetime.timedelta(days=duration_days)
-
         self.settings["start_date"] = start_date
         self.settings["end_date"] = end_date
 
@@ -241,7 +219,6 @@ class ExperimentConfig:
         """
         if sample_size <= 0:
             raise ValueError("Sample size should be positive")
-
         self.settings["sample_size"] = sample_size
 
     def set_randomization_unit(self, unit: str) -> None:
@@ -278,16 +255,10 @@ class ExperimentConfig:
             List of validation errors.
         """
         errors = []
-
-        # Check if at least one variant is defined
         if not self.variants:
             errors.append("No variants defined")
-
-        # Check if at least one metric is defined
         if not self.metrics:
             errors.append("No metrics defined")
-
-        # Check if traffic allocation is defined for all variants
         if self.settings["traffic_allocation"]:
             for variant in self.variants:
                 if variant not in self.settings["traffic_allocation"]:
@@ -296,11 +267,8 @@ class ExperimentConfig:
                     )
         else:
             errors.append("No traffic allocation defined")
-
-        # Check if start date is defined
         if self.settings["start_date"] is None:
             errors.append("No start date defined")
-
         return errors
 
     def to_dict(self) -> Dict:
@@ -338,7 +306,6 @@ class ExperimentConfig:
             },
             "creation_date": self.creation_date.isoformat(),
         }
-
         return config_dict
 
     def to_json(self) -> str:
@@ -374,10 +341,7 @@ class ExperimentConfig:
         format : str, default="json"
             Format to save the configuration in. Options: "json", "yaml".
         """
-        # Create directory if it doesn't exist
         os.makedirs(os.path.dirname(os.path.abspath(filepath)), exist_ok=True)
-
-        # Save to file
         if format == "json":
             with open(filepath, "w") as f:
                 f.write(self.to_json())
@@ -388,7 +352,7 @@ class ExperimentConfig:
             raise ValueError(f"Unsupported format: {format}")
 
     @classmethod
-    def load(cls, filepath: str) -> "ExperimentConfig":
+    def load(cls: Any, filepath: str) -> "ExperimentConfig":
         """
         Load experiment configuration from file.
 
@@ -402,7 +366,6 @@ class ExperimentConfig:
         config : ExperimentConfig
             Loaded experiment configuration.
         """
-        # Determine format from file extension
         if filepath.endswith(".json"):
             with open(filepath, "r") as f:
                 data = json.load(f)
@@ -411,35 +374,25 @@ class ExperimentConfig:
                 data = yaml.safe_load(f)
         else:
             raise ValueError(f"Unsupported file format: {filepath}")
-
-        # Create configuration
         config = cls(name=data["name"], description=data["description"])
-
-        # Set attributes
         config.id = data["id"]
         config.parameters = data["parameters"]
         config.variants = data["variants"]
         config.metrics = data["metrics"]
-
-        # Set settings
         if data["settings"]["start_date"]:
             config.settings["start_date"] = datetime.datetime.fromisoformat(
                 data["settings"]["start_date"]
             )
-
         if data["settings"]["end_date"]:
             config.settings["end_date"] = datetime.datetime.fromisoformat(
                 data["settings"]["end_date"]
             )
-
         config.settings["sample_size"] = data["settings"]["sample_size"]
         config.settings["traffic_allocation"] = data["settings"]["traffic_allocation"]
         config.settings["randomization_unit"] = data["settings"]["randomization_unit"]
         config.settings["randomization_salt"] = data["settings"]["randomization_salt"]
         config.settings["segment_filters"] = data["settings"]["segment_filters"]
-
         config.creation_date = datetime.datetime.fromisoformat(data["creation_date"])
-
         return config
 
     def clone(
@@ -462,18 +415,14 @@ class ExperimentConfig:
         cloned_config : ExperimentConfig
             Cloned experiment configuration.
         """
-        # Create new configuration
         cloned_config = ExperimentConfig(
             name=new_name or f"{self.name} (Clone)",
             description=new_description or self.description,
         )
-
-        # Copy attributes
         cloned_config.parameters = copy.deepcopy(self.parameters)
         cloned_config.variants = copy.deepcopy(self.variants)
         cloned_config.metrics = copy.deepcopy(self.metrics)
         cloned_config.settings = copy.deepcopy(self.settings)
-
         return cloned_config
 
 
@@ -491,11 +440,9 @@ class ExperimentConfigManager:
         If None, uses in-memory storage only.
     """
 
-    def __init__(self, storage_dir: Optional[str] = None):
+    def __init__(self, storage_dir: Optional[str] = None) -> Any:
         self.storage_dir = storage_dir
         self.configs = {}
-
-        # Load existing configurations if storage directory is provided
         if storage_dir and os.path.exists(storage_dir):
             self._load_configs()
 
@@ -508,7 +455,6 @@ class ExperimentConfigManager:
                     config = ExperimentConfig.load(filepath)
                     self.configs[config.id] = config
                 except:
-                    # Skip files that can't be loaded
                     pass
 
     def add_config(self, config: ExperimentConfig, save: bool = True) -> None:
@@ -523,7 +469,6 @@ class ExperimentConfigManager:
             Whether to save the configuration to storage.
         """
         self.configs[config.id] = config
-
         if save and self.storage_dir:
             os.makedirs(self.storage_dir, exist_ok=True)
             filepath = os.path.join(
@@ -547,7 +492,6 @@ class ExperimentConfigManager:
         """
         if config_id not in self.configs:
             raise ValueError(f"Configuration with ID '{config_id}' not found")
-
         return self.configs[config_id]
 
     def get_configs(self, name_filter: Optional[str] = None) -> List[ExperimentConfig]:
@@ -586,7 +530,6 @@ class ExperimentConfigManager:
             Whether to save the configuration to storage.
         """
         self.configs[config.id] = config
-
         if save and self.storage_dir:
             os.makedirs(self.storage_dir, exist_ok=True)
             filepath = os.path.join(
@@ -605,7 +548,6 @@ class ExperimentConfigManager:
         """
         if config_id in self.configs:
             del self.configs[config_id]
-
             if self.storage_dir:
                 for filename in os.listdir(self.storage_dir):
                     if filename.startswith(f"{config_id}_") and filename.endswith(
@@ -629,7 +571,6 @@ class ExperimentConfigManager:
             Format to export configurations in. Options: "json", "yaml".
         """
         os.makedirs(directory, exist_ok=True)
-
         for config in self.configs.values():
             filepath = os.path.join(
                 directory, f"{config.id}_{config.name.replace(' ', '_')}.{format}"
@@ -651,7 +592,6 @@ class ExperimentConfigManager:
             Number of configurations imported.
         """
         count = 0
-
         for filename in os.listdir(directory):
             if filename.endswith((".json", ".yaml", ".yml")):
                 filepath = os.path.join(directory, filename)
@@ -660,7 +600,5 @@ class ExperimentConfigManager:
                     self.add_config(config, save=False)
                     count += 1
                 except:
-                    # Skip files that can't be loaded
                     pass
-
         return count

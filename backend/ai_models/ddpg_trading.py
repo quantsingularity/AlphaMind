@@ -4,7 +4,6 @@ import json
 import logging
 import os
 import random
-
 import gym
 from gym import spaces
 import matplotlib.pyplot as plt
@@ -13,20 +12,15 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-
 from core.logging import get_logger
 
 logger = get_logger(__name__)
-
-# Setup logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[logging.FileHandler("ddpg_trading.log"), logging.StreamHandler()],
 )
 logger = logging.getLogger("DDPG_Trading")
-
-# Define experience replay memory
 Experience = namedtuple(
     "Experience", ["state", "action", "reward", "next_state", "done"]
 )
@@ -35,19 +29,19 @@ Experience = namedtuple(
 class ReplayBuffer:
     """Experience replay buffer to store and sample trading experiences"""
 
-    def __init__(self, capacity=100000):
+    def __init__(self, capacity: Any = 100000) -> Any:
         self.buffer = deque(maxlen=capacity)
 
-    def add(self, state, action, reward, next_state, done):
+    def add(
+        self, state: Any, action: Any, reward: Any, next_state: Any, done: Any
+    ) -> Any:
         """Add experience to buffer"""
         experience = Experience(state, action, reward, next_state, done)
         self.buffer.append(experience)
 
-    def sample(self, batch_size):
+    def sample(self, batch_size: Any) -> Any:
         """Sample random batch of experiences"""
         experiences = random.sample(self.buffer, k=min(batch_size, len(self.buffer)))
-
-        # Convert to tensors
         states = torch.FloatTensor(
             [self._flatten_dict_state(e.state) for e in experiences]
         )
@@ -57,38 +51,38 @@ class ReplayBuffer:
             [self._flatten_dict_state(e.next_state) for e in experiences]
         )
         dones = torch.FloatTensor([float(e.done) for e in experiences]).unsqueeze(-1)
+        return (states, actions, rewards, next_states, dones)
 
-        return states, actions, rewards, next_states, dones
-
-    def _flatten_dict_state(self, state):
+    def _flatten_dict_state(self, state: Any) -> Any:
         """Flatten dictionary state for neural network input"""
         if isinstance(state, dict):
-            # Flatten the dictionary state
             prices = np.array(state["prices"]).flatten()
             volumes = np.array(state["volumes"]).flatten()
             macro = np.array(state["macro"]).flatten()
             return np.concatenate([prices, volumes, macro])
         return state
 
-    def __len__(self):
+    def __len__(self) -> Any:
         return len(self.buffer)
 
 
 class OUNoise:
     """Ornstein-Uhlenbeck process for exploration noise"""
 
-    def __init__(self, size, mu=0.0, theta=0.15, sigma=0.2):
+    def __init__(
+        self, size: Any, mu: Any = 0.0, theta: Any = 0.15, sigma: Any = 0.2
+    ) -> Any:
         self.mu = mu * np.ones(size)
         self.theta = theta
         self.sigma = sigma
         self.size = size
         self.reset()
 
-    def reset(self):
+    def reset(self) -> Any:
         """Reset the internal state"""
         self.state = np.copy(self.mu)
 
-    def sample(self):
+    def sample(self) -> Any:
         """Update internal state and return noise sample"""
         x = self.state
         dx = self.theta * (self.mu - x) + self.sigma * np.random.standard_normal(
@@ -101,95 +95,74 @@ class OUNoise:
 class Actor(nn.Module):
     """Actor network for DDPG that determines the action policy"""
 
-    def __init__(self, state_dim, action_dim, hidden_dims=(256, 128), init_w=3e-3):
+    def __init__(
+        self,
+        state_dim: Any,
+        action_dim: Any,
+        hidden_dims: Any = (256, 128),
+        init_w: Any = 0.003,
+    ) -> Any:
         super(Actor, self).__init__()
-
-        # Build network layers
         self.layers = nn.ModuleList()
         prev_dim = state_dim
-
-        # Hidden layers
         for hidden_dim in hidden_dims:
             self.layers.append(nn.Linear(prev_dim, hidden_dim))
             prev_dim = hidden_dim
-
-        # Output layer
         self.output_layer = nn.Linear(prev_dim, action_dim)
-
-        # Initialize weights
         self.output_layer.weight.data.uniform_(-init_w, init_w)
         self.output_layer.bias.data.uniform_(-init_w, init_w)
 
-    def forward(self, state):
+    def forward(self, state: Any) -> Any:
         """Forward pass through the network"""
         x = state
         for layer in self.layers:
             x = F.relu(layer(x))
-
-        # Output actions in range [-1, 1]
         return torch.tanh(self.output_layer(x))
 
 
 class Critic(nn.Module):
     """Critic network for DDPG that estimates Q-values"""
 
-    def __init__(self, state_dim, action_dim, hidden_dims=(256, 128), init_w=3e-3):
+    def __init__(
+        self,
+        state_dim: Any,
+        action_dim: Any,
+        hidden_dims: Any = (256, 128),
+        init_w: Any = 0.003,
+    ) -> Any:
         super(Critic, self).__init__()
-
-        # First layer processes only the state
         self.fc1 = nn.Linear(state_dim, hidden_dims[0])
-
-        # Second layer processes both state features and action
         self.fc2 = nn.Linear(hidden_dims[0] + action_dim, hidden_dims[1])
-
-        # Output layer produces Q-value
         self.output_layer = nn.Linear(hidden_dims[1], 1)
-
-        # Initialize weights
         self.output_layer.weight.data.uniform_(-init_w, init_w)
         self.output_layer.bias.data.uniform_(-init_w, init_w)
 
-    def forward(self, state, action):
+    def forward(self, state: Any, action: Any) -> Any:
         """Forward pass through the network"""
-        # Process state through first layer
         x = F.relu(self.fc1(state))
-
-        # Concatenate state features with action
         x = torch.cat([x, action], dim=1)
-
-        # Process combined features
         x = F.relu(self.fc2(x))
-
-        # Output Q-value
         return self.output_layer(x)
 
 
 class DDPGAgent:
     """Deep Deterministic Policy Gradient agent for trading"""
 
-    def __init__(self, env, config=None):
+    def __init__(self, env: Any, config: Any = None) -> Any:
         """Initialize the DDPG agent with environment and optional config"""
         self.env = env
         self.config = self._load_config(config)
-
-        # Extract dimensions from environment
         if isinstance(env.observation_space, spaces.Dict):
-            # Calculate flattened state dimension
             sample_obs = env.reset()
             flat_obs = self._flatten_observation(sample_obs)
             self.state_dim = len(flat_obs)
         else:
             self.state_dim = env.observation_space.shape[0]
-
         self.action_dim = env.action_space.shape[0]
-
-        # Initialize device
         self.device = torch.device(
             "cuda" if torch.cuda.is_available() and self.config["use_cuda"] else "cpu"
         )
         logger.info(f"Using device: {self.device}")
-
-        # Initialize actor and critic networks
         self.actor = Actor(
             self.state_dim,
             self.action_dim,
@@ -200,8 +173,6 @@ class DDPGAgent:
             self.action_dim,
             hidden_dims=self.config["critic_hidden_dims"],
         ).to(self.device)
-
-        # Initialize target networks
         self.actor_target = Actor(
             self.state_dim,
             self.action_dim,
@@ -212,46 +183,33 @@ class DDPGAgent:
             self.action_dim,
             hidden_dims=self.config["critic_hidden_dims"],
         ).to(self.device)
-
-        # Copy weights to target networks
         self._hard_update(self.actor_target, self.actor)
         self._hard_update(self.critic_target, self.critic)
-
-        # Initialize optimizers
         self.actor_optimizer = optim.Adam(
             self.actor.parameters(), lr=self.config["actor_lr"]
         )
         self.critic_optimizer = optim.Adam(
             self.critic.parameters(), lr=self.config["critic_lr"]
         )
-
-        # Initialize replay buffer
         self.replay_buffer = ReplayBuffer(capacity=self.config["buffer_capacity"])
-
-        # Initialize exploration noise
         self.noise = OUNoise(self.action_dim, sigma=self.config["noise_sigma"])
-
-        # Initialize training metrics
         self.rewards_history = []
         self.q_values_history = []
         self.actor_losses = []
         self.critic_losses = []
-
-        # Create results directory
         self.results_dir = os.path.join(
             "results", f"ddpg_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         )
         os.makedirs(self.results_dir, exist_ok=True)
-
         logger.info(
             f"DDPG Agent initialized with state_dim={self.state_dim}, action_dim={self.action_dim}"
         )
 
-    def _load_config(self, config=None):
+    def _load_config(self, config: Any = None) -> Any:
         """Load configuration with defaults"""
         default_config = {
-            "actor_lr": 1e-4,
-            "critic_lr": 1e-3,
+            "actor_lr": 0.0001,
+            "critic_lr": 0.001,
             "actor_hidden_dims": (256, 128),
             "critic_hidden_dims": (256, 128),
             "gamma": 0.99,
@@ -267,62 +225,46 @@ class DDPGAgent:
             "max_steps_per_episode": 1000,
             "warmup_steps": 1000,
         }
-
         if config:
-            # Update default config with provided values
             default_config.update(config)
-
         return default_config
 
-    def _flatten_observation(self, obs):
+    def _flatten_observation(self, obs: Any) -> Any:
         """Flatten dictionary observation for neural network input"""
         if isinstance(obs, dict):
-            # Flatten the dictionary observation
             prices = np.array(obs["prices"]).flatten()
             volumes = np.array(obs["volumes"]).flatten()
             macro = np.array(obs["macro"]).flatten()
             return np.concatenate([prices, volumes, macro])
         return obs
 
-    def _hard_update(self, target, source):
+    def _hard_update(self, target: Any, source: Any) -> Any:
         """Hard update: target = source"""
         for target_param, param in zip(target.parameters(), source.parameters()):
             target_param.data.copy_(param.data)
 
-    def _soft_update(self, target, source):
+    def _soft_update(self, target: Any, source: Any) -> Any:
         """Soft update: target = tau * source + (1 - tau) * target"""
         tau = self.config["tau"]
         for target_param, param in zip(target.parameters(), source.parameters()):
             target_param.data.copy_(target_param.data * (1.0 - tau) + param.data * tau)
 
-    def select_action(self, state, add_noise=True):
+    def select_action(self, state: Any, add_noise: Any = True) -> Any:
         """Select action based on current policy with optional exploration noise"""
-        # Flatten state if needed
         flat_state = self._flatten_observation(state)
         state_tensor = torch.FloatTensor(flat_state).unsqueeze(0).to(self.device)
-
-        # Set actor to evaluation mode
         self.actor.eval()
-
         with torch.no_grad():
             action = self.actor(state_tensor).cpu().data.numpy().flatten()
-
-        # Set actor back to training mode
         self.actor.train()
-
-        # Add exploration noise if required
         if add_noise:
             action += self.noise.sample()
-
-        # Clip action to valid range
         return np.clip(action, -1.0, 1.0)
 
-    def update(self):
+    def update(self) -> Any:
         """Update actor and critic networks using sampled experiences"""
         if len(self.replay_buffer) < self.config["batch_size"]:
-            return 0, 0  # Not enough samples
-
-        # Sample batch from replay buffer
+            return (0, 0)
         states, actions, rewards, next_states, dones = self.replay_buffer.sample(
             self.config["batch_size"]
         )
@@ -331,194 +273,127 @@ class DDPGAgent:
         rewards = rewards.to(self.device)
         next_states = next_states.to(self.device)
         dones = dones.to(self.device)
-
-        # Update critic
         with torch.no_grad():
             next_actions = self.actor_target(next_states)
             next_q_values = self.critic_target(next_states, next_actions)
             target_q = rewards + (1 - dones) * self.config["gamma"] * next_q_values
-
-        # Current Q-values
         current_q = self.critic(states, actions)
-
-        # Compute critic loss
         critic_loss = F.mse_loss(current_q, target_q)
-
-        # Optimize critic
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
         self.critic_optimizer.step()
-
-        # Update actor
         policy_actions = self.actor(states)
         actor_loss = -self.critic(states, policy_actions).mean()
-
-        # Optimize actor
         self.actor_optimizer.zero_grad()
         actor_loss.backward()
         self.actor_optimizer.step()
-
-        # Update target networks
         self._soft_update(self.actor_target, self.actor)
         self._soft_update(self.critic_target, self.critic)
-
-        # Record metrics
         self.q_values_history.append(current_q.mean().item())
         self.actor_losses.append(actor_loss.item())
         self.critic_losses.append(critic_loss.item())
+        return (actor_loss.item(), critic_loss.item())
 
-        return actor_loss.item(), critic_loss.item()
-
-    def train(self, max_episodes=None, max_steps=None):
+    def train(self, max_episodes: Any = None, max_steps: Any = None) -> Any:
         """Train the agent on the environment"""
         max_episodes = max_episodes or self.config["max_episodes"]
         max_steps = max_steps or self.config["max_steps_per_episode"]
-
         logger.info(
             f"Starting training for {max_episodes} episodes, max {max_steps} steps per episode"
         )
-
         total_steps = 0
         episode_rewards = []
-
         for episode in range(1, max_episodes + 1):
             state = self.env.reset()
             self.noise.reset()
             episode_reward = 0
-
             for step in range(1, max_steps + 1):
-                # Select action
                 if total_steps < self.config["warmup_steps"]:
-                    # Random actions during warmup
                     action = self.env.action_space.sample()
                 else:
-                    # Policy actions with noise after warmup
                     action = self.select_action(state, add_noise=True)
-
-                # Execute action
                 next_state, reward, done, info = self.env.step(action)
-
-                # Store experience
                 self.replay_buffer.add(state, action, reward, next_state, done)
-
-                # Update networks
                 if total_steps >= self.config["warmup_steps"]:
                     actor_loss, critic_loss = self.update()
-
-                # Update state and counters
                 state = next_state
                 episode_reward += reward
                 total_steps += 1
-
                 if done or step == max_steps:
                     break
-
-            # Record episode reward
             episode_rewards.append(episode_reward)
             self.rewards_history.append(episode_reward)
-
-            # Logging
             if episode % self.config["log_interval"] == 0:
                 avg_reward = np.mean(episode_rewards[-self.config["log_interval"] :])
                 logger.info(
                     f"Episode {episode}/{max_episodes} | Avg Reward: {avg_reward:.2f} | Buffer Size: {len(self.replay_buffer)}"
                 )
-
-                # Plot and save metrics
                 if len(self.rewards_history) > 0:
                     self._plot_metrics()
-
-            # Save model
             if episode % self.config["save_interval"] == 0:
                 self.save_model(os.path.join(self.results_dir, f"model_ep{episode}"))
-
-            # Evaluation
             if episode % self.config["eval_interval"] == 0:
                 eval_reward = self.evaluate(5)
                 logger.info(
                     f"Evaluation after episode {episode}: Avg Reward = {eval_reward:.2f}"
                 )
-
-        # Final save
         self.save_model(os.path.join(self.results_dir, "model_final"))
-
-        # Final evaluation
         final_eval_reward = self.evaluate(10)
         logger.info(f"Final evaluation: Avg Reward = {final_eval_reward:.2f}")
-
-        # Save final metrics
         self._plot_metrics(final=True)
-
         return self.rewards_history
 
-    def evaluate(self, num_episodes=5):
+    def evaluate(self, num_episodes: Any = 5) -> Any:
         """Evaluate the agent without exploration noise"""
         logger.info(f"Evaluating agent for {num_episodes} episodes")
         eval_rewards = []
-
         for episode in range(num_episodes):
             state = self.env.reset()
             episode_reward = 0
             done = False
-
             while not done:
                 action = self.select_action(state, add_noise=False)
                 next_state, reward, done, _ = self.env.step(action)
                 episode_reward += reward
                 state = next_state
-
             eval_rewards.append(episode_reward)
-
         avg_reward = np.mean(eval_rewards)
         return avg_reward
 
-    def _plot_metrics(self, final=False):
+    def _plot_metrics(self, final: Any = False) -> Any:
         """Plot and save training metrics"""
         plt.figure(figsize=(15, 10))
-
-        # Plot rewards
         plt.subplot(2, 2, 1)
         plt.plot(self.rewards_history)
         plt.title("Episode Rewards")
         plt.xlabel("Episode")
         plt.ylabel("Reward")
-
-        # Plot Q-values
         if self.q_values_history:
             plt.subplot(2, 2, 2)
             plt.plot(self.q_values_history)
             plt.title("Average Q-values")
             plt.xlabel("Update Step")
             plt.ylabel("Q-value")
-
-        # Plot actor loss
         if self.actor_losses:
             plt.subplot(2, 2, 3)
             plt.plot(self.actor_losses)
             plt.title("Actor Loss")
             plt.xlabel("Update Step")
             plt.ylabel("Loss")
-
-        # Plot critic loss
         if self.critic_losses:
             plt.subplot(2, 2, 4)
             plt.plot(self.critic_losses)
             plt.title("Critic Loss")
             plt.xlabel("Update Step")
             plt.ylabel("Loss")
-
         plt.tight_layout()
-
-        # Save figure
         filename = "final_metrics.png" if final else "metrics.png"
         plt.savefig(os.path.join(self.results_dir, filename))
         plt.close()
 
-    def save_model(self, path):
+    def save_model(self, path: Any) -> Any:
         """Save model weights and configuration"""
         os.makedirs(path, exist_ok=True)
-
-        # Save model weights
         torch.save(self.actor.state_dict(), os.path.join(path, "actor.pth"))
         torch.save(self.critic.state_dict(), os.path.join(path, "critic.pth"))
         torch.save(
@@ -527,16 +402,12 @@ class DDPGAgent:
         torch.save(
             self.critic_target.state_dict(), os.path.join(path, "critic_target.pth")
         )
-
-        # Save configuration
         with open(os.path.join(path, "config.json"), "w") as f:
             json.dump(self.config, f, indent=4)
-
         logger.info(f"Model saved to {path}")
 
-    def load_model(self, path):
+    def load_model(self, path: Any) -> Any:
         """Load model weights and configuration"""
-        # Load model weights
         self.actor.load_state_dict(
             torch.load(os.path.join(path, "actor.pth"), map_location=self.device)
         )
@@ -551,14 +422,11 @@ class DDPGAgent:
                 os.path.join(path, "critic_target.pth"), map_location=self.device
             )
         )
-
-        # Load configuration if exists
         config_path = os.path.join(path, "config.json")
         if os.path.exists(config_path):
             with open(config_path, "r") as f:
                 loaded_config = json.load(f)
             self.config.update(loaded_config)
-
         logger.info(f"Model loaded from {path}")
 
 
@@ -567,13 +435,13 @@ class TradingGymEnv(gym.Env):
 
     def __init__(
         self,
-        data_stream,
-        features=None,
-        window_size=10,
-        transaction_cost=0.001,
-        reward_scaling=1.0,
-        max_steps=252,
-    ):
+        data_stream: Any,
+        features: Any = None,
+        window_size: Any = 10,
+        transaction_cost: Any = 0.001,
+        reward_scaling: Any = 1.0,
+        max_steps: Any = 252,
+    ) -> Any:
         """
         Initialize the trading environment
 
@@ -586,28 +454,19 @@ class TradingGymEnv(gym.Env):
             max_steps: Maximum number of steps per episode
         """
         super(TradingGymEnv, self).__init__()
-
         self.data = data_stream
         self.features = features
         self.window_size = window_size
         self.transaction_cost = transaction_cost
         self.reward_scaling = reward_scaling
         self.max_steps = max_steps
-
-        # Determine number of assets from data
         if hasattr(data_stream, "shape"):
-            # DataFrame-like
             self.num_assets = data_stream.shape[1] if len(data_stream.shape) > 1 else 1
         else:
-            # Assume single asset if can't determine
             self.num_assets = 1
-
-        # Define action and observation spaces
         self.action_space = spaces.Box(
             low=-1, high=1, shape=(self.num_assets,), dtype=np.float32
         )
-
-        # Observation space includes price history, volumes, and macro indicators
         self.observation_space = spaces.Dict(
             {
                 "prices": spaces.Box(
@@ -624,154 +483,102 @@ class TradingGymEnv(gym.Env):
                 ),
             }
         )
-
-        # Initialize state variables
         self.current_step = 0
         self.current_weights = np.zeros(self.num_assets)
         self.price_history = np.zeros((self.num_assets, window_size))
         self.returns = np.zeros((100, self.num_assets))
-
-        # Logging
         self.episode_returns = []
         self.portfolio_values = []
         self.actions_history = []
 
-    def reset(self):
+    def reset(self) -> Any:
         """Reset environment to initial state"""
         self.current_step = 0
         self.current_weights = np.zeros(self.num_assets)
         self.price_history = np.zeros((self.num_assets, self.window_size))
-
-        # Generate random returns for simulation
-        # In a real implementation, this would be replaced with actual market data
         self.returns = np.random.normal(0.0005, 0.01, (100, self.num_assets))
-
-        # Reset tracking variables
         self.episode_returns = []
-        self.portfolio_values = [1.0]  # Start with $1
+        self.portfolio_values = [1.0]
         self.actions_history = []
-
         return self._get_observation()
 
-    def step(self, action):
+    def step(self, action: Any) -> Any:
         """Execute one step in the environment"""
-        # Increment step counter
         self.current_step += 1
-
-        # Convert action to portfolio weights
         new_weights = self._normalize_weights(action)
-
-        # Calculate transaction costs
         cost = self._calculate_transaction_cost(new_weights)
-
-        # Calculate returns for this step
         if self.current_step < len(self.returns):
             step_returns = self.returns[self.current_step]
         else:
-            # If we run out of data, generate random returns
             step_returns = np.random.normal(0.0005, 0.01, self.num_assets)
-
-        # Calculate portfolio return
         portfolio_return = np.sum(new_weights * step_returns) - cost
-
-        # Update portfolio value
         current_value = self.portfolio_values[-1]
         new_value = current_value * (1 + portfolio_return)
         self.portfolio_values.append(new_value)
-
-        # Calculate reward (Sharpe ratio or returns-based)
         reward = self._calculate_reward(portfolio_return)
-
-        # Update state
         self.current_weights = new_weights
         self.episode_returns.append(portfolio_return)
         self.actions_history.append(new_weights)
-
-        # Update price history with new data
-        # In a real implementation, this would use actual market data
         new_prices = self.price_history[:, 1:].copy()
-        new_prices = np.column_stack([new_prices, step_returns + 1])  # Add new prices
+        new_prices = np.column_stack([new_prices, step_returns + 1])
         self.price_history = new_prices
-
-        # Check if episode is done
         done = self.current_step >= self.max_steps
-
-        # Get new observation
         observation = self._get_observation()
-
-        # Additional info
         info = {
             "portfolio_value": new_value,
             "portfolio_return": portfolio_return,
             "transaction_cost": cost,
             "weights": new_weights,
         }
+        return (observation, reward, done, info)
 
-        return observation, reward, done, info
-
-    def _normalize_weights(self, action):
+    def _normalize_weights(self, action: Any) -> Any:
         """Normalize actions to valid portfolio weights"""
-        # Convert actions to weights between -1 and 1
         weights = np.tanh(action)
-
-        # Ensure weights sum to 1 for fully invested portfolio
         if np.sum(np.abs(weights)) > 0:
             weights = weights / np.sum(np.abs(weights))
-
         return weights
 
-    def _calculate_transaction_cost(self, new_weights):
+    def _calculate_transaction_cost(self, new_weights: Any) -> Any:
         """Calculate transaction costs from rebalancing"""
-        # Calculate turnover (sum of absolute weight changes)
         turnover = np.sum(np.abs(new_weights - self.current_weights))
-
-        # Apply transaction cost
         cost = turnover * self.transaction_cost
-
         return cost
 
-    def _calculate_reward(self, portfolio_return):
+    def _calculate_reward(self, portfolio_return: Any) -> Any:
         """Calculate reward based on portfolio performance"""
-        # Simple return-based reward
         reward = portfolio_return * self.reward_scaling
-
-        # Alternative: Sharpe ratio if we have enough history
         if len(self.episode_returns) > 10:
             returns_array = np.array(self.episode_returns)
-            # Risk-free rate (0.0001 per step is a placeholder)
-            sharpe = (np.mean(returns_array) - 0.0001) / (np.std(returns_array) + 1e-6)
+            sharpe = (np.mean(returns_array) - 0.0001) / (np.std(returns_array) + 1e-06)
             reward = sharpe * self.reward_scaling
-
         return reward
 
-    def _get_observation(self):
+    def _get_observation(self) -> Any:
         """Get current market observation"""
-        # In a real implementation, this would fetch actual market data
-        # This is a placeholder implementation
         return {
             "prices": self.price_history,
             "volumes": np.abs(np.random.normal(1000, 500, (self.num_assets,))),
             "macro": np.random.normal(0, 1, (5,)),
         }
 
-    def render(self, mode="human"):
+    def render(self, mode: Any = "human") -> Any:
         """Render the environment"""
         if mode == "human":
             logger.info(f"Step: {self.current_step}")
             logger.info(f"Portfolio Value: {self.portfolio_values[-1]:.4f}")
             logger.info(f"Current Weights: {self.current_weights}")
             logger.info(
-                f"Current Return: {self.episode_returns[-1] if self.episode_returns else 0:.4f}"
+                f"Current Return: {(self.episode_returns[-1] if self.episode_returns else 0):.4f}"
             )
             logger.info("-" * 50)
-
         return None
 
 
 class BacktestEngine:
     """Backtesting engine for evaluating trading strategies"""
 
-    def __init__(self, env, agent, data=None):
+    def __init__(self, env: Any, agent: Any, data: Any = None) -> Any:
         """
         Initialize backtesting engine
 
@@ -782,12 +589,8 @@ class BacktestEngine:
         """
         self.env = env
         self.agent = agent
-
         if data is not None:
-            # Override environment data if provided
             self.env.data = data
-
-        # Initialize metrics
         self.portfolio_values = []
         self.returns = []
         self.sharpe_ratio = None
@@ -795,27 +598,24 @@ class BacktestEngine:
         self.total_return = None
         self.annual_return = None
         self.volatility = None
-
-        # Logging
         self.logger = logging.getLogger("BacktestEngine")
 
-    def _calculate_sharpe_ratio(self, returns, risk_free_rate=0.0001):
+    def _calculate_sharpe_ratio(
+        self, returns: Any, risk_free_rate: Any = 0.0001
+    ) -> Any:
         """Calculate Sharpe Ratio"""
         if len(returns) < 2:
             return 0.0
         returns_array = np.array(returns)
-        # Annualized Sharpe (assuming returns are daily for 252 trading days)
         annualized_return = np.mean(returns_array) * 252
         annualized_volatility = np.std(returns_array) * np.sqrt(252)
-        annualized_risk_free_rate = risk_free_rate * 252  # placeholder annualization
-
+        annualized_risk_free_rate = risk_free_rate * 252
         if annualized_volatility == 0:
             return 0.0
-
         sharpe = (annualized_return - annualized_risk_free_rate) / annualized_volatility
         return sharpe
 
-    def _calculate_max_drawdown(self, portfolio_values):
+    def _calculate_max_drawdown(self, portfolio_values: Any) -> Any:
         """Calculate Maximum Drawdown"""
         if not portfolio_values:
             return 0.0
@@ -825,63 +625,40 @@ class BacktestEngine:
         max_drawdown = np.max(drawdown)
         return max_drawdown
 
-    def run(self, episodes=1, render=False):
+    def run(self, episodes: Any = 1, render: Any = False) -> Any:
         """Run backtest for specified number of episodes"""
         self.logger.info(f"Starting backtest for {episodes} episodes")
-
         all_portfolio_values = []
         all_returns = []
         all_actions = []
-
         for episode in range(1, episodes + 1):
             state = self.env.reset()
             done = False
-            episode_values = [1.0]  # Start with $1
+            episode_values = [1.0]
             episode_returns = []
             episode_actions = []
-
             while not done:
-                # Select action without exploration noise
                 action = self.agent.select_action(state, add_noise=False)
-
-                # Execute action
                 next_state, reward, done, info = self.env.step(action)
-
-                # Record metrics
                 episode_values.append(info["portfolio_value"])
                 episode_returns.append(info["portfolio_return"])
                 episode_actions.append(info["weights"])
-
-                # Render if requested
                 if render:
                     self.env.render()
-
-                # Update state
                 state = next_state
-
-            # Store episode results
             all_portfolio_values.append(episode_values)
             all_returns.append(episode_returns)
             all_actions.append(episode_actions)
-
-            # Log episode results
             final_value = episode_values[-1]
             episode_sharpe = self._calculate_sharpe_ratio(episode_returns)
             self.logger.info(
                 f"Episode {episode}/{episodes} | Final Value: ${final_value:.2f} | Sharpe: {episode_sharpe:.2f}"
             )
-
-        # Calculate aggregate metrics
         self._calculate_metrics(all_portfolio_values, all_returns, all_actions)
-
-        # Log final results
         self.logger.info(
             f"Backtest completed | Total Return: {self.total_return:.2%} | Sharpe: {self.sharpe_ratio:.2f} | Max Drawdown: {self.max_drawdown:.2%}"
         )
-
-        # Plot results
         self._plot_results(all_portfolio_values, all_returns, all_actions)
-
         return {
             "portfolio_values": all_portfolio_values,
             "returns": all_returns,
@@ -895,36 +672,29 @@ class BacktestEngine:
             },
         }
 
-    def _calculate_metrics(self, portfolio_values, returns, actions):
+    def _calculate_metrics(
+        self, portfolio_values: Any, returns: Any, actions: Any
+    ) -> Any:
         """Calculate performance metrics"""
-        # Use the longest episode for metrics
         longest_idx = np.argmax([len(pv) for pv in portfolio_values])
         self.portfolio_values = portfolio_values[longest_idx]
         self.returns = returns[longest_idx]
-
-        # Calculate total return
         self.total_return = self.portfolio_values[-1] / self.portfolio_values[0] - 1
-
-        # Calculate annualized return (assuming 252 trading days)
         days = len(self.returns)
         if days > 0:
             self.annual_return = (1 + self.total_return) ** (252 / days) - 1
         else:
             self.annual_return = 0.0
-
-        # Calculate Sharpe ratio
         self.sharpe_ratio = self._calculate_sharpe_ratio(self.returns)
-
-        # Calculate max drawdown
         self.max_drawdown = self._calculate_max_drawdown(self.portfolio_values)
-
-        # Calculate volatility (annualized standard deviation of returns)
         if days > 1:
             self.volatility = np.std(self.returns) * np.sqrt(252)
         else:
             self.volatility = 0.0
 
-    def _plot_results(self, all_portfolio_values, all_returns, all_actions):
+    def _plot_results(
+        self, all_portfolio_values: Any, all_returns: Any, all_actions: Any
+    ) -> Any:
         """Plot and save backtest results"""
         plt.figure(figsize=(15, 5))
         plt.plot(self.portfolio_values, label="Portfolio Value")
@@ -934,7 +704,6 @@ class BacktestEngine:
         plt.legend()
         plt.savefig(os.path.join(self.agent.results_dir, "backtest_portfolio.png"))
         plt.close()
-
         self.logger.info(
             f"Backtest plot saved to {os.path.join(self.agent.results_dir, 'backtest_portfolio.png')}"
         )

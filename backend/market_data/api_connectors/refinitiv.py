@@ -13,8 +13,6 @@
 from datetime import date, datetime
 import logging
 from typing import Any, Dict, List, Optional, Union
-
-
 from .base import (
     APIConnector,
     APICredentials,
@@ -55,28 +53,19 @@ class RefinitivConnector(APIConnector):
         password: Optional[str] = None,
         app_id: Optional[str] = None,
         access_token: Optional[str] = None,
-    ):
-        # Create credentials
+    ) -> Any:
         credentials = APICredentials(
             username=username,
             password=password,
             api_key=app_id,
             access_token=access_token,
         )
-
-        # Set base URL
         base_url = "https://api.refinitiv.com"
-
-        # Create rate limiter
         rate_limiter = RateLimiter(requests_per_second=5)
-
         super().__init__(
             credentials=credentials, base_url=base_url, rate_limiter=rate_limiter
         )
-
         self.logger = logging.getLogger(self.__class__.__name__)
-
-        # Placeholder for Refinitiv session
         self.session = None
 
     @property
@@ -100,7 +89,6 @@ class RefinitivConnector(APIConnector):
         success : bool
             Whether authentication was successful.
         """
-        # Stub implementation
         self.logger.warning(
             "This is a stub implementation. Actual implementation requires Refinitiv API access."
         )
@@ -188,14 +176,10 @@ class RefinitivConnector(APIConnector):
         response : DataResponse
             Response containing the time series data.
         """
-        # Convert dates to strings if needed
         if isinstance(start_date, (date, datetime)):
             start_date = start_date.strftime("%Y-%m-%d")
-
         if isinstance(end_date, (date, datetime)):
             end_date = end_date.strftime("%Y-%m-%d")
-
-        # Create request
         request = self._create_request(
             endpoint="/data/historical-pricing/v1/views/summaries",
             params={
@@ -207,8 +191,6 @@ class RefinitivConnector(APIConnector):
             },
             category=DataCategory.MARKET_DATA,
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
@@ -243,14 +225,10 @@ class RefinitivConnector(APIConnector):
         response : DataResponse
             Response containing the intraday data.
         """
-        # Convert times to strings if needed
         if isinstance(start_time, datetime):
             start_time = start_time.strftime("%Y-%m-%dT%H:%M:%SZ")
-
         if isinstance(end_time, datetime):
             end_time = end_time.strftime("%Y-%m-%dT%H:%M:%SZ")
-
-        # Create request
         request = self._create_request(
             endpoint="/data/historical-pricing/v1/views/interday",
             params={
@@ -262,8 +240,6 @@ class RefinitivConnector(APIConnector):
             },
             category=DataCategory.MARKET_DATA,
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
@@ -287,7 +263,6 @@ class RefinitivConnector(APIConnector):
         response : DataResponse
             Response containing the reference data.
         """
-        # Create request
         request = self._create_request(
             endpoint="/data/reference/v1",
             params={
@@ -296,8 +271,6 @@ class RefinitivConnector(APIConnector):
             },
             category=DataCategory.MARKET_DATA,
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
@@ -329,14 +302,10 @@ class RefinitivConnector(APIConnector):
         response : DataResponse
             Response containing the news.
         """
-        # Convert dates to strings if needed
         if isinstance(date_from, (date, datetime)):
             date_from = date_from.strftime("%Y-%m-%d")
-
         if isinstance(date_to, (date, datetime)):
             date_to = date_to.strftime("%Y-%m-%d")
-
-        # Create request
         request = self._create_request(
             endpoint="/data/news/v1",
             params={
@@ -347,8 +316,6 @@ class RefinitivConnector(APIConnector):
             },
             category=DataCategory.NEWS,
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
@@ -380,14 +347,10 @@ class RefinitivConnector(APIConnector):
         response : DataResponse
             Response containing the news headlines.
         """
-        # Convert dates to strings if needed
         if isinstance(date_from, (date, datetime)):
             date_from = date_from.strftime("%Y-%m-%d")
-
         if isinstance(date_to, (date, datetime)):
             date_to = date_to.strftime("%Y-%m-%d")
-
-        # Create request
         request = self._create_request(
             endpoint="/data/news/v1/headlines",
             params={
@@ -398,8 +361,6 @@ class RefinitivConnector(APIConnector):
             },
             category=DataCategory.NEWS,
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
@@ -419,12 +380,9 @@ class RefinitivConnector(APIConnector):
         response : DataResponse
             Response containing the news story.
         """
-        # Create request
         request = self._create_request(
             endpoint=f"/data/news/v1/story/{story_id}", category=DataCategory.NEWS
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
@@ -448,7 +406,6 @@ class RefinitivConnector(APIConnector):
         response : DataResponse
             Response containing the fundamental data.
         """
-        # Create request
         request = self._create_request(
             endpoint="/data/fundamentals/v1",
             params={
@@ -457,8 +414,6 @@ class RefinitivConnector(APIConnector):
             },
             category=DataCategory.FUNDAMENTAL,
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
@@ -482,7 +437,6 @@ class RefinitivConnector(APIConnector):
         response : DataResponse
             Response containing the ESG data.
         """
-        # Create request
         request = self._create_request(
             endpoint="/data/esg/v1",
             params={
@@ -491,8 +445,6 @@ class RefinitivConnector(APIConnector):
             },
             category=DataCategory.FUNDAMENTAL,
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
@@ -516,7 +468,6 @@ class RefinitivConnector(APIConnector):
         response : DataResponse
             Response containing the estimates.
         """
-        # Create request
         request = self._create_request(
             endpoint="/data/estimates/v1",
             params={
@@ -525,8 +476,6 @@ class RefinitivConnector(APIConnector):
             },
             category=DataCategory.FUNDAMENTAL,
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
@@ -550,7 +499,6 @@ class RefinitivConnector(APIConnector):
         response : DataResponse
             Response containing the ownership data.
         """
-        # Create request
         request = self._create_request(
             endpoint="/data/ownership/v1",
             params={
@@ -559,8 +507,6 @@ class RefinitivConnector(APIConnector):
             },
             category=DataCategory.FUNDAMENTAL,
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
@@ -582,14 +528,11 @@ class RefinitivConnector(APIConnector):
         response : DataResponse
             Response containing the search results.
         """
-        # Create request
         request = self._create_request(
             endpoint="/discovery/search/v1",
             params={"q": query, "limit": limit},
             category=DataCategory.MARKET_DATA,
         )
-
-        # Stub implementation
         return self._create_error_response(
             request=request,
             error="This is a stub implementation. Actual implementation requires Refinitiv API access.",
@@ -597,9 +540,7 @@ class RefinitivConnector(APIConnector):
 
     def close(self) -> None:
         """Close the Refinitiv connector."""
-        # Stub implementation
         self.logger.info("Closing Refinitiv connector.")
-
         if self.session:
             self.logger.info("Closing Refinitiv session.")
             self.session = None

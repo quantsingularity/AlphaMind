@@ -8,8 +8,6 @@ and more.
 
 import logging
 from typing import Any, Dict, List, Optional
-
-
 from .base import (
     APIConnector,
     APICredentials,
@@ -47,24 +45,16 @@ class IEXCloudConnector(APIConnector):
         api_secret: Optional[str] = None,
         sandbox: bool = False,
         version: str = "v1",
-    ):
-        # Create credentials
+    ) -> Any:
         credentials = APICredentials(api_key=api_key, api_secret=api_secret)
-
-        # Set base URL based on environment
         if sandbox:
             base_url = f"https://sandbox.iexapis.com/{version}"
         else:
             base_url = f"https://cloud.iexapis.com/{version}"
-
-        # Create rate limiter
-        # IEX Cloud has a limit of 100 requests per second per IP
         rate_limiter = RateLimiter(requests_per_second=100)
-
         super().__init__(
             credentials=credentials, base_url=base_url, rate_limiter=rate_limiter
         )
-
         self.sandbox = sandbox
         self.version = version
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -90,10 +80,7 @@ class IEXCloudConnector(APIConnector):
         success : bool
             Whether authentication was successful.
         """
-        # IEX Cloud uses API key for authentication
-        # Test authentication by making a simple request
         response = self.get_quote("AAPL")
-
         return response.is_success()
 
     def _add_token_param(
@@ -132,7 +119,6 @@ class IEXCloudConnector(APIConnector):
         """
         endpoint = f"stock/{symbol}/quote"
         params = self._add_token_param()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -176,7 +162,6 @@ class IEXCloudConnector(APIConnector):
             Response containing the historical prices.
         """
         endpoint = f"stock/{symbol}/chart/{range}"
-
         params = self._add_token_param(
             {
                 "chartByDay": str(chart_by_day).lower(),
@@ -185,10 +170,8 @@ class IEXCloudConnector(APIConnector):
                 "chartSimplify": str(chart_simplify).lower(),
             }
         )
-
         if chart_interval is not None:
             params["chartInterval"] = chart_interval
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -212,7 +195,6 @@ class IEXCloudConnector(APIConnector):
         """
         endpoint = f"stock/{symbol}/company"
         params = self._add_token_param()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -241,9 +223,7 @@ class IEXCloudConnector(APIConnector):
             Response containing the financial statements.
         """
         endpoint = f"stock/{symbol}/financials"
-
         params = self._add_token_param({"period": period, "last": last})
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -272,9 +252,7 @@ class IEXCloudConnector(APIConnector):
             Response containing the income statement.
         """
         endpoint = f"stock/{symbol}/income"
-
         params = self._add_token_param({"period": period, "last": last})
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -303,9 +281,7 @@ class IEXCloudConnector(APIConnector):
             Response containing the balance sheet.
         """
         endpoint = f"stock/{symbol}/balance-sheet"
-
         params = self._add_token_param({"period": period, "last": last})
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -334,9 +310,7 @@ class IEXCloudConnector(APIConnector):
             Response containing the cash flow statement.
         """
         endpoint = f"stock/{symbol}/cash-flow"
-
         params = self._add_token_param({"period": period, "last": last})
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -361,9 +335,7 @@ class IEXCloudConnector(APIConnector):
             Response containing the earnings data.
         """
         endpoint = f"stock/{symbol}/earnings"
-
         params = self._add_token_param({"last": last})
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -389,7 +361,6 @@ class IEXCloudConnector(APIConnector):
         """
         endpoint = f"stock/{symbol}/dividends/{range}"
         params = self._add_token_param()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -415,7 +386,6 @@ class IEXCloudConnector(APIConnector):
         """
         endpoint = f"stock/{symbol}/splits/{range}"
         params = self._add_token_param()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -441,7 +411,6 @@ class IEXCloudConnector(APIConnector):
         """
         endpoint = f"stock/{symbol}/news/last/{last}"
         params = self._add_token_param()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -465,7 +434,6 @@ class IEXCloudConnector(APIConnector):
         """
         endpoint = f"stock/{symbol}/peers"
         params = self._add_token_param()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -489,7 +457,6 @@ class IEXCloudConnector(APIConnector):
         """
         endpoint = f"stock/{symbol}/stats"
         params = self._add_token_param()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -513,7 +480,6 @@ class IEXCloudConnector(APIConnector):
         """
         endpoint = f"stock/{symbol}/largest-trades"
         params = self._add_token_param()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -532,7 +498,6 @@ class IEXCloudConnector(APIConnector):
         """
         endpoint = "market/volume"
         params = self._add_token_param()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -559,9 +524,7 @@ class IEXCloudConnector(APIConnector):
             Response containing the market list.
         """
         endpoint = f"stock/market/list/{list_type}"
-
         params = self._add_token_param({"listLimit": list_size})
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -580,7 +543,6 @@ class IEXCloudConnector(APIConnector):
         """
         endpoint = "stock/market/sector-performance"
         params = self._add_token_param()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -604,7 +566,6 @@ class IEXCloudConnector(APIConnector):
         """
         endpoint = f"crypto/{symbol}/quote"
         params = self._add_token_param()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -627,12 +588,9 @@ class IEXCloudConnector(APIConnector):
             Response containing the forex exchange rates.
         """
         endpoint = "fx/latest"
-
         params = self._add_token_param()
-
         if symbols:
             params["symbols"] = ",".join(symbols)
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -662,9 +620,7 @@ class IEXCloudConnector(APIConnector):
             endpoint = f"stock/{symbol}/options/{expiration_date}"
         else:
             endpoint = f"stock/{symbol}/options"
-
         params = self._add_token_param()
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -687,9 +643,7 @@ class IEXCloudConnector(APIConnector):
             Response containing the batch quotes.
         """
         endpoint = "stock/market/batch"
-
         params = self._add_token_param({"symbols": ",".join(symbols), "types": "quote"})
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -724,17 +678,13 @@ class IEXCloudConnector(APIConnector):
             Response containing the batch data.
         """
         endpoint = "stock/market/batch"
-
         params = self._add_token_param(
             {"symbols": ",".join(symbols), "types": ",".join(types)}
         )
-
         if range:
             params["range"] = range
-
         if last:
             params["last"] = last
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -758,7 +708,6 @@ class IEXCloudConnector(APIConnector):
         """
         endpoint = f"search/{fragment}"
         params = self._add_token_param()
-
         return self.request(
             endpoint=endpoint,
             params=params,

@@ -3,7 +3,6 @@ from enum import Enum
 import logging
 from typing import Any, Dict, List, Optional
 
-# Configure logging
 logger = logging.getLogger("AlphaMind.Exceptions")
 logger.setLevel(logging.INFO)
 
@@ -11,25 +10,22 @@ logger.setLevel(logging.INFO)
 class ErrorSeverity(Enum):
     """Severity levels for errors, mapped to standard logging levels."""
 
-    INFO = "info"  # Minor issue, purely informational
-    WARNING = "warning"  # Non-fatal issue, execution can continue
-    ERROR = "error"  # Failure of a module/operation, usually recoverable
-    CRITICAL = "critical"  # System-wide failure, halts the trading process
+    INFO = "info"
+    WARNING = "warning"
+    ERROR = "error"
+    CRITICAL = "critical"
 
 
 class ErrorCategory(Enum):
     """Categories of errors, used to classify the origin of the failure."""
 
-    VALIDATION = "validation"  # Input or data structure is incorrect
-    CONFIGURATION = "configuration"  # Missing or invalid settings
-    CONNECTION = "connection"  # External API/DB connection failure
-    EXECUTION = "execution"  # Runtime logic or processing failure
-    DATA = "data"  # Data quality or format issue
-    SYSTEM = "system"  # OS, resource, or unhandled language exception
-    UNKNOWN = "unknown"  # Catch-all for wrapped exceptions
-
-
-# --- 2. Base Exception ---
+    VALIDATION = "validation"
+    CONFIGURATION = "configuration"
+    CONNECTION = "connection"
+    EXECUTION = "execution"
+    DATA = "data"
+    SYSTEM = "system"
+    UNKNOWN = "unknown"
 
 
 class AlphaMindException(Exception):
@@ -45,7 +41,7 @@ class AlphaMindException(Exception):
         category: ErrorCategory = ErrorCategory.UNKNOWN,
         severity: ErrorSeverity = ErrorSeverity.ERROR,
         details: Dict[str, Any] = None,
-    ):
+    ) -> Any:
         """
         Initialize AlphaMindException.
 
@@ -62,24 +58,19 @@ class AlphaMindException(Exception):
         self.severity = severity
         self.details = details or {}
         self.timestamp = datetime.datetime.now()
-
-        # Log the error based on severity using the logger instance
         log_message = f"[{self.category.value.upper()}] {self.error_code}: {message}"
-
         if severity == ErrorSeverity.CRITICAL:
             logger.critical(log_message, extra={"details": self.details})
         elif severity == ErrorSeverity.ERROR:
             logger.error(log_message, extra={"details": self.details})
         elif severity == ErrorSeverity.WARNING:
             logger.warning(log_message, extra={"details": self.details})
-        else:  # ErrorSeverity.INFO
+        else:
             logger.info(log_message, extra={"details": self.details})
-
         super().__init__(message)
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert exception to dictionary representation for logging/API responses."""
-
         return {
             "error_code": self.error_code,
             "message": self.message,
@@ -88,9 +79,6 @@ class AlphaMindException(Exception):
             "timestamp": self.timestamp.isoformat(),
             "details": self.details,
         }
-
-
-# --- 3. Exception Hierarchy ---
 
 
 class ValidationException(AlphaMindException):
@@ -102,17 +90,16 @@ class ValidationException(AlphaMindException):
         error_code: str = "VALIDATION_ERROR",
         details: Dict[str, Any] = None,
         field: Optional[str] = None,
-    ):
+    ) -> Any:
         """Initialize ValidationException."""
         details = details or {}
         if field:
             details["field"] = field
-
         super().__init__(
             message=message,
             error_code=error_code,
             category=ErrorCategory.VALIDATION,
-            severity=ErrorSeverity.WARNING,  # Typically warning, as logic flow can correct/skip
+            severity=ErrorSeverity.WARNING,
             details=details,
         )
 
@@ -126,17 +113,16 @@ class ConfigurationException(AlphaMindException):
         error_code: str = "CONFIG_ERROR",
         details: Dict[str, Any] = None,
         config_key: Optional[str] = None,
-    ):
+    ) -> Any:
         """Initialize ConfigurationException."""
         details = details or {}
         if config_key:
             details["config_key"] = config_key
-
         super().__init__(
             message=message,
             error_code=error_code,
             category=ErrorCategory.CONFIGURATION,
-            severity=ErrorSeverity.ERROR,  # Often requires human intervention to fix config
+            severity=ErrorSeverity.ERROR,
             details=details,
         )
 
@@ -150,12 +136,11 @@ class ConnectionException(AlphaMindException):
         error_code: str = "CONNECTION_ERROR",
         details: Dict[str, Any] = None,
         service: Optional[str] = None,
-    ):
+    ) -> Any:
         """Initialize ConnectionException."""
         details = details or {}
         if service:
             details["service"] = service
-
         super().__init__(
             message=message,
             error_code=error_code,
@@ -174,12 +159,11 @@ class ExecutionException(AlphaMindException):
         error_code: str = "EXECUTION_ERROR",
         details: Dict[str, Any] = None,
         operation: Optional[str] = None,
-    ):
+    ) -> Any:
         """Initialize ExecutionException."""
         details = details or {}
         if operation:
             details["operation"] = operation
-
         super().__init__(
             message=message,
             error_code=error_code,
@@ -198,12 +182,11 @@ class DataException(AlphaMindException):
         error_code: str = "DATA_ERROR",
         details: Dict[str, Any] = None,
         data_source: Optional[str] = None,
-    ):
+    ) -> Any:
         """Initialize DataException."""
         details = details or {}
         if data_source:
             details["data_source"] = data_source
-
         super().__init__(
             message=message,
             error_code=error_code,
@@ -221,18 +204,15 @@ class SystemException(AlphaMindException):
         message: str,
         error_code: str = "SYSTEM_ERROR",
         details: Dict[str, Any] = None,
-    ):
+    ) -> Any:
         """Initialize SystemException."""
         super().__init__(
             message=message,
             error_code=error_code,
             category=ErrorCategory.SYSTEM,
-            severity=ErrorSeverity.CRITICAL,  # System errors are usually unrecoverable without restart/fix
+            severity=ErrorSeverity.CRITICAL,
             details=details,
         )
-
-
-# --- 4. Utilities ---
 
 
 def handle_exception(
@@ -250,29 +230,24 @@ def handle_exception(
         log_traceback: Whether to log the full Python traceback
     """
     if log_traceback:
-        # Log the full traceback for unhandled or unexpected errors
         logger.error(
             f"Unwrapped exception caught: {exc.__class__.__name__}", exc_info=True
         )
-
     if isinstance(exc, AlphaMindException):
-        # Already logged within the exception's __init__
         return exc.to_dict()
     else:
-        # Wrap unknown exceptions in SystemException for standardized reporting
         system_exc = SystemException(
             message=str(exc) or default_message,
             error_code="UNHANDLED_EXCEPTION",
             details={"exception_type": exc.__class__.__name__},
         )
-        # Note: We return the dictionary here to prevent double-logging (it's logged in SystemException.__init__)
         return system_exc.to_dict()
 
 
 class ErrorCollector:
     """Collects and aggregates errors, useful for batch processing or validation steps."""
 
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize error collector."""
         self.errors: List[Dict[str, Any]] = []
 
@@ -291,7 +266,7 @@ class ErrorCollector:
 
     def has_critical_errors(self) -> bool:
         """Check if the collector has any critical errors."""
-        return any(e["severity"] == ErrorSeverity.CRITICAL.value for e in self.errors)
+        return any((e["severity"] == ErrorSeverity.CRITICAL.value for e in self.errors))
 
     def get_errors(self) -> List[Dict[str, Any]]:
         """Get all collected errors."""

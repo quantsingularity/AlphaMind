@@ -10,22 +10,18 @@ import json
 import logging
 import os
 from typing import Any, Callable, Dict, List, Optional, Union
-
 import yaml
 
 
-# Assuming this custom exception exists in a .exceptions file (as per the import line)
-# For this implementation, we define a simple placeholder.
 class ConfigurationException(Exception):
     """Custom exception raised for configuration errors."""
 
-    def __init__(self, message: str, error_code: str, details: Dict[str, Any]):
+    def __init__(self, message: str, error_code: str, details: Dict[str, Any]) -> Any:
         super().__init__(message)
         self.error_code = error_code
         self.details = details
 
 
-# Configure logging
 logger = logging.getLogger("AlphaMind.Config")
 logger.setLevel(logging.INFO)
 
@@ -38,7 +34,6 @@ class ConfigItem:
     default_value: Any
     description: str = ""
     required: bool = False
-    # Callable is a function that takes the value and returns a boolean
     validator: Optional[Callable[[Any], bool]] = None
     validator_message: str = "Invalid configuration value"
 
@@ -52,16 +47,10 @@ class ConfigItem:
         Returns:
             True if the value is valid, False otherwise
         """
-        # 1. Check for required missing value
         if value is None and self.required:
             return False
-
-        # 2. Check against custom validator only if value is present
         if self.validator and value is not None:
-            # First, check if the value is of the expected type before running the validator
-            # We don't explicitly check type here, relying on the validator logic itself.
             return self.validator(value)
-
         return True
 
 
@@ -70,11 +59,10 @@ class ConfigManager:
     Manages configuration settings, supporting schema registration, multiple load sources, and validation.
     """
 
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize configuration manager."""
         self.config: Dict[str, Any] = {}
         self.schema: Dict[str, ConfigItem] = {}
-        # Tracks where configuration values were loaded from (for debugging)
         self.config_sources: List[str] = []
 
     def register_config_item(self, item: ConfigItem) -> None:
@@ -86,10 +74,7 @@ class ConfigManager:
         """
         if item.key in self.schema:
             logger.warning(f"Configuration item '{item.key}' redefined.")
-
         self.schema[item.key] = item
-
-        # Set default value only if the key has not been loaded from a source yet
         if item.key not in self.config:
             self.config[item.key] = item.default_value
 
@@ -128,7 +113,6 @@ class ConfigManager:
         try:
             with open(file_path, "r") as f:
                 config_dict = json.load(f)
-
             self.load_from_dict(config_dict, source=file_path)
         except Exception as e:
             raise ConfigurationException(
@@ -149,12 +133,9 @@ class ConfigManager:
         """
         try:
             with open(file_path, "r") as f:
-                # Use safe_load for security when loading YAML
                 config_dict = yaml.safe_load(f)
-
             if config_dict is None:
-                config_dict = {}  # Handle empty YAML files gracefully
-
+                config_dict = {}
             self.load_from_dict(config_dict, source=file_path)
         except Exception as e:
             raise ConfigurationException(
@@ -173,12 +154,10 @@ class ConfigManager:
             prefix: Prefix for environment variables
         """
         config_dict = {}
-
         for key, value in os.environ.items():
             if key.startswith(prefix):
                 config_key = key[len(prefix) :].lower()
                 config_dict[config_key] = value
-
         self.load_from_dict(config_dict, source="environment")
 
     def validate(self) -> List[str]:
@@ -189,10 +168,8 @@ class ConfigManager:
             List of validation error messages. Returns empty list if validation passes.
         """
         errors = []
-
         for key, item in self.schema.items():
             value = self.config.get(key)
-
             if not item.validate(value):
                 if item.required and value is None:
                     errors.append(f"Required configuration '{key}' is missing")
@@ -200,12 +177,10 @@ class ConfigManager:
                     errors.append(
                         f"Configuration '{key}': {item.validator_message} (Value: {value})"
                     )
-
         if errors:
             logger.error(f"Configuration validation failed with {len(errors)} errors.")
         else:
             logger.info("Configuration validated successfully against schema.")
-
         return errors
 
     def validate_or_raise(self) -> None:
@@ -216,7 +191,6 @@ class ConfigManager:
             ConfigurationException: If the configuration is invalid
         """
         errors = self.validate()
-
         if errors:
             raise ConfigurationException(
                 message="Configuration validation failed",
@@ -248,7 +222,6 @@ class ConfigManager:
         Raises:
             ConfigurationException: If the value is invalid according to the schema
         """
-        # Validate if schema exists for this key
         if key in self.schema:
             item = self.schema[key]
             if not item.validate(value):
@@ -261,7 +234,6 @@ class ConfigManager:
                         "message": item.validator_message,
                     },
                 )
-
         self.config[key] = value
 
     def get_all(self) -> Dict[str, Any]:
@@ -283,11 +255,7 @@ class ConfigManager:
         return self.config_sources.copy()
 
 
-# Create a global instance for convenient access across the system
 config_manager = ConfigManager()
-
-
-# --- Common Validators ---
 
 
 def is_positive(value: Union[int, float]) -> bool:
@@ -338,4 +306,4 @@ def is_url(value: str) -> bool:
 
 def is_email(value: str) -> bool:
     """Check if a value is an email address (simple check)."""
-    return isinstance(value, str) and "@" in value and "." in value.split("@")[-1]
+    return isinstance(value, str) and "@" in value and ("." in value.split("@")[-1])

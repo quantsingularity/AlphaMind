@@ -8,8 +8,6 @@ from the Federal Reserve Economic Data (FRED) API.
 from datetime import date, datetime
 import logging
 from typing import Any, Dict, List, Optional, Union
-
-
 from .base import (
     APIConnector,
     APICredentials,
@@ -34,21 +32,13 @@ class FREDConnector(APIConnector):
         FRED API key.
     """
 
-    def __init__(self, api_key: str):
-        # Create credentials
+    def __init__(self, api_key: str) -> Any:
         credentials = APICredentials(api_key=api_key)
-
-        # Set base URL
         base_url = "https://api.stlouisfed.org/fred"
-
-        # Create rate limiter
-        # FRED API has a limit of 120 requests per minute
         rate_limiter = RateLimiter(requests_per_minute=120)
-
         super().__init__(
             credentials=credentials, base_url=base_url, rate_limiter=rate_limiter
         )
-
         self.logger = logging.getLogger(self.__class__.__name__)
 
     @property
@@ -72,10 +62,7 @@ class FREDConnector(APIConnector):
         success : bool
             Whether authentication was successful.
         """
-        # FRED uses API key for authentication
-        # Test authentication by making a simple request
         response = self.get_series("GDP")
-
         return response.is_success()
 
     def _add_api_key(self, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
@@ -136,37 +123,27 @@ class FREDConnector(APIConnector):
             Response containing the series data.
         """
         endpoint = "series/observations"
-
         params = self._add_api_key({"series_id": series_id})
-
-        # Convert dates to strings if needed
         if observation_start:
             if isinstance(observation_start, (date, datetime)):
                 observation_start = observation_start.strftime("%Y-%m-%d")
             params["observation_start"] = observation_start
-
         if observation_end:
             if isinstance(observation_end, (date, datetime)):
                 observation_end = observation_end.strftime("%Y-%m-%d")
             params["observation_end"] = observation_end
-
         if units:
             params["units"] = units
-
         if frequency:
             params["frequency"] = frequency
-
         if aggregation_method:
             params["aggregation_method"] = aggregation_method
-
         if output_type:
             params["output_type"] = output_type
-
         if vintage_dates:
             if isinstance(vintage_dates, list):
                 vintage_dates = ",".join(vintage_dates)
             params["vintage_dates"] = vintage_dates
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -189,9 +166,7 @@ class FREDConnector(APIConnector):
             Response containing the series information.
         """
         endpoint = "series"
-
         params = self._add_api_key({"series_id": series_id})
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -244,36 +219,27 @@ class FREDConnector(APIConnector):
             Response containing the search results.
         """
         endpoint = "series/search"
-
         params = self._add_api_key(
             {"search_text": search_text, "limit": limit, "offset": offset}
         )
-
         if search_type:
             params["search_type"] = search_type
-
         if order_by:
             params["order_by"] = order_by
-
         if sort_order:
             params["sort_order"] = sort_order
-
         if filter_variable:
             params["filter_variable"] = filter_variable
-
         if filter_value:
             params["filter_value"] = filter_value
-
         if tag_names:
             if isinstance(tag_names, list):
                 tag_names = ";".join(tag_names)
             params["tag_names"] = tag_names
-
         if exclude_tag_names:
             if isinstance(exclude_tag_names, list):
                 exclude_tag_names = ";".join(exclude_tag_names)
             params["exclude_tag_names"] = exclude_tag_names
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -296,9 +262,7 @@ class FREDConnector(APIConnector):
             Response containing the series categories.
         """
         endpoint = "series/categories"
-
         params = self._add_api_key({"series_id": series_id})
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -321,9 +285,7 @@ class FREDConnector(APIConnector):
             Response containing the series release.
         """
         endpoint = "series/release"
-
         params = self._add_api_key({"series_id": series_id})
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -346,9 +308,7 @@ class FREDConnector(APIConnector):
             Response containing the series tags.
         """
         endpoint = "series/tags"
-
         params = self._add_api_key({"series_id": series_id})
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -386,23 +346,17 @@ class FREDConnector(APIConnector):
             Response containing the series updates.
         """
         endpoint = "series/updates"
-
         params = self._add_api_key({"limit": limit, "offset": offset})
-
         if filter_value:
             params["filter_value"] = filter_value
-
-        # Convert times to strings if needed
         if start_time:
             if isinstance(start_time, datetime):
                 start_time = start_time.strftime("%Y-%m-%d %H:%M:%S")
             params["start_time"] = start_time
-
         if end_time:
             if isinstance(end_time, datetime):
                 end_time = end_time.strftime("%Y-%m-%d %H:%M:%S")
             params["end_time"] = end_time
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -437,14 +391,11 @@ class FREDConnector(APIConnector):
             Response containing the vintage dates.
         """
         endpoint = "series/vintagedates"
-
         params = self._add_api_key(
             {"series_id": series_id, "limit": limit, "offset": offset}
         )
-
         if sort_order:
             params["sort_order"] = sort_order
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -467,9 +418,7 @@ class FREDConnector(APIConnector):
             Response containing the category.
         """
         endpoint = "category"
-
         params = self._add_api_key({"category_id": category_id})
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -492,9 +441,7 @@ class FREDConnector(APIConnector):
             Response containing the category children.
         """
         endpoint = "category/children"
-
         params = self._add_api_key({"category_id": category_id})
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -517,9 +464,7 @@ class FREDConnector(APIConnector):
             Response containing the related categories.
         """
         endpoint = "category/related"
-
         params = self._add_api_key({"category_id": category_id})
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -569,33 +514,25 @@ class FREDConnector(APIConnector):
             Response containing the category series.
         """
         endpoint = "category/series"
-
         params = self._add_api_key(
             {"category_id": category_id, "limit": limit, "offset": offset}
         )
-
         if order_by:
             params["order_by"] = order_by
-
         if sort_order:
             params["sort_order"] = sort_order
-
         if filter_variable:
             params["filter_variable"] = filter_variable
-
         if filter_value:
             params["filter_value"] = filter_value
-
         if tag_names:
             if isinstance(tag_names, list):
                 tag_names = ";".join(tag_names)
             params["tag_names"] = tag_names
-
         if exclude_tag_names:
             if isinstance(exclude_tag_names, list):
                 exclude_tag_names = ";".join(exclude_tag_names)
             params["exclude_tag_names"] = exclude_tag_names
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -642,28 +579,21 @@ class FREDConnector(APIConnector):
             Response containing the category tags.
         """
         endpoint = "category/tags"
-
         params = self._add_api_key(
             {"category_id": category_id, "limit": limit, "offset": offset}
         )
-
         if order_by:
             params["order_by"] = order_by
-
         if sort_order:
             params["sort_order"] = sort_order
-
         if tag_names:
             if isinstance(tag_names, list):
                 tag_names = ";".join(tag_names)
             params["tag_names"] = tag_names
-
         if tag_group_id:
             params["tag_group_id"] = tag_group_id
-
         if search_text:
             params["search_text"] = search_text
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -698,15 +628,11 @@ class FREDConnector(APIConnector):
             Response containing the releases.
         """
         endpoint = "releases"
-
         params = self._add_api_key({"limit": limit, "offset": offset})
-
         if order_by:
             params["order_by"] = order_by
-
         if sort_order:
             params["sort_order"] = sort_order
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -729,9 +655,7 @@ class FREDConnector(APIConnector):
             Response containing the release.
         """
         endpoint = "release"
-
         params = self._add_api_key({"release_id": release_id})
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -769,7 +693,6 @@ class FREDConnector(APIConnector):
             Response containing the release dates.
         """
         endpoint = "release/dates"
-
         params = self._add_api_key(
             {
                 "release_id": release_id,
@@ -780,10 +703,8 @@ class FREDConnector(APIConnector):
                 ).lower(),
             }
         )
-
         if sort_order:
             params["sort_order"] = sort_order
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -833,33 +754,25 @@ class FREDConnector(APIConnector):
             Response containing the release series.
         """
         endpoint = "release/series"
-
         params = self._add_api_key(
             {"release_id": release_id, "limit": limit, "offset": offset}
         )
-
         if order_by:
             params["order_by"] = order_by
-
         if sort_order:
             params["sort_order"] = sort_order
-
         if filter_variable:
             params["filter_variable"] = filter_variable
-
         if filter_value:
             params["filter_value"] = filter_value
-
         if tag_names:
             if isinstance(tag_names, list):
                 tag_names = ";".join(tag_names)
             params["tag_names"] = tag_names
-
         if exclude_tag_names:
             if isinstance(exclude_tag_names, list):
                 exclude_tag_names = ";".join(exclude_tag_names)
             params["exclude_tag_names"] = exclude_tag_names
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -882,9 +795,7 @@ class FREDConnector(APIConnector):
             Response containing the release sources.
         """
         endpoint = "release/sources"
-
         params = self._add_api_key({"release_id": release_id})
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -931,28 +842,21 @@ class FREDConnector(APIConnector):
             Response containing the release tags.
         """
         endpoint = "release/tags"
-
         params = self._add_api_key(
             {"release_id": release_id, "limit": limit, "offset": offset}
         )
-
         if order_by:
             params["order_by"] = order_by
-
         if sort_order:
             params["sort_order"] = sort_order
-
         if tag_names:
             if isinstance(tag_names, list):
                 tag_names = ";".join(tag_names)
             params["tag_names"] = tag_names
-
         if tag_group_id:
             params["tag_group_id"] = tag_group_id
-
         if search_text:
             params["search_text"] = search_text
-
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -1002,10 +906,8 @@ class FREDConnector(APIConnector):
             Response containing the related tags.
         """
         endpoint = "release/related_tags"
-
         if isinstance(tag_names, list):
             tag_names = ";".join(tag_names)
-
         params = self._add_api_key(
             {
                 "release_id": release_id,
@@ -1014,24 +916,18 @@ class FREDConnector(APIConnector):
                 "offset": offset,
             }
         )
-
         if order_by:
             params["order_by"] = order_by
-
         if sort_order:
             params["sort_order"] = sort_order
-
         if tag_group_id:
             params["tag_group_id"] = tag_group_id
-
         if search_text:
             params["search_text"] = search_text
-
         if exclude_tag_names:
             if isinstance(exclude_tag_names, list):
                 exclude_tag_names = ";".join(exclude_tag_names)
             params["exclude_tag_names"] = exclude_tag_names
-
         return self.request(
             endpoint=endpoint,
             params=params,

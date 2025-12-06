@@ -8,7 +8,6 @@
 from datetime import datetime, timedelta
 import logging
 from typing import Any, Dict, Optional
-
 import dash
 from dash import Input, Output, dcc, html
 import dash_bootstrap_components as dbc
@@ -18,7 +17,6 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
@@ -28,17 +26,14 @@ logger = logging.getLogger(__name__)
 class DashboardMetrics:
     """Class for calculating and storing dashboard metrics."""
 
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize dashboard metrics."""
-        # Portfolio metrics
         self.portfolio_value_history = []
         self.cash_history = []
         self.equity_history = []
         self.positions = {}
         self.realized_pnl = 0.0
         self.unrealized_pnl = 0.0
-
-        # Performance metrics
         self.daily_returns = []
         self.cumulative_returns = []
         self.drawdowns = []
@@ -46,23 +41,15 @@ class DashboardMetrics:
         self.sortino_ratio = 0.0
         self.max_drawdown = 0.0
         self.win_rate = 0.0
-
-        # Risk metrics
         self.var_95 = 0.0
         self.var_99 = 0.0
         self.expected_shortfall = 0.0
         self.beta = 0.0
         self.volatility = 0.0
-
-        # Trading metrics
         self.trades_history = []
         self.orders_history = []
         self.active_orders = []
-
-        # Market data
         self.market_data = {}
-
-        # System metrics
         self.system_health = {
             "cpu_usage": [],
             "memory_usage": [],
@@ -76,7 +63,7 @@ class DashboardMetrics:
         portfolio_value: float,
         cash: float,
         positions: Dict[str, Dict[str, Any]],
-    ):
+    ) -> Any:
         """
         Update portfolio metrics.
 
@@ -89,24 +76,17 @@ class DashboardMetrics:
         self.portfolio_value_history.append(
             {"timestamp": timestamp, "value": portfolio_value}
         )
-
         self.cash_history.append({"timestamp": timestamp, "value": cash})
-
         self.equity_history.append(
             {"timestamp": timestamp, "value": portfolio_value - cash}
         )
-
         self.positions = positions
-
-        # Calculate unrealized PnL
         self.unrealized_pnl = sum(
-            pos.get("unrealized_pnl", 0.0) for pos in positions.values()
+            (pos.get("unrealized_pnl", 0.0) for pos in positions.values())
         )
-
-        # Calculate performance metrics
         self._calculate_performance_metrics()
 
-    def update_trade(self, trade: Dict[str, Any]):
+    def update_trade(self, trade: Dict[str, Any]) -> Any:
         """
         Update trade metrics.
 
@@ -114,19 +94,15 @@ class DashboardMetrics:
             trade: Trade information
         """
         self.trades_history.append(trade)
-
-        # Update realized PnL
         if "realized_pnl" in trade:
             self.realized_pnl += trade["realized_pnl"]
-
-        # Update win rate
         winning_trades = sum(
-            1 for t in self.trades_history if t.get("realized_pnl", 0) > 0
+            (1 for t in self.trades_history if t.get("realized_pnl", 0) > 0)
         )
         total_trades = len(self.trades_history)
         self.win_rate = winning_trades / total_trades if total_trades > 0 else 0.0
 
-    def update_order(self, order: Dict[str, Any]):
+    def update_order(self, order: Dict[str, Any]) -> Any:
         """
         Update order metrics.
 
@@ -134,15 +110,13 @@ class DashboardMetrics:
             order: Order information
         """
         self.orders_history.append(order)
-
-        # Update active orders
         self.active_orders = [
             o
             for o in self.orders_history
             if o.get("status") in ["pending", "open", "partially_filled"]
         ]
 
-    def update_market_data(self, symbol: str, data: Dict[str, Any]):
+    def update_market_data(self, symbol: str, data: Dict[str, Any]) -> Any:
         """
         Update market data.
 
@@ -152,16 +126,13 @@ class DashboardMetrics:
         """
         if symbol not in self.market_data:
             self.market_data[symbol] = []
-
         self.market_data[symbol].append(data)
-
-        # Keep only recent data (last 1000 points)
         if len(self.market_data[symbol]) > 1000:
             self.market_data[symbol] = self.market_data[symbol][-1000:]
 
     def update_system_health(
         self, cpu_usage: float, memory_usage: float, latency: float, errors: int
-    ):
+    ) -> Any:
         """
         Update system health metrics.
 
@@ -172,92 +143,58 @@ class DashboardMetrics:
             errors: Number of errors
         """
         timestamp = datetime.now()
-
         self.system_health["cpu_usage"].append(
             {"timestamp": timestamp, "value": cpu_usage}
         )
-
         self.system_health["memory_usage"].append(
             {"timestamp": timestamp, "value": memory_usage}
         )
-
         self.system_health["latency"].append({"timestamp": timestamp, "value": latency})
-
         self.system_health["errors"].append({"timestamp": timestamp, "value": errors})
-
-        # Keep only recent data (last 1000 points)
         for key in self.system_health:
             if len(self.system_health[key]) > 1000:
                 self.system_health[key] = self.system_health[key][-1000:]
 
-    def _calculate_performance_metrics(self):
+    def _calculate_performance_metrics(self) -> Any:
         """Calculate performance metrics from portfolio history."""
         if len(self.portfolio_value_history) < 2:
             return
-
-        # Convert to DataFrame for easier calculations
         df = pd.DataFrame(self.portfolio_value_history)
         df["timestamp"] = pd.to_datetime(df["timestamp"])
         df.set_index("timestamp", inplace=True)
-
-        # Resample to daily frequency
         daily_values = df.resample("D").last()
-
-        # Calculate daily returns
         daily_returns = daily_values["value"].pct_change().dropna()
-
-        # Store daily returns
         self.daily_returns = [
             {"timestamp": timestamp, "value": value}
             for timestamp, value in zip(daily_returns.index, daily_returns.values)
         ]
-
-        # Calculate cumulative returns
         cumulative_returns = (1 + daily_returns).cumprod() - 1
-
-        # Store cumulative returns
         self.cumulative_returns = [
             {"timestamp": timestamp, "value": value}
             for timestamp, value in zip(
                 cumulative_returns.index, cumulative_returns.values
             )
         ]
-
-        # Calculate drawdowns
         rolling_max = daily_values["value"].cummax()
         drawdowns = (daily_values["value"] - rolling_max) / rolling_max
-
-        # Store drawdowns
         self.drawdowns = [
             {"timestamp": timestamp, "value": value}
             for timestamp, value in zip(drawdowns.index, drawdowns.values)
         ]
-
-        # Calculate max drawdown
         self.max_drawdown = drawdowns.min()
-
-        # Calculate Sharpe ratio (annualized)
         if len(daily_returns) > 0:
             mean_return = daily_returns.mean()
             std_return = daily_returns.std()
             if std_return > 0:
-                self.sharpe_ratio = (mean_return / std_return) * np.sqrt(252)
-
-            # Calculate Sortino ratio (annualized)
+                self.sharpe_ratio = mean_return / std_return * np.sqrt(252)
             negative_returns = daily_returns[daily_returns < 0]
             if len(negative_returns) > 0:
                 downside_std = negative_returns.std()
                 if downside_std > 0:
-                    self.sortino_ratio = (mean_return / downside_std) * np.sqrt(252)
-
-            # Calculate volatility (annualized)
+                    self.sortino_ratio = mean_return / downside_std * np.sqrt(252)
             self.volatility = std_return * np.sqrt(252)
-
-            # Calculate VaR (95% and 99%)
             self.var_95 = np.percentile(daily_returns, 5)
             self.var_99 = np.percentile(daily_returns, 1)
-
-            # Calculate Expected Shortfall (CVaR)
             self.expected_shortfall = negative_returns.mean()
 
     def get_summary(self) -> Dict[str, Any]:
@@ -272,9 +209,7 @@ class DashboardMetrics:
             if self.portfolio_value_history
             else 0.0
         )
-
         current_cash = self.cash_history[-1]["value"] if self.cash_history else 0.0
-
         return {
             "portfolio": {
                 "value": current_portfolio_value,
@@ -328,7 +263,7 @@ class DashboardMetrics:
                     else 0.0
                 ),
                 "errors": (
-                    sum(item["value"] for item in self.system_health["errors"][-100:])
+                    sum((item["value"] for item in self.system_health["errors"][-100:]))
                     if self.system_health["errors"]
                     else 0
                 ),
@@ -345,7 +280,7 @@ class DashboardServer:
         port: int = 8050,
         debug: bool = False,
         metrics: Optional[DashboardMetrics] = None,
-    ):
+    ) -> Any:
         """
         Initialize dashboard server.
 
@@ -361,51 +296,38 @@ class DashboardServer:
         self.metrics = metrics or DashboardMetrics()
         self.app = None
         self.server = None
-        self.update_interval = 1000  # 1 second
+        self.update_interval = 1000
 
-    def setup(self):
+    def setup(self) -> Any:
         """Set up dashboard application."""
-        # Create Flask server
         server = Flask(__name__)
-
-        # Create Dash app
         app = dash.Dash(
             __name__,
             server=server,
             external_stylesheets=[dbc.themes.DARKLY],
             suppress_callback_exceptions=True,
         )
-
-        # Set app title
         app.title = "AlphaMind Trading Dashboard"
-
-        # Define layout
         app.layout = self._create_layout()
-
-        # Register callbacks
         self._register_callbacks(app)
-
         self.app = app
         self.server = server
-
         logger.info("Dashboard server set up")
 
-    def run(self):
+    def run(self) -> Any:
         """Run dashboard server."""
         if not self.app:
             self.setup()
-
         logger.info(f"Starting dashboard server on {self.host}:{self.port}")
         self.app.run_server(host=self.host, port=self.port, debug=self.debug)
 
-    def _create_layout(self):
+    def _create_layout(self) -> Any:
         """
         Create dashboard layout.
 
         Returns:
             Dash layout
         """
-        # Create navbar
         navbar = dbc.Navbar(
             dbc.Container(
                 [
@@ -418,7 +340,7 @@ class DashboardServer:
                             dbc.Col(
                                 dbc.NavbarBrand(
                                     "AlphaMind Trading Dashboard", className="ms-2"
-                                ),
+                                )
                             ),
                         ],
                         align="center",
@@ -454,8 +376,8 @@ class DashboardServer:
                                     navbar=True,
                                 ),
                                 align="center",
-                            ),
-                        ],
+                            )
+                        ]
                     ),
                 ],
                 fluid=True,
@@ -464,8 +386,6 @@ class DashboardServer:
             dark=True,
             className="mb-4",
         )
-
-        # Create overview cards
         overview_cards = dbc.Row(
             [
                 dbc.Col(
@@ -527,8 +447,6 @@ class DashboardServer:
             ],
             className="mb-4",
         )
-
-        # Create portfolio section
         portfolio_section = html.Div(
             [
                 html.H2("Portfolio", id="portfolio", className="mb-3"),
@@ -564,8 +482,6 @@ class DashboardServer:
                 ),
             ]
         )
-
-        # Create performance section
         performance_section = html.Div(
             [
                 html.H2("Performance", id="performance", className="mb-3"),
@@ -617,8 +533,6 @@ class DashboardServer:
                 ),
             ]
         )
-
-        # Create market data section
         market_data_section = html.Div(
             [
                 html.H2("Market Data", id="market-data", className="mb-3"),
@@ -672,8 +586,6 @@ class DashboardServer:
                 ),
             ]
         )
-
-        # Create orders section
         orders_section = html.Div(
             [
                 html.H2("Orders", id="orders", className="mb-3"),
@@ -693,8 +605,6 @@ class DashboardServer:
                 ),
             ]
         )
-
-        # Create system section
         system_section = html.Div(
             [
                 html.H2("System", id="system", className="mb-3"),
@@ -746,8 +656,6 @@ class DashboardServer:
                 ),
             ]
         )
-
-        # Create main layout
         layout = html.Div(
             [
                 navbar,
@@ -770,10 +678,9 @@ class DashboardServer:
                 ),
             ]
         )
-
         return layout
 
-    def _register_callbacks(self, app):
+    def _register_callbacks(self, app: Any) -> Any:
         """
         Register dashboard callbacks.
 
@@ -781,7 +688,6 @@ class DashboardServer:
             app: Dash application
         """
 
-        # Overview cards callbacks
         @app.callback(
             [
                 Output("portfolio-value", "children"),
@@ -799,38 +705,25 @@ class DashboardServer:
         )
         def update_overview_cards(n):
             summary = self.metrics.get_summary()
-
-            # Portfolio value
             portfolio_value = summary["portfolio"]["value"]
             portfolio_value_str = f"${portfolio_value:,.2f}"
-
-            # Portfolio change
             daily_return = summary["performance"]["daily_return"]
             portfolio_change_str = f"{daily_return:.2%}"
             portfolio_change_class = (
                 "text-success" if daily_return >= 0 else "text-danger"
             )
-
-            # Daily P&L
             daily_pnl = portfolio_value * daily_return
             daily_pnl_str = f"${daily_pnl:,.2f}"
             daily_pnl_percent_str = f"{daily_return:.2%}"
             daily_pnl_class = "text-success" if daily_pnl >= 0 else "text-danger"
-
-            # Total P&L
             total_pnl = summary["portfolio"]["total_pnl"]
             total_pnl_str = f"${total_pnl:,.2f}"
-
-            # Total P&L percent
             initial_value = portfolio_value - total_pnl
             total_pnl_percent = total_pnl / initial_value if initial_value > 0 else 0
             total_pnl_percent_str = f"{total_pnl_percent:.2%}"
             total_pnl_class = "text-success" if total_pnl >= 0 else "text-danger"
-
-            # Sharpe ratio
             sharpe_ratio = summary["performance"]["sharpe_ratio"]
             sharpe_ratio_str = f"{sharpe_ratio:.2f}"
-
             return (
                 portfolio_value_str,
                 portfolio_change_str,
@@ -844,20 +737,15 @@ class DashboardServer:
                 sharpe_ratio_str,
             )
 
-        # Portfolio section callbacks
         @app.callback(
             Output("equity-curve", "figure"),
             [Input("interval-component", "n_intervals")],
         )
         def update_equity_curve(n):
-            # Create figure
             fig = go.Figure()
-
-            # Add portfolio value trace
             if self.metrics.portfolio_value_history:
                 df = pd.DataFrame(self.metrics.portfolio_value_history)
                 df["timestamp"] = pd.to_datetime(df["timestamp"])
-
                 fig.add_trace(
                     go.Scatter(
                         x=df["timestamp"],
@@ -867,12 +755,9 @@ class DashboardServer:
                         line=dict(color="#2FA4E7", width=2),
                     )
                 )
-
-            # Add cash trace
             if self.metrics.cash_history:
                 df = pd.DataFrame(self.metrics.cash_history)
                 df["timestamp"] = pd.to_datetime(df["timestamp"])
-
                 fig.add_trace(
                     go.Scatter(
                         x=df["timestamp"],
@@ -882,12 +767,9 @@ class DashboardServer:
                         line=dict(color="#73B9EE", width=2, dash="dash"),
                     )
                 )
-
-            # Add equity trace
             if self.metrics.equity_history:
                 df = pd.DataFrame(self.metrics.equity_history)
                 df["timestamp"] = pd.to_datetime(df["timestamp"])
-
                 fig.add_trace(
                     go.Scatter(
                         x=df["timestamp"],
@@ -897,8 +779,6 @@ class DashboardServer:
                         line=dict(color="#2780E3", width=2, dash="dot"),
                     )
                 )
-
-            # Update layout
             fig.update_layout(
                 title="Equity Curve",
                 xaxis_title="Time",
@@ -910,7 +790,6 @@ class DashboardServer:
                     orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1
                 ),
             )
-
             return fig
 
         @app.callback(
@@ -920,25 +799,17 @@ class DashboardServer:
         def update_asset_allocation(n):
             summary = self.metrics.get_summary()
             positions = summary["portfolio"]["positions"]
-
             labels = []
             values = []
-
             for symbol, pos_data in positions.items():
                 market_value = pos_data.get("market_value", 0.0)
                 if market_value > 0:
                     labels.append(symbol)
                     values.append(market_value)
-
-            # Add cash
             cash = summary["portfolio"]["cash"]
-            if (
-                cash > 0 or not values
-            ):  # Include cash if present or if there are no other positions
+            if cash > 0 or not values:
                 labels.append("Cash")
                 values.append(cash)
-
-            # Create pie chart
             fig = go.Figure(
                 data=[
                     go.Pie(
@@ -949,15 +820,12 @@ class DashboardServer:
                     )
                 ]
             )
-
-            # Update layout
             fig.update_layout(
                 title="Asset Allocation",
                 margin=dict(l=20, r=20, t=40, b=20),
                 template="plotly_dark",
                 showlegend=True,
             )
-
             return fig
 
         @app.callback(
@@ -967,16 +835,12 @@ class DashboardServer:
         def update_positions_table(n):
             summary = self.metrics.get_summary()
             positions = summary["portfolio"]["positions"]
-
             if not positions:
                 return html.P("No active positions.")
-
-            # Prepare table data
             data = []
             for symbol, pos_data in positions.items():
                 unrealized_pnl = pos_data.get("unrealized_pnl", 0.0)
                 pnl_class = "text-success" if unrealized_pnl >= 0 else "text-danger"
-
                 data.append(
                     (
                         symbol,
@@ -991,8 +855,6 @@ class DashboardServer:
                         ),
                     )
                 )
-
-            # Create table
             table_header = [
                 html.Thead(
                     html.Tr(
@@ -1008,11 +870,9 @@ class DashboardServer:
                     )
                 )
             ]
-
             table_body = [
                 html.Tbody([html.Tr([html.Td(col) for col in row]) for row in data])
             ]
-
             return dbc.Table(
                 table_header + table_body,
                 striped=True,
@@ -1022,13 +882,11 @@ class DashboardServer:
                 responsive=True,
             )
 
-        # Performance section callbacks
         @app.callback(
             Output("returns-chart", "figure"),
             [Input("interval-component", "n_intervals")],
         )
         def update_returns_chart(n):
-            # Create figure with two subplots
             fig = make_subplots(
                 rows=2,
                 cols=1,
@@ -1036,16 +894,13 @@ class DashboardServer:
                 vertical_spacing=0.1,
                 subplot_titles=("Cumulative Returns", "Daily Returns"),
             )
-
-            # Add cumulative returns trace
             if self.metrics.cumulative_returns:
                 df = pd.DataFrame(self.metrics.cumulative_returns)
                 df["timestamp"] = pd.to_datetime(df["timestamp"])
-
                 fig.add_trace(
                     go.Scatter(
                         x=df["timestamp"],
-                        y=df["value"] * 100,  # Show as percentage
+                        y=df["value"] * 100,
                         mode="lines",
                         name="Cumulative Returns (%)",
                         line=dict(color="#17A2B8", width=2),
@@ -1053,16 +908,13 @@ class DashboardServer:
                     row=1,
                     col=1,
                 )
-
-            # Add daily returns trace
             if self.metrics.daily_returns:
                 df = pd.DataFrame(self.metrics.daily_returns)
                 df["timestamp"] = pd.to_datetime(df["timestamp"])
-
                 fig.add_trace(
                     go.Bar(
                         x=df["timestamp"],
-                        y=df["value"] * 100,  # Show as percentage
+                        y=df["value"] * 100,
                         name="Daily Returns (%)",
                         marker_color=[
                             "#28A745" if val >= 0 else "#DC3545" for val in df["value"]
@@ -1071,8 +923,6 @@ class DashboardServer:
                     row=2,
                     col=1,
                 )
-
-            # Update layout
             fig.update_layout(
                 title="Trading Strategy Returns",
                 margin=dict(l=20, r=20, t=60, b=20),
@@ -1081,7 +931,6 @@ class DashboardServer:
             )
             fig.update_yaxes(title_text="Returns (%)", row=1, col=1)
             fig.update_yaxes(title_text="Returns (%)", row=2, col=1)
-
             return fig
 
         @app.callback(
@@ -1089,18 +938,14 @@ class DashboardServer:
             [Input("interval-component", "n_intervals")],
         )
         def update_drawdowns_chart(n):
-            # Create figure
             fig = go.Figure()
-
-            # Add drawdowns trace
             if self.metrics.drawdowns:
                 df = pd.DataFrame(self.metrics.drawdowns)
                 df["timestamp"] = pd.to_datetime(df["timestamp"])
-
                 fig.add_trace(
                     go.Scatter(
                         x=df["timestamp"],
-                        y=df["value"] * 100,  # Show as percentage
+                        y=df["value"] * 100,
                         mode="lines",
                         name="Drawdown (%)",
                         line=dict(color="#DC3545", width=2, shape="hvh"),
@@ -1108,8 +953,6 @@ class DashboardServer:
                         fillcolor="rgba(220, 53, 69, 0.3)",
                     )
                 )
-
-            # Update layout
             fig.update_layout(
                 title=f"Drawdowns (Max: {self.metrics.max_drawdown:.2%})",
                 xaxis_title="Time",
@@ -1119,7 +962,6 @@ class DashboardServer:
                 hovermode="x unified",
             )
             fig.update_yaxes(tickformat=".2f")
-
             return fig
 
         @app.callback(
@@ -1129,7 +971,6 @@ class DashboardServer:
         def update_performance_metrics(n):
             summary = self.metrics.get_summary()
             perf_metrics = summary["performance"]
-
             return dbc.Table(
                 [
                     html.Tbody(
@@ -1203,7 +1044,6 @@ class DashboardServer:
         def update_risk_metrics(n):
             summary = self.metrics.get_summary()
             risk_metrics = summary["risk"]
-
             return dbc.Table(
                 [
                     html.Tbody(
@@ -1249,8 +1089,6 @@ class DashboardServer:
                 dark=True,
             )
 
-        # Market data callbacks
-
         @app.callback(
             Output("market-symbol-dropdown", "options"),
             [Input("interval-component", "n_intervals")],
@@ -1272,19 +1110,18 @@ class DashboardServer:
             ],
         )
         def update_market_data_charts(n, selected_symbol):
-            # Default empty figures/content
             price_fig = go.Figure()
             order_book_fig = go.Figure()
             market_overview_content = html.P("Select a symbol to view market data.")
-
             if selected_symbol and selected_symbol in self.metrics.market_data:
                 data_list = self.metrics.market_data[selected_symbol]
                 df = pd.DataFrame(data_list)
-
-                if "timestamp" in df.columns and "price" in df.columns and len(df) > 0:
+                if (
+                    "timestamp" in df.columns
+                    and "price" in df.columns
+                    and (len(df) > 0)
+                ):
                     df["timestamp"] = pd.to_datetime(df["timestamp"])
-
-                    # --- Price Chart ---
                     price_fig = go.Figure(
                         data=[
                             go.Scatter(
@@ -1304,8 +1141,6 @@ class DashboardServer:
                         template="plotly_dark",
                         hovermode="x unified",
                     )
-
-                    # --- Market Overview ---
                     latest_data = df.iloc[-1]
                     market_overview_content = dbc.Table(
                         [
@@ -1359,12 +1194,10 @@ class DashboardServer:
                         hover=True,
                         dark=True,
                     )
-
-                    # --- Order Book (Placeholder/Example with Bid/Ask) ---
                     if (
                         "bid_price" in latest_data
                         and "ask_price" in latest_data
-                        and "volume" in latest_data
+                        and ("volume" in latest_data)
                     ):
                         bids = latest_data.get(
                             "bids",
@@ -1384,16 +1217,12 @@ class DashboardServer:
                                 )
                             ],
                         )
-
                         bid_prices = [b[0] for b in bids]
                         bid_volumes = [b[1] for b in bids]
                         ask_prices = [a[0] for a in asks]
                         ask_volumes = [a[1] for a in asks]
-
-                        # Calculate cumulative volume
                         cumulative_bid_volume = np.cumsum(bid_volumes[::-1])[::-1]
                         cumulative_ask_volume = np.cumsum(ask_volumes)
-
                         order_book_fig = go.Figure(
                             data=[
                                 go.Scatter(
@@ -1429,10 +1258,8 @@ class DashboardServer:
                                 x=1,
                             ),
                         )
+            return (price_fig, market_overview_content, order_book_fig)
 
-            return price_fig, market_overview_content, order_book_fig
-
-        # Orders section callbacks
         @app.callback(
             Output("active-orders-table", "children"),
             [Input("interval-component", "n_intervals")],
@@ -1440,11 +1267,8 @@ class DashboardServer:
         def update_active_orders_table(n):
             summary = self.metrics.get_summary()
             active_orders = summary["trading"]["active_orders"]
-
             if not active_orders:
                 return html.P("No active orders.")
-
-            # Prepare table data (show latest 10 active orders)
             data = []
             for order in active_orders[-10:]:
                 data.append(
@@ -1466,8 +1290,6 @@ class DashboardServer:
                         order.get("status", "N/A"),
                     )
                 )
-
-            # Create table
             table_header = [
                 html.Thead(
                     html.Tr(
@@ -1483,11 +1305,9 @@ class DashboardServer:
                     )
                 )
             ]
-
             table_body = [
                 html.Tbody([html.Tr([html.Td(col) for col in row]) for row in data])
             ]
-
             return dbc.Table(
                 table_header + table_body,
                 striped=True,
@@ -1503,11 +1323,8 @@ class DashboardServer:
         )
         def update_recent_trades_table(n):
             trades = self.metrics.trades_history
-
             if not trades:
                 return html.P("No recent trades.")
-
-            # Prepare table data (show latest 10 trades)
             data = []
             for trade in trades[-10:]:
                 pnl = trade.get("realized_pnl")
@@ -1516,7 +1333,6 @@ class DashboardServer:
                     if pnl >= 0
                     else "text-danger" if pnl is not None else ""
                 )
-
                 data.append(
                     (
                         (
@@ -1534,8 +1350,6 @@ class DashboardServer:
                         ),
                     )
                 )
-
-            # Create table
             table_header = [
                 html.Thead(
                     html.Tr(
@@ -1550,11 +1364,9 @@ class DashboardServer:
                     )
                 )
             ]
-
             table_body = [
                 html.Tbody([html.Tr([html.Td(col) for col in row]) for row in data])
             ]
-
             return dbc.Table(
                 table_header + table_body,
                 striped=True,
@@ -1564,7 +1376,6 @@ class DashboardServer:
                 responsive=True,
             )
 
-        # System section callbacks
         @app.callback(
             [
                 Output("cpu-usage-chart", "figure"),
@@ -1585,7 +1396,6 @@ class DashboardServer:
                 if data:
                     df = pd.DataFrame(data)
                     df["timestamp"] = pd.to_datetime(df["timestamp"])
-
                     fig.add_trace(
                         go.Scatter(
                             x=df["timestamp"],
@@ -1594,7 +1404,6 @@ class DashboardServer:
                             line=dict(color=color, width=2),
                         )
                     )
-
                 fig.update_layout(
                     title=title,
                     xaxis_title="Time",
@@ -1613,15 +1422,11 @@ class DashboardServer:
                 latency_data, "Latency", "Latency (ms)", "#428BCA"
             )
             errors_fig = create_chart(errors_data, "Errors", "Count", "#DC3545")
-
-            return cpu_fig, memory_fig, latency_fig, errors_fig
+            return (cpu_fig, memory_fig, latency_fig, errors_fig)
 
 
 if __name__ == "__main__":
-    # Example usage (simulated metrics)
     metrics = DashboardMetrics()
-
-    # Simulate some initial data
     now = datetime.now()
     for i in range(100):
         timestamp = now - timedelta(hours=100 - i)
@@ -1685,6 +1490,5 @@ if __name__ == "__main__":
                 "ask_price": 2500.0 + np.random.normal(0, 2) + 0.1,
             },
         )
-
     server = DashboardServer(metrics=metrics)
     server.run()

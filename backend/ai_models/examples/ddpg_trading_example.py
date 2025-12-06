@@ -8,22 +8,20 @@ import os
 from core.logging import get_logger
 
 logger = get_logger(__name__)
-
 import sys
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-# Add parent directory to path to import modules
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-
 from backend.ai_models.ddpg_trading import BacktestEngine, DDPGAgent, TradingGymEnv
 
 
-def generate_sample_market_data(n_assets=3, n_days=252, seed=42):
+def generate_sample_market_data(
+    n_assets: Any = 3, n_days: Any = 252, seed: Any = 42
+) -> Any:
     """
     Generate sample market data for testing
 
@@ -36,62 +34,43 @@ def generate_sample_market_data(n_assets=3, n_days=252, seed=42):
         DataFrame with asset prices
     """
     np.random.seed(seed)
-
-    # Generate price series with different characteristics
     prices = {}
-
-    # Asset 1: Trending upward
     prices["Asset1"] = np.cumprod(1 + np.random.normal(0.001, 0.01, n_days))
-
-    # Asset 2: Mean-reverting
     noise = np.random.normal(0, 0.02, n_days)
     prices["Asset2"] = 100 + np.cumsum(noise - 0.3 * np.sign(np.cumsum(noise)))
-
-    # Asset 3: Cyclical
     t = np.linspace(0, 4 * np.pi, n_days)
     prices["Asset3"] = (
         100 + 10 * np.sin(t) + np.cumsum(np.random.normal(0, 0.01, n_days))
     )
-
-    # Additional assets if needed
     for i in range(4, n_assets + 1):
-        # Random walk with drift
         drift = np.random.uniform(-0.0005, 0.0015)
         vol = np.random.uniform(0.01, 0.02)
         prices[f"Asset{i}"] = np.cumprod(1 + np.random.normal(drift, vol, n_days))
-
-    # Convert to DataFrame
     df = pd.DataFrame(prices)
-
     return df
 
 
-def train_and_backtest_ddpg_agent():
+def train_and_backtest_ddpg_agent() -> Any:
     """
     Train a DDPG agent and backtest its performance
 
     Returns:
         Backtest results
     """
-    # Generate sample market data
     logger.info("Generating sample market data...")
-    data = generate_sample_market_data(n_assets=4, n_days=504)  # 2 years of data
-
-    # Create trading environment
+    data = generate_sample_market_data(n_assets=4, n_days=504)
     logger.info("Creating trading environment...")
     env = TradingGymEnv(
         data_stream=data,
         window_size=10,
         transaction_cost=0.001,
         reward_scaling=1.0,
-        max_steps=252,  # One trading year
+        max_steps=252,
     )
-
-    # Create DDPG agent with custom configuration
     logger.info("Initializing DDPG agent...")
     agent_config = {
-        "actor_lr": 1e-4,
-        "critic_lr": 1e-3,
+        "actor_lr": 0.0001,
+        "critic_lr": 0.001,
         "actor_hidden_dims": (256, 128),
         "critic_hidden_dims": (256, 128),
         "gamma": 0.99,
@@ -105,15 +84,10 @@ def train_and_backtest_ddpg_agent():
         "eval_interval": 50,
         "warmup_steps": 1000,
     }
-
     agent = DDPGAgent(env, config=agent_config)
-
-    # Train agent
     logger.info("Training DDPG agent...")
     logger.info("This may take a few minutes...")
     rewards = agent.train(max_episodes=50, max_steps=252)
-
-    # Plot training rewards
     plt.figure(figsize=(10, 6))
     plt.plot(rewards)
     plt.title("Training Rewards")
@@ -121,25 +95,18 @@ def train_and_backtest_ddpg_agent():
     plt.ylabel("Reward")
     plt.grid(True)
     plt.savefig("training_rewards.png")
-
-    # Backtest trained agent
     logger.info("Backtesting trained agent...")
     backtest = BacktestEngine(env, agent)
     results = backtest.run(episodes=1, render=False)
-
-    # Print backtest results
     logger.info("\nBacktest Results:")
     logger.info(f"Total Return: {results['metrics']['total_return']:.2%}")
     logger.info(f"Annual Return: {results['metrics']['annual_return']:.2%}")
     logger.info(f"Sharpe Ratio: {results['metrics']['sharpe_ratio']:.2f}")
     logger.info(f"Volatility: {results['metrics']['volatility']:.2%}")
     logger.info(f"Max Drawdown: {results['metrics']['max_drawdown']:.2%}")
-
-    # Save agent model
     logger.info("Saving trained agent model...")
     os.makedirs("saved_models", exist_ok=True)
     agent.save_model("saved_models/ddpg_agent")
-
     return results
 
 

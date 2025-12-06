@@ -2,7 +2,8 @@ import QuantLib as ql
 
 
 class StochasticVolatilitySurface:
-    def __init__(self, calibration_data):
+
+    def __init__(self, calibration_data: Any) -> Any:
         self.calibration_data = calibration_data
         self.helpers = []
         self.model = ql.HestonModel(
@@ -19,15 +20,15 @@ class StochasticVolatilitySurface:
             )
         )
 
-    def calibrate(self):
-        optimization_method = ql.LevenbergMarquardt(1e-8, 1e-8, 1e-8)
+    def calibrate(self) -> Any:
+        optimization_method = ql.LevenbergMarquardt(1e-08, 1e-08, 1e-08)
         self.model.calibrate(
             self.helpers,
             optimization_method,
-            ql.EndCriteria(1000, 100, 1e-8, 1e-8, 1e-8),
+            ql.EndCriteria(1000, 100, 1e-08, 1e-08, 1e-08),
         )
 
-    def calculate_arbitrage_free_surface(self):
+    def calculate_arbitrage_free_surface(self) -> Any:
         heston_process = self.model.process()
         return ql.HestonModelHelper(
             heston_process,

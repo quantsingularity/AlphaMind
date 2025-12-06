@@ -7,7 +7,6 @@ and Bayesian analysis.
 """
 
 from typing import Dict, List
-
 import numpy as np
 import scipy.stats as stats
 
@@ -20,7 +19,7 @@ class StatisticalTest:
     in the A/B testing framework.
     """
 
-    def __init__(self):
+    def __init__(self) -> Any:
         self.results = {}
 
     def run(self, control: np.ndarray, treatment: np.ndarray, **kwargs) -> Dict:
@@ -70,7 +69,6 @@ class StatisticalTest:
         """
         if "p_value" not in self.results:
             raise ValueError("Test has not been run yet")
-
         return self.results["p_value"] < alpha
 
 
@@ -109,22 +107,16 @@ class TTest(StatisticalTest):
         results : dict
             Test results.
         """
-        # Calculate basic statistics
         control_mean = np.mean(control)
         treatment_mean = np.mean(treatment)
         control_std = np.std(control, ddof=1)
         treatment_std = np.std(treatment, ddof=1)
         control_n = len(control)
         treatment_n = len(treatment)
-
-        # Run t-test
         t_stat, p_value = stats.ttest_ind(
             treatment, control, equal_var=equal_var, alternative=alternative
         )
-
-        # Calculate effect size (Cohen's d)
         if equal_var:
-            # Pooled standard deviation
             pooled_std = np.sqrt(
                 (
                     (control_n - 1) * control_std**2
@@ -134,12 +126,9 @@ class TTest(StatisticalTest):
             )
             cohens_d = (treatment_mean - control_mean) / pooled_std
         else:
-            # Weighted standard deviation
             cohens_d = (treatment_mean - control_mean) / np.sqrt(
                 (control_std**2 + treatment_std**2) / 2
             )
-
-        # Calculate confidence interval
         if alternative == "two-sided":
             ci_lower, ci_upper = stats.t.interval(
                 0.95,
@@ -169,8 +158,6 @@ class TTest(StatisticalTest):
                 ),
             )
             ci_upper = np.inf
-
-        # Store results
         self.results = {
             "test": "t-test",
             "equal_var": equal_var,
@@ -192,7 +179,6 @@ class TTest(StatisticalTest):
                 else np.nan
             ),
         }
-
         return self.results
 
 
@@ -230,26 +216,19 @@ class MannWhitneyU(StatisticalTest):
         results : dict
             Test results.
         """
-        # Calculate basic statistics
         control_median = np.median(control)
         treatment_median = np.median(treatment)
         control_n = len(control)
         treatment_n = len(treatment)
-
-        # Run Mann-Whitney U test
         u_stat, p_value = stats.mannwhitneyu(
             treatment, control, alternative=alternative, use_continuity=use_continuity
         )
-
-        # Calculate effect size (r)
         z_score = (
             stats.norm.ppf(1 - p_value / 2)
             if alternative == "two-sided"
             else stats.norm.ppf(1 - p_value)
         )
         effect_size_r = z_score / np.sqrt(control_n + treatment_n)
-
-        # Store results
         self.results = {
             "test": "mann-whitney-u",
             "alternative": alternative,
@@ -267,7 +246,6 @@ class MannWhitneyU(StatisticalTest):
                 else np.nan
             ),
         }
-
         return self.results
 
 
@@ -308,46 +286,30 @@ class BayesianABTest(StatisticalTest):
         results : dict
             Test results.
         """
-        # Calculate basic statistics
         control_mean = np.mean(control)
         treatment_mean = np.mean(treatment)
         control_std = np.std(control, ddof=1)
         treatment_std = np.std(treatment, ddof=1)
         control_n = len(control)
         treatment_n = len(treatment)
-
-        # For binary outcomes (0/1)
         if set(np.unique(control)).issubset({0, 1}) and set(
             np.unique(treatment)
         ).issubset({0, 1}):
-            # Beta-binomial model
             control_successes = np.sum(control)
             treatment_successes = np.sum(treatment)
-
-            # Calculate posterior parameters
             control_alpha = prior_alpha + control_successes
             control_beta = prior_beta + control_n - control_successes
             treatment_alpha = prior_alpha + treatment_successes
             treatment_beta = prior_beta + treatment_n - treatment_successes
-
-            # Draw samples from posterior distributions
             control_samples = np.random.beta(control_alpha, control_beta, n_samples)
             treatment_samples = np.random.beta(
                 treatment_alpha, treatment_beta, n_samples
             )
-
-            # Calculate probability of improvement
             prob_improvement = np.mean(treatment_samples > control_samples)
-
-            # Calculate expected improvement
             expected_improvement = np.mean(treatment_samples - control_samples)
-
-            # Calculate credible interval
             diff_samples = treatment_samples - control_samples
             ci_lower = np.percentile(diff_samples, 2.5)
             ci_upper = np.percentile(diff_samples, 97.5)
-
-            # Store results
             self.results = {
                 "test": "bayesian-ab-test",
                 "model": "beta-binomial",
@@ -369,35 +331,22 @@ class BayesianABTest(StatisticalTest):
                     expected_improvement / control_mean if control_mean != 0 else np.nan
                 ),
             }
-
         else:
-            # Normal model with uninformative prior
-            # Calculate posterior parameters
             control_mean_posterior = control_mean
             control_std_posterior = control_std / np.sqrt(control_n)
             treatment_mean_posterior = treatment_mean
             treatment_std_posterior = treatment_std / np.sqrt(treatment_n)
-
-            # Draw samples from posterior distributions
             control_samples = np.random.normal(
                 control_mean_posterior, control_std_posterior, n_samples
             )
             treatment_samples = np.random.normal(
                 treatment_mean_posterior, treatment_std_posterior, n_samples
             )
-
-            # Calculate probability of improvement
             prob_improvement = np.mean(treatment_samples > control_samples)
-
-            # Calculate expected improvement
             expected_improvement = np.mean(treatment_samples - control_samples)
-
-            # Calculate credible interval
             diff_samples = treatment_samples - control_samples
             ci_lower = np.percentile(diff_samples, 2.5)
             ci_upper = np.percentile(diff_samples, 97.5)
-
-            # Store results
             self.results = {
                 "test": "bayesian-ab-test",
                 "model": "normal",
@@ -415,7 +364,6 @@ class BayesianABTest(StatisticalTest):
                     expected_improvement / control_mean if control_mean != 0 else np.nan
                 ),
             }
-
         return self.results
 
     def is_significant(self, threshold: float = 0.95) -> bool:
@@ -434,7 +382,6 @@ class BayesianABTest(StatisticalTest):
         """
         if "prob_improvement" not in self.results:
             raise ValueError("Test has not been run yet")
-
         return self.results["prob_improvement"] > threshold
 
 
@@ -480,28 +427,19 @@ class MultipleTestingCorrection:
             Corrected p-values.
         """
         n_tests = len(p_values)
-
-        # Sort p-values
         sorted_indices = np.argsort(p_values)
         sorted_p_values = [p_values[i] for i in sorted_indices]
-
-        # Calculate corrected p-values
         corrected_sorted_p_values = []
         for i, p in enumerate(sorted_p_values):
             corrected_p = p * n_tests / (i + 1)
             corrected_sorted_p_values.append(min(corrected_p, 1.0))
-
-        # Ensure monotonicity
         for i in range(n_tests - 2, -1, -1):
             corrected_sorted_p_values[i] = min(
                 corrected_sorted_p_values[i], corrected_sorted_p_values[i + 1]
             )
-
-        # Restore original order
         corrected_p_values = [0] * n_tests
         for i, idx in enumerate(sorted_indices):
             corrected_p_values[idx] = corrected_sorted_p_values[i]
-
         return corrected_p_values
 
     @staticmethod
@@ -520,26 +458,17 @@ class MultipleTestingCorrection:
             Corrected p-values.
         """
         n_tests = len(p_values)
-
-        # Sort p-values
         sorted_indices = np.argsort(p_values)
         sorted_p_values = [p_values[i] for i in sorted_indices]
-
-        # Calculate corrected p-values
         corrected_sorted_p_values = []
         for i, p in enumerate(sorted_p_values):
             corrected_p = p * (n_tests - i)
             corrected_sorted_p_values.append(min(corrected_p, 1.0))
-
-        # Ensure monotonicity
         for i in range(n_tests - 2, -1, -1):
             corrected_sorted_p_values[i] = max(
                 corrected_sorted_p_values[i], corrected_sorted_p_values[i + 1]
             )
-
-        # Restore original order
         corrected_p_values = [0] * n_tests
         for i, idx in enumerate(sorted_indices):
             corrected_p_values[idx] = corrected_sorted_p_values[i]
-
         return corrected_p_values

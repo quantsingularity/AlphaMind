@@ -11,8 +11,6 @@ from enum import Enum
 import logging
 from typing import Dict, List, Optional, Tuple
 
-
-# Configure logging
 logger = logging.getLogger(__name__)
 
 
@@ -54,21 +52,19 @@ class PositionLimit:
 
     def is_breached(self, value: float) -> Tuple[bool, str]:
         """Check if a value breaches the position limits."""
-
         if not self.active:
-            return False, "none"
-
+            return (False, "none")
         if value > self.hard_limit:
-            return True, "hard"
+            return (True, "hard")
         elif value > self.soft_limit:
-            return True, "soft"
-        return False, "none"
+            return (True, "soft")
+        return (False, "none")
 
 
 class PositionLimitsManager:
     """Manages position limits across the system."""
 
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize position limits manager."""
         self.limits: Dict[str, PositionLimit] = {}
         self.breaches: Dict[str, List[Dict]] = {}
@@ -79,7 +75,6 @@ class PositionLimitsManager:
             logger.warning(
                 f"Overwriting existing position limit with ID {limit.limit_id}"
             )
-
         self.limits[limit.limit_id] = limit
         logger.info(
             f"Added position limit {limit.limit_id} for {limit.scope.value}:{limit.scope_value}"
@@ -91,7 +86,6 @@ class PositionLimitsManager:
             del self.limits[limit_id]
             logger.info(f"Removed position limit {limit_id}")
             return True
-
         logger.warning(f"Attempted to remove non-existent position limit {limit_id}")
         return False
 
@@ -102,9 +96,7 @@ class PositionLimitsManager:
                 f"Attempted to update non-existent position limit {limit_id}"
             )
             return False
-
         limit = self.limits[limit_id]
-
         for key, value in kwargs.items():
             if hasattr(limit, key):
                 setattr(limit, key, value)
@@ -112,7 +104,6 @@ class PositionLimitsManager:
                 logger.warning(
                     f"Ignoring unknown attribute {key} for position limit {limit_id}"
                 )
-
         limit.updated_at = datetime.datetime.now()
         logger.info(f"Updated position limit {limit_id}")
         return True
@@ -121,10 +112,8 @@ class PositionLimitsManager:
         """Check a specific position limit."""
         if limit_id not in self.limits:
             raise KeyError(f"Position limit {limit_id} not found")
-
         limit = self.limits[limit_id]
         is_breached, severity = limit.is_breached(value)
-
         if is_breached:
             breach = {
                 "limit_id": limit_id,
@@ -132,32 +121,24 @@ class PositionLimitsManager:
                 "severity": severity,
                 "timestamp": datetime.datetime.now(),
             }
-
             if limit_id not in self.breaches:
                 self.breaches[limit_id] = []
-
             self.breaches[limit_id].append(breach)
-
             logger.warning(
-                f"Position limit breach for {limit_id} ({limit.scope.value}:{limit.scope_value}): "
-                f"{value} exceeds {severity} limit of "
-                f"{limit.soft_limit if severity == 'soft' else limit.hard_limit}"
+                f"Position limit breach for {limit_id} ({limit.scope.value}:{limit.scope_value}): {value} exceeds {severity} limit of {(limit.soft_limit if severity == 'soft' else limit.hard_limit)}"
             )
-
-        return is_breached, severity
+        return (is_breached, severity)
 
     def check_limits_by_scope(
         self, scope: LimitScope, scope_value: str, values: Dict[str, float]
     ) -> Dict[str, Tuple[bool, str]]:
         """Check all limits for a specific scope and value."""
         results = {}
-
         for limit_id, limit in self.limits.items():
             if limit.scope == scope and limit.scope_value == scope_value:
                 if limit.limit_type.value in values:
                     value = values[limit.limit_type.value]
                     results[limit_id] = self.check_limit(limit_id, value)
-
         return results
 
     def get_active_breaches(
@@ -166,20 +147,17 @@ class PositionLimitsManager:
         """Get all active limit breaches."""
         if severity is None:
             return self.breaches
-
         filtered_breaches = {}
         for limit_id, breach_list in self.breaches.items():
             filtered = [b for b in breach_list if b["severity"] == severity]
             if filtered:
                 filtered_breaches[limit_id] = filtered
-
         return filtered_breaches
 
     def clear_breach(self, limit_id: str, breach_index: Optional[int] = None) -> bool:
         """Clear a specific breach or all breaches for a limit."""
         if limit_id not in self.breaches:
             return False
-
         if breach_index is not None:
             if 0 <= breach_index < len(self.breaches[limit_id]):
                 self.breaches[limit_id].pop(breach_index)
@@ -202,7 +180,6 @@ class PositionLimitsManager:
             "active_breaches": len(self.breaches),
             "breach_details": self.breaches.copy(),
         }
-
         for limit_id, limit in self.limits.items():
             report["limits"][limit_id] = {
                 "type": limit.limit_type.value,
@@ -213,5 +190,4 @@ class PositionLimitsManager:
                 "active": limit.active,
                 "has_breaches": limit_id in self.breaches,
             }
-
         return report

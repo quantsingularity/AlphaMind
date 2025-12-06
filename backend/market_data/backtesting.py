@@ -1,21 +1,13 @@
 """"""
 
-## Backtesting Module for AlphaMind
-#
-## This module provides comprehensive backtesting capabilities for trading strategies,
-## including historical data processing, strategy execution simulation, performance
-## analysis, and visualization tools.
-""""""
-
+""
 from datetime import datetime
 from enum import Enum
 import logging
 from typing import Callable, Dict, Optional
-
 import numpy as np
 import pandas as pd
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
@@ -62,20 +54,9 @@ class BacktestOrder:
         stop_price: Optional[float] = None,
         time_in_force: str = "GTC",
         order_id: Optional[str] = None,
-    ):
+    ) -> Any:
         """"""
-        ## Initialize a backtest order.
-        #
-        ## Args:
-        ## symbol: Trading symbol
-        ## side: Order side (buy/sell)
-        ## quantity: Order quantity
-        ## order_type: Order type (market, limit, etc.)
-        ## price: Limit price (required for limit orders)
-        ## stop_price: Stop price (required for stop orders)
-        ## time_in_force: Time in force (GTC, IOC, FOK)
-        ## order_id: Order ID (generated if not provided)
-        """"""
+        ""
         self.symbol = symbol
         self.side = side
         self.quantity = quantity
@@ -84,7 +65,6 @@ class BacktestOrder:
         self.stop_price = stop_price
         self.time_in_force = time_in_force
         self.order_id = order_id or f"order_{datetime.now().timestamp():.6f}"
-
         self.status = OrderStatus.PENDING
         self.filled_quantity = 0.0
         self.filled_price = 0.0
@@ -93,18 +73,15 @@ class BacktestOrder:
         self.updated_time = self.created_time
         self.commission = 0.0
         self.slippage = 0.0
-
-        # Validate order
         self._validate()
 
-    def _validate(self):
+    def _validate(self) -> Any:
         """Validate order parameters."""
         if (
             self.order_type in [OrderType.LIMIT, OrderType.STOP_LIMIT]
             and self.price is None
         ):
             raise ValueError(f"Price is required for {self.order_type.value} orders")
-
         if (
             self.order_type in [OrderType.STOP, OrderType.STOP_LIMIT]
             and self.stop_price is None
@@ -118,65 +95,43 @@ class BacktestOrder:
         price: float,
         quantity: Optional[float] = None,
         time: Optional[datetime] = None,
-    ):
+    ) -> Any:
         """"""
-        # Fill the order (partially or completely).
-
-        # Args:
-        # price: Fill price
-        # quantity: Fill quantity (defaults to remaining quantity)
-        # time: Fill time (defaults to current time)
-        """"""
-        fill_qty = quantity or (self.quantity - self.filled_quantity)
+        ""
+        fill_qty = quantity or self.quantity - self.filled_quantity
         fill_qty = min(fill_qty, self.quantity - self.filled_quantity)
-
         if fill_qty <= 0:
             return
-
-        # Update filled information
         self.filled_quantity += fill_qty
-
-        # Calculate average filled price
         if self.filled_price > 0:
             self.filled_price = (
                 self.filled_price * (self.filled_quantity - fill_qty) + price * fill_qty
             ) / self.filled_quantity
         else:
             self.filled_price = price
-
         self.filled_time = time or datetime.now()
         self.updated_time = self.filled_time
-
-        # Update status
         if self.filled_quantity >= self.quantity:
             self.status = OrderStatus.FILLED
         else:
             self.status = OrderStatus.PARTIALLY_FILLED
 
-    def cancel(self):
+    def cancel(self) -> Any:
         """Cancel the order if not filled."""
         if self.status in [OrderStatus.PENDING, OrderStatus.PARTIALLY_FILLED]:
             self.status = OrderStatus.CANCELED
             self.updated_time = datetime.now()
 
-    def reject(self, reason: str = ""):
+    def reject(self, reason: str = "") -> Any:
         """"""
-        # Reject the order.
-
-        # Args:
-        # reason: Rejection reason
-        """"""
+        ""
         self.status = OrderStatus.REJECTED
         self.updated_time = datetime.now()
         logger.warning(f"Order {self.order_id} rejected: {reason}")
 
     def to_dict(self) -> Dict:
         """"""
-        # Convert order to dictionary.
-
-        # Returns:
-        # Order as dictionary
-        """"""
+        ""
         return {
             "order_id": self.order_id,
             "symbol": self.symbol,
@@ -200,15 +155,11 @@ class BacktestOrder:
 class Position:
     """Represents a trading position in the backtesting system."""
 
-    def __init__(self, symbol: str, quantity: float = 0.0, avg_price: float = 0.0):
+    def __init__(
+        self, symbol: str, quantity: float = 0.0, avg_price: float = 0.0
+    ) -> Any:
         """"""
-        # Initialize a position.
-
-        # Args:
-        # symbol: Trading symbol
-        # quantity: Position quantity (positive for long, negative for short)
-        # avg_price: Average entry price
-        """"""
+        ""
         self.symbol = symbol
         self.quantity = quantity
         self.avg_price = avg_price
@@ -217,67 +168,40 @@ class Position:
         self.last_price = avg_price
         self.trades = []
 
-    def update(self, price: float):
+    def update(self, price: float) -> Any:
         """"""
-        # Update position with current market price.
-
-        # Args:
-        # price: Current market price
-        """"""
+        ""
         self.last_price = price
         self.unrealized_pnl = self.quantity * (price - self.avg_price)
 
     def apply_trade(
         self, side: OrderSide, quantity: float, price: float, commission: float = 0.0
-    ):
+    ) -> Any:
         """"""
-        # Apply a trade to the position.
-
-        # Args:
-        # side: Trade side (buy/sell)
-        # quantity: Trade quantity
-        # price: Trade price
-        # commission: Trade commission
-
-        # Returns:
-        # Realized PnL from this trade
-        """"""
+        ""
         trade_qty = quantity
         if side == OrderSide.SELL:
             trade_qty = -quantity
-
-        # Calculate realized PnL for reducing positions
         realized_pnl = 0.0
-        if (self.quantity > 0 and trade_qty < 0) or (
-            self.quantity < 0 and trade_qty > 0
-        ):
-            # Reducing position
+        if self.quantity > 0 and trade_qty < 0 or (self.quantity < 0 and trade_qty > 0):
             reduction_qty = min(abs(self.quantity), abs(trade_qty))
             if self.quantity > 0:
                 realized_pnl = reduction_qty * (price - self.avg_price) - commission
             else:
                 realized_pnl = reduction_qty * (self.avg_price - price) - commission
-
-        # Update position
         new_quantity = self.quantity + trade_qty
-
-        # Update average price for increasing positions
-        if (self.quantity >= 0 and trade_qty > 0) or (
-            self.quantity <= 0 and trade_qty < 0
+        if (
+            self.quantity >= 0
+            and trade_qty > 0
+            or (self.quantity <= 0 and trade_qty < 0)
         ):
-            # Increasing position
             self.avg_price = (
                 abs(self.quantity) * self.avg_price + abs(trade_qty) * price
             ) / (abs(self.quantity) + abs(trade_qty))
-
-        # Handle position flipping
-        if self.quantity * new_quantity < 0:  # Sign change
+        if self.quantity * new_quantity < 0:
             self.avg_price = price
-
         self.quantity = new_quantity
         self.realized_pnl += realized_pnl
-
-        # Record trade
         self.trades.append(
             {
                 "time": datetime.now(),
@@ -288,16 +212,11 @@ class Position:
                 "realized_pnl": realized_pnl,
             }
         )
-
         return realized_pnl
 
     def to_dict(self) -> Dict:
         """"""
-        # Convert position to dictionary.
-
-        # Returns:
-        # Position as dictionary
-        """"""
+        ""
         return {
             "symbol": self.symbol,
             "quantity": self.quantity,
@@ -313,50 +232,31 @@ class Position:
 class Portfolio:
     """Represents a portfolio in the backtesting system."""
 
-    def __init__(self, initial_cash: float = 100000.0):
+    def __init__(self, initial_cash: float = 100000.0) -> Any:
         """"""
-        ## Initialize a portfolio.
-        #
-        ## Args:
-        ## initial_cash: Initial cash balance
-        """"""
+        ""
         self.initial_cash = initial_cash
         self.cash = initial_cash
-        self.positions = {}  # symbol -> Position
+        self.positions = {}
         self.equity = initial_cash
         self.history = []
 
     def get_position(self, symbol: str) -> Position:
         """"""
-        ## Get position for a symbol.
-        #
-        ## Args:
-        ## symbol: Trading symbol
-        #
-        ## Returns:
-        ## Position object
-        """"""
+        ""
         if symbol not in self.positions:
             self.positions[symbol] = Position(symbol)
         return self.positions[symbol]
 
-    def update(self, prices: Dict[str, float]):
+    def update(self, prices: Dict[str, float]) -> Any:
         """"""
-        ## Update portfolio with current market prices.
-        #
-        ## Args:
-        ## prices: Dictionary of symbol -> price
-        """"""
+        ""
         portfolio_value = self.cash
-
         for symbol, position in self.positions.items():
             if symbol in prices:
                 position.update(prices[symbol])
                 portfolio_value += position.quantity * position.last_price
-
         self.equity = portfolio_value
-
-        # Record history
         self.history.append(
             {
                 "time": datetime.now(),
@@ -373,52 +273,26 @@ class Portfolio:
         quantity: float,
         price: float,
         commission: float = 0.0,
-    ):
+    ) -> Any:
         """"""
-        ## Apply a trade to the portfolio.
-        #
-        ## Args:
-        ## symbol: Trading symbol
-        ## side: Trade side (buy/sell)
-        ## quantity: Trade quantity
-        ## price: Trade price
-        ## commission: Trade commission
-        #
-        ## Returns:
-        ## True if trade was successful, False otherwise
-        """"""
+        ""
         position = self.get_position(symbol)
-
-        # Check if we have enough cash for buys
         if side == OrderSide.BUY:
             cost = quantity * price + commission
             if cost > self.cash:
                 logger.warning(f"Insufficient cash for trade: {cost} > {self.cash}")
                 return False
-
-            # Update cash
             self.cash -= cost
-
-        # Apply trade to position
         position.apply_trade(side, quantity, price, commission)
-
-        # Update cash for sells
         if side == OrderSide.SELL:
             self.cash += quantity * price - commission
-
-        # Remove position if quantity is zero
         if position.quantity == 0:
             self.positions.pop(symbol, None)
-
         return True
 
     def to_dict(self) -> Dict:
         """"""
-        ## Convert portfolio to dictionary.
-        #
-        ## Returns:
-        ## Portfolio as dictionary
-        """"""
+        ""
         return {
             "initial_cash": self.initial_cash,
             "cash": self.cash,
@@ -437,134 +311,74 @@ class MarketSimulator:
         commission_rate: float = 0.001,
         slippage_model: str = "fixed",
         slippage_params: Dict = None,
-    ):
+    ) -> Any:
         """"""
-        # Initialize market simulator.
-
-        # Args:
-        # data: Dictionary of symbol -> DataFrame with OHLCV data
-        # commission_rate: Commission rate as percentage of trade value
-        # slippage_model: Slippage model type (fixed, normal, proportional)
-        # slippage_params: Parameters for slippage model
-        """"""
+        ""
         self.data = data
         self.commission_rate = commission_rate
         self.slippage_model = slippage_model
         self.slippage_params = slippage_params or {}
-
-        # Default slippage parameters
         if self.slippage_model == "fixed" and "value" not in self.slippage_params:
-            self.slippage_params["value"] = 0.0001  # 1 basis point
+            self.slippage_params["value"] = 0.0001
         elif self.slippage_model == "normal" and "std" not in self.slippage_params:
-            self.slippage_params["std"] = 0.0005  # 5 basis points std dev
+            self.slippage_params["std"] = 0.0005
         elif (
             self.slippage_model == "proportional"
             and "factor" not in self.slippage_params
         ):
-            self.slippage_params["factor"] = 0.1  # 10% of volatility
+            self.slippage_params["factor"] = 0.1
 
     def get_price_for_order(self, order: BacktestOrder, bar: pd.Series) -> float:
         """"""
-        # Get execution price for an order based on the current bar.
-
-        # Args:
-        # order: Order to execute
-        # bar: Current price bar (OHLCV)
-
-        # Returns:
-        # Execution price
-        """"""
-        # Base price depends on order type
+        ""
         if order.order_type == OrderType.MARKET:
-            # For market orders, use the next bar's open or current bar's close
             base_price = bar["close"]
         elif order.order_type == OrderType.LIMIT:
-            # For limit orders, use the limit price
             if order.side == OrderSide.BUY and bar["low"] <= order.price:
-                # Buy limit order executed if low price <= limit price
-                base_price = min(
-                    bar["open"], order.price
-                )  # Can't get better than limit price
+                base_price = min(bar["open"], order.price)
             elif order.side == OrderSide.SELL and bar["high"] >= order.price:
-                # Sell limit order executed if high price >= limit price
-                base_price = max(
-                    bar["open"], order.price
-                )  # Can't get better than limit price
+                base_price = max(bar["open"], order.price)
             else:
-                # Limit order not executed
                 return None
         elif order.order_type in [OrderType.STOP, OrderType.STOP_LIMIT]:
-            # For stop orders, check if stop price is triggered
             if order.side == OrderSide.BUY and bar["high"] >= order.stop_price:
-                # Buy stop triggered if high price >= stop price
                 if order.order_type == OrderType.STOP:
-                    base_price = max(
-                        bar["open"], order.stop_price
-                    )  # Can't get better than stop price
-                else:  # STOP_LIMIT
-                    if bar["low"] <= order.price:
-                        base_price = min(
-                            max(bar["open"], order.stop_price), order.price
-                        )
-                    else:
-                        # Stop triggered but limit not reached
-                        return None
+                    base_price = max(bar["open"], order.stop_price)
+                elif bar["low"] <= order.price:
+                    base_price = min(max(bar["open"], order.stop_price), order.price)
+                else:
+                    return None
             elif order.side == OrderSide.SELL and bar["low"] <= order.stop_price:
-                # Sell stop triggered if low price <= stop price
                 if order.order_type == OrderType.STOP:
-                    base_price = min(
-                        bar["open"], order.stop_price
-                    )  # Can't get better than stop price
-                else:  # STOP_LIMIT
-                    if bar["high"] >= order.price:
-                        base_price = max(
-                            min(bar["open"], order.stop_price), order.price
-                        )
-                    else:
-                        # Stop triggered but limit not reached
-                        return None
+                    base_price = min(bar["open"], order.stop_price)
+                elif bar["high"] >= order.price:
+                    base_price = max(min(bar["open"], order.stop_price), order.price)
+                else:
+                    return None
             else:
-                # Stop not triggered
                 return None
         else:
             raise ValueError(f"Unsupported order type: {order.order_type}")
-
-        # Apply slippage
         price_with_slippage = self._apply_slippage(base_price, order.side, bar)
-
         return price_with_slippage
 
     def _apply_slippage(self, price: float, side: OrderSide, bar: pd.Series) -> float:
         """"""
-        # Apply slippage to the execution price.
-
-        # Args:
-        # price: Base execution price
-        # side: Order side
-        # bar: Current price bar
-
-        # Returns:
-        # Price with slippage applied
-        """"""
+        ""
         if self.slippage_model == "fixed":
-            # Fixed basis point slippage
             slippage_value = price * self.slippage_params["value"]
             if side == OrderSide.BUY:
                 return price * (1 + self.slippage_params["value"])
             else:
                 return price * (1 - self.slippage_params["value"])
-
         elif self.slippage_model == "normal":
-            # Normal distribution slippage
             std = self.slippage_params["std"]
             slippage_value = price * np.random.normal(0, std)
             if side == OrderSide.BUY:
                 return price + abs(slippage_value)
             else:
                 return price - abs(slippage_value)
-
         elif self.slippage_model == "proportional":
-            # Proportional to volatility
             factor = self.slippage_params["factor"]
             volatility = (bar["high"] - bar["low"]) / bar["close"]
             slippage_value = price * volatility * factor
@@ -572,21 +386,12 @@ class MarketSimulator:
                 return price + slippage_value
             else:
                 return price - slippage_value
-
         else:
-            return price  # No slippage
+            return price
 
     def calculate_commission(self, price: float, quantity: float) -> float:
         """"""
-        # Calculate commission for a trade.
-
-        # Args:
-        # price: Execution price
-        # quantity: Execution quantity
-
-        # Returns:
-        # Commission amount
-        """"""
+        ""
         return price * quantity * self.commission_rate
 
 
@@ -602,37 +407,21 @@ class BacktestEngine:
         slippage_params: Dict = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
-    ):
+    ) -> Any:
         """"""
-        ## Initialize backtesting engine.
-        #
-        ## Args:
-        ## data: Dictionary of symbol -> DataFrame with OHLCV data
-        ## initial_cash: Initial cash balance
-        ## commission_rate: Commission rate as percentage of trade value
-        ## slippage_model: Slippage model type (fixed, normal, proportional)
-        ## slippage_params: Parameters for slippage model
-        ## start_date: Start date for backtest (YYYY-MM-DD)
-        ## end_date: End date for backtest (YYYY-MM-DD)
-        """"""
+        ""
         self.data = data
         self.portfolio = Portfolio(initial_cash)
         self.market_simulator = MarketSimulator(
             data, commission_rate, slippage_model, slippage_params
         )
-
-        # Prepare data
         self._prepare_data(start_date, end_date)
-
-        # Initialize state
         self.current_time = None
         self.current_bar = {}
         self.pending_orders = []
         self.filled_orders = []
         self.canceled_orders = []
         self.rejected_orders = []
-
-        # Performance tracking
         self.performance = {
             "equity_curve": [],
             "returns": [],
@@ -640,15 +429,9 @@ class BacktestEngine:
             "trades": [],
         }
 
-    def _prepare_data(self, start_date: Optional[str], end_date: Optional[str]):
+    def _prepare_data(self, start_date: Optional[str], end_date: Optional[str]) -> Any:
         """"""
-        ## Prepare data for backtesting.
-        #
-        ## Args:
-        ## start_date: Start date for backtest
-        ## end_date: End date for backtest
-        """"""
-        # Ensure all dataframes have datetime index
+        ""
         for symbol, df in self.data.items():
             if not isinstance(df.index, pd.DatetimeIndex):
                 if "timestamp" in df.columns:
@@ -657,78 +440,49 @@ class BacktestEngine:
                     raise ValueError(
                         f"DataFrame for {symbol} must have datetime index or timestamp column"
                     )
-
-        # Filter by date range
         if start_date or end_date:
             for symbol, df in self.data.items():
                 if start_date:
                     self.data[symbol] = df[df.index >= pd.to_datetime(start_date)]
                 if end_date:
                     self.data[symbol] = df[df.index <= pd.to_datetime(end_date)]
-
-        # Get common date range
         all_dates = set()
         for df in self.data.values():
             all_dates.update(df.index)
-
         self.dates = sorted(all_dates)
-
         if not self.dates:
             raise ValueError("No data available for the specified date range")
 
     def place_order(self, order: BacktestOrder) -> str:
         """"""
-        ## Place an order in the backtesting system.
-        #
-        ## Args:
-        ## order: Order to place
-        #
-        ## Returns:
-        ## Order ID
-        """"""
+        ""
         self.pending_orders.append(order)
         return order.order_id
 
     def cancel_order(self, order_id: str) -> bool:
         """"""
-        ## Cancel a pending order.
-        #
-        ## Args:
-        ## order_id: Order ID to cancel
-        #
-        ## Returns:
-        ## True if order was canceled, False otherwise
-        """"""
+        ""
         for i, order in enumerate(self.pending_orders):
             if order.order_id == order_id:
                 order.cancel()
                 self.canceled_orders.append(order)
                 self.pending_orders.pop(i)
                 return True
-
         return False
 
-    def _process_orders(self):
+    def _process_orders(self) -> Any:
         """Process pending orders with current bar data."""
         remaining_orders = []
-
         for order in self.pending_orders:
-            # Skip if symbol not in current bar
             if order.symbol not in self.current_bar:
                 remaining_orders.append(order)
                 continue
-
-            # Get execution price
             bar = self.current_bar[order.symbol]
             execution_price = self.market_simulator.get_price_for_order(order, bar)
-
             if execution_price is not None:
-                # Calculate commission
                 commission = self.market_simulator.calculate_commission(
                     execution_price, order.quantity
                 )
-
-                # Apply trade to portfolio
                 success = self.portfolio.apply_trade(
                     order.symbol,
                     order.side,
@@ -736,14 +490,10 @@ class BacktestEngine:
                     execution_price,
                     commission,
                 )
-
                 if success:
-                    # Fill order
                     order.fill(execution_price, time=self.current_time)
                     order.commission = commission
                     self.filled_orders.append(order)
-
-                    # Record trade
                     self.performance["trades"].append(
                         {
                             "time": self.current_time,
@@ -756,16 +506,13 @@ class BacktestEngine:
                         }
                     )
                 else:
-                    # Reject order
                     order.reject("Insufficient funds")
                     self.rejected_orders.append(order)
             else:
-                # Order not executed this bar
                 remaining_orders.append(order)
-
         self.pending_orders = remaining_orders
 
-    def _update_performance(self):
+    def _update_performance(self) -> Any:
         """Update performance metrics."""
         self.performance["equity_curve"].append(
             {
@@ -774,17 +521,13 @@ class BacktestEngine:
                 "cash": self.portfolio.cash,
             }
         )
-
-        # Calculate returns
         if len(self.performance["equity_curve"]) > 1:
             prev_equity = self.performance["equity_curve"][-2]["equity"]
             curr_equity = self.performance["equity_curve"][-1]["equity"]
-            returns = (curr_equity / prev_equity) - 1
+            returns = curr_equity / prev_equity - 1
             self.performance["returns"].append(
                 {"time": self.current_time, "returns": returns}
             )
-
-        # Calculate drawdowns
         equity_series = [p["equity"] for p in self.performance["equity_curve"]]
         if equity_series:
             max_equity = max(equity_series)
@@ -796,99 +539,67 @@ class BacktestEngine:
                 {"time": self.current_time, "drawdown": drawdown}
             )
 
-    def run(self, strategy_fn: Callable[[Dict, Portfolio, BacktestEngine], None]):
+    def run(
+        self, strategy_fn: Callable[[Dict, Portfolio, BacktestEngine], None]
+    ) -> Any:
         """"""
-        ## Run backtest with the provided strategy function.
-        #
-        ## Args:
-        ## strategy_fn: Strategy function that receives current bar data, portfolio, and engine
-        """"""
+        ""
         for date in self.dates:
             self.current_time = date
-
-            # Get current bar data for all symbols
             self.current_bar = {}
             for symbol, df in self.data.items():
                 if date in df.index:
                     self.current_bar[symbol] = df.loc[date]
-
-            # Update portfolio with current prices
             current_prices = {s: bar["close"] for s, bar in self.current_bar.items()}
             self.portfolio.update(current_prices)
-
-            # Execute strategy
             strategy_fn(self.current_bar, self.portfolio, self)
-
-            # Process orders
             self._process_orders()
-
-            # Update performance metrics
             self._update_performance()
-
-        # Calculate final performance statistics
         self._calculate_performance_stats()
 
-    def _calculate_performance_stats(self):
+    def _calculate_performance_stats(self) -> Any:
         """Calculate performance statistics after backtest completion."""
-        # Convert lists to DataFrames for easier analysis
         equity_df = pd.DataFrame(self.performance["equity_curve"])
         if not equity_df.empty:
             equity_df.set_index("time", inplace=True)
-
             returns_df = pd.DataFrame(self.performance["returns"])
             if not returns_df.empty:
                 returns_df.set_index("time", inplace=True)
-
-                # Calculate statistics
                 total_return = (
-                    equity_df["equity"].iloc[-1] / self.portfolio.initial_cash
-                ) - 1
+                    equity_df["equity"].iloc[-1] / self.portfolio.initial_cash - 1
+                )
                 annual_return = (
                     (1 + total_return) ** (252 / len(returns_df)) - 1
                     if len(returns_df) > 0
                     else 0
                 )
-
                 daily_returns = returns_df["returns"]
                 volatility = (
                     daily_returns.std() * np.sqrt(252) if len(daily_returns) > 0 else 0
                 )
-
                 annual_return / volatility if volatility > 0 else 0
-
                 drawdown_df = pd.DataFrame(self.performance["drawdowns"])
                 max_drawdown = (
                     drawdown_df["drawdown"].max() if not drawdown_df.empty else 0
                 )
-
-                # Calculate win rate and profit factor
                 trades_df = pd.DataFrame(self.performance["trades"])
                 if not trades_df.empty:
-                    # Add position and realized PnL to trades
                     trades_df["position"] = (
                         trades_df["side"].apply(lambda x: 1 if x == "buy" else -1)
                         * trades_df["quantity"]
                     )
-
-                    # Group by symbol and calculate PnL
                     trades_by_symbol = trades_df.groupby("symbol")
-
                     for symbol, group in trades_by_symbol:
-                        # Calculate PnL for each trade
                         position = 0
                         avg_price = 0
                         trade_pnls = []
-
                         for _, trade in group.iterrows():
                             trade_qty = trade["quantity"]
                             trade_price = trade["price"]
                             trade_side = trade["side"]
                             commission = trade["commission"]
-
                             if trade_side == "buy":
-                                # Buying
                                 if position >= 0:
-                                    # Increasing long position
                                     avg_price = (
                                         position * avg_price + trade_qty * trade_price
                                     ) / (position + trade_qty)

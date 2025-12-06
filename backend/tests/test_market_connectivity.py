@@ -12,7 +12,6 @@ import unittest
 from unittest.mock import MagicMock
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
-
 from order_management.enhanced_market_connectivity import (
     EnhancedMarketConnectivityManager,
     EnhancedVenueAdapter,
@@ -28,7 +27,7 @@ from order_management.market_connectivity import (
 class TestEnhancedVenueAdapter(unittest.TestCase):
     """Test cases for the EnhancedVenueAdapter class."""
 
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test fixtures."""
         self.config = VenueConfig(
             venue_id="test_venue",
@@ -43,95 +42,78 @@ class TestEnhancedVenueAdapter(unittest.TestCase):
             },
             capabilities=["market_data", "order_execution"],
         )
-
         self.adapter = EnhancedVenueAdapter(self.config)
-
-        # Mock actual connection behavior
         self.adapter._connect_impl = MagicMock(return_value=True)
         self.adapter._disconnect_impl = MagicMock(return_value=True)
 
-    def test_initialization(self):
+    def test_initialization(self) -> Any:
         self.assertEqual(self.adapter.config.venue_id, "test_venue")
         self.assertEqual(self.adapter.status, ConnectionStatus.DISCONNECTED)
         self.assertFalse(self.adapter.failure_simulation_enabled)
         self.assertEqual(self.adapter.messages_sent, 0)
         self.assertEqual(self.adapter.messages_received, 0)
 
-    def test_connect_disconnect(self):
+    def test_connect_disconnect(self) -> Any:
         success = self.adapter.connect()
         self.assertTrue(success)
         self.assertEqual(self.adapter.status, ConnectionStatus.CONNECTED)
         self.adapter._connect_impl.assert_called_once()
-
         success = self.adapter.disconnect()
         self.assertTrue(success)
         self.assertEqual(self.adapter.status, ConnectionStatus.DISCONNECTED)
         self.adapter._disconnect_impl.assert_called_once()
 
-    def test_connection_failure(self):
+    def test_connection_failure(self) -> Any:
         self.adapter._connect_impl.return_value = False
-
         success = self.adapter.connect()
         self.assertFalse(success)
         self.assertEqual(self.adapter.status, ConnectionStatus.ERROR)
         self.assertEqual(self.adapter.connection_failures, 1)
 
-    def test_failure_simulation_disconnect(self):
+    def test_failure_simulation_disconnect(self) -> Any:
         self.adapter.enable_failure_simulation(True)
         self.adapter.configure_failure_mode(FailureMode.DISCONNECT, 1.0)
-
         success = self.adapter.connect()
         self.assertFalse(success)
         self.assertEqual(self.adapter.status, ConnectionStatus.ERROR)
         self.assertEqual(self.adapter.last_error, "Simulated connection failure")
 
-    def test_health_check(self):
+    def test_health_check(self) -> Any:
         self.adapter.connect()
         self.assertEqual(self.adapter.status, ConnectionStatus.CONNECTED)
-
         is_healthy = self.adapter._check_connection_health()
         self.assertTrue(is_healthy)
-
-        # simulate inactivity timeout
         self.adapter.last_activity_time = datetime.datetime.now() - datetime.timedelta(
             seconds=120
         )
         is_healthy = self.adapter._check_connection_health()
         self.assertFalse(is_healthy)
 
-    def test_failure_simulation_timeout(self):
+    def test_failure_simulation_timeout(self) -> Any:
         self.adapter.connect()
         self.assertEqual(self.adapter.status, ConnectionStatus.CONNECTED)
-
         self.adapter.enable_failure_simulation(True)
         self.adapter.configure_failure_mode(FailureMode.TIMEOUT, 1.0)
-
         is_healthy = self.adapter._check_connection_health()
         self.assertFalse(is_healthy)
 
-    def test_order_submission_with_failure_simulation(self):
+    def test_order_submission_with_failure_simulation(self) -> Any:
         self.adapter.connect()
         self.assertEqual(self.adapter.status, ConnectionStatus.CONNECTED)
-
         order_data = {"symbol": "AAPL", "quantity": 100, "price": 150.0}
-
         success, order_id, response = self.adapter.submit_order(order_data)
         self.assertTrue(success)
         self.assertNotEqual(order_id, "")
-
-        # Simulate timeout
         self.adapter.enable_failure_simulation(True)
         self.adapter.configure_failure_mode(FailureMode.TIMEOUT, 1.0)
-
         success, order_id, response = self.adapter.submit_order(order_data)
         self.assertFalse(success)
         self.assertEqual(order_id, "")
         self.assertEqual(response["error"], "Simulated timeout")
 
-    def test_market_data_processing_with_failure_simulation(self):
+    def test_market_data_processing_with_failure_simulation(self) -> Any:
         self.adapter.connect()
         self.assertEqual(self.adapter.status, ConnectionStatus.CONNECTED)
-
         data = {
             "venue_id": "test_venue",
             "instrument_id": "AAPL",
@@ -141,30 +123,22 @@ class TestEnhancedVenueAdapter(unittest.TestCase):
             "last": 150.05,
             "volume": 1000,
         }
-
         update = self.adapter.process_market_data(data)
         self.assertIsNotNone(update)
-
-        # Data corruption
         self.adapter.enable_failure_simulation(True)
         self.adapter.configure_failure_mode(FailureMode.DATA_CORRUPTION, 1.0)
-
         update = self.adapter.process_market_data(data)
         self.assertIsNone(update)
-
-        # Partial data
         self.adapter.configure_failure_mode(FailureMode.DATA_CORRUPTION, 0.0)
         self.adapter.configure_failure_mode(FailureMode.PARTIAL_DATA, 1.0)
-
         update = self.adapter.process_market_data(data)
         self.assertIsNotNone(update)
         self.assertIsNone(update.bid)
         self.assertIsNone(update.ask)
 
-    def test_get_enhanced_status(self):
+    def test_get_enhanced_status(self) -> Any:
         self.adapter.connect()
         status = self.adapter.get_status()
-
         self.assertEqual(status["venue_id"], "test_venue")
         self.assertEqual(status["status"], "connected")
         self.assertIn("messages_sent", status)
@@ -176,9 +150,8 @@ class TestEnhancedVenueAdapter(unittest.TestCase):
 class TestEnhancedMarketConnectivityManager(unittest.TestCase):
     """Test cases for the EnhancedMarketConnectivityManager class."""
 
-    def setUp(self):
+    def setUp(self) -> Any:
         self.manager = EnhancedMarketConnectivityManager()
-
         self.venue1_config = VenueConfig(
             venue_id="venue1",
             venue_type=VenueType.EXCHANGE,
@@ -186,7 +159,6 @@ class TestEnhancedMarketConnectivityManager(unittest.TestCase):
             priority=1,
             enabled=True,
         )
-
         self.venue2_config = VenueConfig(
             venue_id="venue2",
             venue_type=VenueType.EXCHANGE,
@@ -194,22 +166,19 @@ class TestEnhancedMarketConnectivityManager(unittest.TestCase):
             priority=2,
             enabled=True,
         )
-
         self.manager.add_venue(self.venue1_config)
         self.manager.add_venue(self.venue2_config)
-
         self.manager.venues["venue1"]._connect_impl = MagicMock(return_value=True)
         self.manager.venues["venue2"]._connect_impl = MagicMock(return_value=True)
 
-    def test_initialization(self):
+    def test_initialization(self) -> Any:
         self.assertEqual(len(self.manager.venues), 2)
         self.assertFalse(self.manager.global_failure_simulation_enabled)
 
-    def test_connect_all_venues(self):
+    def test_connect_all_venues(self) -> Any:
         results = self.manager.connect_all_venues()
         self.assertTrue(results["venue1"])
         self.assertTrue(results["venue2"])
-
         self.assertEqual(
             self.manager.venues["venue1"].status, ConnectionStatus.CONNECTED
         )
@@ -217,20 +186,17 @@ class TestEnhancedMarketConnectivityManager(unittest.TestCase):
             self.manager.venues["venue2"].status, ConnectionStatus.CONNECTED
         )
 
-    def test_global_failure_simulation(self):
+    def test_global_failure_simulation(self) -> Any:
         self.manager.enable_global_failure_simulation(True)
         self.assertTrue(self.manager.global_failure_simulation_enabled)
-
         self.assertTrue(self.manager.venues["venue1"].failure_simulation_enabled)
         self.assertTrue(self.manager.venues["venue2"].failure_simulation_enabled)
-
         self.manager.enable_global_failure_simulation(False)
         self.assertFalse(self.manager.global_failure_simulation_enabled)
-
         self.assertFalse(self.manager.venues["venue1"].failure_simulation_enabled)
         self.assertFalse(self.manager.venues["venue2"].failure_simulation_enabled)
 
-    def test_venue_specific_failure_configuration(self):
+    def test_venue_specific_failure_configuration(self) -> Any:
         success = self.manager.configure_venue_failure(
             venue_id="venue1", mode=FailureMode.DISCONNECT, probability=0.5
         )
@@ -239,31 +205,25 @@ class TestEnhancedMarketConnectivityManager(unittest.TestCase):
             self.manager.venues["venue1"].failure_probabilities[FailureMode.DISCONNECT],
             0.5,
         )
-
         self.assertNotIn(
-            FailureMode.DISCONNECT,
-            self.manager.venues["venue2"].failure_probabilities,
+            FailureMode.DISCONNECT, self.manager.venues["venue2"].failure_probabilities
         )
 
-    def test_simulate_venue_failure(self):
+    def test_simulate_venue_failure(self) -> Any:
         self.manager.connect_all_venues()
-
         self.manager.venues["venue1"].reconnection_manager.connection_lost = (
             lambda: None
         )
-
         success = self.manager.simulate_venue_failure("venue1")
         self.assertTrue(success)
         self.assertEqual(self.manager.venues["venue1"].status, ConnectionStatus.ERROR)
 
-    def test_simulate_market_data_issue(self):
+    def test_simulate_market_data_issue(self) -> Any:
         self.manager.connect_all_venues()
-
         success = self.manager.simulate_market_data_issue(
             venue_id="venue1", issue_type=FailureMode.DATA_CORRUPTION
         )
         self.assertTrue(success)
-
         self.assertTrue(self.manager.venues["venue1"].failure_simulation_enabled)
         self.assertEqual(
             self.manager.venues["venue1"].failure_probabilities[
@@ -272,35 +232,27 @@ class TestEnhancedMarketConnectivityManager(unittest.TestCase):
             1.0,
         )
 
-    def test_get_connection_health_report(self):
+    def test_get_connection_health_report(self) -> Any:
         self.manager.connect_all_venues()
-
         report = self.manager.get_connection_health_report()
         self.assertEqual(report["total_venues"], 2)
         self.assertEqual(report["connected_venues"], 2)
         self.assertEqual(report["overall_status"], "healthy")
-
-        # Simulate venue1 failure
         self.manager.venues["venue1"].reconnection_manager.connection_lost = (
             lambda: None
         )
-
         self.manager.venues["venue1"].status = ConnectionStatus.ERROR
         self.manager.venues["venue1"].last_error = "Simulated complete failure"
-
         report = self.manager.get_connection_health_report()
         self.assertEqual(report["connected_venues"], 1)
         self.assertEqual(report["overall_status"], "degraded")
 
-    def test_reset_failure_simulations(self):
+    def test_reset_failure_simulations(self) -> Any:
         self.manager.enable_global_failure_simulation(True)
-
         self.manager.configure_venue_failure(
             venue_id="venue1", mode=FailureMode.DISCONNECT, probability=0.5
         )
-
         self.manager.reset_failure_simulations()
-
         self.assertFalse(self.manager.global_failure_simulation_enabled)
         self.assertFalse(self.manager.venues["venue1"].failure_simulation_enabled)
         self.assertFalse(self.manager.venues["venue2"].failure_simulation_enabled)

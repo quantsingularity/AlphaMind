@@ -15,7 +15,6 @@ import threading
 import time
 from typing import Any, Dict, List, Optional, Union
 import uuid
-
 import pandas as pd
 import requests
 
@@ -93,7 +92,7 @@ class APICredentials:
         password: Optional[str] = None,
         token: Optional[str] = None,
         additional_params: Optional[Dict[str, Any]] = None,
-    ):
+    ) -> Any:
         self.api_key = api_key
         self.api_secret = api_secret
         self.username = username
@@ -120,7 +119,7 @@ class APICredentials:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "APICredentials":
+    def from_dict(cls: Any, data: Dict[str, Any]) -> "APICredentials":
         """
         Create credentials from dictionary.
 
@@ -144,7 +143,7 @@ class APICredentials:
         )
 
     @classmethod
-    def from_env(cls, prefix: str = "") -> "APICredentials":
+    def from_env(cls: Any, prefix: str = "") -> "APICredentials":
         """
         Create credentials from environment variables.
 
@@ -170,7 +169,7 @@ class APICredentials:
         )
 
     @classmethod
-    def from_file(cls, filepath: str) -> "APICredentials":
+    def from_file(cls: Any, filepath: str) -> "APICredentials":
         """
         Create credentials from a file.
 
@@ -186,7 +185,6 @@ class APICredentials:
         """
         with open(filepath, "r") as f:
             data = json.load(f)
-
         return cls.from_dict(data)
 
     def save(self, filepath: str) -> None:
@@ -239,7 +237,7 @@ class DataRequest:
         headers: Optional[Dict[str, str]] = None,
         category: Optional[DataCategory] = None,
         format: Optional[DataFormat] = None,
-    ):
+    ) -> Any:
         self.id = str(uuid.uuid4())
         self.provider = provider
         self.endpoint = endpoint
@@ -274,7 +272,7 @@ class DataRequest:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "DataRequest":
+    def from_dict(cls: Any, data: Dict[str, Any]) -> "DataRequest":
         """
         Create request from dictionary.
 
@@ -296,17 +294,12 @@ class DataRequest:
             data=data.get("data", {}),
             headers=data.get("headers", {}),
         )
-
         request.id = data["id"]
-
         if data.get("category"):
             request.category = DataCategory(data["category"])
-
         if data.get("format"):
             request.format = DataFormat(data["format"])
-
         request.timestamp = datetime.fromisoformat(data["timestamp"])
-
         return request
 
 
@@ -338,7 +331,7 @@ class DataResponse:
         data: Any,
         headers: Optional[Dict[str, str]] = None,
         error: Optional[str] = None,
-    ):
+    ) -> Any:
         self.id = str(uuid.uuid4())
         self.request_id = request.id
         self.provider = request.provider
@@ -371,7 +364,9 @@ class DataResponse:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any], request: DataRequest) -> "DataResponse":
+    def from_dict(
+        cls: Any, data: Dict[str, Any], request: DataRequest
+    ) -> "DataResponse":
         """
         Create response from dictionary.
 
@@ -394,10 +389,8 @@ class DataResponse:
             headers=data.get("headers", {}),
             error=data.get("error"),
         )
-
         response.id = data["id"]
         response.timestamp = datetime.fromisoformat(data["timestamp"])
-
         return response
 
     def is_success(self) -> bool:
@@ -409,7 +402,7 @@ class DataResponse:
         is_success : bool
             Whether the response was successful.
         """
-        return 200 <= self.status_code < 300 and not self.error
+        return 200 <= self.status_code < 300 and (not self.error)
 
     def to_dataframe(self) -> pd.DataFrame:
         """
@@ -422,25 +415,18 @@ class DataResponse:
         """
         if isinstance(self.data, pd.DataFrame):
             return self.data
-
         if isinstance(self.data, list):
             return pd.DataFrame(self.data)
-
         if isinstance(self.data, dict):
-            # Try to extract data from common API response formats
             if "data" in self.data:
                 data = self.data["data"]
                 if isinstance(data, list):
                     return pd.DataFrame(data)
-
             if "results" in self.data:
                 results = self.data["results"]
                 if isinstance(results, list):
                     return pd.DataFrame(results)
-
-            # Try to convert the entire dictionary to a DataFrame
             return pd.DataFrame([self.data])
-
         raise ValueError("Cannot convert response data to DataFrame")
 
 
@@ -469,17 +455,15 @@ class RateLimiter:
         requests_per_minute: Optional[int] = None,
         requests_per_hour: Optional[int] = None,
         requests_per_day: Optional[int] = None,
-    ):
+    ) -> Any:
         self.requests_per_second = requests_per_second
         self.requests_per_minute = requests_per_minute
         self.requests_per_hour = requests_per_hour
         self.requests_per_day = requests_per_day
-
         self.second_timestamps = []
         self.minute_timestamps = []
         self.hour_timestamps = []
         self.day_timestamps = []
-
         self.lock = threading.Lock()
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -489,40 +473,29 @@ class RateLimiter:
         """
         with self.lock:
             now = time.time()
-
-            # Check and enforce rate limits
             if self.requests_per_second:
                 self._enforce_rate_limit(
                     self.second_timestamps, self.requests_per_second, now - 1.0
                 )
-
             if self.requests_per_minute:
                 self._enforce_rate_limit(
                     self.minute_timestamps, self.requests_per_minute, now - 60.0
                 )
-
             if self.requests_per_hour:
                 self._enforce_rate_limit(
                     self.hour_timestamps, self.requests_per_hour, now - 3600.0
                 )
-
             if self.requests_per_day:
                 self._enforce_rate_limit(
                     self.day_timestamps, self.requests_per_day, now - 86400.0
                 )
-
-            # Record the request
             now = time.time()
-
             if self.requests_per_second:
                 self.second_timestamps.append(now)
-
             if self.requests_per_minute:
                 self.minute_timestamps.append(now)
-
             if self.requests_per_hour:
                 self.hour_timestamps.append(now)
-
             if self.requests_per_day:
                 self.day_timestamps.append(now)
 
@@ -541,13 +514,9 @@ class RateLimiter:
         cutoff : float
             Cutoff time for considering requests.
         """
-        # Remove old timestamps
         while timestamps and timestamps[0] < cutoff:
             timestamps.pop(0)
-
-        # Check if rate limit is exceeded
         if len(timestamps) >= limit:
-            # Calculate wait time
             if timestamps:
                 wait_time = cutoff - timestamps[0] + 0.1
                 if wait_time > 0:
@@ -555,8 +524,6 @@ class RateLimiter:
                         f"Rate limit reached. Waiting {wait_time:.2f} seconds"
                     )
                     time.sleep(wait_time)
-
-                    # Remove old timestamps again after waiting
                     now = time.time()
                     cutoff = now - (cutoff - timestamps[0])
                     while timestamps and timestamps[0] < cutoff:
@@ -600,7 +567,7 @@ class APIConnector(ABC):
         credentials: APICredentials,
         base_url: str,
         rate_limiter: Optional[RateLimiter] = None,
-    ):
+    ) -> Any:
         self.credentials = credentials
         self.base_url = base_url
         self.rate_limiter = rate_limiter
@@ -665,7 +632,6 @@ class APIConnector(ABC):
         response : DataResponse
             Response from the API.
         """
-        # Create request object
         request = DataRequest(
             provider=self.provider_name,
             endpoint=endpoint,
@@ -676,43 +642,30 @@ class APIConnector(ABC):
             category=category,
             format=format,
         )
-
-        # Apply rate limiting if configured
         if self.rate_limiter:
             self.rate_limiter.wait()
-
-        # Make the request
         try:
             url = f"{self.base_url.rstrip('/')}/{endpoint.lstrip('/')}"
-
             response = self.session.request(
                 method=method, url=url, params=params, json=data, headers=headers
             )
-
-            # Parse response data based on content type
             content_type = response.headers.get("Content-Type", "")
-
             if "application/json" in content_type:
                 response_data = response.json()
             elif "text/csv" in content_type:
                 response_data = pd.read_csv(pd.StringIO(response.text))
             elif "text/xml" in content_type or "application/xml" in content_type:
-                response_data = response.text  # XML as string
+                response_data = response.text
             else:
                 response_data = response.text
-
-            # Create response object
             return DataResponse(
                 request=request,
                 status_code=response.status_code,
                 data=response_data,
                 headers=dict(response.headers),
             )
-
         except Exception as e:
             self.logger.error(f"Error making request: {e}")
-
-            # Create error response
             return DataResponse(
                 request=request, status_code=500, data=None, error=str(e)
             )
@@ -725,6 +678,6 @@ class APIConnector(ABC):
         """Enter context manager."""
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         """Exit context manager."""
         self.close()
