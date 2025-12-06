@@ -614,16 +614,16 @@ class TradingEnvironment(ABC):
             current_idx = self.start_idx + self.window_size + self.current_step
             current_price = self.data.iloc[current_idx][self.price_col]
 
-            print(f"Step: {self.current_step}")
-            print(f"Price: {current_price:.2f}")
-            print(f"Position: {self.position:.6f}")
-            print(f"Balance: {self.balance:.2f}")
-            print(f"Equity: {self.equity:.2f}")
-            print(f"PnL: {self.pnl:.2f}")
+            logger.info(f"Step: {self.current_step}")
+            logger.info(f"Price: {current_price:.2f}")
+            logger.info(f"Position: {self.position:.6f}")
+            logger.info(f"Balance: {self.balance:.2f}")
+            logger.info(f"Equity: {self.equity:.2f}")
+            logger.info(f"PnL: {self.pnl:.2f}")
             print(
                 f"Total Return: {(self.equity - self.initial_balance) / self.initial_balance:.2%}"
             )
-            print("-" * 50)
+            logger.info("-" * 50)
 
     def close(self):
         """Close environment and release resources."""

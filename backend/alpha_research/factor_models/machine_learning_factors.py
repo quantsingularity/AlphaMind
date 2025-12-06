@@ -1,4 +1,8 @@
 import pandas as pd
+from core.logging import get_logger
+
+logger = get_logger(__name__)
+
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import RobustScaler
@@ -82,7 +86,7 @@ class AutoAlphaGenerator:
         Args:
             returns: DataFrame of asset returns (index=time, columns=assets).
         """
-        print("1. Creating rolling dataset...")
+        logger.info("1. Creating rolling dataset...")
         X = self._create_rolling_dataset(returns)
 
         # Update the autoencoder's expected input dimension based on the generated dataset
@@ -95,14 +99,14 @@ class AutoAlphaGenerator:
                 layers=[X.shape[1], 256, 128, 64, self.n_factors], noise=0.1
             )
 
-        print("2. Scaling data...")
+        logger.info("2. Scaling data...")
         X_scaled = self.scaler.fit_transform(X)
         X_scaled = pd.DataFrame(X_scaled, index=X.index, columns=X.columns)
 
-        print("3. Encoding factors...")
+        logger.info("3. Encoding factors...")
         factors = self.autoencoder.encode(X_scaled)
 
-        print("4. Orthogonalizing factors...")
+        logger.info("4. Orthogonalizing factors...")
         return self._orthogonalize_factors(factors)
 
     def _create_rolling_dataset(self, returns: pd.DataFrame) -> pd.DataFrame:

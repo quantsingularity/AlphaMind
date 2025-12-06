@@ -5,6 +5,10 @@
 """
 
 import os
+from core.logging import get_logger
+
+logger = get_logger(__name__)
+
 import sys
 
 import matplotlib.pyplot as plt
@@ -70,11 +74,11 @@ def train_and_backtest_ddpg_agent():
         Backtest results
     """
     # Generate sample market data
-    print("Generating sample market data...")
+    logger.info("Generating sample market data...")
     data = generate_sample_market_data(n_assets=4, n_days=504)  # 2 years of data
 
     # Create trading environment
-    print("Creating trading environment...")
+    logger.info("Creating trading environment...")
     env = TradingGymEnv(
         data_stream=data,
         window_size=10,
@@ -84,7 +88,7 @@ def train_and_backtest_ddpg_agent():
     )
 
     # Create DDPG agent with custom configuration
-    print("Initializing DDPG agent...")
+    logger.info("Initializing DDPG agent...")
     agent_config = {
         "actor_lr": 1e-4,
         "critic_lr": 1e-3,
@@ -105,8 +109,8 @@ def train_and_backtest_ddpg_agent():
     agent = DDPGAgent(env, config=agent_config)
 
     # Train agent
-    print("Training DDPG agent...")
-    print("This may take a few minutes...")
+    logger.info("Training DDPG agent...")
+    logger.info("This may take a few minutes...")
     rewards = agent.train(max_episodes=50, max_steps=252)
 
     # Plot training rewards
@@ -119,20 +123,20 @@ def train_and_backtest_ddpg_agent():
     plt.savefig("training_rewards.png")
 
     # Backtest trained agent
-    print("Backtesting trained agent...")
+    logger.info("Backtesting trained agent...")
     backtest = BacktestEngine(env, agent)
     results = backtest.run(episodes=1, render=False)
 
     # Print backtest results
-    print("\nBacktest Results:")
-    print(f"Total Return: {results['metrics']['total_return']:.2%}")
-    print(f"Annual Return: {results['metrics']['annual_return']:.2%}")
-    print(f"Sharpe Ratio: {results['metrics']['sharpe_ratio']:.2f}")
-    print(f"Volatility: {results['metrics']['volatility']:.2%}")
-    print(f"Max Drawdown: {results['metrics']['max_drawdown']:.2%}")
+    logger.info("\nBacktest Results:")
+    logger.info(f"Total Return: {results['metrics']['total_return']:.2%}")
+    logger.info(f"Annual Return: {results['metrics']['annual_return']:.2%}")
+    logger.info(f"Sharpe Ratio: {results['metrics']['sharpe_ratio']:.2f}")
+    logger.info(f"Volatility: {results['metrics']['volatility']:.2%}")
+    logger.info(f"Max Drawdown: {results['metrics']['max_drawdown']:.2%}")
 
     # Save agent model
-    print("Saving trained agent model...")
+    logger.info("Saving trained agent model...")
     os.makedirs("saved_models", exist_ok=True)
     agent.save_model("saved_models/ddpg_agent")
 
@@ -140,9 +144,9 @@ def train_and_backtest_ddpg_agent():
 
 
 if __name__ == "__main__":
-    print("Starting DDPG trading module demonstration...")
+    logger.info("Starting DDPG trading module demonstration...")
     results = train_and_backtest_ddpg_agent()
     print(
         "\nDemonstration complete! Results saved to 'backtest_results.png' and 'training_rewards.png'"
     )
-    print("Trained model saved to 'saved_models/ddpg_agent'")
+    logger.info("Trained model saved to 'saved_models/ddpg_agent'")

@@ -172,7 +172,7 @@ if __name__ == "__main__":
 
     # Example of accessing a nested key
     tickers = config.get("GLOBAL.TICKERS")
-    print(f"\nLoaded Tickers: {tickers}")
+    logger.info(f"\nLoaded Tickers: {tickers}")
 
     # Example of a concrete module implementation
     class DataFetcher(BaseModule):
@@ -195,7 +195,7 @@ if __name__ == "__main__":
     data = fetcher.run()
 
     if data:
-        print(f"\nLatest Data Point: {data.get_latest()}")
+        logger.info(f"\nLatest Data Point: {data.get_latest()}")
 
     signal = Signal("AAPL", 1, 0.95, datetime.datetime.now())
-    print(f"Generated Signal: {signal.to_dict()}")
+    logger.info(f"Generated Signal: {signal.to_dict()}")

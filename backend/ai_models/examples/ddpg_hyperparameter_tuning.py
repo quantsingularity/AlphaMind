@@ -5,6 +5,10 @@
 """
 
 import os
+from core.logging import get_logger
+
+logger = get_logger(__name__)
+
 import sys
 
 import matplotlib.pyplot as plt
@@ -140,14 +144,14 @@ def run_hyperparameter_tuning(
     )
 
     # Run tuning
-    print(f"Starting hyperparameter tuning with {n_trials} trials...")
+    logger.info(f"Starting hyperparameter tuning with {n_trials} trials...")
     best_config, tuning_results = tuner.run()
 
-    print(f"\nTuning completed!")
-    print(f"Best configuration: {best_config}")
+    logger.info(f"\nTuning completed!")
+    logger.info(f"Best configuration: {best_config}")
 
     # Validate best configuration with longer run
-    print("\nValidating best configuration with extended run...")
+    logger.info("\nValidating best configuration with extended run...")
     env = create_environment(data=data, max_steps=252)
     agent = DDPGAgent(env, config=best_config)
 
@@ -158,11 +162,11 @@ def run_hyperparameter_tuning(
     backtest = BacktestEngine(env, agent)
     results = backtest.run(episodes=1)
 
-    print(f"Validation complete!")
-    print(f"Final metrics with best configuration:")
-    print(f" 	Total Return: {results['metrics']['total_return']:.2%}")
-    print(f" 	Sharpe Ratio: {results['metrics']['sharpe_ratio']:.2f}")
-    print(f" 	Max Drawdown: {results['metrics']['max_drawdown']:.2%}")
+    logger.info(f"Validation complete!")
+    logger.info(f"Final metrics with best configuration:")
+    logger.info(f" 	Total Return: {results['metrics']['total_return']:.2%}")
+    logger.info(f" 	Sharpe Ratio: {results['metrics']['sharpe_ratio']:.2f}")
+    logger.info(f" 	Max Drawdown: {results['metrics']['max_drawdown']:.2%}")
 
     return best_config, tuning_results
 

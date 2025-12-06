@@ -1,4 +1,8 @@
 import matplotlib.pyplot as plt
+from core.logging import get_logger
+
+logger = get_logger(__name__)
+
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -176,7 +180,7 @@ class PortfolioOptimizer:
         Returns:
             Training history
         """
-        print("Preprocessing data and creating sequences...")
+        logger.info("Preprocessing data and creating sequences...")
         # Preprocess data
         X_price, X_vol, X_macro, y = self.preprocess_data(
             price_data, volatility_data, macro_data
@@ -187,7 +191,7 @@ class PortfolioOptimizer:
             # We need one set of current weights for every input sample (sequence)
             initial_weights = np.ones((len(y), self.n_assets)) / self.n_assets
 
-        print("Splitting data for training and validation...")
+        logger.info("Splitting data for training and validation...")
         # Split data (use shuffle=False to maintain time-series order)
         indices = np.arange(len(y))
         train_idx, val_idx = train_test_split(
@@ -206,7 +210,7 @@ class PortfolioOptimizer:
         val_X_macro, val_y = X_macro[val_idx], y[val_idx]
         val_weights = initial_weights[val_idx]
 
-        print("Starting model training...")
+        logger.info("Starting model training...")
         # Train model
         history = self.model.fit(
             [train_X_price, train_X_vol, train_X_macro, train_weights],
@@ -287,7 +291,7 @@ class PortfolioOptimizer:
         Returns:
             DataFrame with backtest results and performance metrics
         """
-        print("\nStarting backtest (walk-forward simulation)...")
+        logger.info("\nStarting backtest (walk-forward simulation)...")
         # Preprocess data to get aligned sequences and next-period returns
         X_price, X_vol, X_macro, returns = self.preprocess_data(
             price_data, volatility_data, macro_data
@@ -370,8 +374,8 @@ class PortfolioOptimizer:
             ],  # Align index with available returns
         )
 
-        print("Backtest Complete. Performance:")
-        print(pd.Series(self.performance_metrics))
+        logger.info("Backtest Complete. Performance:")
+        logger.info(pd.Series(self.performance_metrics))
         return results
 
     def plot_results(self, results):
@@ -398,12 +402,12 @@ class PortfolioOptimizer:
 
     def save(self, filepath):
         """Save the model to disk"""
-        print(f"Saving model to {filepath}")
+        logger.info(f"Saving model to {filepath}")
         self.model.save(filepath)
 
     def load(self, filepath):
         """Load the model from disk"""
-        print(f"Loading model from {filepath}")
+        logger.info(f"Loading model from {filepath}")
         # Need to provide the custom loss function when loading
         self.model = tf.keras.models.load_model(
             filepath, custom_objects={"_portfolio_loss": self._portfolio_loss}

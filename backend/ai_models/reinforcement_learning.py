@@ -1,4 +1,8 @@
 import gym
+from core.logging import get_logger
+
+logger = get_logger(__name__)
+
 from gym import spaces
 import numpy as np
 from stable_baselines3 import PPO
@@ -187,10 +191,10 @@ class PPOAgent:
 
     def train(self, timesteps=1e6):
         """Start the training process for a specified number of time steps."""
-        print(f"Starting PPO training for {timesteps/1e6} million steps...")
+        logger.info(f"Starting PPO training for {timesteps/1e6} million steps...")
         # The agent interacts with the environment here (Policy Optimization Loop)
         self.model.learn(total_timesteps=int(timesteps))
-        print("Training complete.")
+        logger.info("Training complete.")
 
 
 # --- Example Usage ---
@@ -203,8 +207,8 @@ if __name__ == "__main__":
     env = PortfolioGymEnv(universe=asset_universe)
 
     # Check the action and observation space
-    print(f"Action Space Shape: {env.action_space.shape}")
-    print(f"Observation Space Keys: {env.observation_space.spaces.keys()}")
+    logger.info(f"Action Space Shape: {env.action_space.shape}")
+    logger.info(f"Observation Space Keys: {env.observation_space.spaces.keys()}")
 
     # 2. Initialize and Train the Agent
     agent = PPOAgent(env)
@@ -217,7 +221,7 @@ if __name__ == "__main__":
     done = False
     episode_reward = 0
 
-    print("\n--- Running Test Episode ---")
+    logger.info("\n--- Running Test Episode ---")
     while not done:
         # Agent predicts the best action based on the observation
         action, _ = agent.model.predict(obs, deterministic=True)
@@ -225,5 +229,5 @@ if __name__ == "__main__":
         obs, reward, done, _, info = env.step(action)
         episode_reward += reward
 
-    print(f"Episode finished after {env.current_step} steps.")
-    print(f"Total Episode Reward: {episode_reward:.4f}")
+    logger.info(f"Episode finished after {env.current_step} steps.")
+    logger.info(f"Total Episode Reward: {episode_reward:.4f}")

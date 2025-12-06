@@ -753,13 +753,13 @@ class TradingGymEnv(gym.Env):
     def render(self, mode="human"):
         """Render the environment"""
         if mode == "human":
-            print(f"Step: {self.current_step}")
-            print(f"Portfolio Value: {self.portfolio_values[-1]:.4f}")
-            print(f"Current Weights: {self.current_weights}")
+            logger.info(f"Step: {self.current_step}")
+            logger.info(f"Portfolio Value: {self.portfolio_values[-1]:.4f}")
+            logger.info(f"Current Weights: {self.current_weights}")
             print(
                 f"Current Return: {self.episode_returns[-1] if self.episode_returns else 0:.4f}"
             )
-            print("-" * 50)
+            logger.info("-" * 50)
 
         return None
 
