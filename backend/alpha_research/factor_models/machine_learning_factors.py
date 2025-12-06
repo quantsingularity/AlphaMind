@@ -92,7 +92,7 @@ class AutoAlphaGenerator:
         # Update the autoencoder's expected input dimension based on the generated dataset
         if X.shape[1] != self.autoencoder.encoder.input_shape[1]:
             # In a proper implementation, you would re-initialize or dynamically adjust the model here
-            print(
+            logger.info(
                 f"Warning: Re-initializing SDAE to match input dimension {X.shape[1]}"
             )
             self.autoencoder = StackedDenoisingAutoencoder(

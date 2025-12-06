@@ -4,6 +4,10 @@ import tensorflow as tf
 
 from ..attention_mechanism import FinancialTimeSeriesTransformer
 
+from core.logging import get_logger
+
+logger = get_logger(__name__)
+
 
 class AdvancedTimeSeriesForecaster:
     """
@@ -174,14 +178,13 @@ class AdvancedTimeSeriesForecaster:
             history["loss"].append(train_loss_metric.result().numpy())
             if validation_data is not None:
                 history["val_loss"].append(val_loss_metric.result().numpy())
-                print(
+                logger.info(
                     f"Epoch {epoch+1}/{epochs} - loss: {train_loss_metric.result():.4f} - val_loss: {val_loss_metric.result():.4f}"
                 )
             else:
-                print(
+                logger.info(
                     f"Epoch {epoch+1}/{epochs} - loss: {train_loss_metric.result():.4f}"
                 )
-
         return history
 
     def predict(self, X):

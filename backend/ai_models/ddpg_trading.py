@@ -14,6 +14,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
+from core.logging import get_logger
+
+logger = get_logger(__name__)
+
 # Setup logging
 logging.basicConfig(
     level=logging.INFO,
@@ -756,7 +760,7 @@ class TradingGymEnv(gym.Env):
             logger.info(f"Step: {self.current_step}")
             logger.info(f"Portfolio Value: {self.portfolio_values[-1]:.4f}")
             logger.info(f"Current Weights: {self.current_weights}")
-            print(
+            logger.info(
                 f"Current Return: {self.episode_returns[-1] if self.episode_returns else 0:.4f}"
             )
             logger.info("-" * 50)

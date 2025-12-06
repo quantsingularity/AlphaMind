@@ -247,6 +247,6 @@ if __name__ == "__main__":
 
         json.dump(serializable_config, f, indent=4)
 
-    print(
+    logger.info(
         "\nAnalysis complete! Results saved to 'parameter_importance.png' and 'best_ddpg_config.json'"
     )

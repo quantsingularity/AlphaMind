@@ -146,7 +146,7 @@ def train_and_backtest_ddpg_agent():
 if __name__ == "__main__":
     logger.info("Starting DDPG trading module demonstration...")
     results = train_and_backtest_ddpg_agent()
-    print(
+    logger.info(
         "\nDemonstration complete! Results saved to 'backtest_results.png' and 'training_rewards.png'"
     )
     logger.info("Trained model saved to 'saved_models/ddpg_agent'")

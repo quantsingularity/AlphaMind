@@ -20,6 +20,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
+from core.logging import get_logger
+
+logger = get_logger(__name__)
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -620,7 +624,7 @@ class TradingEnvironment(ABC):
             logger.info(f"Balance: {self.balance:.2f}")
             logger.info(f"Equity: {self.equity:.2f}")
             logger.info(f"PnL: {self.pnl:.2f}")
-            print(
+            logger.info(
                 f"Total Return: {(self.equity - self.initial_balance) / self.initial_balance:.2%}"
             )
             logger.info("-" * 50)
