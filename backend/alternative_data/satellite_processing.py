@@ -1,4 +1,3 @@
-import geopython as gp
 import numpy as np
 import pandas as pd
 from sentinelhub import WmsRequest, DataCollection, MimeType, SHConfig, CRS

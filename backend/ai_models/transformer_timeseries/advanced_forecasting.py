@@ -55,9 +55,9 @@ class AdvancedTimeSeriesForecaster:
         iqr = q75 - q25
         normalized_data = (data - median) / (iqr + 1e-08)
         try:
-            projected_data = self.feature_projection(normalized_data)
+            self.feature_projection(normalized_data)
         except Exception:
-            projected_data = normalized_data
+            pass
         return normalized_data
 
     def train(

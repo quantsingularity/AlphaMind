@@ -10,7 +10,6 @@ import logging
 import re
 import time
 from typing import Any, Dict, List
-import requests
 
 try:
     from sec_edgar_downloader import Downloader
