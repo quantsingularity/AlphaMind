@@ -85,7 +85,7 @@ transfer_files() {
 # --- Initialization ---
 
 # Exit immediately if a command exits with a non-zero status
-set -e
+set -euo pipefail
 
 # Define project root directory (assuming the script is in the project root)
 PROJECT_ROOT="$(pwd)"
@@ -357,7 +357,7 @@ if [[ "$SKIP_TESTS" == "false" && "$ROLLBACK" == "false" ]]; then
       TEST_ARGS="$TEST_ARGS --component $COMPONENT"
     fi
 
-    if ! bash ./run_tests.sh $TEST_ARGS; then
+    if ! bash "$PROJECT_ROOT/scripts/run_tests.sh" $TEST_ARGS; then
       print_error "Tests failed!"
       if [[ "$FORCE" != "true" ]]; then
         print_info "Exiting. Run with --force to deploy anyway."
@@ -378,7 +378,7 @@ fi
 if [[ "$SKIP_BUILD" == "false" && "$ROLLBACK" == "false" ]]; then
   print_header "Building Application"
 
-  if [[ -f "./optimized_build.sh" ]]; then
+  if [[ -f "$PROJECT_ROOT/scripts/build.sh" ]]; then
     print_info "Building application for $DEPLOY_ENV environment..."
 
     BUILD_ARGS="--env $DEPLOY_ENV"
@@ -386,14 +386,14 @@ if [[ "$SKIP_BUILD" == "false" && "$ROLLBACK" == "false" ]]; then
       BUILD_ARGS="$BUILD_ARGS --component $COMPONENT"
     fi
 
-    if ! bash ./optimized_build.sh $BUILD_ARGS; then
+    if ! bash "$PROJECT_ROOT/scripts/build.sh" $BUILD_ARGS; then
       print_error "Build failed!"
       exit 1
     else
       print_success "Build completed successfully!"
     fi
   else
-    print_warning "optimized_build.sh not found, using existing build artifacts"
+    print_warning "build.sh not found, using existing build artifacts"
   fi
 fi
 

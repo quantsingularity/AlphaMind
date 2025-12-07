@@ -48,7 +48,7 @@ print_info() {
 # --- Initialization ---
 
 # Exit immediately if a command exits with a non-zero status
-set -e
+set -euo pipefail
 
 # Define project root directory (assuming the script is in the project root)
 PROJECT_ROOT="$(pwd)"

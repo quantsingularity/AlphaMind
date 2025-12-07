@@ -48,7 +48,7 @@ print_info() {
 # --- Initialization ---
 
 # Exit immediately if a command exits with a non-zero status
-set -e
+set -euo pipefail
 
 # Define project root directory (assuming the script is in the project root)
 PROJECT_ROOT="$(pwd)"
@@ -131,7 +131,7 @@ if [[ -d "venv" ]]; then
 else
   print_warning "Python virtual environment not found. Running setup_environment.sh..."
   if [[ -f "./setup_environment.sh" ]]; then
-    bash ./setup_environment.sh --type testing
+    bash "$PROJECT_ROOT/scripts/setup_environment.sh" --type testing
     source venv/bin/activate
   else
     print_error "setup_environment.sh not found. Please set up the environment first."
