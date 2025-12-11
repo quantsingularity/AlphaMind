@@ -1,31 +1,31 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
- name: alphamind-ingress
- annotations:
+  name: alphamind-ingress
+  annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   tls:
-  - hosts:
-    - alphamind.example.com
-    secretName: alphamind-tls-secrets
+    - hosts:
+        - alphamind.example.com
+      secretName: alphamind-tls-secrets
   rules:
-  - host: alphamind.example.com
-    http:
-      paths:
-      - path: /api
-        pathType: Prefix
-        backend:
-          service:
-           name: alphamind-backend
-            port:
-              number: 80
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-           name: alphamind-frontend
-            port:
-              number: 80
+    - host: alphamind.example.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: alphamind-backend
+                port:
+                  number: 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: alphamind-frontend
+                port:
+                  number: 80

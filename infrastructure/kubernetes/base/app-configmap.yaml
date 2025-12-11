@@ -1,104 +1,99 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
- name: alphamind-config
- namespace: alphamind-prod
- annotations:
-   description: "Application configuration with security and compliance settings"
-
-
-
-
-
- labels:
-   app: alphamind-app
-   component: config
-   security.alphamind.io/classification: "internal"
+  name: alphamind-config
+  namespace: alphamind-prod
+  annotations:
+    description: "Application configuration with security and compliance settings"
+  labels:
+    app: alphamind-app
+    component: config
+    security.alphamind.io/classification: "internal"
 data:
- # Application Configuration
- API_URL: {{ .Values.backend.apiUrl }}
- REDIS_HOST: {{ .Values.appName }}-redis
- REDIS_PORT: "{{ .Values.redis.containerPort }}"
- DATABASE_HOST: {{ .Values.appName }}-database
- DATABASE_PORT: "{{ .Values.database.containerPort }}"
- DATABASE_NAME: {{ .Values.database.name }}
- DATABASE_USER: {{ .Values.database.user }}
- LOG_LEVEL: {{ .Values.logLevel }}
+  # Application Configuration
+  API_URL: "http://alphamind-backend"
+  REDIS_HOST: "alphamind-redis"
+  REDIS_PORT: "6379"
+  DATABASE_HOST: "alphamind-database"
+  DATABASE_PORT: "3306"
+  DATABASE_NAME: "alphamind_db"
+  DATABASE_USER: "alphamind_user"
+  LOG_LEVEL: "info"
 
- # Security Configuration
- ENABLE_ENCRYPTION: "true"
- ENCRYPTION_ALGORITHM: "AES-256-GCM"
- TLS_MIN_VERSION: "1.2"
- ENABLE_CSRF_PROTECTION: "true"
- ENABLE_XSS_PROTECTION: "true"
- ENABLE_CONTENT_SECURITY_POLICY: "true"
- SESSION_TIMEOUT: "900"
- PASSWORD_MIN_LENGTH: "12"
- ENABLE_MFA: "true"
+  # Security Configuration
+  ENABLE_ENCRYPTION: "true"
+  ENCRYPTION_ALGORITHM: "AES-256-GCM"
+  TLS_MIN_VERSION: "1.2"
+  ENABLE_CSRF_PROTECTION: "true"
+  ENABLE_XSS_PROTECTION: "true"
+  ENABLE_CONTENT_SECURITY_POLICY: "true"
+  SESSION_TIMEOUT: "900"
+  PASSWORD_MIN_LENGTH: "12"
+  ENABLE_MFA: "true"
 
- # Compliance Configuration
- AUDIT_ENABLED: "true"
- AUDIT_LOG_RETENTION_DAYS: "2555"  # 7 years for financial compliance
- DATA_RETENTION_POLICY: "7-years"
- GDPR_COMPLIANCE_MODE: "strict"
- PCI_DSS_COMPLIANCE: "true"
- SOX_COMPLIANCE: "true"
+  # Compliance Configuration
+  AUDIT_ENABLED: "true"
+  AUDIT_LOG_RETENTION_DAYS: "2555" # 7 years for financial compliance
+  DATA_RETENTION_POLICY: "7-years"
+  GDPR_COMPLIANCE_MODE: "strict"
+  PCI_DSS_COMPLIANCE: "true"
+  SOX_COMPLIANCE: "true"
 
- # Monitoring and Alerting
- ENABLE_METRICS: "true"
- METRICS_PORT: "9090"
- HEALTH_CHECK_INTERVAL: "30"
- ENABLE_DISTRIBUTED_TRACING: "true"
- LOG_FORMAT: "json"
- LOG_DESTINATION: "stdout"
+  # Monitoring and Alerting
+  ENABLE_METRICS: "true"
+  METRICS_PORT: "9090"
+  HEALTH_CHECK_INTERVAL: "30"
+  ENABLE_DISTRIBUTED_TRACING: "true"
+  LOG_FORMAT: "json"
+  LOG_DESTINATION: "stdout"
 
- # Rate Limiting
- RATE_LIMIT_ENABLED: "true"
- RATE_LIMIT_REQUESTS_PER_MINUTE: "100"
- RATE_LIMIT_BURST_SIZE: "20"
+  # Rate Limiting
+  RATE_LIMIT_ENABLED: "true"
+  RATE_LIMIT_REQUESTS_PER_MINUTE: "100"
+  RATE_LIMIT_BURST_SIZE: "20"
 
- # Database Security
- DATABASE_SSL_MODE: "require"
- DATABASE_CONNECTION_TIMEOUT: "30"
- DATABASE_MAX_CONNECTIONS: "100"
- DATABASE_IDLE_TIMEOUT: "300"
+  # Database Security
+  DATABASE_SSL_MODE: "require"
+  DATABASE_CONNECTION_TIMEOUT: "30"
+  DATABASE_MAX_CONNECTIONS: "100"
+  DATABASE_IDLE_TIMEOUT: "300"
 
- # Redis Security
- REDIS_AUTH_ENABLED: "true"
- REDIS_SSL_ENABLED: "true"
- REDIS_CONNECTION_TIMEOUT: "10"
+  # Redis Security
+  REDIS_AUTH_ENABLED: "true"
+  REDIS_SSL_ENABLED: "true"
+  REDIS_CONNECTION_TIMEOUT: "10"
 
- # Backup Configuration
- BACKUP_ENABLED: "true"
- BACKUP_SCHEDULE: "0 2 * * *"  # Daily at 2 AM
- BACKUP_RETENTION_DAYS: "2555"  # 7 years
- BACKUP_ENCRYPTION_ENABLED: "true"
+  # Backup Configuration
+  BACKUP_ENABLED: "true"
+  BACKUP_SCHEDULE: "0 2 * * *" # Daily at 2 AM
+  BACKUP_RETENTION_DAYS: "2555" # 7 years
+  BACKUP_ENCRYPTION_ENABLED: "true"
 
- # Network Security
- ALLOWED_ORIGINS: {{ .Values.security.allowedOrigins | default "*" }}
- TRUSTED_PROXIES: {{ .Values.security.trustedProxies | default "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16" }}
+  # Network Security
+  ALLOWED_ORIGINS: "*"
+  TRUSTED_PROXIES: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
 
- # Feature Flags
- ENABLE_API_VERSIONING: "true"
- ENABLE_REQUEST_VALIDATION: "true"
- ENABLE_RESPONSE_COMPRESSION: "true"
- ENABLE_CORS: "true"
+  # Feature Flags
+  ENABLE_API_VERSIONING: "true"
+  ENABLE_REQUEST_VALIDATION: "true"
+  ENABLE_RESPONSE_COMPRESSION: "true"
+  ENABLE_CORS: "true"
 
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
- name: alphamind-security-config
- namespace: alphamind-prod
- annotations:
-   description: "Security-specific configuration for compliance frameworks"
- labels:
-   app: alphamind-app
-   component: security-config
-   security.alphamind.io/classification: "internal"
+  name: alphamind-security-config
+  namespace: alphamind-prod
+  annotations:
+    description: "Security-specific configuration for compliance frameworks"
+  labels:
+    app: alphamind-app
+    component: security-config
+    security.alphamind.io/classification: "internal"
 data:
   # PCI DSS Configuration
- pci_dss_config.json: |
+  pci_dss_config.json: |
     {
       "version": "4.0",
       "requirements": {
@@ -116,12 +111,12 @@ data:
         "information_security_policy": true
       },
       "compliance_level": "Level 1",
-      "assessment_date": "{{ now | date "2006-01-02" }}",
-      "next_assessment": "{{ now | date_modify "+1y" | date "2006-01-02" }}"
+      "assessment_date": "2025-01-01",
+      "next_assessment": "2026-01-01"
     }
 
   # GDPR Configuration
- gdpr_config.json: |
+  gdpr_config.json: |
     {
       "version": "2018",
       "data_protection_principles": {
@@ -146,7 +141,7 @@ data:
     }
 
   # SOX Configuration
- sox_config.json: |
+  sox_config.json: |
     {
       "version": "2002",
       "sections": {
@@ -176,7 +171,7 @@ data:
     }
 
   # NIST CSF Configuration
- nist_csf_config.json: |
+  nist_csf_config.json: |
     {
       "version": "2.0",
       "core_functions": {
@@ -218,7 +213,7 @@ data:
     }
 
   # ISO 27001 Configuration
- iso_27001_config.json: |
+  iso_27001_config.json: |
     {
       "version": "2022",
       "annex_a_controls": {

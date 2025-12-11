@@ -1,8 +1,8 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
- name: alphamind-database
- labels:
+  name: alphamind-database
+  labels:
     app: alphamind-database
 spec:
   serviceName: alphamind-database
@@ -12,56 +12,65 @@ spec:
       app: alphamind-database
   template:
     metadata:
-     labels:
+      labels:
         app: alphamind-database
     spec:
       containers:
-      - name: alphamind-database
-        image: mysql:8.0
-        imagePullPolicy: IfNotPresent
-        ports:
-        - containerPort: 3306
-        resources:
-          limits:
-            cpu: 1000m
-            memory: 1Gi
-          requests:
-            cpu: 500m
-            memory: 512Mi
-        env:
-        - name: MYSQL_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-             name: alphamind-secrets
-              key: mysql-root-password
-        - name: MYSQL_DATABASE
-          value: alphamind_db
-        - name: MYSQL_USER
-          value: alphamind_user
-        - name: MYSQL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-             name: alphamind-secrets
-              key: mysql-password
-        volumeMounts:
-        - name: alphamind-database-data
-          mountPath: /var/lib/mysql
-        livenessProbe:
-          exec:
-            command: ["mysqladmin", "ping", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          exec:
-            command: ["mysql", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}", "-e", "SELECT 1"]
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - name: alphamind-database
+          image: mysql:8.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3306
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 500m
+              memory: 512Mi
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: alphamind-secrets
+                  key: mysql-root-password
+            - name: MYSQL_DATABASE
+              value: alphamind_db
+            - name: MYSQL_USER
+              value: alphamind_user
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: alphamind-secrets
+                  key: mysql-password
+          volumeMounts:
+            - name: alphamind-database-data
+              mountPath: /var/lib/mysql
+          livenessProbe:
+            exec:
+              command:
+                ["mysqladmin", "ping", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                [
+                  "mysql",
+                  "-u",
+                  "root",
+                  "-p${MYSQL_ROOT_PASSWORD}",
+                  "-e",
+                  "SELECT 1",
+                ]
+            initialDelaySeconds: 5
+            periodSeconds: 5
   volumeClaimTemplates:
-  - metadata:
-     name: alphamind-database-data
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      storageClassName: standard
-      resources:
-        requests:
-          storage: 10Gi
+    - metadata:
+        name: alphamind-database-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 10Gi
