@@ -1,48 +1,48 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.appName }}-frontend
+  name: alphamind-frontend
   labels:
-    app: {{ .Values.appName }}-frontend
+    app: alphamind-frontend
 spec:
-  replicas: {{ .Values.frontend.replicas }}
+  replicas: 3
   selector:
     matchLabels:
-      app: {{ .Values.appName }}-frontend
+      app: alphamind-frontend
   template:
     metadata:
       labels:
-        app: {{ .Values.appName }}-frontend
+        app: alphamind-frontend
     spec:
       containers:
-      - name: {{ .Values.appName }}-frontend
-        image: {{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}
-        imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
-        ports:
-        - containerPort: {{ .Values.frontend.containerPort }}
-        resources:
-          limits:
-            cpu: {{ .Values.frontend.resources.limits.cpu }}
-            memory: {{ .Values.frontend.resources.limits.memory }}
-          requests:
-            cpu: {{ .Values.frontend.resources.requests.cpu }}
-            memory: {{ .Values.frontend.resources.requests.memory }}
-        env:
-        - name: REACT_APP_API_URL
-          value: {{ .Values.frontend.apiUrl }}
-        - name: REACT_APP_ENV
-          value: {{ .Values.environment }}
-        livenessProbe:
-          httpGet:
-            path: /
-            port: {{ .Values.frontend.containerPort }}
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /
-            port: {{ .Values.frontend.containerPort }}
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - name: alphamind-frontend
+          image: alphamind/frontend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          env:
+            - name: REACT_APP_API_URL
+              value: /api
+            - name: REACT_APP_ENV
+              value: production
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
       imagePullSecrets:
-      - name: {{ .Values.imagePullSecrets }}
+        - name: regcred

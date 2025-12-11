@@ -1,17 +1,17 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ .Values.appName }}-service-account
-  namespace: {{ .Values.namespace | default "alphamind-prod" }}
-  annotations:
+ name: alphamind-service-account
+ namespace: alphamind-prod
+ annotations:
     description: "Service account for AlphaMind application with minimal required permissions"
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: {{ .Values.namespace | default "alphamind-prod" }}
-  name: {{ .Values.appName }}-app-role
+ namespace: alphamind-prod
+ name: alphamind-app-role
 rules:
 - apiGroups: [""]
   resources: ["configmaps", "secrets"]
@@ -27,32 +27,32 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ .Values.appName }}-app-binding
-  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+ name: alphamind-app-binding
+ namespace: alphamind-prod
 subjects:
 - kind: ServiceAccount
-  name: {{ .Values.appName }}-service-account
-  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+ name: alphamind-service-account
+ namespace: alphamind-prod
 roleRef:
   kind: Role
-  name: {{ .Values.appName }}-app-role
+ name: alphamind-app-role
   apiGroup: rbac.authorization.k8s.io
 
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ .Values.appName }}-monitoring-sa
-  namespace: {{ .Values.namespace | default "alphamind-prod" }}
-  annotations:
+ name: alphamind-monitoring-sa
+ namespace: alphamind-prod
+ annotations:
     description: "Service account for monitoring and observability components"
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: {{ .Values.namespace | default "alphamind-prod" }}
-  name: {{ .Values.appName }}-monitoring-role
+ namespace: alphamind-prod
+ name: alphamind-monitoring-role
 rules:
 - apiGroups: [""]
   resources: ["pods", "services", "endpoints"]
@@ -68,32 +68,32 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ .Values.appName }}-monitoring-binding
-  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+ name: alphamind-monitoring-binding
+ namespace: alphamind-prod
 subjects:
 - kind: ServiceAccount
-  name: {{ .Values.appName }}-monitoring-sa
-  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+ name: alphamind-monitoring-sa
+ namespace: alphamind-prod
 roleRef:
   kind: Role
-  name: {{ .Values.appName }}-monitoring-role
+ name: alphamind-monitoring-role
   apiGroup: rbac.authorization.k8s.io
 
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ .Values.appName }}-backup-sa
-  namespace: {{ .Values.namespace | default "alphamind-prod" }}
-  annotations:
+ name: alphamind-backup-sa
+ namespace: alphamind-prod
+ annotations:
     description: "Service account for backup operations with restricted database access"
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: {{ .Values.namespace | default "alphamind-prod" }}
-  name: {{ .Values.appName }}-backup-role
+ namespace: alphamind-prod
+ name: alphamind-backup-role
 rules:
 - apiGroups: [""]
   resources: ["pods"]
@@ -101,7 +101,7 @@ rules:
 - apiGroups: [""]
   resources: ["secrets"]
   verbs: ["get"]
-  resourceNames: ["{{ .Values.appName }}-db-backup-secret"]
+  resourceNames: ["alphamind-db-backup-secret"]
 - apiGroups: [""]
   resources: ["persistentvolumeclaims"]
   verbs: ["get", "list"]
@@ -110,15 +110,15 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ .Values.appName }}-backup-binding
-  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+ name: alphamind-backup-binding
+ namespace: alphamind-prod
 subjects:
 - kind: ServiceAccount
-  name: {{ .Values.appName }}-backup-sa
-  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+ name: alphamind-backup-sa
+ namespace: alphamind-prod
 roleRef:
   kind: Role
-  name: {{ .Values.appName }}-backup-role
+ name: alphamind-backup-role
   apiGroup: rbac.authorization.k8s.io
 
 ---
@@ -126,7 +126,7 @@ roleRef:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ .Values.appName }}-security-auditor
+ name: alphamind-security-auditor
 rules:
 - apiGroups: [""]
   resources: ["nodes", "pods", "services", "events"]
@@ -148,23 +148,23 @@ rules:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ .Values.appName }}-security-auditor-sa
-  namespace: {{ .Values.namespace | default "alphamind-prod" }}
-  annotations:
+ name: alphamind-security-auditor-sa
+ namespace: alphamind-prod
+ annotations:
     description: "Service account for security auditing and compliance monitoring"
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ .Values.appName }}-security-auditor-binding
+ name: alphamind-security-auditor-binding
 subjects:
 - kind: ServiceAccount
-  name: {{ .Values.appName }}-security-auditor-sa
-  namespace: {{ .Values.namespace | default "alphamind-prod" }}
+ name: alphamind-security-auditor-sa
+ namespace: alphamind-prod
 roleRef:
   kind: ClusterRole
-  name: {{ .Values.appName }}-security-auditor
+ name: alphamind-security-auditor
   apiGroup: rbac.authorization.k8s.io
 
 ---
@@ -172,8 +172,8 @@ roleRef:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: {{ .Values.namespace | default "alphamind-dev" }}
-  name: {{ .Values.appName }}-developer-role
+ namespace: alphamind-dev
+ name: alphamind-developer-role
 rules:
 - apiGroups: [""]
   resources: ["pods", "services", "configmaps"]
@@ -196,8 +196,8 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: {{ .Values.namespace | default "alphamind-prod" }}
-  name: {{ .Values.appName }}-production-viewer-role
+ namespace: alphamind-prod
+ name: alphamind-production-viewer-role
 rules:
 - apiGroups: [""]
   resources: ["pods", "services", "configmaps", "events"]
@@ -214,8 +214,8 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: {{ .Values.namespace | default "alphamind-prod" }}
-  name: {{ .Values.appName }}-emergency-access-role
+ namespace: alphamind-prod
+ name: alphamind-emergency-access-role
 rules:
 - apiGroups: [""]
   resources: ["pods", "services", "configmaps", "secrets"]

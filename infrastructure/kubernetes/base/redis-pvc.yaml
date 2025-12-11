@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Values.appName }}-redis-pvc
+ name: {{ .Values.appName }}-redis-pvc
 spec:
   accessModes:
     - ReadWriteOnce

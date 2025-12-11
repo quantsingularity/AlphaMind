@@ -1,8 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.appName }}-redis
-  labels:
+ name: {{ .Values.appName }}-redis
+ labels:
     app: {{ .Values.appName }}-redis
 spec:
   replicas: {{ .Values.redis.replicas }}
@@ -11,7 +11,7 @@ spec:
       app: {{ .Values.appName }}-redis
   template:
     metadata:
-      labels:
+     labels:
         app: {{ .Values.appName }}-redis
     spec:
       containers:

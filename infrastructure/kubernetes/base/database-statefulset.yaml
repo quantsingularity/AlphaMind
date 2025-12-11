@@ -1,50 +1,50 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Values.appName }}-database
-  labels:
-    app: {{ .Values.appName }}-database
+ name: alphamind-database
+ labels:
+    app: alphamind-database
 spec:
-  serviceName: {{ .Values.appName }}-database
-  replicas: {{ .Values.database.replicas }}
+  serviceName: alphamind-database
+  replicas: 1
   selector:
     matchLabels:
-      app: {{ .Values.appName }}-database
+      app: alphamind-database
   template:
     metadata:
-      labels:
-        app: {{ .Values.appName }}-database
+     labels:
+        app: alphamind-database
     spec:
       containers:
-      - name: {{ .Values.appName }}-database
-        image: {{ .Values.database.image.repository }}:{{ .Values.database.image.tag }}
-        imagePullPolicy: {{ .Values.database.image.pullPolicy }}
+      - name: alphamind-database
+        image: mysql:8.0
+        imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: {{ .Values.database.containerPort }}
+        - containerPort: 3306
         resources:
           limits:
-            cpu: {{ .Values.database.resources.limits.cpu }}
-            memory: {{ .Values.database.resources.limits.memory }}
+            cpu: 1000m
+            memory: 1Gi
           requests:
-            cpu: {{ .Values.database.resources.requests.cpu }}
-            memory: {{ .Values.database.resources.requests.memory }}
+            cpu: 500m
+            memory: 512Mi
         env:
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.appName }}-secrets
+             name: alphamind-secrets
               key: mysql-root-password
         - name: MYSQL_DATABASE
-          value: {{ .Values.database.name }}
+          value: alphamind_db
         - name: MYSQL_USER
-          value: {{ .Values.database.user }}
+          value: alphamind_user
         - name: MYSQL_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.appName }}-secrets
+             name: alphamind-secrets
               key: mysql-password
         volumeMounts:
-        - name: {{ .Values.appName }}-database-data
+        - name: alphamind-database-data
           mountPath: /var/lib/mysql
         livenessProbe:
           exec:
@@ -58,10 +58,10 @@ spec:
           periodSeconds: 5
   volumeClaimTemplates:
   - metadata:
-      name: {{ .Values.appName }}-database-data
+     name: alphamind-database-data
     spec:
       accessModes: ["ReadWriteOnce"]
-      storageClassName: {{ .Values.database.storageClass }}
+      storageClassName: standard
       resources:
         requests:
-          storage: {{ .Values.database.storage }}
+          storage: 10Gi

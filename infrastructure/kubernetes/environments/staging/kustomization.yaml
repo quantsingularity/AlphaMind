@@ -1,0 +1,39 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+  - ../../base
+
+namePrefix: staging-
+
+patches:
+  - target:
+      kind: Deployment
+      name: alphamind-backend
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: staging
+  - target:
+      kind: Deployment
+      name: alphamind-frontend
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+      - op: replace
+        path: /spec/template/spec/containers/0/env/1/value
+        value: staging
+  - target:
+      kind: Ingress
+      name: alphamind-ingress
+    patch: |-
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: staging.alphamind.example.com
+      - op: replace
+        path: /spec/rules/0/host
+        value: staging.alphamind.example.com
