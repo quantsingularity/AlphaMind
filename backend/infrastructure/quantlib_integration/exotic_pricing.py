@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class AutocallablePricer:
 
     def __init__(self, observation_dates: Any, coupon_barriers: Any) -> Any:

@@ -1,3 +1,4 @@
+from typing import Any
 import numpy as np
 from ruptures import Binseg
 from ruptures.costs import CostL2

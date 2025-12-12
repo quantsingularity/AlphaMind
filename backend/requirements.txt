@@ -43,3 +43,16 @@ bcrypt>=3.2.0
 
 
 PyJWT>=2.0.0
+
+# Additional required dependencies
+SQLAlchemy>=1.4.0
+ruptures>=1.1.0
+dask>=2021.0.0
+websockets>=10.0
+dash>=2.0.0
+torch>=1.10.0
+pymc>=4.0.0
+requests>=2.26.0
+
+# Database connector
+pymysql>=1.0.0

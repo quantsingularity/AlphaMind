@@ -8,7 +8,7 @@ and more.
 
 import logging
 from typing import Any, Dict, List, Optional
-from .base import (
+from market_data.api_connectors.base import (
     APIConnector,
     APICredentials,
     DataCategory,

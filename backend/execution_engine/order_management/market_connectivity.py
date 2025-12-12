@@ -19,7 +19,10 @@ from AlphaMind.backend.execution_engine.order_management.market_connectivity imp
     VenueAdapter,
     VenueConfig,
 )
-from .reconnection_manager import ReconnectionConfig, ReconnectionManager
+from execution_engine.order_management.reconnection_manager import (
+    ReconnectionConfig,
+    ReconnectionManager,
+)
 
 logger = logging.getLogger(__name__)
 

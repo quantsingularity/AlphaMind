@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class OptimalExecution:
 
     def __init__(self, order_size: Any, liquidity_profile: Any) -> Any:

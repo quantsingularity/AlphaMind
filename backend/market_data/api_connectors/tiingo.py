@@ -7,8 +7,8 @@
 
 from datetime import date, datetime
 import logging
-from typing import Dict, List, Optional, Union
-from .base import (
+from typing import Dict, List, Optional, Union, Any
+from market_data.api_connectors.base import (
     APIConnector,
     APICredentials,
     DataCategory,

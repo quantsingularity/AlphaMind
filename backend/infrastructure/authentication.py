@@ -1,3 +1,4 @@
+from typing import Any
 import datetime
 from functools import wraps
 import bcrypt

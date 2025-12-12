@@ -2,12 +2,13 @@
 Alpha Vantage API connector for financial data.
 
 This module provides a connector for accessing financial market data
+from typing import Any, Dict, List, Optional, Tuple, Union
 from Alpha Vantage, including stock prices, technical indicators,
 forex data, and more.
 """
 
 import logging
-from .base import (
+from market_data.api_connectors.base import (
     APIConnector,
     APICredentials,
     DataCategory,

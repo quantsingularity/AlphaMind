@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class LatencyOptimizedRouter:
 
     def __init__(self, venue_latencies: Any) -> Any:

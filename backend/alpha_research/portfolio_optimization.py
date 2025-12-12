@@ -1,3 +1,4 @@
+from typing import Any
 import matplotlib.pyplot as plt
 from core.logging import get_logger
 

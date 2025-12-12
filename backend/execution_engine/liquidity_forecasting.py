@@ -1,6 +1,6 @@
 import numpy as np
 import warnings
-from typing import List, Optional
+from typing import List, Optional, Any
 
 
 class LiquidityHawkesProcess:

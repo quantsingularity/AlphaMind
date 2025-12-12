@@ -8,9 +8,9 @@
 
 from datetime import datetime, timedelta
 import logging
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Any
 import requests
-from .base import (
+from market_data.api_connectors.base import (
     APIConnector,
     APICredentials,
     DataCategory,

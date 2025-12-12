@@ -1,3 +1,4 @@
+from typing import Any
 from functools import wraps
 import os
 import sys

@@ -8,7 +8,7 @@
 from datetime import datetime, timedelta
 from enum import Enum
 import logging
-from typing import Callable, Dict, Optional, Tuple
+from typing import Callable, Dict, Optional, Tuple, Any
 import numpy as np
 import pandas as pd
 

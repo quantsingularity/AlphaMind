@@ -6,7 +6,7 @@ on A/B test results, including hypothesis testing, confidence intervals,
 and Bayesian analysis.
 """
 
-from typing import Dict, List
+from typing import Dict, List, Any
 import numpy as np
 import scipy.stats as stats
 

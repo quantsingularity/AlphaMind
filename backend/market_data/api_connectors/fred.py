@@ -8,7 +8,7 @@ from the Federal Reserve Economic Data (FRED) API.
 from datetime import date, datetime
 import logging
 from typing import Any, Dict, List, Optional, Union
-from .base import (
+from market_data.api_connectors.base import (
     APIConnector,
     APICredentials,
     DataCategory,

@@ -1,7 +1,8 @@
+from typing import Any
 import keras
 import numpy as np
 import tensorflow as tf
-from ..attention_mechanism import FinancialTimeSeriesTransformer
+from ai_models.attention_mechanism import FinancialTimeSeriesTransformer
 from core.logging import get_logger
 
 logger = get_logger(__name__)

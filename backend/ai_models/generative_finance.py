@@ -1,3 +1,4 @@
+from typing import Any
 import tensorflow as tf
 from tensorflow.keras.layers import Dense, Conv1D, Flatten, LeakyReLU, Reshape, LSTM
 

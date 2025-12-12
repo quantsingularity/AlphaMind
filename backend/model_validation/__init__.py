@@ -6,15 +6,19 @@ in financial applications, including cross-validation strategies, performance me
 model comparison utilities, and explainability tools.
 """
 
-from .comparison import ModelComparison, StatisticalTests
-from .cross_validation import BlockingTimeSeriesSplit, PurgedKFold, TimeSeriesSplit
-from .explainability import (
+from model_validation.comparison import ModelComparison, StatisticalTests
+from model_validation.cross_validation import (
+    BlockingTimeSeriesSplit,
+    PurgedKFold,
+    TimeSeriesSplit,
+)
+from model_validation.explainability import (
     FeatureImportance,
     PartialDependence,
     PermutationImportance,
     ShapExplainer,
 )
-from .metrics import (
+from model_validation.metrics import (
     calculate_metrics,
     calmar_ratio,
     information_coefficient,
@@ -22,7 +26,7 @@ from .metrics import (
     sharpe_ratio,
     sortino_ratio,
 )
-from .validation_report import ValidationReport
+from model_validation.validation_report import ValidationReport
 
 __all__ = [
     "TimeSeriesSplit",

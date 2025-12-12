@@ -5,7 +5,7 @@ from datetime import date, datetime
 import logging
 from typing import Any, Dict, List, Optional, Union
 import pandas as pd
-from .base import (
+from market_data.api_connectors.base import (
     APIConnector,
     APICredentials,
     DataCategory,

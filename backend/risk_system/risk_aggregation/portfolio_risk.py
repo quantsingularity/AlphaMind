@@ -7,7 +7,7 @@ and portfolios, calculating various risk metrics, and monitoring risk limits.
 
 from dataclasses import dataclass
 import logging
-from typing import Dict, Tuple
+from typing import Dict, Tuple, Any
 import numpy as np
 import pandas as pd
 

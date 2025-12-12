@@ -15,22 +15,33 @@ and pipeline monitoring tools.
 
 # Import necessary components from their respective sub-modules
 # These imports assume the sub-modules (e.g., caching, pipeline) are defined within the same package structure.
-from .caching import CacheManager, CachePolicy, DiskCache, MemoryCache, RedisCache
-from .monitoring import (
+from data_processing.caching import (
+    CacheManager,
+    CachePolicy,
+    DiskCache,
+    MemoryCache,
+    RedisCache,
+)
+from data_processing.monitoring import (
     AlertManager,
     MetricsCollector,
     PerformanceTracker,
     PipelineMonitor,
 )
-from .parallel import DistributedComputing, ParallelProcessor, TaskManager, WorkerPool
-from .pipeline import (
+from data_processing.parallel import (
+    DistributedComputing,
+    ParallelProcessor,
+    TaskManager,
+    WorkerPool,
+)
+from data_processing.pipeline import (
     DataExporter,
     DataLoader,
     DataPipeline,
     DataTransformer,
     PipelineStage,
 )
-from .streaming import (
+from data_processing.streaming import (
     DataStream,
     KafkaStreamAdapter,
     StreamingPipeline,

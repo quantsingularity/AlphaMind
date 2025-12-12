@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from sentinelhub import WmsRequest, DataCollection, MimeType, SHConfig, CRS
 from tensorflow.keras.models import load_model
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Any
 import logging
 
 logger = logging.getLogger(__name__)

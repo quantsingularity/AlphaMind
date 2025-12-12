@@ -5,6 +5,7 @@ This module contains tests for the enhanced market connectivity functionality,
 including reconnection logic, failure simulation, and data feed stability.
 """
 
+from typing import Any
 import datetime
 import os
 import sys

@@ -9,7 +9,7 @@ from dataclasses import dataclass
 import datetime
 from enum import Enum
 import logging
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 
 logger = logging.getLogger(__name__)
 

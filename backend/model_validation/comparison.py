@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy import stats
-from .metrics import calculate_metrics
+from model_validation.metrics import calculate_metrics
 
 
 class ModelComparison:

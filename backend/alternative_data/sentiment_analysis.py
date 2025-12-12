@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-from typing import List, Dict
+from typing import List, Dict, Any
 
 
 class MarketSentimentAnalyzer:

@@ -9,10 +9,10 @@ import datetime
 import os
 import pickle
 import sqlite3
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Any
 import uuid
 import pandas as pd
-from .experiment import Experiment, ExperimentStatus
+from ab_testing.experiment import Experiment, ExperimentStatus
 
 
 class ExperimentResult:

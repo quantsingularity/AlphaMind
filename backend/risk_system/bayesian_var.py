@@ -1,3 +1,4 @@
+from typing import Any
 import pymc as pm
 import pytensor.tensor as pt
 import numpy as np
