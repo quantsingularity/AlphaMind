@@ -1,5 +1,5 @@
 #!/bin/bash
-# AlphaMind Backend Startup Script
+# AlphaMind Backend Startup Script (FastAPI)
 
 echo "=================================="
 echo "AlphaMind Backend Startup"
@@ -24,13 +24,24 @@ pip install --upgrade pip -q
 echo "Installing dependencies (this may take a few minutes)..."
 pip install -r requirements.txt -q
 
+# Load environment variables
+if [ -f ".env" ]; then
+    echo "Loading environment variables from .env"
+    export $(cat .env | grep -v '^#' | xargs)
+else
+    echo "Warning: .env file not found. Using default configuration."
+    echo "Please copy .env.example to .env and configure appropriately."
+fi
+
 echo ""
-echo "Starting Flask backend server..."
-echo "Server will be available at: http://localhost:5000"
-echo "Health check endpoint: http://localhost:5000/health"
+echo "Starting FastAPI backend server with Uvicorn..."
+echo "Server will be available at: http://localhost:8000"
+echo "API Documentation: http://localhost:8000/docs"
+echo "Alternative docs: http://localhost:8000/redoc"
+echo "Health check endpoint: http://localhost:8000/health"
 echo ""
 echo "Press CTRL+C to stop the server"
 echo ""
 
 # Start the server
-python3 src/main.py
+python3 -m uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload

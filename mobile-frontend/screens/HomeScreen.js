@@ -1,92 +1,119 @@
-import React, { useMemo } from "react"; // Added useMemo
-import { StyleSheet, View, ScrollView, Text } from "react-native";
-import { Headline, Paragraph, Card, Title, useTheme } from "react-native-paper";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-
-// Mock KPI data
-const kpiData = [
-  {
-    title: "Portfolio Value",
-    value: "$1,250,345.67",
-    change: "+1.2%",
-    changeColor: "green", // This might need theming later if flagged
-    icon: "chart-line",
-  },
-  {
-    title: "Daily P&L",
-    value: "$15,678.90",
-    change: "+0.8%",
-    changeColor: "green", // This might need theming later if flagged
-    icon: "trending-up",
-  },
-  {
-    title: "Sharpe Ratio",
-    value: "2.35",
-    change: "-0.05",
-    changeColor: "red", // This might need theming later if flagged
-    icon: "chart-bell-curve-cumulative",
-  },
-  {
-    title: "Active Strategies",
-    value: "12",
-    change: "+1",
-    changeColor: "blue", // This might need theming later if flagged
-    icon: "robot",
-  },
-];
+import React, { useEffect, useMemo } from "react";
+import { StyleSheet, View, ScrollView, Text, RefreshControl } from "react-native";
+import { Headline, Paragraph, useTheme } from "react-native-paper";
+import { useDispatch, useSelector } from "react-redux";
+import KPICard from "../components/KPICard";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorMessage from "../components/ErrorMessage";
+import { fetchPortfolio } from "../store/slices/portfolioSlice";
 
 export default function HomeScreen() {
   const theme = useTheme();
+  const dispatch = useDispatch();
+  
+  const { data, loading, error } = useSelector((state) => state.portfolio);
+  const { user } = useSelector((state) => state.auth);
+  const [refreshing, setRefreshing] = React.useState(false);
 
-  // Memoize styles to prevent recreation on every render unless theme changes
+  useEffect(() => {
+    dispatch(fetchPortfolio());
+  }, [dispatch]);
+
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await dispatch(fetchPortfolio());
+    setRefreshing(false);
+  }, [dispatch]);
+
+  const kpiData = useMemo(() => {
+    if (!data) {
+      return [
+        {
+          title: "Portfolio Value",
+          value: "$0.00",
+          change: "0.0%",
+          changeColor: "gray",
+          icon: "chart-line",
+        },
+        {
+          title: "Daily P&L",
+          value: "$0.00",
+          change: "0.0%",
+          changeColor: "gray",
+          icon: "trending-up",
+        },
+        {
+          title: "Sharpe Ratio",
+          value: "0.00",
+          change: "0.00",
+          changeColor: "gray",
+          icon: "chart-bell-curve-cumulative",
+        },
+        {
+          title: "Active Strategies",
+          value: "0",
+          change: "0",
+          changeColor: "gray",
+          icon: "robot",
+        },
+      ];
+    }
+
+    const portfolioValue = `$${data.value?.toLocaleString() || "0.00"}`;
+    const dailyPnL = `$${data.dailyPnL?.toLocaleString() || "0.00"}`;
+    const dailyPnLChange = `${data.dailyPnLPercent >= 0 ? "+" : ""}${data.dailyPnLPercent?.toFixed(2) || "0.00"}%`;
+    const changeColor = data.dailyPnLPercent >= 0 ? "green" : "red";
+
+    return [
+      {
+        title: "Portfolio Value",
+        value: portfolioValue,
+        change: dailyPnLChange,
+        changeColor,
+        icon: "chart-line",
+      },
+      {
+        title: "Daily P&L",
+        value: dailyPnL,
+        change: dailyPnLChange,
+        changeColor,
+        icon: "trending-up",
+      },
+      {
+        title: "Sharpe Ratio",
+        value: data.sharpeRatio?.toFixed(2) || "0.00",
+        change: "",
+        changeColor: "blue",
+        icon: "chart-bell-curve-cumulative",
+      },
+      {
+        title: "Active Strategies",
+        value: String(data.activeStrategies || 0),
+        change: "",
+        changeColor: "blue",
+        icon: "robot",
+      },
+    ];
+  }, [data]);
+
   const styles = useMemo(
     () =>
       StyleSheet.create({
         container: {
-          backgroundColor: theme.colors.background, // Use theme color
+          backgroundColor: theme.colors.background,
           flexGrow: 1,
           padding: 16,
         },
         infoText: {
-          color: theme.colors.outline, // Use theme color (formerly '#888')
+          color: theme.colors.outline,
           marginTop: 16,
           textAlign: "center",
-        },
-        kpiCard: {
-          marginBottom: 16,
-          width: "48%",
-        },
-        kpiCardContent: {
-          alignItems: "center",
-          paddingHorizontal: 8,
-          paddingVertical: 12,
-        },
-        kpiChange: {
-          fontSize: 12,
-          marginTop: 2,
         },
         kpiContainer: {
           flexDirection: "row",
           flexWrap: "wrap",
           justifyContent: "space-between",
           marginBottom: 24,
-        },
-        kpiIcon: {
-          marginBottom: 8,
-        },
-        kpiTextContainer: {
-          alignItems: "center",
-        },
-        kpiTitle: {
-          color: theme.colors.onSurfaceVariant, // Use theme color (formerly '#666')
-          fontSize: 12,
-          marginBottom: 2,
-          textAlign: "center",
-        },
-        kpiValue: {
-          fontSize: 16,
-          lineHeight: 20,
-          textAlign: "center",
         },
         paragraph: {
           fontSize: 16,
@@ -97,50 +124,47 @@ export default function HomeScreen() {
           marginBottom: 8,
           textAlign: "center",
         },
+        welcome: {
+          fontSize: 14,
+          marginBottom: 16,
+          textAlign: "center",
+        },
       }),
     [theme],
   );
 
+  if (loading && !data) {
+    return <LoadingSpinner message="Loading portfolio..." />;
+  }
+
+  if (error && !data) {
+    return <ErrorMessage message={error} onRetry={() => dispatch(fetchPortfolio())} />;
+  }
+
   return (
     <ScrollView
-      contentContainerStyle={styles.container} // Use memoized styles
+      contentContainerStyle={styles.container}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
+      {user && (
+        <Text style={styles.welcome}>Welcome back, {user.name || user.email}!</Text>
+      )}
+      
       <Headline style={styles.title}>
         <Text>AlphaMind Dashboard</Text>
       </Headline>
       <Paragraph style={styles.paragraph}>
-        <Text>
-          Real-time overview of your quantitative trading performance.
-        </Text>
+        <Text>Real-time overview of your quantitative trading performance.</Text>
       </Paragraph>
 
       <View style={styles.kpiContainer}>
         {kpiData.map((kpi, index) => (
-          <Card key={index} style={styles.kpiCard}>
-            <Card.Content style={styles.kpiCardContent}>
-              <Icon
-                name={kpi.icon}
-                size={32}
-                color={theme.colors.primary}
-                style={styles.kpiIcon}
-              />
-              <View style={styles.kpiTextContainer}>
-                <Text style={styles.kpiTitle}>{kpi.title}</Text>
-                <Title style={styles.kpiValue}>{kpi.value}</Title>
-                <Text style={[styles.kpiChange, { color: kpi.changeColor }]}>
-                  {kpi.change}
-                </Text>
-              </View>
-            </Card.Content>
-          </Card>
+          <KPICard key={index} {...kpi} isLoading={loading} />
         ))}
       </View>
 
       <Paragraph style={styles.infoText}>
-        <Text>
-          Navigate using the bottom tabs to explore features, documentation, and
-          research.
-        </Text>
+        <Text>Navigate using the bottom tabs to explore features, documentation, and research.</Text>
       </Paragraph>
     </ScrollView>
   );

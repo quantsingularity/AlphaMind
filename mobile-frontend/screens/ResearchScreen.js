@@ -1,65 +1,77 @@
-import React from "react";
-import { StyleSheet, ScrollView, Alert, Text } from "react-native"; // Import Alert & Text
-import {
-  // Surface, // Removed unused import
-  Headline,
-  Paragraph,
-  Card,
-  Title,
-  Button,
-  useTheme,
-} from "react-native-paper";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, ScrollView, Alert, Text, RefreshControl } from "react-native";
+import { Headline, Paragraph, Card, Title, Button, useTheme } from "react-native-paper";
+import { researchService } from "../services/researchService";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorMessage from "../components/ErrorMessage";
 
 export default function ResearchScreen() {
   const theme = useTheme();
+  const [papers, setPapers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Placeholder data for research papers
-  const researchItems = [
-    {
-      title: "Deep Learning for Market Prediction",
-      summary:
-        "Exploring the efficacy of LSTM networks in forecasting short-term market movements.",
-      link: "#dl-market-pred",
-    },
-    {
-      title: "Factor Investing with Alternative Data",
-      summary:
-        "A study on integrating satellite imagery data into quantitative investment strategies.",
-      link: "#factor-alt-data",
-    },
-    {
-      title: "High-Frequency Trading Algorithms",
-      summary:
-        "Analysis of optimal execution strategies in volatile market conditions.",
-      link: "#hft-algo",
-    },
-  ];
-
-  const handlePress = (title) => {
-    Alert.alert("Navigate", `Opening research paper: ${title}`);
-    // In a real app, you might open a webview or navigate to a detail screen
-    // e.g., Linking.openURL(link) or navigation.navigate('ResearchDetail', { paperId: link });
+  const fetchPapers = async () => {
+    try {
+      setError(null);
+      const data = await researchService.getPapers();
+      setPapers(data);
+    } catch (err) {
+      setError(err.message || "Failed to load research papers");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchPapers();
+  }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchPapers();
+    setRefreshing(false);
+  };
+
+  const handlePress = (paper) => {
+    Alert.alert("Research Paper", `Title: ${paper.title}\n\nOpening paper...`, [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Open",
+        onPress: () => {
+          // In production, open paper URL or navigate to detail screen
+          console.log("Opening paper:", paper.url);
+        },
+      },
+    ]);
+  };
+
+  if (loading) {
+    return <LoadingSpinner message="Loading research papers..." />;
+  }
+
+  if (error) {
+    return <ErrorMessage message={error} onRetry={fetchPapers} />;
+  }
 
   return (
     <ScrollView
-      contentContainerStyle={[
-        styles.container,
-        { backgroundColor: theme.colors.background },
-      ]}
+      contentContainerStyle={[styles.container, { backgroundColor: theme.colors.background }]}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <Headline style={styles.title}>
         <Text>Research Insights</Text>
       </Headline>
       <Paragraph style={styles.paragraph}>
-        <Text>
-          Explore the latest publications and findings from the AlphaMind
-          research team.
-        </Text>
+        <Text>Explore the latest publications and findings from the AlphaMind research team.</Text>
       </Paragraph>
 
-      {researchItems.map((item, index) => (
-        <Card key={index} style={styles.card}>
+      {papers.map((item) => (
+        <Card key={item.id} style={styles.card}>
           <Card.Content>
             <Title>
               <Text>{item.title}</Text>
@@ -67,10 +79,15 @@ export default function ResearchScreen() {
             <Paragraph>
               <Text>{item.summary}</Text>
             </Paragraph>
+            {item.authors && (
+              <Text style={styles.authors}>By: {item.authors.join(", ")}</Text>
+            )}
+            {item.date && (
+              <Text style={styles.date}>Published: {item.date}</Text>
+            )}
           </Card.Content>
           <Card.Actions>
-            {/* Update onPress to call handlePress */}
-            <Button onPress={() => handlePress(item.title, item.link)}>
+            <Button onPress={() => handlePress(item)}>
               <Text>Read More</Text>
             </Button>
           </Card.Actions>
@@ -81,6 +98,11 @@ export default function ResearchScreen() {
 }
 
 const styles = StyleSheet.create({
+  authors: {
+    fontSize: 12,
+    fontStyle: "italic",
+    marginTop: 8,
+  },
   card: {
     marginBottom: 16,
     width: "100%",
@@ -89,6 +111,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexGrow: 1,
     padding: 20,
+  },
+  date: {
+    fontSize: 12,
+    marginTop: 4,
   },
   paragraph: {
     marginBottom: 24,

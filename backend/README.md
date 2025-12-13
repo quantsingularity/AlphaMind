@@ -1,187 +1,416 @@
-# AlphaMind Backend - Refined Documentation
+# AlphaMind Backend
 
-![Python](https://img.shields.io/badge/Python-3.10+-green.svg)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-2.8+-orange.svg)
-![MLflow](https://img.shields.io/badge/MLflow-Enabled-purple.svg)
+Institutional-Grade Quantitative AI Trading System - Backend API
 
-## 🧠 Institutional-Grade Quantitative AI Trading System Backend
+## Overview
 
-AlphaMind is a cutting-edge quantitative trading system backend designed for high-performance, institutional-grade alpha generation. It leverages a distributed microservices architecture, advanced machine learning models, and real-time data processing to capitalize on market inefficiencies across multiple asset classes.
+The AlphaMind backend is a production-ready FastAPI-based REST API that provides comprehensive trading, portfolio management, market data, and strategy backtesting capabilities.
 
-## Table of Contents
+## Features
 
-1.  System Architecture & Overview
-2.  Technology Stack Summary
-3.  Core Modules & Functionality
-4.  Installation & Deployment Summary
-5.  API Endpoints Summary
-6.  Development & Operations Overview
-7.  Security & Compliance
-8.  Troubleshooting
+- **FastAPI Framework**: High-performance async API with automatic documentation
+- **Trading Operations**: Order management, execution tracking
+- **Portfolio Management**: Real-time portfolio tracking and performance metrics
+- **Market Data**: Real-time quotes and historical data access
+- **Strategy Backtesting**: Comprehensive backtesting engine with performance metrics
+- **Authentication**: JWT-based authentication system
+- **Data Processing**: Advanced data pipeline with caching and monitoring
+- **Risk Management**: Bayesian VaR, stress testing, risk aggregation
+- **AI Models**: Reinforcement learning, transformers, generative models
 
----
+## Quick Start
 
-## 1. System Architecture & Overview
+### Prerequisites
 
-The AlphaMind backend is a **distributed, microservices-based system** built on an **event-driven architecture** (Apache Kafka) to prioritize modularity, scalability, and fault tolerance.
+- Python 3.10 or higher
+- Virtual environment (recommended)
+- PostgreSQL or MySQL (optional, for production)
+- Redis (optional, for caching)
 
-### Core System Components
+### Installation
 
-The system is structured into four main layers, each responsible for a distinct function in the trading pipeline.
+1. **Clone and navigate to backend directory**:
+   ```bash
+   cd backend
+   ```
 
-| Component Layer          | Primary Function                                           | Key Activities                                                                                                                  |
-| :----------------------- | :--------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------ |
-| **Data Ingestion Layer** | Collection and preprocessing of all data sources.          | Real-time market feeds, alternative data (satellite, SEC, social media), data validation, normalization, and quality assurance. |
-| **AI Engine**            | Computational core for signal generation and optimization. | Temporal Fusion Transformers, Deep Reinforcement Learning, ensemble methods, model registry, and feature store management.      |
-| **Strategy Layer**       | Translation of AI signals into trading actions.            | Signal generation algorithms, portfolio construction, risk management frameworks, and comprehensive backtesting engine.         |
-| **Execution Layer**      | Placement and management of trades in the market.          | Smart Order Routing (SOR), market impact modeling, real-time Order Management System (OMS) with sub-millisecond latency.        |
+2. **Create virtual environment**:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
----
+3. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-## 2. Technology Stack Summary
+4. **Configure environment**:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
 
-The technology stack is selected for its performance, reliability, and mathematical precision, essential for quantitative trading systems.
+5. **Run the server**:
+   ```bash
+   # Using the startup script
+   ./start_backend.sh
+   
+   # Or directly with uvicorn
+   python3 -m uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+   ```
 
-### Key Technologies
+### Using Setup Script
 
-| Category                | Technology          | Rationale / Use Case                                                                       |
-| :---------------------- | :------------------ | :----------------------------------------------------------------------------------------- |
-| **Primary Language**    | Python              | Extensive ecosystem for scientific computing, finance, and machine learning.               |
-| **Machine Learning**    | TensorFlow, PyTorch | Production-grade stability and access to cutting-edge deep learning research.              |
-| **Financial Math**      | QuantLib            | Sophisticated financial mathematics capabilities (derivatives pricing, risk analytics).    |
-| **Messaging/Streaming** | Apache Kafka        | Event-driven architecture, low-latency, real-time data processing, and horizontal scaling. |
-| **Time Series DB**      | InfluxDB            | Optimized for high-volume, time-stamped financial market data.                             |
-| **Relational DB**       | PostgreSQL          | Primary storage for structured data (trade records, portfolio positions, configuration).   |
-| **Caching**             | Redis               | Low-latency access to frequently accessed data and distributed caching.                    |
-| **Orchestration**       | Kubernetes          | Automated scaling, deployment, and management of containerized services.                   |
+The included `start_backend.sh` script automates the setup process:
 
----
+```bash
+chmod +x start_backend.sh
+./start_backend.sh
+```
 
-## 3. Core Modules & Functionality
+This script will:
+- Create a virtual environment if it doesn't exist
+- Install all dependencies
+- Load environment variables from `.env`
+- Start the FastAPI server with hot reload
 
-### AI Models Module (`ai_models/`)
+## API Documentation
 
-This module is the intellectual core, implementing various sophisticated models for forecasting and optimization.
+Once the server is running, access the interactive API documentation at:
 
-| Model Type              | Key Algorithm(s)                                      | Primary Function                                                                                     |
-| :---------------------- | :---------------------------------------------------- | :--------------------------------------------------------------------------------------------------- |
-| **Forecasting Models**  | Temporal Fusion Transformers (TFT), LSTM/GRU Networks | Multi-horizon time series forecasting of asset prices and volatility.                                |
-| **Optimization Models** | Deep Reinforcement Learning (DRL) Agents              | Adaptive portfolio construction and dynamic execution strategy optimization.                         |
-| **Signal Generation**   | Ensemble Methods, Statistical Arbitrage Models        | Combining multiple predictions for robust trading signals and identifying short-term inefficiencies. |
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+- **Health Check**: http://localhost:8000/health
 
-### Data Processing Module (`data_processing/`)
+## API Endpoints
 
-Handles the transformation of raw data into high-quality features for the AI Engine.
+### Health & Status
+- `GET /health` - Health check endpoint
+- `GET /` - Root endpoint with service information
 
-| Data Source           | Processing Technique                          | Output / Feature                                                               |
-| :-------------------- | :-------------------------------------------- | :----------------------------------------------------------------------------- |
-| **Market Data**       | Normalization, Cleansing, Imputation          | Clean, consistent time series data (OHLCV, order book depth).                  |
-| **Satellite Imagery** | Computer Vision (CNNs)                        | Commodity-relevant information (e.g., oil tank levels, parking lot occupancy). |
-| **SEC Filings**       | Natural Language Processing (NLP)             | Sentiment scores, material event extraction, and financial entity recognition. |
-| **Social Media**      | Real-time Text Processing, Sentiment Analysis | Aggregate market sentiment and early warning signals.                          |
+### Trading
+- `POST /api/v1/trading/orders` - Create new order
+- `GET /api/v1/trading/orders` - List all orders
+- `GET /api/v1/trading/orders/{order_id}` - Get specific order
 
----
+### Portfolio
+- `GET /api/v1/portfolio/` - Get current portfolio
+- `GET /api/v1/portfolio/performance` - Get performance metrics
 
-## 4. Installation & Deployment Summary
+### Market Data
+- `GET /api/v1/market-data/quote/{symbol}` - Get real-time quote
+- `GET /api/v1/market-data/historical/{symbol}` - Get historical data
 
-### Local Development Environment
+### Strategies
+- `GET /api/v1/strategies/` - List all strategies
+- `POST /api/v1/strategies/backtest` - Run strategy backtest
 
-| Prerequisite        | Version/Tool                     | Purpose                       |
-| :------------------ | :------------------------------- | :---------------------------- |
-| **Python**          | 3.10+                            | Primary development language. |
-| **Package Manager** | `pip` / `pipenv`                 | Dependency management.        |
-| **Database**        | PostgreSQL (local instance)      | Local data storage.           |
-| **Message Broker**  | Kafka (local instance or Docker) | Event stream testing.         |
+## Testing
 
-### Docker Deployment
+### Run All Tests
 
-The system is containerized for consistency across environments.
+```bash
+pytest
+```
 
-| Service          | Image                           | Role                                       |
-| :--------------- | :------------------------------ | :----------------------------------------- |
-| **API Gateway**  | `alphamind/api:latest`          | Handles all incoming requests and routing. |
-| **AI Engine**    | `alphamind/ai-engine:latest`    | Runs the machine learning models.          |
-| **Data Service** | `alphamind/data-service:latest` | Manages data retrieval and feature store.  |
-| **PostgreSQL**   | `postgres:14-alpine`            | Core relational database.                  |
-| **Kafka**        | `confluentinc/cp-kafka:latest`  | Core message broker.                       |
+### Run Specific Test File
 
-### Cloud Deployment Strategy
+```bash
+pytest tests/test_api.py -v
+```
 
-The system supports both major cloud providers, leveraging managed services for scalability and reliability.
+### Run with Coverage
 
-| Cloud Provider          | Orchestration    | Managed Database       | Managed Caching           | Managed ML |
-| :---------------------- | :--------------- | :--------------------- | :------------------------ | :--------- |
-| **Google Cloud**        | GKE (Kubernetes) | Cloud SQL (PostgreSQL) | Cloud Memorystore (Redis) | Vertex AI  |
-| **Amazon Web Services** | EKS (Kubernetes) | RDS (PostgreSQL)       | ElastiCache (Redis)       | SageMaker  |
+```bash
+pytest --cov=. --cov-report=html
+```
 
----
+## Project Structure
 
-## 5. API Endpoints Summary
+```
+backend/
+├── api/                      # FastAPI application
+│   ├── main.py              # Main application entry point
+│   ├── routers/             # API route handlers
+│   ├── schemas/             # Pydantic models
+│   ├── services/            # Business logic
+│   └── dependencies/        # Dependency injection
+├── core/                    # Core utilities
+│   ├── config.py           # Configuration management
+│   ├── exceptions.py       # Custom exceptions
+│   └── logging.py          # Logging configuration
+├── data_processing/        # Data processing modules
+│   ├── caching.py         # Caching mechanisms
+│   ├── pipeline.py        # ETL pipelines
+│   ├── monitoring.py      # Performance monitoring
+│   ├── parallel.py        # Parallel processing
+│   └── streaming.py       # Stream processing
+├── ai_models/             # AI/ML models
+├── alpha_research/        # Alpha research tools
+├── alternative_data/      # Alternative data processing
+├── execution_engine/      # Order execution
+├── market_data/          # Market data connectors
+├── risk_system/          # Risk management
+├── tests/                # Test suite
+├── requirements.txt      # Python dependencies
+├── setup.py             # Package setup
+├── .env.example         # Environment template
+└── README.md            # This file
+```
 
-The backend offers multiple API interfaces for different client needs.
+## Configuration
 
-| API Type      | Protocol     | Primary Use Case                                                               | Key Feature                                          |
-| :------------ | :----------- | :----------------------------------------------------------------------------- | :--------------------------------------------------- |
-| **REST API**  | HTTP/S       | Standard access for system functionality (portfolio, trade execution).         | OpenAPI 3.0 specification, OAuth 2.0 with JWT, RBAC. |
-| **GraphQL**   | HTTP/S       | Flexible and efficient data querying for complex analytical dashboards.        | Unified data model, minimizes network overhead.      |
-| **WebSocket** | WebSocket    | Real-time data streaming (market data, position updates, trade notifications). | Low-latency, sophisticated subscription management.  |
-| **FIX**       | FIX Protocol | Native integration with institutional trading platforms and market venues.     | Standardized protocol for trade execution.           |
+### Environment Variables
 
-### Key REST Endpoints (v1)
+Key environment variables (see `.env.example` for complete list):
 
-| Endpoint                     | Method | Description                                         | Authorization Scope |
-| :--------------------------- | :----- | :-------------------------------------------------- | :------------------ |
-| `/auth/token`                | `POST` | Obtain JWT access token.                            | `public`            |
-| `/portfolios/{id}/positions` | `GET`  | Retrieve current portfolio positions and metrics.   | `read:portfolio`    |
-| `/trades`                    | `POST` | Submit a new trade order for execution.             | `write:trade`       |
-| `/risk/metrics`              | `GET`  | Fetch real-time risk analytics (VaR, stress tests). | `read:risk`         |
-| `/models/{id}/predict`       | `POST` | Request a prediction from a specific AI model.      | `read:model`        |
+- `API_HOST`: API host address (default: 0.0.0.0)
+- `API_PORT`: API port (default: 8000)
+- `SECRET_KEY`: JWT secret key
+- `DB_HOST`, `DB_PORT`, `DB_NAME`: Database configuration
+- `REDIS_HOST`, `REDIS_PORT`: Redis configuration
+- `LOG_LEVEL`: Logging level (DEBUG, INFO, WARNING, ERROR)
 
----
+### Database Setup
 
-## 6. Development & Operations Overview
+For production use, configure a proper database:
 
-### Coding Standards
+**PostgreSQL**:
+```bash
+# Update .env
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_DB=alphamind
+POSTGRES_USER=your_user
+POSTGRES_PASSWORD=your_password
+```
 
-The system adheres to strict coding standards to maintain high quality and consistency.
+**MySQL**:
+```bash
+# Update .env
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=alphamind
+DB_USERNAME=your_user
+DB_PASSWORD=your_password
+```
 
-| Standard Area     | Key Requirement          | Tools/Enforcement                            |
-| :---------------- | :----------------------- | :------------------------------------------- |
-| **Language**      | Python 3.10+             | Enforced by environment.                     |
-| **Style**         | PEP 8 Compliance         | `Black` formatter, `Flake8` linter.          |
-| **Typing**        | Comprehensive Type Hints | `mypy` static type checker.                  |
-| **Documentation** | Google-style Docstrings  | Enforced for all public methods and classes. |
-| **Testing**       | 90%+ Code Coverage       | `pytest`, `pytest-cov`.                      |
+## Development
 
-### Continuous Integration / Continuous Deployment (CI/CD)
+### Code Style
 
-The CI/CD pipeline ensures rapid, reliable, and secure deployment.
+The project follows PEP 8 style guidelines. Format code using:
 
-| Stage                           | Trigger                        | Key Activities                                                                    |
-| :------------------------------ | :----------------------------- | :-------------------------------------------------------------------------------- |
-| **Continuous Integration (CI)** | Code Push (GitHub/GitLab)      | Static analysis, Unit/Integration tests, Code coverage check, Docker image build. |
-| **Continuous Delivery (CD)**    | Successful CI on `main` branch | Deploy to Staging environment, run End-to-End (E2E) tests.                        |
-| **Continuous Deployment (CD)**  | Manual Approval                | Deploy to Production environment, run smoke tests.                                |
+```bash
+black .
+flake8 .
+```
 
----
+### Adding New Endpoints
 
-## 7. Security & Compliance
+1. Create a new router in `api/routers/`
+2. Define Pydantic schemas in `api/schemas/`
+3. Implement business logic in `api/services/`
+4. Register the router in `api/main.py`
+5. Add tests in `tests/`
 
-| Area                 | Mechanism                                          | Description                                                           |
-| :------------------- | :------------------------------------------------- | :-------------------------------------------------------------------- |
-| **Authentication**   | OAuth 2.0, JWT                                     | Secure token-based access for all APIs.                               |
-| **Authorization**    | Role-Based Access Control (RBAC)                   | Fine-grained permissions (e.g., `trader`, `risk_manager`, `admin`).   |
-| **Data Encryption**  | TLS/SSL, AES-256                                   | Encrypts all data in transit and at rest (DB, storage).               |
-| **Network Security** | VPC, Security Groups, Firewalls                    | Strict network segmentation and least-privilege access.               |
-| **Compliance**       | Financial Regulations (e.g., MiFID II, Dodd-Frank) | Auditable logging, trade record keeping, and data retention policies. |
+### Example: Adding a New Endpoint
 
----
+```python
+# api/routers/new_feature.py
+from fastapi import APIRouter
+from pydantic import BaseModel
 
-## 8. Troubleshooting
+router = APIRouter()
 
-| Issue Category            | Symptom(s)                                               | Diagnostic Step(s)                                                                                             | Potential Solution(s)                                                                                           |
-| :------------------------ | :------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------- |
-| **Database Connection**   | Connection timeouts, authentication failures.            | Check database host/port/credentials. Verify network connectivity. Monitor active connections.                 | Restart database service. Update configuration with correct credentials. Increase connection pool size.         |
-| **Kafka/Messaging**       | Messages not being consumed, high consumer lag.          | Check Kafka broker status. Verify topic names and consumer group IDs. Check consumer service logs for errors.  | Restart broker/consumer. Scale up consumer service instances. Check firewall rules.                             |
-| **AI Engine Performance** | Slow prediction latency, model serving failures.         | Monitor GPU/CPU utilization. Check model server logs. Profile prediction function.                             | Scale out model serving instances. Optimize model for inference (e.g., quantization). Increase resource limits. |
-| **Trade Execution**       | Orders not being filled, incorrect fills, high slippage. | Check Execution Layer logs. Verify connectivity to external broker/exchange. Check market data feed integrity. | Verify broker credentials/API keys. Check risk management rules for blocks. Contact broker support.             |
+class NewFeatureRequest(BaseModel):
+    param1: str
+    param2: int
+
+@router.post("/new-feature")
+async def new_feature(request: NewFeatureRequest):
+    return {"result": "success"}
+```
+
+Then register in `api/main.py`:
+```python
+from api.routers import new_feature
+app.include_router(new_feature.router, prefix="/api/v1/new-feature", tags=["new-feature"])
+```
+
+## Modules Overview
+
+### Core Modules
+
+- **config.py**: Configuration management with validation
+- **exceptions.py**: Custom exception hierarchy
+- **logging.py**: Structured logging setup
+
+### Data Processing
+
+- **caching.py**: Multi-level caching with TTL and LRU policies
+- **pipeline.py**: ETL pipeline framework
+- **monitoring.py**: Performance monitoring and alerting
+- **parallel.py**: Parallel and distributed processing
+- **streaming.py**: Real-time data stream processing
+
+### AI Models
+
+- **reinforcement_learning.py**: RL-based trading agents
+- **transformer_timeseries/**: Transformer models for forecasting
+- **generative_finance.py**: Generative models for synthetic data
+
+### Market Data
+
+- **api_connectors/**: Connectors for various data providers
+  - Alpha Vantage
+  - IEX Cloud
+  - Bloomberg
+  - FRED
+- **live_feed.py**: Real-time market data feed
+- **backtesting.py**: Historical backtesting engine
+
+### Risk System
+
+- **bayesian_var.py**: Bayesian Value at Risk
+- **stress_testing.py**: Scenario-based stress testing
+- **risk_aggregation/**: Portfolio-level risk aggregation
+
+## Performance Optimization
+
+### Caching
+
+The backend implements multi-level caching:
+
+```python
+from data_processing.caching import cache_function
+
+@cache_function(ttl_seconds=300)
+def expensive_computation(symbol):
+    # Your expensive computation
+    return result
+```
+
+### Async Operations
+
+All API endpoints are async for better performance:
+
+```python
+@router.get("/data/{symbol}")
+async def get_data(symbol: str):
+    # Async database query
+    data = await fetch_data_async(symbol)
+    return data
+```
+
+## Monitoring and Logging
+
+### Logging
+
+Logs are written to both console and file (if configured):
+
+```python
+from core.logging import get_logger
+
+logger = get_logger(__name__)
+logger.info("Processing order", extra={"order_id": "123"})
+```
+
+### Performance Monitoring
+
+```python
+from data_processing.monitoring import PerformanceMonitor
+
+monitor = PerformanceMonitor("trading")
+monitor.register_metric("order_latency")
+monitor.set_threshold("order_latency", "max", 100, AlertLevel.WARNING)
+```
+
+## Troubleshooting
+
+### Common Issues
+
+**Import Errors**:
+```bash
+# Ensure backend is in Python path
+export PYTHONPATH=$PYTHONPATH:$(pwd)
+```
+
+**Port Already in Use**:
+```bash
+# Change port in .env or use different port
+uvicorn api.main:app --port 8001
+```
+
+**Database Connection Errors**:
+```bash
+# Verify database is running
+# Check credentials in .env
+# Test connection manually
+```
+
+## Production Deployment
+
+### Using Docker
+
+```dockerfile
+FROM python:3.10-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+### Using Gunicorn
+
+```bash
+pip install gunicorn
+gunicorn api.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+```
+
+### Environment-Specific Settings
+
+- Set `API_DEBUG=false` in production
+- Use proper SECRET_KEY
+- Configure database connection pooling
+- Enable HTTPS/TLS
+- Set appropriate CORS origins
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass
+6. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details
+
+## Support
+
+For issues and questions:
+- GitHub Issues: https://github.com/abrar2030/AlphaMind/issues
+- Documentation: http://localhost:8000/docs
+
+## Changelog
+
+### Version 1.0.0 (Current)
+
+- ✅ FastAPI-based REST API
+- ✅ Trading order management
+- ✅ Portfolio tracking
+- ✅ Market data endpoints
+- ✅ Strategy backtesting
+- ✅ JWT authentication
+- ✅ Comprehensive test suite
+- ✅ Data processing pipelines
+- ✅ Performance monitoring
+- ✅ API documentation
