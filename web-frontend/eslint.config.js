@@ -1,14 +1,23 @@
-export default [
+import js from "@eslint/js";
+import globals from "globals";
+import reactHooks from "eslint-plugin-react-hooks";
+import reactRefresh from "eslint-plugin-react-refresh";
+import tseslint from "typescript-eslint";
+import { defineConfig, globalIgnores } from "eslint/config";
+
+export default defineConfig([
+  globalIgnores(["dist"]),
   {
-    ignores: ["node_modules/**"],
-  },
-  // Add your ESLint rules and configurations here
-  // Example: Using recommended rules (install @eslint/js first if needed)
-  // import js from "@eslint/js";
-  // js.configs.recommended,
-  {
-    rules: {
-      // Add specific rule overrides if necessary
+    files: ["**/*.{ts,tsx}"],
+    extends: [
+      js.configs.recommended,
+      tseslint.configs.recommended,
+      reactHooks.configs.flat.recommended,
+      reactRefresh.configs.vite,
+    ],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
     },
   },
-];
+]);
