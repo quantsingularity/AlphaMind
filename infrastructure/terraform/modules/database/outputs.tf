@@ -13,3 +13,13 @@ output "db_username" {
   value       = aws_db_instance.main.username
   sensitive   = true
 }
+
+output "db_instance_identifier" {
+  description = "Identifier of the RDS instance"
+  value       = try(aws_db_instance.main[0].identifier, "")
+}
+
+output "db_instance_arn" {
+  description = "ARN of the RDS instance"
+  value       = try(aws_db_instance.main[0].arn, "")
+}

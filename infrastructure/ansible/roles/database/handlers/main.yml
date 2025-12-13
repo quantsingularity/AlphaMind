@@ -1,6 +1,6 @@
 ---
 # roles/database/handlers/main.yml
 - name: Restart MariaDB
-  systemd:
+  ansible.builtin.systemd:
     name: mariadb
     state: restarted

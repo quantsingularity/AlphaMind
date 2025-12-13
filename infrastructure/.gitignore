@@ -1,0 +1,50 @@
+# Terraform
+**/.terraform/
+**/.terraform.lock.hcl
+**/terraform.tfstate
+**/terraform.tfstate.*
+**/terraform.tfvars
+**/*.tfplan
+**/crash.log
+**/override.tf
+**/override.tf.json
+**/*_override.tf
+**/*_override.tf.json
+**/backend-config.tfvars
+
+# Ansible
+**/inventory/hosts.yml
+**/inventory/production
+**/inventory/staging
+**/*.retry
+**/.vault_pass
+**/group_vars/*/vault.yml
+**/host_vars/*/vault.yml
+
+# Kubernetes
+**/secrets.yaml
+**/secret.yaml
+**/*-secrets.yaml
+**/kubeconfig*
+
+# IDE
+**/.vscode/
+**/.idea/
+**/*.swp
+**/*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+**/*.log
+
+# Credentials
+**/.env
+**/.env.*
+**/credentials
+**/*-key.json
+**/*.pem
+**/*.key

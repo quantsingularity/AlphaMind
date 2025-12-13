@@ -34,3 +34,39 @@ variable "security_group_ids" {
   description = "List of security group IDs"
   type        = list(string)
 }
+
+variable "public_subnet_ids" {
+  description = "IDs of the public subnets"
+  type        = list(string)
+  default     = []
+}
+
+variable "kms_key_id" {
+  description = "KMS key ID for encryption"
+  type        = string
+  default     = ""
+}
+
+variable "min_size" {
+  description = "Minimum size of ASG"
+  type        = number
+  default     = 1
+}
+
+variable "max_size" {
+  description = "Maximum size of ASG"
+  type        = number
+  default     = 3
+}
+
+variable "desired_capacity" {
+  description = "Desired capacity of ASG"
+  type        = number
+  default     = 2
+}
+
+variable "enable_detailed_monitoring" {
+  description = "Enable detailed monitoring"
+  type        = bool
+  default     = false
+}

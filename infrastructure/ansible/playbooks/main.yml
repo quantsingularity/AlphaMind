@@ -1,15 +1,19 @@
 ---
-# main.yml - Main playbook that includes all other playbooks
-- name: Configure web servers
+- name: Configure AlphaMind Infrastructure
+  hosts: all
+  become: true
+  roles:
+    - ../roles/common
+    - ../roles/security
+
+- name: Configure Database Servers
+  hosts: database
+  become: true
+  roles:
+    - ../roles/database
+
+- name: Configure Web Servers
   hosts: webservers
   become: true
   roles:
-    - common
-    - webserver
-
-- name: Configure database servers
-  hosts: databases
-  become: true
-  roles:
-    - common
-    - database
+    - ../roles/webserver

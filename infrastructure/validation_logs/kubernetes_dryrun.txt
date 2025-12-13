@@ -1,0 +1,3 @@
+Kubernetes dry-run...
+/bin/bash: line 30: kubectl: command not found
+Requires kubectl context to fully validate

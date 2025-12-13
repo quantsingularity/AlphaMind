@@ -1,0 +1,145 @@
+name: Infrastructure CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "infrastructure/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "infrastructure/**"
+
+jobs:
+  terraform-validate:
+    name: Terraform Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.6.0"
+
+      - name: Terraform Format Check
+        working-directory: ./infrastructure/terraform
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init (Backend=false for validation)
+        working-directory: ./infrastructure/terraform
+        run: terraform init -backend=false
+
+      - name: Terraform Validate
+        working-directory: ./infrastructure/terraform
+        run: terraform validate
+
+      - name: Install tflint
+        run: |
+          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+
+      - name: Run tflint
+        working-directory: ./infrastructure/terraform
+        run: tflint --init && tflint
+
+  kubernetes-validate:
+    name: Kubernetes Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: "v1.28.0"
+
+      - name: Install kubeval
+        run: |
+          wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
+          tar xf kubeval-linux-amd64.tar.gz
+          sudo mv kubeval /usr/local/bin
+
+      - name: Validate Kubernetes Manifests
+        working-directory: ./infrastructure/kubernetes/base
+        run: |
+          for file in *.yaml; do
+            echo "Validating $file"
+            kubeval --strict "$file" || true
+          done
+
+      - name: Dry-run Apply
+        working-directory: ./infrastructure/kubernetes/base
+        run: |
+          kubectl apply --dry-run=client -f .
+
+      - name: Install yamllint
+        run: pip install yamllint
+
+      - name: Run yamllint
+        working-directory: ./infrastructure/kubernetes
+        run: yamllint .
+
+  ansible-validate:
+    name: Ansible Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Ansible and ansible-lint
+        run: |
+          pip install ansible ansible-lint
+
+      - name: Install Ansible Collections
+        working-directory: ./infrastructure/ansible
+        run: |
+          ansible-galaxy collection install -r requirements.yml
+
+      - name: Run ansible-lint
+        working-directory: ./infrastructure/ansible
+        run: |
+          ansible-lint --exclude .git --exclude .github
+
+      - name: Syntax Check Playbooks
+        working-directory: ./infrastructure/ansible
+        run: |
+          ansible-playbook --syntax-check playbooks/main.yml
+
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "config"
+          scan-ref: "infrastructure/"
+          format: "sarif"
+          output: "trivy-results.sarif"
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: "trivy-results.sarif"
+
+      - name: Check for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./infrastructure
+          base: main
+          head: HEAD

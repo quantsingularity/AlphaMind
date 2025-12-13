@@ -6,10 +6,10 @@ resource "aws_s3_bucket" "cloudtrail" {
   force_destroy = false
 
   tags = {
-    Name        = "${var.app_name}-${var.environment}-cloudtrail"
-    Purpose     = "CloudTrail audit logs"
-    Compliance  = "SOX,PCI-DSS,GDPR"
-    Retention   = "7-years"
+    Name       = "${var.app_name}-${var.environment}-cloudtrail"
+    Purpose    = "CloudTrail audit logs"
+    Compliance = "SOX,PCI-DSS,GDPR"
+    Retention  = "7-years"
   }
 }
 
@@ -68,7 +68,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "cloudtrail" {
     }
 
     expiration {
-      days = 2555  # 7 years for financial compliance
+      days = 2555 # 7 years for financial compliance
     }
 
     noncurrent_version_expiration {
@@ -108,16 +108,16 @@ resource "aws_s3_bucket_policy" "cloudtrail" {
         Resource = "${aws_s3_bucket.cloudtrail.arn}/*"
         Condition = {
           StringEquals = {
-            "s3:x-amz-acl" = "bucket-owner-full-control"
+            "s3:x-amz-acl"  = "bucket-owner-full-control"
             "AWS:SourceArn" = "arn:aws:cloudtrail:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:trail/${var.app_name}-${var.environment}-cloudtrail"
           }
         }
       },
       {
-        Sid    = "DenyInsecureConnections"
-        Effect = "Deny"
+        Sid       = "DenyInsecureConnections"
+        Effect    = "Deny"
         Principal = "*"
-        Action = "s3:*"
+        Action    = "s3:*"
         Resource = [
           aws_s3_bucket.cloudtrail.arn,
           "${aws_s3_bucket.cloudtrail.arn}/*"
@@ -135,13 +135,13 @@ resource "aws_s3_bucket_policy" "cloudtrail" {
 # CloudWatch Log Group for CloudTrail
 resource "aws_cloudwatch_log_group" "cloudtrail" {
   name              = "/aws/cloudtrail/${var.app_name}-${var.environment}"
-  retention_in_days = 2555  # 7 years for financial compliance
+  retention_in_days = 2555 # 7 years for financial compliance
   kms_key_id        = var.kms_key_id
 
   tags = {
-    Name        = "${var.app_name}-${var.environment}-cloudtrail-logs"
-    Purpose     = "CloudTrail audit logs"
-    Compliance  = "SOX,PCI-DSS,GDPR"
+    Name       = "${var.app_name}-${var.environment}-cloudtrail-logs"
+    Purpose    = "CloudTrail audit logs"
+    Compliance = "SOX,PCI-DSS,GDPR"
   }
 }
 
@@ -163,9 +163,9 @@ resource "aws_iam_role" "cloudtrail_cloudwatch" {
   })
 
   tags = {
-    Name        = "${var.app_name}-${var.environment}-cloudtrail-cloudwatch-role"
-    Purpose     = "CloudTrail CloudWatch integration"
-    Compliance  = "SOX"
+    Name       = "${var.app_name}-${var.environment}-cloudtrail-cloudwatch-role"
+    Purpose    = "CloudTrail CloudWatch integration"
+    Compliance = "SOX"
   }
 }
 
@@ -205,14 +205,14 @@ resource "aws_cloudtrail" "main" {
   # Security and compliance settings
   enable_logging                = var.enable_logging
   include_global_service_events = var.include_global_service_events
-  is_multi_region_trail        = var.is_multi_region_trail
-  enable_log_file_validation   = var.enable_log_file_validation
-  kms_key_id                   = var.kms_key_id
+  is_multi_region_trail         = var.is_multi_region_trail
+  enable_log_file_validation    = var.enable_log_file_validation
+  kms_key_id                    = var.kms_key_id
 
   # Event selectors for comprehensive logging
   event_selector {
-    read_write_type                 = "All"
-    include_management_events       = true
+    read_write_type                  = "All"
+    include_management_events        = true
     exclude_management_event_sources = []
 
     data_resource {

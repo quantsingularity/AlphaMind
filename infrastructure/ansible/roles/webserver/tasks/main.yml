@@ -1,7 +1,7 @@
 ---
 # roles/webserver/tasks/main.yml
 - name: Install web server packages
-  yum:
+  ansible.builtin.yum:
     name:
       - nginx
       - nodejs
@@ -17,7 +17,7 @@
     mode: "0755"
 
 - name: Configure Nginx
-  template:
+  ansible.builtin.template:
     src: nginx.conf.j2
     dest: /etc/nginx/conf.d/{{ app_name }}.conf
   notify: Restart Nginx
@@ -26,4 +26,4 @@
   systemd:
     name: nginx
     state: started
-    enabled: yes
+    enabled: true

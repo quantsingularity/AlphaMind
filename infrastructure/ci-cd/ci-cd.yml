@@ -49,9 +49,9 @@ jobs:
         run: npm ci
 
       # Add Lint step for Web Frontend if linters are configured
-      # - name: Lint Web Frontend
-      #   working-directory: ./web-frontend
-      #   run: npm run lint
+      - name: Lint Web Frontend
+        working-directory: ./web-frontend
+        run: npm run lint
 
       - name: Test Web Frontend
         working-directory: ./web-frontend

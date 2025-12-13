@@ -1,0 +1,6 @@
+output "backup_vault_arn" {
+  value = aws_backup_vault.main.arn
+}
+output "backup_plan_id" {
+  value = aws_backup_plan.main.id
+}

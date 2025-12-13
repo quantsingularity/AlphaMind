@@ -1,7 +1,7 @@
 ---
 # roles/database/tasks/main.yml
 - name: Install database packages
-  yum:
+  ansible.builtin.yum:
     name:
       - mariadb-server
       - mariadb
@@ -9,7 +9,7 @@
     state: present
 
 - name: Configure MariaDB
-  template:
+  ansible.builtin.template:
     src: my.cnf.j2
     dest: /etc/my.cnf.d/server.cnf
   notify: Restart MariaDB
@@ -18,13 +18,13 @@
   systemd:
     name: mariadb
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Set root password
   mysql_user:
     name: root
     password: "{{ db_root_password }}"
-    host_all: yes
+    host_all: true
     state: present
   no_log: true
 

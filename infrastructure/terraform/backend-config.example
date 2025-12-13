@@ -1,0 +1,13 @@
+# Example backend configuration for S3
+# Copy this file to backend-config.tfvars and fill in your values
+
+# S3 backend (recommended for production)
+bucket         = "your-terraform-state-bucket"
+key            = "alphamind/terraform.tfstate"
+region         = "us-west-2"
+encrypt        = true
+kms_key_id     = "alias/terraform-state-key"
+dynamodb_table = "terraform-state-lock"
+
+# To use:
+# terraform init -backend-config=backend-config.tfvars

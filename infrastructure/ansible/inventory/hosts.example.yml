@@ -1,0 +1,20 @@
+---
+all:
+  vars:
+    ansible_user: ubuntu
+    ansible_python_interpreter: /usr/bin/python3
+  children:
+    webservers:
+      hosts:
+        web1:
+          ansible_host: 10.0.1.10
+        web2:
+          ansible_host: 10.0.1.11
+    database:
+      hosts:
+        db1:
+          ansible_host: 10.0.7.10
+    monitoring:
+      hosts:
+        monitor1:
+          ansible_host: 10.0.4.10

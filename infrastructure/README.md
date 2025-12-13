@@ -1,66 +1,13 @@
-# AlphaMind Enhanced Infrastructure
-
-[![License](https://img.shields.io/github/license/abrar2030/AlphaMind)](https://github.com/abrar2030/AlphaMind/blob/main/LICENSE)
-[![Compliance](https://img.shields.io/badge/Compliance-PCI%20DSS%20%7C%20GDPR%20%7C%20SOX%20%7C%20NIST%20CSF%20%7C%20ISO%2027001-green)](https://github.com/abrar2030/AlphaMind)
+# AlphaMind Infrastructure
 
 ## Overview
 
-This enhanced infrastructure directory contains comprehensive security and compliance configurations for the AlphaMind quantitative trading system. The infrastructure has been specifically designed to meet financial industry standards including PCI DSS, GDPR, SOX, NIST Cybersecurity Framework, and ISO 27001 requirements.
-
-## Compliance Standards Implemented
-
-### PCI DSS (Payment Card Industry Data Security Standard) v4.0
-
-- ✅ **Requirement 1**: Firewall configuration and network segmentation
-- ✅ **Requirement 2**: Secure system configurations and default password changes
-- ✅ **Requirement 3**: Cardholder data protection with encryption at rest
-- ✅ **Requirement 4**: Encrypted transmission over public networks
-- ✅ **Requirement 5**: Anti-malware protection and regular updates
-- ✅ **Requirement 6**: Secure systems and applications development
-- ✅ **Requirement 7**: Access control by business need-to-know
-- ✅ **Requirement 8**: Unique user identification and authentication
-- ✅ **Requirement 9**: Physical access restrictions
-- ✅ **Requirement 10**: Network monitoring and logging
-- ✅ **Requirement 11**: Regular security testing and vulnerability scans
-- ✅ **Requirement 12**: Information security policy maintenance
-
-### GDPR (General Data Protection Regulation)
-
-- ✅ **Data Protection by Design and Default**: Built-in privacy controls
-- ✅ **Data Subject Rights**: Right to access, rectification, erasure, portability
-- ✅ **Breach Notification**: 72-hour breach notification capability
-- ✅ **Data Minimization**: Only necessary data collection and processing
-- ✅ **Encryption**: Strong encryption for personal data protection
-
-### SOX (Sarbanes-Oxley Act)
-
-- ✅ **Section 302**: Corporate responsibility for financial reports
-- ✅ **Section 404**: Internal controls over financial reporting (ICFR)
-- ✅ **Section 906**: Criminal penalties prevention through robust controls
-- ✅ **Audit Trails**: Comprehensive logging and monitoring
-- ✅ **Change Management**: Controlled deployment processes
-
-### NIST Cybersecurity Framework 2.0
-
-- ✅ **Identify**: Asset management, risk assessment, governance
-- ✅ **Protect**: Access control, data security, protective technology
-- ✅ **Detect**: Anomaly detection, security monitoring
-- ✅ **Respond**: Incident response planning and communications
-- ✅ **Recover**: Recovery planning and business continuity
-
-### ISO 27001:2022
-
-- ✅ **Information Security Policies**: Comprehensive security policies
-- ✅ **Asset Management**: Information asset identification and protection
-- ✅ **Access Control**: Role-based access control implementation
-- ✅ **Cryptography**: Strong encryption standards
-- ✅ **Operations Security**: Secure operations procedures
-- ✅ **Incident Management**: Security incident response procedures
+This infrastructure directory contains comprehensive security and compliance configurations for the AlphaMind quantitative trading system. The infrastructure has been specifically designed to meet financial industry standards including PCI DSS, GDPR, SOX, NIST Cybersecurity Framework, and ISO 27001 requirements.
 
 ## Directory Structure
 
 ```
-enhanced_infrastructure/
+infrastructure/
 ├── README.md                           # This comprehensive guide
 ├── ansible/                           # Configuration management
 │   ├── inventory/
@@ -78,7 +25,7 @@ enhanced_infrastructure/
 │           └── templates/             # Security configuration templates
 ├── kubernetes/                        # Container orchestration
 │   ├── base/                         # Base Kubernetes manifests
-│   │   ├── app-configmap.yaml        # Enhanced application configuration
+│   │   ├── app-configmap.yaml        # application configuration
 │   │   ├── app-secrets.yaml          # Encrypted secrets management
 │   │   ├── backend-deployment.yaml   # Backend service deployment
 │   │   ├── database-service.yaml     # Database service configuration
@@ -93,7 +40,7 @@ enhanced_infrastructure/
 │       ├── staging/values.yaml
 │       └── prod/values.yaml
 └── terraform/                        # Infrastructure as Code
-    ├── main.tf                       # Enhanced main configuration
+    ├── main.tf                       # main configuration
     ├── variables.tf                  # Comprehensive variable definitions
     ├── outputs.tf                    # Infrastructure outputs
     ├── environments/                 # Environment-specific variables
@@ -114,7 +61,7 @@ enhanced_infrastructure/
         └── storage/                  # S3 with encryption and lifecycle
 ```
 
-## Security Enhancements
+## Security
 
 ### Network Security
 
@@ -362,7 +309,7 @@ enhanced_infrastructure/
 
 ## License
 
-This enhanced infrastructure configuration is provided under the same license as the main AlphaMind project. See the [LICENSE](../LICENSE) file for details.
+This infrastructure configuration is provided under the same license as the main AlphaMind project. See the [LICENSE](../LICENSE) file for details.
 
 ## Disclaimer
 
@@ -373,3 +320,119 @@ This infrastructure configuration is designed to meet common financial industry 
 **Last Updated**: $(date)
 **Version**: 2.0.0
 **Compliance Standards**: PCI DSS v4.0, GDPR, SOX, NIST CSF 2.0, ISO 27001:2022
+
+---
+
+## Quick Start Deployment Guide
+
+### Prerequisites
+
+Install the following tools:
+
+```bash
+# Terraform >= 1.6.0
+wget https://releases.hashicorp.com/terraform/1.6.0/terraform_1.6.0_linux_amd64.zip
+unzip terraform_1.6.0_linux_amd64.zip
+sudo mv terraform /usr/local/bin/
+
+# kubectl >= 1.28.0
+curl -LO "https://dl.k8s.io/release/v1.28.0/bin/linux/amd64/kubectl"
+chmod +x kubectl
+sudo mv kubectl /usr/local/bin/
+
+# Ansible >= 2.15.0
+pip install ansible ansible-lint yamllint
+
+# AWS CLI
+pip install awscli
+aws configure
+```
+
+### Local Development Setup
+
+1. **Terraform Local Validation**
+
+```bash
+cd infrastructure/terraform
+
+# Create your variables file from example
+cp environments/dev/terraform.tfvars.example environments/dev/terraform.tfvars
+# Edit terraform.tfvars with your values (DO NOT commit)
+
+# Format code
+terraform fmt -recursive
+
+# Initialize (local state for development)
+terraform init -backend=false
+
+# Validate configuration
+terraform validate
+
+# Plan (with your variables)
+terraform plan -var-file=environments/dev/terraform.tfvars
+```
+
+2. **Kubernetes Local Validation**
+
+```bash
+cd infrastructure/kubernetes
+
+# Create secrets from example
+cp base/app-secrets.example.yaml base/app-secrets.yaml
+# Edit app-secrets.yaml with base64 encoded values (DO NOT commit)
+
+# Validate YAML
+yamllint base/
+
+# Dry-run apply
+kubectl apply --dry-run=client -f base/
+
+# Apply to cluster (when ready)
+kubectl apply -f base/
+```
+
+3. **Ansible Local Validation**
+
+```bash
+cd infrastructure/ansible
+
+# Install required collections
+ansible-galaxy collection install -r requirements.yml
+
+# Create inventory from example
+cp inventory/hosts.example.yml inventory/hosts.yml
+# Edit with your server IPs (DO NOT commit)
+
+# Validate syntax
+ansible-playbook --syntax-check playbooks/main.yml
+
+# Run with check mode (dry-run)
+ansible-playbook -i inventory/hosts.yml --check playbooks/main.yml
+
+# Run for real (when ready)
+ansible-playbook -i inventory/hosts.yml playbooks/main.yml
+```
+
+### Running All Validations
+
+```bash
+cd infrastructure
+./validate.sh
+```
+
+This will check:
+
+- ✓ Required tools installed
+- ✓ Terraform format, init, validate
+- ✓ Kubernetes YAML lint and dry-run
+- ✓ Ansible lint and syntax check
+- ✓ No committed secrets
+
+### Tool Versions Used
+
+- Terraform: 1.6.0
+- kubectl: 1.28.0
+- Ansible: 2.15.0
+- Python: 3.11
+- yamllint: 1.33.0
+- ansible-lint: 6.20.0

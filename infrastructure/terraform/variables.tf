@@ -5,7 +5,7 @@ variable "aws_region" {
   default     = "us-west-2"
 
   validation {
-    condition = can(regex("^[a-z]{2}-[a-z]+-[0-9]$", var.aws_region))
+    condition     = can(regex("^[a-z]{2}-[a-z]+-[0-9]$", var.aws_region))
     error_message = "AWS region must be in the format: us-west-2, eu-west-1, etc."
   }
 }
@@ -15,7 +15,7 @@ variable "environment" {
   type        = string
 
   validation {
-    condition = contains(["dev", "staging", "prod"], var.environment)
+    condition     = contains(["dev", "staging", "prod"], var.environment)
     error_message = "Environment must be one of: dev, staging, prod."
   }
 }
@@ -26,7 +26,7 @@ variable "app_name" {
   default     = "alphamind"
 
   validation {
-    condition = can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.app_name))
+    condition     = can(regex("^[a-z][a-z0-9-]*[a-z0-9]$", var.app_name))
     error_message = "App name must start with a letter, contain only lowercase letters, numbers, and hyphens."
   }
 }
@@ -38,7 +38,7 @@ variable "vpc_cidr" {
   default     = "10.0.0.0/16"
 
   validation {
-    condition = can(cidrhost(var.vpc_cidr, 0))
+    condition     = can(cidrhost(var.vpc_cidr, 0))
     error_message = "VPC CIDR must be a valid IPv4 CIDR block."
   }
 }
@@ -49,7 +49,7 @@ variable "availability_zones" {
   default     = ["us-west-2a", "us-west-2b", "us-west-2c"]
 
   validation {
-    condition = length(var.availability_zones) >= 2
+    condition     = length(var.availability_zones) >= 2
     error_message = "At least 2 availability zones must be specified for high availability."
   }
 }
@@ -76,7 +76,7 @@ variable "database_subnet_cidrs" {
 variable "allowed_cidr_blocks" {
   description = "CIDR blocks allowed to access the application"
   type        = list(string)
-  default     = ["0.0.0.0/0"]  # Should be restricted in production
+  default     = ["0.0.0.0/0"] # Should be restricted in production
 }
 
 variable "assume_role_arn" {
@@ -89,10 +89,10 @@ variable "assume_role_arn" {
 variable "instance_type" {
   description = "EC2 instance type"
   type        = string
-  default     = "t3.medium"  # Upgraded for financial workloads
+  default     = "t3.medium" # Upgraded for financial workloads
 
   validation {
-    condition = can(regex("^[a-z][0-9][a-z]?\\.(nano|micro|small|medium|large|xlarge|[0-9]+xlarge)$", var.instance_type))
+    condition     = can(regex("^[a-z][0-9][a-z]?\\.(nano|micro|small|medium|large|xlarge|[0-9]+xlarge)$", var.instance_type))
     error_message = "Instance type must be a valid EC2 instance type."
   }
 }
@@ -126,7 +126,7 @@ variable "asg_desired_capacity" {
 variable "db_instance_class" {
   description = "RDS instance class"
   type        = string
-  default     = "db.t3.medium"  # Upgraded for financial workloads
+  default     = "db.t3.medium" # Upgraded for financial workloads
 }
 
 variable "db_name" {
@@ -148,7 +148,7 @@ variable "db_password" {
   sensitive   = true
 
   validation {
-    condition = length(var.db_password) >= 12
+    condition     = length(var.db_password) >= 12
     error_message = "Database password must be at least 12 characters long for PCI DSS compliance."
   }
 }
@@ -169,7 +169,7 @@ variable "application_port" {
 variable "db_backup_retention_period" {
   description = "Number of days to retain database backups"
   type        = number
-  default     = 2555  # 7 years for financial compliance
+  default     = 2555 # 7 years for financial compliance
 }
 
 variable "db_backup_window" {
@@ -191,7 +191,7 @@ variable "kms_deletion_window" {
   default     = 30
 
   validation {
-    condition = var.kms_deletion_window >= 7 && var.kms_deletion_window <= 30
+    condition     = var.kms_deletion_window >= 7 && var.kms_deletion_window <= 30
     error_message = "KMS deletion window must be between 7 and 30 days."
   }
 }
@@ -236,7 +236,7 @@ variable "s3_lifecycle_rules" {
         }
       ]
       expiration = {
-        days = 2555  # 7 years for financial compliance
+        days = 2555 # 7 years for financial compliance
       }
     }
   ]
@@ -246,7 +246,7 @@ variable "s3_lifecycle_rules" {
 variable "log_retention_days" {
   description = "CloudWatch log retention period in days"
   type        = number
-  default     = 2555  # 7 years for financial compliance
+  default     = 2555 # 7 years for financial compliance
 }
 
 variable "alert_email_addresses" {
@@ -259,13 +259,13 @@ variable "alert_email_addresses" {
 variable "backup_schedule" {
   description = "Backup schedule in cron format"
   type        = string
-  default     = "cron(0 2 * * ? *)"  # Daily at 2 AM UTC
+  default     = "cron(0 2 * * ? *)" # Daily at 2 AM UTC
 }
 
 variable "backup_retention_days" {
   description = "Number of days to retain backups"
   type        = number
-  default     = 2555  # 7 years for financial compliance
+  default     = 2555 # 7 years for financial compliance
 }
 
 # Compliance Tags
@@ -273,10 +273,10 @@ variable "default_tags" {
   description = "Default tags for all resources"
   type        = map(string)
   default = {
-    Project     = "AlphaMind"
-    Owner       = "Platform Team"
-    CostCenter  = "Engineering"
-    Terraform   = "true"
+    Project    = "AlphaMind"
+    Owner      = "Platform Team"
+    CostCenter = "Engineering"
+    Terraform  = "true"
   }
 }
 
@@ -318,7 +318,7 @@ variable "data_classification" {
   default     = "Financial"
 
   validation {
-    condition = contains(["Public", "Internal", "Confidential", "Financial", "Restricted"], var.data_classification)
+    condition     = contains(["Public", "Internal", "Confidential", "Financial", "Restricted"], var.data_classification)
     error_message = "Data classification must be one of: Public, Internal, Confidential, Financial, Restricted."
   }
 }

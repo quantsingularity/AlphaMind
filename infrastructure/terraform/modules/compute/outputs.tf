@@ -12,3 +12,13 @@ output "load_balancer_dns" {
   description = "DNS name of the load balancer"
   value       = aws_lb.app.dns_name
 }
+
+output "asg_arn" {
+  description = "ARN of the Auto Scaling Group"
+  value       = try(aws_autoscaling_group.main[0].arn, "")
+}
+
+output "instance_arns" {
+  description = "ARNs of EC2 instances"
+  value       = []
+}

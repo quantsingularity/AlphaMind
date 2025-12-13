@@ -1,0 +1,67 @@
+Terraform validation attempt...
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mInvalid Attribute Combination[0m
+[33m│[0m [0m
+[33m│[0m [0m[0m  with module.cloudtrail.aws_s3_bucket_lifecycle_configuration.cloudtrail,
+[33m│[0m [0m  on modules/cloudtrail/main.tf line 48, in resource "aws_s3_bucket_lifecycle_configuration" "cloudtrail":
+[33m│[0m [0m  48: resource "aws_s3_bucket_lifecycle_configuration" "cloudtrail" [4m{[0m[0m
+[33m│[0m [0m
+[33m│[0m [0mNo attribute specified when one (and only one) of
+[33m│[0m [0m[rule[0].filter,rule[0].prefix] is required
+[33m│[0m [0m
+[33m│[0m [0mThis will be an error in a future version of the provider
+[33m╵[0m[0m
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mArgument is deprecated[0m
+[33m│[0m [0m
+[33m│[0m [0m[0m  with module.network.aws_eip.nat,
+[33m│[0m [0m  on modules/network/main.tf line 48, in resource "aws_eip" "nat":
+[33m│[0m [0m  48:   vpc   = [4mtrue[0m[0m
+[33m│[0m [0m
+[33m│[0m [0mvpc is deprecated. Use domain instead.
+[33m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mexpected retention_in_days to be one of [0 1 3 5 7 14 30 60 90 120 150 180 365 400 545 731 1096 1827 2192 2557 2922 3288 3653], got 2555[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with module.cloudtrail.aws_cloudwatch_log_group.cloudtrail,
+[31m│[0m [0m  on modules/cloudtrail/main.tf line 138, in resource "aws_cloudwatch_log_group" "cloudtrail":
+[31m│[0m [0m 138:   retention_in_days = [4m2555[0m # 7 years for financial compliance[0m
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mInvalid resource type[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on modules/cloudtrail/main.tf line 274, in resource "aws_cloudwatch_metric_filter" "root_usage":
+[31m│[0m [0m 274: resource [4m"aws_cloudwatch_metric_filter"[0m "root_usage" {[0m
+[31m│[0m [0m
+[31m│[0m [0mThe provider hashicorp/aws does not support resource type
+[31m│[0m [0m"aws_cloudwatch_metric_filter".
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mInvalid resource type[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on modules/cloudtrail/main.tf line 286, in resource "aws_cloudwatch_metric_filter" "unauthorized_api_calls":
+[31m│[0m [0m 286: resource [4m"aws_cloudwatch_metric_filter"[0m "unauthorized_api_calls" {[0m
+[31m│[0m [0m
+[31m│[0m [0mThe provider hashicorp/aws does not support resource type
+[31m│[0m [0m"aws_cloudwatch_metric_filter".
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mInvalid resource type[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on modules/cloudtrail/main.tf line 298, in resource "aws_cloudwatch_metric_filter" "no_mfa_console_signin":
+[31m│[0m [0m 298: resource [4m"aws_cloudwatch_metric_filter"[0m "no_mfa_console_signin" {[0m
+[31m│[0m [0m
+[31m│[0m [0mThe provider hashicorp/aws does not support resource type
+[31m│[0m [0m"aws_cloudwatch_metric_filter".
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mReference to undeclared resource[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on modules/network/outputs.tf line 18, in output "database_subnet_ids":
+[31m│[0m [0m  18:   value       = try([4maws_subnet.database[0m[*].id, [])[0m
+[31m│[0m [0m
+[31m│[0m [0mA managed resource "aws_subnet" "database" has not been declared in
+[31m│[0m [0mmodule.network.
+[31m╵[0m[0m
+Some module stubs may need AWS provider resources

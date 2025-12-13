@@ -28,89 +28,89 @@
   template:
     src: jail.local.j2
     dest: /etc/fail2ban/jail.local
-    backup: yes
+    backup: true
   notify: restart fail2ban
 
 - name: Enable and start fail2ban
   systemd:
     name: fail2ban
-    enabled: yes
+    enabled: true
     state: started
 
 - name: Configure audit daemon for SOX compliance
   template:
     src: auditd.conf.j2
     dest: /etc/audit/auditd.conf
-    backup: yes
+    backup: true
   notify: restart auditd
 
 - name: Configure audit rules for financial data access
   template:
     src: audit.rules.j2
     dest: /etc/audit/rules.d/financial.rules
-    backup: yes
+    backup: true
   notify: restart auditd
 
 - name: Enable and start auditd
   systemd:
     name: auditd
-    enabled: yes
+    enabled: true
     state: started
 
 - name: Configure rsyslog for centralized logging
   template:
     src: rsyslog.conf.j2
     dest: /etc/rsyslog.conf
-    backup: yes
+    backup: true
   notify: restart rsyslog
 
 - name: Configure log rotation for compliance
   template:
     src: logrotate.conf.j2
     dest: /etc/logrotate.conf
-    backup: yes
+    backup: true
 
 - name: Create log retention policy
   template:
     src: log-retention.j2
     dest: /etc/logrotate.d/financial-logs
-    backup: yes
+    backup: true
 
 - name: Configure time synchronization for audit trails
   template:
     src: chrony.conf.j2
     dest: /etc/chrony/chrony.conf
-    backup: yes
+    backup: true
   notify: restart chrony
 
 - name: Enable and start chrony
   systemd:
     name: chrony
-    enabled: yes
+    enabled: true
     state: started
 
 - name: Configure ClamAV antivirus
   template:
     src: clamd.conf.j2
     dest: /etc/clamav/clamd.conf
-    backup: yes
+    backup: true
   notify: restart clamav-daemon
 
 - name: Update ClamAV virus definitions
   command: freshclam
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Enable and start ClamAV daemon
   systemd:
     name: clamav-daemon
-    enabled: yes
+    enabled: true
     state: started
 
 - name: Configure file integrity monitoring with AIDE
   template:
     src: aide.conf.j2
     dest: /etc/aide/aide.conf
-    backup: yes
+    backup: true
 
 - name: Initialize AIDE database
   command: aideinit
@@ -155,14 +155,14 @@
 
 - name: Configure AppArmor profiles
   command: aa-enforce /etc/apparmor.d/*
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Set secure kernel parameters
   sysctl:
     name: "{{ item.name }}"
     value: "{{ item.value }}"
     state: present
-    reload: yes
+    reload: true
   loop:
     - { name: "net.ipv4.ip_forward", value: "0" }
     - { name: "net.ipv4.conf.all.send_redirects", value: "0" }
@@ -198,7 +198,7 @@
 - name: Disable unnecessary services
   systemd:
     name: "{{ item }}"
-    enabled: no
+    enabled: false
     state: stopped
   loop:
     - avahi-daemon
@@ -214,14 +214,14 @@
     - smb
     - squid
     - snmpd
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Set password policy for PCI DSS compliance
   lineinfile:
     path: /etc/security/pwquality.conf
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
-    backup: yes
+    backup: true
   loop:
     - { regexp: "^minlen", line: "minlen = 12" }
     - { regexp: "^minclass", line: "minclass = 4" }
@@ -236,7 +236,7 @@
     path: /etc/security/faillock.conf
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
-    backup: yes
+    backup: true
   loop:
     - { regexp: "^deny", line: "deny = 5" }
     - { regexp: "^unlock_time", line: "unlock_time = 900" }
@@ -246,7 +246,7 @@
   lineinfile:
     path: /etc/profile
     line: "export TMOUT=900"
-    backup: yes
+    backup: true
 
 - name: Create compliance monitoring script
   template:
@@ -271,7 +271,7 @@
   template:
     src: rsyslog-siem.conf.j2
     dest: /etc/rsyslog.d/50-siem.conf
-    backup: yes
+    backup: true
   notify: restart rsyslog
 
 - name: Create vulnerability scanning script
@@ -301,7 +301,7 @@
   template:
     src: security-baseline.md.j2
     dest: /etc/security/baseline.md
-    backup: yes
+    backup: true
 
 - name: Generate compliance report
   template:
