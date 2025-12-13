@@ -15,10 +15,7 @@ export default function FeaturesScreen() {
 
   return (
     <ScrollView
-      contentContainerStyle={[
-        styles.container,
-        { backgroundColor: theme.colors.background },
-      ]}
+      contentContainerStyle={[styles.container, { backgroundColor: theme.colors.background }]}
     >
       <Headline style={styles.title}>
         <Text>Key Features</Text>
@@ -34,8 +31,8 @@ export default function FeaturesScreen() {
           </Title>
           <Paragraph>
             <Text>
-              Leverage advanced machine learning models for predictive analytics
-              and strategy generation.
+              Leverage advanced machine learning models for predictive analytics and strategy
+              generation.
             </Text>
           </Paragraph>
         </Card.Content>
@@ -48,8 +45,7 @@ export default function FeaturesScreen() {
           </Title>
           <Paragraph>
             <Text>
-              Access powerful tools for backtesting, factor analysis, and
-              portfolio optimization.
+              Access powerful tools for backtesting, factor analysis, and portfolio optimization.
             </Text>
           </Paragraph>
         </Card.Content>
@@ -62,8 +58,7 @@ export default function FeaturesScreen() {
           </Title>
           <Paragraph>
             <Text>
-              Incorporate diverse datasets like satellite imagery, social media
-              sentiment, and more.
+              Incorporate diverse datasets like satellite imagery, social media sentiment, and more.
             </Text>
           </Paragraph>
         </Card.Content>
@@ -76,8 +71,7 @@ export default function FeaturesScreen() {
           </Title>
           <Paragraph>
             <Text>
-              Utilize sophisticated risk models and real-time monitoring to
-              protect capital.
+              Utilize sophisticated risk models and real-time monitoring to protect capital.
             </Text>
           </Paragraph>
         </Card.Content>
@@ -90,8 +84,7 @@ export default function FeaturesScreen() {
           </Title>
           <Paragraph>
             <Text>
-              Connect seamlessly with brokers for low-latency order execution
-              and management.
+              Connect seamlessly with brokers for low-latency order execution and management.
             </Text>
           </Paragraph>
         </Card.Content>

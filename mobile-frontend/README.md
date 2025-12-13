@@ -87,7 +87,7 @@ mobile-frontend/
 
 ### Prerequisites
 
-- Node.js 16+ 
+- Node.js 16+
 - npm or yarn
 - Expo CLI
 - iOS Simulator (macOS) or Android Emulator/Device
@@ -95,20 +95,23 @@ mobile-frontend/
 ### Installation
 
 1. Navigate to the mobile-frontend directory:
+
    ```bash
    cd mobile-frontend
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
 
 3. Create environment file:
+
    ```bash
    cp .env.example .env
    ```
-   
+
    Edit `.env` to configure your settings:
    - Set `API_BASE_URL` to your backend URL (default: http://localhost:5000)
    - Set `ENABLE_MOCK_DATA=true` for offline development
@@ -118,11 +121,13 @@ mobile-frontend/
 #### Development Mode
 
 Start the Expo development server:
+
 ```bash
 npm start
 ```
 
 This will open the Expo DevTools in your browser. From there, you can:
+
 - Press `i` to open iOS Simulator
 - Press `a` to open Android Emulator
 - Scan QR code with Expo Go app on your phone
@@ -142,11 +147,12 @@ npm run web
 
 ### Backend Integration
 
-The mobile app integrates with the AlphaMind backend API. 
+The mobile app integrates with the AlphaMind backend API.
 
 #### Running with Backend
 
 1. **Start the backend server** (from repository root):
+
    ```bash
    cd backend
    python -m venv venv
@@ -154,7 +160,7 @@ The mobile app integrates with the AlphaMind backend API.
    pip install -r requirements.txt
    python src/main.py
    ```
-   
+
    The backend should start on `http://localhost:5000`
 
 2. **Configure mobile app** to connect to backend:
@@ -170,6 +176,7 @@ The mobile app integrates with the AlphaMind backend API.
 #### Running without Backend (Mock Data)
 
 For development without backend:
+
 - Set `ENABLE_MOCK_DATA=true` in `.env`
 - The app will use mock data from services (portfolioService, researchService)
 
@@ -194,6 +201,7 @@ npm test -- --testPathPattern="authService"
 ### Test Coverage
 
 Current test suites:
+
 - ✅ Authentication service tests
 - ✅ Redux store slice tests
 - ✅ Configuration tests
@@ -245,6 +253,7 @@ NODE_ENV=development
 ### Theme Customization
 
 Themes are defined in `constants/theme.js`. You can customize:
+
 - Light theme colors
 - Dark theme colors
 - Component-specific styling
@@ -254,6 +263,7 @@ Users can switch themes in Settings screen.
 ## Key Features Implementation
 
 ### Authentication
+
 - JWT token-based authentication
 - Login and registration screens
 - Auto-login with stored credentials
@@ -261,18 +271,21 @@ Users can switch themes in Settings screen.
 - Secure token storage with AsyncStorage
 
 ### State Management
+
 - Redux Toolkit for centralized state
 - Async thunks for API calls
 - Slices for auth, portfolio, and settings
 - Persistent state with AsyncStorage
 
 ### API Integration
+
 - Axios client with interceptors
 - Automatic token injection
 - Error handling and retry logic
 - Mock data support for offline development
 
 ### Navigation
+
 - Tab-based navigation for main screens
 - Stack navigation for authentication flow
 - Protected routes requiring authentication
@@ -305,17 +318,20 @@ eas build --platform ios
 ### Common Issues
 
 1. **Metro bundler cache issues**:
+
    ```bash
    expo start -c
    ```
 
 2. **Node modules issues**:
+
    ```bash
    rm -rf node_modules
    npm install
    ```
 
 3. **iOS Simulator not opening**:
+
    ```bash
    # Ensure Xcode is installed
    xcode-select --install
@@ -369,12 +385,14 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 ## Support
 
 For issues and questions:
+
 - GitHub Issues: https://github.com/abrar2030/AlphaMind/issues
 - Documentation: See `/docs` in repository root
 
 ## Changelog
 
 ### v1.0.0 (Current)
+
 - ✅ Complete authentication system (login/register)
 - ✅ Redux state management implementation
 - ✅ API integration with backend

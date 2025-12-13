@@ -10,9 +10,11 @@ export default function ErrorMessage({ message, onRetry }) {
     <View style={styles.container}>
       <Icon name="alert-circle-outline" size={64} color={theme.colors.error} />
       <Text style={[styles.message, { color: theme.colors.error }]}>{message}</Text>
-      {onRetry && <Button mode="contained" onPress={onRetry} style={styles.button}>
+      {onRetry && (
+        <Button mode="contained" onPress={onRetry} style={styles.button}>
           Retry
-        </Button>}
+        </Button>
+      )}
     </View>
   );
 }

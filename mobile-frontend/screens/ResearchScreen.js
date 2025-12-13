@@ -79,12 +79,8 @@ export default function ResearchScreen() {
             <Paragraph>
               <Text>{item.summary}</Text>
             </Paragraph>
-            {item.authors && (
-              <Text style={styles.authors}>By: {item.authors.join(", ")}</Text>
-            )}
-            {item.date && (
-              <Text style={styles.date}>Published: {item.date}</Text>
-            )}
+            {item.authors && <Text style={styles.authors}>By: {item.authors.join(", ")}</Text>}
+            {item.date && <Text style={styles.date}>Published: {item.date}</Text>}
           </Card.Content>
           <Card.Actions>
             <Button onPress={() => handlePress(item)}>

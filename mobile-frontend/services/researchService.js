@@ -6,8 +6,7 @@ const mockResearchPapers = [
   {
     id: "1",
     title: "Deep Learning for Market Prediction",
-    summary:
-      "Exploring the efficacy of LSTM networks in forecasting short-term market movements.",
+    summary: "Exploring the efficacy of LSTM networks in forecasting short-term market movements.",
     authors: ["Dr. John Smith", "Dr. Jane Doe"],
     date: "2025-11-15",
     category: "Machine Learning",

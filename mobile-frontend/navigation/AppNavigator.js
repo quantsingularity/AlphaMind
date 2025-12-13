@@ -59,11 +59,7 @@ export default function AppNavigator() {
 
   const renderIcon = ({ route, focused, color }) => {
     return (
-      <Icon
-        name={focused ? route.focusedIcon : route.unfocusedIcon}
-        size={24}
-        color={color}
-      />
+      <Icon name={focused ? route.focusedIcon : route.unfocusedIcon} size={24} color={color} />
     );
   };
 

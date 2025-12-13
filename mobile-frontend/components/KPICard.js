@@ -9,9 +9,7 @@ export default function KPICard({ title, value, change, changeColor, icon, isLoa
   return (
     <Card style={styles.card}>
       <Card.Content style={styles.cardContent}>
-        {icon && (
-          <Icon name={icon} size={32} color={theme.colors.primary} style={styles.icon} />
-        )}
+        {icon && <Icon name={icon} size={32} color={theme.colors.primary} style={styles.icon} />}
         <View style={styles.textContainer}>
           <Text style={[styles.title, { color: theme.colors.onSurfaceVariant }]}>{title}</Text>
           <Title style={styles.value}>{isLoading ? "..." : value}</Title>

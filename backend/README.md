@@ -30,32 +30,37 @@ The AlphaMind backend is a production-ready FastAPI-based REST API that provides
 ### Installation
 
 1. **Clone and navigate to backend directory**:
+
    ```bash
    cd backend
    ```
 
 2. **Create virtual environment**:
+
    ```bash
    python3 -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
 3. **Install dependencies**:
+
    ```bash
    pip install -r requirements.txt
    ```
 
 4. **Configure environment**:
+
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
 5. **Run the server**:
+
    ```bash
    # Using the startup script
    ./start_backend.sh
-   
+
    # Or directly with uvicorn
    python3 -m uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
    ```
@@ -70,6 +75,7 @@ chmod +x start_backend.sh
 ```
 
 This script will:
+
 - Create a virtual environment if it doesn't exist
 - Install all dependencies
 - Load environment variables from `.env`
@@ -86,23 +92,28 @@ Once the server is running, access the interactive API documentation at:
 ## API Endpoints
 
 ### Health & Status
+
 - `GET /health` - Health check endpoint
 - `GET /` - Root endpoint with service information
 
 ### Trading
+
 - `POST /api/v1/trading/orders` - Create new order
 - `GET /api/v1/trading/orders` - List all orders
 - `GET /api/v1/trading/orders/{order_id}` - Get specific order
 
 ### Portfolio
+
 - `GET /api/v1/portfolio/` - Get current portfolio
 - `GET /api/v1/portfolio/performance` - Get performance metrics
 
 ### Market Data
+
 - `GET /api/v1/market-data/quote/{symbol}` - Get real-time quote
 - `GET /api/v1/market-data/historical/{symbol}` - Get historical data
 
 ### Strategies
+
 - `GET /api/v1/strategies/` - List all strategies
 - `POST /api/v1/strategies/backtest` - Run strategy backtest
 
@@ -177,6 +188,7 @@ Key environment variables (see `.env.example` for complete list):
 For production use, configure a proper database:
 
 **PostgreSQL**:
+
 ```bash
 # Update .env
 POSTGRES_HOST=localhost
@@ -187,6 +199,7 @@ POSTGRES_PASSWORD=your_password
 ```
 
 **MySQL**:
+
 ```bash
 # Update .env
 DB_HOST=localhost
@@ -234,6 +247,7 @@ async def new_feature(request: NewFeatureRequest):
 ```
 
 Then register in `api/main.py`:
+
 ```python
 from api.routers import new_feature
 app.include_router(new_feature.router, prefix="/api/v1/new-feature", tags=["new-feature"])
@@ -332,18 +346,21 @@ monitor.set_threshold("order_latency", "max", 100, AlertLevel.WARNING)
 ### Common Issues
 
 **Import Errors**:
+
 ```bash
 # Ensure backend is in Python path
 export PYTHONPATH=$PYTHONPATH:$(pwd)
 ```
 
 **Port Already in Use**:
+
 ```bash
 # Change port in .env or use different port
 uvicorn api.main:app --port 8001
 ```
 
 **Database Connection Errors**:
+
 ```bash
 # Verify database is running
 # Check credentials in .env
@@ -397,6 +414,7 @@ MIT License - see LICENSE file for details
 ## Support
 
 For issues and questions:
+
 - GitHub Issues: https://github.com/abrar2030/AlphaMind/issues
 - Documentation: http://localhost:8000/docs
 

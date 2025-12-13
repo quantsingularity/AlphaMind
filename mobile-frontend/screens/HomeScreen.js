@@ -10,7 +10,7 @@ import { fetchPortfolio } from "../store/slices/portfolioSlice";
 export default function HomeScreen() {
   const theme = useTheme();
   const dispatch = useDispatch();
-  
+
   const { data, loading, error } = useSelector((state) => state.portfolio);
   const { user } = useSelector((state) => state.auth);
   const [refreshing, setRefreshing] = React.useState(false);
@@ -146,10 +146,8 @@ export default function HomeScreen() {
       contentContainerStyle={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
-      {user && (
-        <Text style={styles.welcome}>Welcome back, {user.name || user.email}!</Text>
-      )}
-      
+      {user && <Text style={styles.welcome}>Welcome back, {user.name || user.email}!</Text>}
+
       <Headline style={styles.title}>
         <Text>AlphaMind Dashboard</Text>
       </Headline>
@@ -164,7 +162,9 @@ export default function HomeScreen() {
       </View>
 
       <Paragraph style={styles.infoText}>
-        <Text>Navigate using the bottom tabs to explore features, documentation, and research.</Text>
+        <Text>
+          Navigate using the bottom tabs to explore features, documentation, and research.
+        </Text>
       </Paragraph>
     </ScrollView>
   );

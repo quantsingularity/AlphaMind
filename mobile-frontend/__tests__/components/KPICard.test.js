@@ -18,7 +18,7 @@ describe("KPICard Component", () => {
 
   it("renders all props correctly", () => {
     renderWithProvider(<KPICard {...defaultProps} />);
-    
+
     expect(screen.getByText("Portfolio Value")).toBeTruthy();
     expect(screen.getByText("$1,250,345.67")).toBeTruthy();
     expect(screen.getByText("+1.2%")).toBeTruthy();
@@ -26,7 +26,7 @@ describe("KPICard Component", () => {
 
   it("shows loading state", () => {
     renderWithProvider(<KPICard {...defaultProps} isLoading={true} />);
-    
+
     expect(screen.getByText("Portfolio Value")).toBeTruthy();
     expect(screen.getByText("...")).toBeTruthy();
   });
@@ -34,7 +34,7 @@ describe("KPICard Component", () => {
   it("renders without change value", () => {
     const propsWithoutChange = { ...defaultProps, change: undefined };
     renderWithProvider(<KPICard {...propsWithoutChange} />);
-    
+
     expect(screen.getByText("Portfolio Value")).toBeTruthy();
     expect(screen.getByText("$1,250,345.67")).toBeTruthy();
     expect(screen.queryByText("+1.2%")).toBeNull();
@@ -43,7 +43,7 @@ describe("KPICard Component", () => {
   it("renders without icon", () => {
     const propsWithoutIcon = { ...defaultProps, icon: undefined };
     renderWithProvider(<KPICard {...propsWithoutIcon} />);
-    
+
     expect(screen.getByText("Portfolio Value")).toBeTruthy();
   });
 });

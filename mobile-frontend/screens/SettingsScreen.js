@@ -17,7 +17,7 @@ import { logoutUser } from "../store/slices/authSlice";
 export default function SettingsScreen() {
   const theme = useTheme();
   const dispatch = useDispatch();
-  
+
   const settings = useSelector((state) => state.settings);
   const { user } = useSelector((state) => state.auth);
 

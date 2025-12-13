@@ -8,7 +8,7 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  
+
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.auth);
   const theme = useTheme();

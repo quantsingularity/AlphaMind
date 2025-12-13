@@ -3,21 +3,25 @@
 ## Running Tests
 
 ### Run All Tests
+
 ```bash
 npm test
 ```
 
 ### Run Tests with Coverage
+
 ```bash
 npm run test:coverage
 ```
 
 ### Run Tests in Watch Mode
+
 ```bash
 npm run test:watch
 ```
 
 ### Run Specific Test Suite
+
 ```bash
 npm test -- --testPathPattern="authService"
 ```
@@ -34,6 +38,7 @@ npm test -- --testPathPattern="authService"
 ## Test Coverage
 
 Current tests cover:
+
 - Authentication service and flows
 - Redux store slices (auth, portfolio, settings)
 - Configuration constants
@@ -42,6 +47,7 @@ Current tests cover:
 ## Known Testing Limitations
 
 Due to React Native's complex testing environment:
+
 1. Some UI component tests require additional setup for React Native Paper components
 2. Flow type checking in React Native core may cause test failures
 3. Integration tests work best with mocked API responses
@@ -49,6 +55,7 @@ Due to React Native's complex testing environment:
 ## Adding New Tests
 
 When adding new features, ensure:
+
 1. Unit tests for services and utilities
 2. Redux slice tests for new state management
 3. Integration tests for critical user flows
