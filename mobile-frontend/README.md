@@ -1,7 +1,5 @@
 # AlphaMind Mobile Frontend
 
-[![License](https://img.shields.io/github/license/abrar2030/AlphaMind)](https://github.com/abrar2030/AlphaMind/blob/main/LICENSE)
-
 ## Overview
 
 The mobile-frontend directory contains the React Native mobile application for AlphaMind, providing traders with on-the-go access to portfolio monitoring, alerts, and trading capabilities. This cross-platform mobile application delivers a responsive and intuitive interface for monitoring investments and executing trades from any mobile device.

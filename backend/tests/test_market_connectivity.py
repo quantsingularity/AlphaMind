@@ -13,9 +13,9 @@ import unittest
 from unittest.mock import MagicMock
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
-from order_management.enhanced_market_connectivity import (
-    EnhancedMarketConnectivityManager,
-    EnhancedVenueAdapter,
+from order_management.market_connectivity import (
+    MarketConnectivityManager,
+    VenueAdapter,
     FailureMode,
 )
 from order_management.market_connectivity import (
@@ -25,8 +25,8 @@ from order_management.market_connectivity import (
 )
 
 
-class TestEnhancedVenueAdapter(unittest.TestCase):
-    """Test cases for the EnhancedVenueAdapter class."""
+class TestVenueAdapter(unittest.TestCase):
+    """Test cases for the VenueAdapter class."""
 
     def setUp(self) -> Any:
         """Set up test fixtures."""
@@ -43,7 +43,7 @@ class TestEnhancedVenueAdapter(unittest.TestCase):
             },
             capabilities=["market_data", "order_execution"],
         )
-        self.adapter = EnhancedVenueAdapter(self.config)
+        self.adapter = VenueAdapter(self.config)
         self.adapter._connect_impl = MagicMock(return_value=True)
         self.adapter._disconnect_impl = MagicMock(return_value=True)
 
@@ -137,7 +137,7 @@ class TestEnhancedVenueAdapter(unittest.TestCase):
         self.assertIsNone(update.bid)
         self.assertIsNone(update.ask)
 
-    def test_get_enhanced_status(self) -> Any:
+    def test_get_status(self) -> Any:
         self.adapter.connect()
         status = self.adapter.get_status()
         self.assertEqual(status["venue_id"], "test_venue")
@@ -148,11 +148,11 @@ class TestEnhancedVenueAdapter(unittest.TestCase):
         self.assertIn("failure_simulation_enabled", status)
 
 
-class TestEnhancedMarketConnectivityManager(unittest.TestCase):
-    """Test cases for the EnhancedMarketConnectivityManager class."""
+class TestMarketConnectivityManager(unittest.TestCase):
+    """Test cases for the MarketConnectivityManager class."""
 
     def setUp(self) -> Any:
-        self.manager = EnhancedMarketConnectivityManager()
+        self.manager = MarketConnectivityManager()
         self.venue1_config = VenueConfig(
             venue_id="venue1",
             venue_type=VenueType.EXCHANGE,

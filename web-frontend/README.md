@@ -1,7 +1,5 @@
 # AlphaMind Web Frontend
 
-[![License](https://img.shields.io/github/license/abrar2030/AlphaMind)](https://github.com/abrar2030/AlphaMind/blob/main/LICENSE)
-
 ## Overview
 
 The web-frontend is a modern React/TypeScript application providing a comprehensive interface for the AlphaMind quantitative trading system. This responsive web application offers traders and analysts real-time portfolio monitoring, strategy management, backtesting capabilities, and risk visualization.
