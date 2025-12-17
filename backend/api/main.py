@@ -2,6 +2,7 @@
 Main FastAPI application for AlphaMind backend.
 """
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -19,8 +20,21 @@ from core.logging import setup_logging
 setup_logging()
 logger = logging.getLogger(__name__)
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage application lifespan."""
+    # Startup
+    logger.info("Starting AlphaMind API...")
+    logger.info("API documentation available at /docs")
+    yield
+    # Shutdown
+    logger.info("Shutting down AlphaMind API...")
+
+
 # Create FastAPI app
 app = FastAPI(
+    lifespan=lifespan,
     title="AlphaMind API",
     description="Institutional-Grade Quantitative AI Trading System",
     version="1.0.0",
@@ -45,19 +59,6 @@ app.include_router(
     market_data.router, prefix="/api/v1/market-data", tags=["market-data"]
 )
 app.include_router(strategies.router, prefix="/api/v1/strategies", tags=["strategies"])
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Initialize application on startup."""
-    logger.info("Starting AlphaMind API...")
-    logger.info("API documentation available at /docs")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Cleanup on shutdown."""
-    logger.info("Shutting down AlphaMind API...")
 
 
 @app.exception_handler(HTTPException)

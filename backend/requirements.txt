@@ -1,87 +1,86 @@
 # Core API Framework
-fastapi>=0.104.0
-uvicorn[standard]>=0.24.0
-pydantic>=2.4.0
-pydantic-settings>=2.0.0
+fastapi>=0.104.0,<0.110.0
+uvicorn[standard]>=0.24.0,<0.28.0
+pydantic>=2.4.0,<2.7.0
+pydantic-settings>=2.0.0,<2.3.0
 python-multipart>=0.0.6
 
 # Core dependencies
 numpy>=1.20.0,<2.0.0
-pandas>=1.3.0,<2.2.0
-scikit-learn>=1.0.0,<1.4.0
+pandas>=1.3.0,<2.3.0
+scikit-learn>=1.0.0,<1.5.0
 
-# Deep Learning
-tensorflow>=2.8.0,<2.16.0
-torch>=1.10.0,<2.2.0
-stable-baselines3>=1.5.0
+# Deep Learning (optional - install only if needed)
+# tensorflow>=2.8.0,<2.16.0
+# torch>=1.10.0,<2.2.0
+# stable-baselines3>=1.5.0
 
-# Alternative data processing
-sentinelhub>=3.4.0
-geopython>=0.1.0
-sec-edgar-downloader>=2.0.0
+# Alternative data processing (optional)
+# sentinelhub>=3.4.0
+# geopython>=0.1.0
+# sec-edgar-downloader>=2.0.0
 
-# ML/AI libraries
-gym>=0.21.0
-pymc3>=3.11.0
-arviz>=0.11.0
-pymc>=4.0.0
+# ML/AI libraries (optional)
+# gym>=0.21.0
+# pymc3>=3.11.0
+# arviz>=0.11.0
+# pymc>=4.0.0
 
 # Quantitative finance
-QuantLib>=1.24
-scipy>=1.7.0,<1.12.0
+# QuantLib>=1.24
+scipy>=1.7.0,<1.13.0
 
-# Data streaming
-confluent-kafka>=1.8.0
-avro-python3>=1.10.0
+# Data streaming (optional)
+# confluent-kafka>=1.8.0
+# avro-python3>=1.10.0
 
-# Cloud infrastructure
-google-cloud-aiplatform>=1.12.0
+# Cloud infrastructure (optional)
+# google-cloud-aiplatform>=1.12.0
 
 # Visualization
-matplotlib>=3.5.0
-seaborn>=0.11.0
-plotly>=5.11.0
+matplotlib>=3.5.0,<3.9.0
+seaborn>=0.11.0,<0.14.0
+plotly>=5.11.0,<5.21.0
 
-# Database
-SQLAlchemy>=1.4.0,<2.1.0
-pymysql>=1.0.0
-psycopg2-binary>=2.9.0
-redis>=4.3.0
+# Database (install as needed)
+# SQLAlchemy>=1.4.0,<2.1.0
+# pymysql>=1.0.0
+# psycopg2-binary>=2.9.0
+# redis>=4.3.0
 
 # Authentication & Security
-bcrypt>=3.2.0
-PyJWT>=2.0.0
+bcrypt>=3.2.0,<4.2.0
+PyJWT>=2.0.0,<2.9.0
 python-jose[cryptography]>=3.3.0
 passlib[bcrypt]>=1.7.4
 
 # HTTP & API
-requests>=2.26.0
-httpx>=0.24.0
-aiohttp>=3.8.0
+requests>=2.26.0,<2.32.0
+httpx>=0.24.0,<0.27.0
+aiohttp>=3.8.0,<3.10.0
 
 # Data Processing
-dask>=2021.0.0
-ruptures>=1.1.0
+# dask>=2021.0.0
+# ruptures>=1.1.0
 
 # WebSockets
-websockets>=10.0
+websockets>=10.0,<13.0
 
-# Dashboard
-dash>=2.0.0
+# Dashboard (optional)
+# dash>=2.0.0
 
 # Configuration
 python-dotenv>=0.19.0
-pyyaml>=6.0
+pyyaml>=6.0,<6.1
 
 # Development tools
-pytest>=7.0.0
-pytest-asyncio>=0.21.0
-pytest-cov>=4.0.0
-black>=22.0.0
-flake8>=4.0.0
-mypy>=0.990
-httpx>=0.24.0  # For testing FastAPI
+pytest>=7.0.0,<8.2.0
+pytest-asyncio>=0.21.0,<0.24.0
+pytest-cov>=4.0.0,<5.1.0
+black>=22.0.0,<24.5.0
+flake8>=4.0.0,<7.1.0
+mypy>=0.990,<1.11
 
 # Utilities
 python-dateutil>=2.8.2
-pytz>=2021.3
+pytz>=2021.3,<2025.0

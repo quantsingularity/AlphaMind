@@ -760,5 +760,53 @@ class PluginManager:
             logger.error(f"Error discovering plugins from directory: {e}")
             return discovered
 
-    async def load_plugin(self) -> None:
-        pass
+    async def load_plugin(self, plugin_name: str, config: Dict[str, Any]) -> bool:
+        """
+        Load and initialize a plugin.
+
+        Args:
+            plugin_name: Name of the plugin to load
+            config: Configuration dictionary for the plugin
+
+        Returns:
+            True if plugin loaded successfully, False otherwise
+        """
+        try:
+            if plugin_name not in self.plugin_classes:
+                logger.error(f"Plugin '{plugin_name}' not found in registered plugins")
+                return False
+
+            if (
+                plugin_name in self.plugins
+                and self.plugins[plugin_name]["status"] == PluginStatus.ACTIVE
+            ):
+                logger.warning(f"Plugin '{plugin_name}' is already loaded and active")
+                return True
+
+            logger.info(f"Loading plugin: {plugin_name}")
+            plugin_class = self.plugin_classes[plugin_name]
+            plugin_instance = plugin_class(config)
+
+            # Initialize the plugin
+            await plugin_instance.initialize()
+
+            # Store plugin instance
+            self.plugins[plugin_name] = {
+                "instance": plugin_instance,
+                "status": PluginStatus.ACTIVE,
+                "metadata": plugin_instance._get_metadata(),
+                "loaded_at": datetime.now(),
+            }
+
+            logger.info(f"Successfully loaded plugin: {plugin_name}")
+            self.health_status["active_plugins"] = sum(
+                1 for p in self.plugins.values() if p["status"] == PluginStatus.ACTIVE
+            )
+            return True
+
+        except Exception as e:
+            logger.error(f"Error loading plugin '{plugin_name}': {e}")
+            logger.debug(traceback.format_exc())
+            if plugin_name in self.plugins:
+                self.plugins[plugin_name]["status"] = PluginStatus.ERROR
+            return False
