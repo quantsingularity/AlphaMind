@@ -95,6 +95,7 @@ docker run -p 8000:8000 alphamind-backend
 ### Import Errors
 
 If you encounter import errors, ensure all dependencies are installed:
+
 ```bash
 pip install -r requirements.txt
 ```
@@ -102,6 +103,7 @@ pip install -r requirements.txt
 ### Port Already in Use
 
 If port 8000 is already in use:
+
 ```bash
 # Change port in .env file
 API_PORT=8001
@@ -113,6 +115,7 @@ python3 -m uvicorn api.main:app --host 0.0.0.0 --port 8001
 ### Permission Issues
 
 Make start script executable:
+
 ```bash
 chmod +x start_backend.sh
 ```
@@ -139,6 +142,7 @@ See docker-compose.yml (if provided) for running these services locally.
 ## Development Mode
 
 For development with auto-reload:
+
 ```bash
 uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload --log-level debug
 ```
