@@ -1,5 +1,0 @@
-Ansible lint...
-WARNING  Project directory /.ansible cannot be used for caching as it is not writable.
-WARNING  Using unique temporary directory /tmp/.ansible-0aaa for caching.
-
-Passed: 0 failure(s), 0 warning(s) in 0 files processed of 1 encountered. Last profile that met the validation criteria was 'production'.
