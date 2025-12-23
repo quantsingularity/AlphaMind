@@ -1,6 +1,6 @@
 import numpy as np
 import warnings
-from typing import List, Optional, Any
+from typing import List, Optional
 
 
 class LiquidityHawkesProcess:
@@ -17,7 +17,7 @@ class LiquidityHawkesProcess:
     - beta (decay rate): How quickly the intensity decays back to mu.
     """
 
-    def __init__(self, alpha: float = 0.1, beta: float = 0.3, mu: float = 0.5) -> Any:
+    def __init__(self, alpha: float = 0.1, beta: float = 0.3, mu: float = 0.5) -> None:
         """
         Initializes the Hawkes Process parameters.
 

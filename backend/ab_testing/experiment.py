@@ -56,7 +56,7 @@ class Experiment:
         metrics: Optional[List[str]] = None,
         start_date: Optional[datetime.datetime] = None,
         end_date: Optional[datetime.datetime] = None,
-    ) -> Any:
+    ) -> None:
         self.id = str(uuid.uuid4())
         self.name = name
         self.description = description or ""
@@ -236,7 +236,7 @@ class Experiment:
             not any((variant in self.results.get(m, {}) for m in self.results))
         ):
             raise ValueError(f"No results found for variant '{variant}'")
-        filtered_results = {}
+        filtered_results: Dict[str, Any] = {}
         if metric:
             metrics = [metric]
         else:
@@ -252,7 +252,7 @@ class Experiment:
             for v in variants:
                 filtered_results[m][v] = self.results[m][v]
         if as_dataframe:
-            data = []
+            data: List[Any] = []
             for m, variants in filtered_results.items():
                 for v, values in variants.items():
                     for result in values:
@@ -288,9 +288,9 @@ class Experiment:
             Summary statistics for the experiment.
         """
         results_df = self.get_results(metric, variant, as_dataframe=True)
-        if results_df.empty:
+        if hasattr(results_df, "empty") and results_df.empty:
             return pd.DataFrame()
-        stats = []
+        stats: List[Any] = []
         for (m, v), group in results_df.groupby(["metric", "variant"]):
             values = group["value"]
             stats.append(
@@ -347,7 +347,7 @@ class Experiment:
         """
         data = self.to_dict()
         if include_results:
-            results_dict = {}
+            results_dict: Dict[str, Any] = {}
             for metric, variants in self.results.items():
                 results_dict[metric] = {}
                 for variant, values in variants.items():
@@ -443,7 +443,7 @@ class ExperimentGroup:
         Description of the experiment group.
     """
 
-    def __init__(self, name: str, description: Optional[str] = None) -> Any:
+    def __init__(self, name: str, description: Optional[str] = None) -> None:
         self.id = str(uuid.uuid4())
         self.name = name
         self.description = description or ""
@@ -570,7 +570,7 @@ class ExperimentGroup:
             Combined results for the experiments.
         """
         if as_dataframe:
-            dfs = []
+            dfs: List[Any] = []
             for experiment in self.experiments.values():
                 df = experiment.get_results(metric=metric, as_dataframe=True)
                 if not df.empty:
@@ -582,7 +582,7 @@ class ExperimentGroup:
             else:
                 return pd.DataFrame()
         else:
-            combined_results = {}
+            combined_results: Dict[str, Any] = {}
             for experiment_id, experiment in self.experiments.items():
                 combined_results[experiment_id] = experiment.get_results(
                     metric=metric, as_dataframe=False
@@ -604,7 +604,7 @@ class ExperimentGroup:
         stats : DataFrame
             Summary statistics for all experiments.
         """
-        dfs = []
+        dfs: List[Any] = []
         for experiment in self.experiments.values():
             df = experiment.get_summary_statistics(metric=metric)
             if not df.empty:

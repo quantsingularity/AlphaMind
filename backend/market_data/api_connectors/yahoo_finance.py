@@ -37,7 +37,7 @@ class YahooFinanceConnector(APIConnector):
         If None, uses the unofficial API.
     """
 
-    def __init__(self, rapid_api_key: Optional[str] = None) -> Any:
+    def __init__(self, rapid_api_key: Optional[str] = None) -> None:
         credentials = APICredentials(api_key=rapid_api_key)
         if rapid_api_key:
             base_url = "https://apidojo-yahoo-finance-v1.p.rapidapi.com"
@@ -211,7 +211,7 @@ class YahooFinanceConnector(APIConnector):
                 params["date"] = date.strftime("%Y-%m-%d")
         else:
             endpoint = "/v7/finance/options/" + symbol
-            params = {}
+            params: Dict[str, Any] = {}
             if date is not None:
                 if isinstance(date, str):
                     date = datetime.fromisoformat(date)
@@ -468,7 +468,7 @@ class YahooFinanceConnector(APIConnector):
             params = {"region": region}
         else:
             endpoint = "/v1/finance/trending/" + region
-            params = {}
+            params: Dict[str, Any] = {}
         return self.request(
             endpoint=endpoint,
             params=params,

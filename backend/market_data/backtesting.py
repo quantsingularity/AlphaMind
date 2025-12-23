@@ -4,7 +4,7 @@
 from datetime import datetime
 from enum import Enum
 import logging
-from typing import Callable, Dict, Optional, Any
+from typing import Callable, Dict, Optional, Any, List
 import numpy as np
 import pandas as pd
 
@@ -54,7 +54,7 @@ class BacktestOrder:
         stop_price: Optional[float] = None,
         time_in_force: str = "GTC",
         order_id: Optional[str] = None,
-    ) -> Any:
+    ) -> None:
         """"""
         ""
         self.symbol = symbol
@@ -157,7 +157,7 @@ class Position:
 
     def __init__(
         self, symbol: str, quantity: float = 0.0, avg_price: float = 0.0
-    ) -> Any:
+    ) -> None:
         """"""
         ""
         self.symbol = symbol
@@ -232,7 +232,7 @@ class Position:
 class Portfolio:
     """Represents a portfolio in the backtesting system."""
 
-    def __init__(self, initial_cash: float = 100000.0) -> Any:
+    def __init__(self, initial_cash: float = 100000.0) -> None:
         """"""
         ""
         self.initial_cash = initial_cash
@@ -310,8 +310,8 @@ class MarketSimulator:
         data: Dict[str, pd.DataFrame],
         commission_rate: float = 0.001,
         slippage_model: str = "fixed",
-        slippage_params: Dict = None,
-    ) -> Any:
+        slippage_params: Optional[Dict] = None,
+    ) -> None:
         """"""
         ""
         self.data = data
@@ -404,10 +404,10 @@ class BacktestEngine:
         initial_cash: float = 100000.0,
         commission_rate: float = 0.001,
         slippage_model: str = "fixed",
-        slippage_params: Dict = None,
+        slippage_params: Optional[Dict] = None,
         start_date: Optional[str] = None,
         end_date: Optional[str] = None,
-    ) -> Any:
+    ) -> None:
         """"""
         ""
         self.data = data
@@ -472,7 +472,7 @@ class BacktestEngine:
 
     def _process_orders(self) -> Any:
         """Process pending orders with current bar data."""
-        remaining_orders = []
+        remaining_orders: List[Any] = []
         for order in self.pending_orders:
             if order.symbol not in self.current_bar:
                 remaining_orders.append(order)
@@ -592,7 +592,7 @@ class BacktestEngine:
                     for symbol, group in trades_by_symbol:
                         position = 0
                         avg_price = 0
-                        trade_pnls = []
+                        trade_pnls: List[Any] = []
                         for _, trade in group.iterrows():
                             trade_qty = trade["quantity"]
                             trade_price = trade["price"]

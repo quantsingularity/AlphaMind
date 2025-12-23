@@ -21,7 +21,7 @@ class QuandlConnector(APIConnector):
 
     ""
 
-    def __init__(self, api_key: str) -> Any:
+    def __init__(self, api_key: str) -> None:
         credentials = APICredentials(api_key=api_key)
         base_url = "https://www.quandl.com/api/v3"
         rate_limiter = RateLimiter(requests_per_second=30)

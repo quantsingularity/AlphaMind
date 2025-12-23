@@ -26,7 +26,7 @@ class PipelineStatus(Enum):
 class PipelineStage(ABC):
     """Base class for pipeline stages."""
 
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         """
         Initialize pipeline stage.
 
@@ -76,7 +76,7 @@ class PipelineStage(ABC):
 class DataExtractionStage(PipelineStage):
     """Stage for extracting data from sources."""
 
-    def __init__(self, name: str, extractor: Callable):
+    def __init__(self, name: str, extractor: Callable) -> None:
         """
         Initialize data extraction stage.
 
@@ -102,7 +102,7 @@ class DataExtractionStage(PipelineStage):
 class DataTransformationStage(PipelineStage):
     """Stage for transforming data."""
 
-    def __init__(self, name: str, transformer: Callable):
+    def __init__(self, name: str, transformer: Callable) -> None:
         """
         Initialize data transformation stage.
 
@@ -128,7 +128,7 @@ class DataTransformationStage(PipelineStage):
 class DataLoadStage(PipelineStage):
     """Stage for loading data to destination."""
 
-    def __init__(self, name: str, loader: Callable):
+    def __init__(self, name: str, loader: Callable) -> None:
         """
         Initialize data load stage.
 
@@ -154,7 +154,7 @@ class DataLoadStage(PipelineStage):
 class DataPipeline:
     """Manages sequential execution of pipeline stages."""
 
-    def __init__(self, name: str, stages: Optional[List[PipelineStage]] = None):
+    def __init__(self, name: str, stages: Optional[List[PipelineStage]] = None) -> None:
         """
         Initialize data pipeline.
 
@@ -200,8 +200,7 @@ class DataPipeline:
         start_time = time.time()
 
         data = initial_data
-        stage_results = []
-
+        stage_results: List[Any] = []
         try:
             for i, stage in enumerate(self.stages):
                 stage_start = time.time()
@@ -288,7 +287,7 @@ class DataPipeline:
 class PipelineBuilder:
     """Builder for creating data pipelines."""
 
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         """Initialize pipeline builder."""
         self.pipeline = DataPipeline(name)
 

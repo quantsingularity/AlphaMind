@@ -46,7 +46,7 @@ class StreamEvent:
         timestamp: Optional[float] = None,
         source: Optional[str] = None,
         metadata: Optional[Dict] = None,
-    ) -> Any:
+    ) -> None:
         self.id = str(uuid.uuid4())
         self.event_type = event_type
         self.data = data
@@ -110,7 +110,7 @@ class DataStream(ABC):
     in the streaming data processing framework.
     """
 
-    def __init__(self) -> Any:
+    def __init__(self) -> None:
         self.listeners = []
         self.running = False
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -192,7 +192,7 @@ class FileStream(DataStream):
         chunk_size: int = 1000,
         delay: float = 0.1,
         repeat: bool = False,
-    ) -> Any:
+    ) -> None:
         super().__init__()
         self.filepath = filepath
         self.event_type = event_type
@@ -222,7 +222,7 @@ class FileStream(DataStream):
         while self.running:
             try:
                 with open(self.filepath, "r") as f:
-                    chunk = []
+                    chunk: List[Any] = []
                     for line in f:
                         if not self.running:
                             break
@@ -234,7 +234,7 @@ class FileStream(DataStream):
                                 source=self.filepath,
                             )
                             self.notify_listeners(event)
-                            chunk = []
+                            chunk: List[Any] = []
                             time.sleep(self.delay)
                     if chunk and self.running:
                         event = StreamEvent(
@@ -276,7 +276,7 @@ class CSVStream(DataStream):
         chunk_size: int = 100,
         delay: float = 0.1,
         repeat: bool = False,
-    ) -> Any:
+    ) -> None:
         super().__init__()
         self.filepath = filepath
         self.event_type = event_type
@@ -351,7 +351,7 @@ class WebSocketStream(DataStream):
         auth: Optional[Tuple[str, str]] = None,
         reconnect: bool = True,
         reconnect_delay: float = 5.0,
-    ) -> Any:
+    ) -> None:
         super().__init__()
         self.url = url
         self.event_type = event_type
@@ -477,7 +477,7 @@ class KafkaStreamAdapter(DataStream):
         event_type: str = "kafka_data",
         group_id: Optional[str] = None,
         auto_offset_reset: str = "latest",
-    ) -> Any:
+    ) -> None:
         super().__init__()
         self.bootstrap_servers = bootstrap_servers
         self.topic = topic
@@ -583,7 +583,7 @@ class WebSocketStreamAdapter(DataStream):
         host: str = "0.0.0.0",
         port: int = 8765,
         event_type: str = "websocket_data",
-    ) -> Any:
+    ) -> None:
         super().__init__()
         self.host = host
         self.port = port
@@ -694,7 +694,7 @@ class StreamProcessor:
         If None, generates a random name.
     """
 
-    def __init__(self, name: Optional[str] = None) -> Any:
+    def __init__(self, name: Optional[str] = None) -> None:
         self.name = name or f"processor-{uuid.uuid4()}"
         self.streams = []
         self.processors = []
@@ -818,7 +818,7 @@ class StreamProcessor:
         events = [event]
         for transformer_func in self.transformers:
             try:
-                new_events = []
+                new_events: List[Any] = []
                 for event in events:
                     result = transformer_func(event)
                     if result is None:
@@ -854,7 +854,7 @@ class StreamingPipeline:
         If None, generates a random name.
     """
 
-    def __init__(self, name: Optional[str] = None) -> Any:
+    def __init__(self, name: Optional[str] = None) -> None:
         self.name = name or f"pipeline-{uuid.uuid4()}"
         self.stages = []
         self.running = False

@@ -19,7 +19,7 @@ class RiskAggregator:
     (e.g., market risk, credit risk, liquidity risk).
     """
 
-    def __init__(self) -> Any:
+    def __init__(self) -> None:
         self.aggregated_data: Dict[str, Any] = {}
         logger.info("RiskAggregator initialized.")
 

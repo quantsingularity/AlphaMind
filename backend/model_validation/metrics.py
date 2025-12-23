@@ -6,7 +6,7 @@ financial machine learning models, including risk-adjusted returns,
 drawdown analysis, and prediction quality metrics.
 """
 
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 
 import numpy as np
 import pandas as pd
@@ -51,8 +51,7 @@ def calculate_metrics(
     metrics : dict
         Dictionary containing calculated metrics.
     """
-    metrics = {}
-
+    metrics: Dict[str, Any] = {}
     if task_type == "regression":
         metrics["mse"] = mean_squared_error(
             y_true, y_pred, sample_weight=sample_weights

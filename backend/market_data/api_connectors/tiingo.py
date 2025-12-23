@@ -32,7 +32,7 @@ class TiingoConnector(APIConnector):
         Tiingo API key.
     """
 
-    def __init__(self, api_key: str) -> Any:
+    def __init__(self, api_key: str) -> None:
         credentials = APICredentials(api_key=api_key)
         base_url = "https://api.tiingo.com"
         rate_limiter = RateLimiter(requests_per_hour=500)
@@ -134,7 +134,7 @@ class TiingoConnector(APIConnector):
             Response containing the historical price data.
         """
         endpoint = f"tiingo/daily/{ticker}/prices"
-        params = {}
+        params: Dict[str, Any] = {}
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%d")
@@ -188,7 +188,7 @@ class TiingoConnector(APIConnector):
             Response containing the intraday price data.
         """
         endpoint = f"iex/{ticker}"
-        params = {}
+        params: Dict[str, Any] = {}
         if start_date:
             if isinstance(start_date, (date, datetime)):
                 start_date = start_date.strftime("%Y-%m-%dT%H:%M:%S")
@@ -442,7 +442,7 @@ class TiingoConnector(APIConnector):
             Response containing the cryptocurrency metadata.
         """
         endpoint = "tiingo/crypto"
-        params = {}
+        params: Dict[str, Any] = {}
         if tickers:
             if isinstance(tickers, list):
                 params["tickers"] = ",".join(tickers)
@@ -590,7 +590,7 @@ class TiingoConnector(APIConnector):
             Response containing the forex metadata.
         """
         endpoint = "tiingo/fx"
-        params = {}
+        params: Dict[str, Any] = {}
         if tickers:
             if isinstance(tickers, list):
                 params["tickers"] = ",".join(tickers)

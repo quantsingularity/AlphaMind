@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, List
 import sys
 import numpy as np
 import pytest
@@ -33,7 +33,7 @@ def sample_mask() -> Any:
     mask = tf.ones((BATCH_SIZE, 1, 1, SEQ_LENGTH), dtype=tf.float32)
     tf.range(SEQ_LENGTH - 3, SEQ_LENGTH)
     zeros = tf.zeros((BATCH_SIZE, 1, 1, 3), dtype=tf.float32)
-    scatter_indices = []
+    scatter_indices: List[Any] = []
     for i in range(BATCH_SIZE):
         for j in range(SEQ_LENGTH - 3, SEQ_LENGTH):
             scatter_indices.append([i, 0, 0, j])

@@ -159,7 +159,7 @@ class Order:
 class OrderValidator:
     """Validates orders before submission."""
 
-    def __init__(self) -> Any:
+    def __init__(self) -> None:
         """Initialize order validator."""
         self.validation_rules = []
         self._register_default_rules()
@@ -176,7 +176,7 @@ class OrderValidator:
 
     def validate(self, order: Order) -> List[OrderValidationError]:
         """Validate an order against all rules."""
-        all_errors = []
+        all_errors: List[Any] = []
         for rule in self.validation_rules:
             try:
                 errors = rule(order)
@@ -200,7 +200,7 @@ class OrderValidator:
 
     def _validate_required_fields(self, order: Order) -> List[OrderValidationError]:
         """Validate that all required fields are present."""
-        errors = []
+        errors: List[Any] = []
         if not order.instrument_id:
             errors.append(
                 OrderValidationError(
@@ -221,7 +221,7 @@ class OrderValidator:
 
     def _validate_price_fields(self, order: Order) -> List[OrderValidationError]:
         """Validate price fields based on order type."""
-        errors = []
+        errors: List[Any] = []
         if order.order_type in [
             OrderType.LIMIT,
             OrderType.STOP_LIMIT,
@@ -252,7 +252,7 @@ class OrderValidator:
 
     def _validate_time_in_force(self, order: Order) -> List[OrderValidationError]:
         """Validate time in force settings."""
-        errors = []
+        errors: List[Any] = []
         if order.time_in_force == OrderTimeInForce.GTD and order.expires_at is None:
             errors.append(
                 OrderValidationError(
@@ -267,7 +267,7 @@ class OrderValidator:
 class OrderManager:
     """Manages the lifecycle of orders."""
 
-    def __init__(self) -> Any:
+    def __init__(self) -> None:
         """Initialize order manager."""
         self.orders: Dict[str, Order] = {}
         self.validator = OrderValidator()

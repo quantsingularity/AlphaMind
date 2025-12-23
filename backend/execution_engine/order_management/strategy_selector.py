@@ -61,7 +61,7 @@ class ExecutionMetrics:
 class StrategySelector:
     """Selects optimal execution strategies based on market conditions and order characteristics."""
 
-    def __init__(self) -> Any:
+    def __init__(self) -> None:
         """Initialize strategy selector."""
         self.strategies = {}
         self.historical_performance = {}
@@ -99,7 +99,7 @@ class StrategySelector:
         strategy: ExecutionAlgorithm,
         description: str,
         suitability_function: Callable,
-        parameters: Dict[str, Any] = None,
+        parameters: Optional[Dict[str, Any]] = None,
         enabled: bool = True,
     ) -> None:
         """
@@ -169,7 +169,7 @@ class StrategySelector:
         metrics = self.historical_performance[strategy]
         if start_time is None and end_time is None:
             return metrics
-        filtered = []
+        filtered: List[Any] = []
         for m in metrics:
             if start_time and m.timestamp < start_time:
                 continue
@@ -191,7 +191,7 @@ class StrategySelector:
         Returns:
             Dictionary mapping strategies to suitability scores
         """
-        scores = {}
+        scores: Dict[str, Any] = {}
         for strategy, config in self.strategies.items():
             if not config["enabled"]:
                 continue
@@ -301,7 +301,7 @@ class StrategySelector:
         Returns:
             Dictionary mapping metric names to classifications (e.g., {"volatility": "high"})
         """
-        classification = {}
+        classification: Dict[str, Any] = {}
         for metric in ["volatility", "spread", "depth", "volume", "momentum"]:
             value = getattr(market_condition, metric)
             classification[metric] = self._classify_metric(metric, value)

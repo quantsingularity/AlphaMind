@@ -53,7 +53,7 @@ class RefinitivConnector(APIConnector):
         password: Optional[str] = None,
         app_id: Optional[str] = None,
         access_token: Optional[str] = None,
-    ) -> Any:
+    ) -> None:
         credentials = APICredentials(
             username=username,
             password=password,

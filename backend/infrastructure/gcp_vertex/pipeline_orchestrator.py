@@ -4,7 +4,7 @@ from google.cloud import aiplatform
 
 class VertexPipelineOrchestrator:
 
-    def __init__(self, project: Any, location: Any) -> Any:
+    def __init__(self, project: Any, location: Any) -> None:
         aiplatform.init(project=project, location=location)
 
     def run_alpha_pipeline(self, parameters: Any) -> Any:

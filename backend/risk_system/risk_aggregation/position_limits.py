@@ -64,7 +64,7 @@ class PositionLimit:
 class PositionLimitsManager:
     """Manages position limits across the system."""
 
-    def __init__(self) -> Any:
+    def __init__(self) -> None:
         """Initialize position limits manager."""
         self.limits: Dict[str, PositionLimit] = {}
         self.breaches: Dict[str, List[Dict]] = {}
@@ -133,7 +133,7 @@ class PositionLimitsManager:
         self, scope: LimitScope, scope_value: str, values: Dict[str, float]
     ) -> Dict[str, Tuple[bool, str]]:
         """Check all limits for a specific scope and value."""
-        results = {}
+        results: Dict[str, Any] = {}
         for limit_id, limit in self.limits.items():
             if limit.scope == scope and limit.scope_value == scope_value:
                 if limit.limit_type.value in values:
@@ -147,7 +147,7 @@ class PositionLimitsManager:
         """Get all active limit breaches."""
         if severity is None:
             return self.breaches
-        filtered_breaches = {}
+        filtered_breaches: Dict[str, Any] = {}
         for limit_id, breach_list in self.breaches.items():
             filtered = [b for b in breach_list if b["severity"] == severity]
             if filtered:

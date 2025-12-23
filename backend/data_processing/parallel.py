@@ -43,7 +43,7 @@ class ParallelProcessor:
 
     def __init__(
         self, n_workers: Optional[int] = None, use_threads: bool = False
-    ) -> Any:
+    ) -> None:
         self.n_workers = n_workers or mp.cpu_count()
         self.use_threads = use_threads
         self.executor_class = ThreadPoolExecutor if use_threads else ProcessPoolExecutor
@@ -136,7 +136,7 @@ class ParallelProcessor:
         result_df : DataFrame
             Processed DataFrame, concatenated from the results of the parallel executions.
         """
-        if df.empty:
+        if hasattr(df, "empty") and df.empty:
             return df
         if args or kwargs:
             func = partial(func, *args, **kwargs)
@@ -150,7 +150,7 @@ class ParallelProcessor:
                     executor.submit(func, item): group_names[i]
                     for i, item in enumerate(items_to_process)
                 }
-                results_map = {}
+                results_map: Dict[str, Any] = {}
                 for future in as_completed(futures):
                     name = futures[future]
                     try:
@@ -199,7 +199,7 @@ class ParallelProcessor:
         result_df : DataFrame
             Processed DataFrame.
         """
-        if df.empty:
+        if hasattr(df, "empty") and df.empty:
             return df
         dask_df = dd.from_pandas(df, npartitions=self.n_workers)
         if args or kwargs:
@@ -232,7 +232,7 @@ class ParallelProcessor:
         result : Series
             Series with the results.
         """
-        if df.empty:
+        if hasattr(df, "empty") and df.empty:
             return pd.Series()
         if args or kwargs:
             func = partial(func, *args, **kwargs)
@@ -269,7 +269,7 @@ class TaskManager:
 
     def __init__(
         self, n_workers: Optional[int] = None, use_threads: bool = False
-    ) -> Any:
+    ) -> None:
         self.n_workers = n_workers or mp.cpu_count()
         self.use_threads = use_threads
         self.executor_class = ThreadPoolExecutor if use_threads else ProcessPoolExecutor
@@ -337,7 +337,7 @@ class TaskManager:
                     self.logger.debug(f"Submitting task: {task_id}")
                     func = self.tasks[task_id]
                     futures[executor.submit(func)] = task_id
-                ready_tasks = []
+                ready_tasks: List[Any] = []
                 if futures:
                     done, _ = concurrent.futures.wait(
                         futures.keys(), return_when=concurrent.futures.FIRST_COMPLETED
@@ -424,7 +424,7 @@ class WorkerPool:
 
     def __init__(
         self, n_workers: Optional[int] = None, use_threads: bool = False
-    ) -> Any:
+    ) -> None:
         self.n_workers = n_workers or mp.cpu_count()
         self.use_threads = use_threads
         QueueClass = queue.Queue if use_threads else mp.Queue
@@ -543,7 +543,7 @@ class WorkerPool:
                 raise TimeoutError("Timed out waiting for a result")
         else:
             start_time = time.time()
-            other_results = []
+            other_results: List[Any] = []
             while timeout is None or time.time() - start_time < timeout:
                 try:
                     result = self.result_queue.get(timeout=1)
@@ -579,7 +579,7 @@ class WorkerPool:
         """
         if not self.running:
             raise RuntimeError("Worker pool is not running")
-        results = {}
+        results: Dict[str, Any] = {}
         start_time = time.time()
         initial_tasks = self.task_queue.qsize() + len(results)
         while len(results) < initial_tasks:
@@ -626,7 +626,7 @@ class DistributedComputing:
 
     def __init__(
         self, scheduler: Optional[str] = None, n_workers: Optional[int] = None
-    ) -> Any:
+    ) -> None:
         self.scheduler = scheduler
         self.n_workers = n_workers or mp.cpu_count()
         self.client = None
@@ -678,7 +678,7 @@ class DistributedComputing:
         result_df : DataFrame
             Processed DataFrame.
         """
-        if df.empty:
+        if hasattr(df, "empty") and df.empty:
             return df
         if not self.client:
             self.logger.warning(

@@ -19,7 +19,7 @@ class StatisticalTest:
     in the A/B testing framework.
     """
 
-    def __init__(self) -> Any:
+    def __init__(self) -> None:
         self.results = {}
 
     def run(self, control: np.ndarray, treatment: np.ndarray, **kwargs) -> Dict:
@@ -429,7 +429,7 @@ class MultipleTestingCorrection:
         n_tests = len(p_values)
         sorted_indices = np.argsort(p_values)
         sorted_p_values = [p_values[i] for i in sorted_indices]
-        corrected_sorted_p_values = []
+        corrected_sorted_p_values: List[Any] = []
         for i, p in enumerate(sorted_p_values):
             corrected_p = p * n_tests / (i + 1)
             corrected_sorted_p_values.append(min(corrected_p, 1.0))
@@ -460,7 +460,7 @@ class MultipleTestingCorrection:
         n_tests = len(p_values)
         sorted_indices = np.argsort(p_values)
         sorted_p_values = [p_values[i] for i in sorted_indices]
-        corrected_sorted_p_values = []
+        corrected_sorted_p_values: List[Any] = []
         for i, p in enumerate(sorted_p_values):
             corrected_p = p * (n_tests - i)
             corrected_sorted_p_values.append(min(corrected_p, 1.0))

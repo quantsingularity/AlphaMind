@@ -4,7 +4,7 @@
 ## and backtest the trained agent on market data.
 """
 
-from typing import Any
+from typing import Any, Dict
 import os
 from core.logging import get_logger
 
@@ -35,7 +35,7 @@ def generate_sample_market_data(
         DataFrame with asset prices
     """
     np.random.seed(seed)
-    prices = {}
+    prices: Dict[str, Any] = {}
     prices["Asset1"] = np.cumprod(1 + np.random.normal(0.001, 0.01, n_days))
     noise = np.random.normal(0, 0.02, n_days)
     prices["Asset2"] = 100 + np.cumsum(noise - 0.3 * np.sign(np.cumsum(noise)))

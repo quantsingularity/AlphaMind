@@ -60,7 +60,7 @@ class DataResponse:
 class RateLimiter:
     """Rate limiter for API calls."""
 
-    def __init__(self, calls_per_minute: int = 5):
+    def __init__(self, calls_per_minute: int = 5) -> None:
         """
         Initialize rate limiter.
 
@@ -68,7 +68,7 @@ class RateLimiter:
             calls_per_minute: Maximum calls allowed per minute
         """
         self.calls_per_minute = calls_per_minute
-        self.calls = []
+        self.calls: list[float] = []
         self.lock = threading.Lock()
 
     def acquire(self) -> None:
@@ -103,7 +103,7 @@ class APIConnector(ABC):
         self,
         credentials: APICredentials,
         rate_limiter: Optional[RateLimiter] = None,
-    ):
+    ) -> None:
         """
         Initialize API connector.
 

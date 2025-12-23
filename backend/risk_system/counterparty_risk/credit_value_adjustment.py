@@ -11,7 +11,7 @@ class CVAcalculator:
 
     def __init__(
         self, portfolio: List[Dict[str, Any]], default_probs: Dict[str, float]
-    ) -> Any:
+    ) -> None:
         """
         Initializes the calculator.
 

@@ -46,7 +46,7 @@ class ExperimentResult:
         value: float,
         timestamp: Optional[datetime.datetime] = None,
         metadata: Optional[Dict] = None,
-    ) -> Any:
+    ) -> None:
         self.id = str(uuid.uuid4())
         self.experiment_id = experiment_id
         self.variant = variant
@@ -118,7 +118,7 @@ class ExperimentTracker:
 
     def __init__(
         self, storage_dir: Optional[str] = None, db_path: Optional[str] = None
-    ) -> Any:
+    ) -> None:
         self.storage_dir = storage_dir
         self.db_path = db_path
         self.experiments = {}
@@ -427,7 +427,7 @@ class ExperimentTracker:
             Results matching the specified criteria.
         """
         query = "SELECT id, experiment_id, variant, metric, value, timestamp, metadata FROM results"
-        params = []
+        params: List[Any] = []
         conditions = []
         if experiment_id:
             conditions.append("experiment_id = ?")
@@ -450,7 +450,7 @@ class ExperimentTracker:
         conn = self._get_connection()
         cursor = conn.cursor()
         cursor.execute(query, params)
-        results = []
+        results: List[Any] = []
         for row in cursor.fetchall():
             result_id, exp_id, var, met, val, ts, meta = row
             result = ExperimentResult(
@@ -466,7 +466,7 @@ class ExperimentTracker:
             results.append(result)
         conn.close()
         if as_dataframe:
-            data = []
+            data: List[Any] = []
             for result in results:
                 data.append(
                     {
@@ -512,9 +512,9 @@ class ExperimentTracker:
             variant=variant,
             as_dataframe=True,
         )
-        if results_df.empty:
+        if hasattr(results_df, "empty") and results_df.empty:
             return pd.DataFrame()
-        stats = []
+        stats: List[Any] = []
         for (exp_id, met, var), group in results_df.groupby(
             ["experiment_id", "metric", "variant"]
         ):
@@ -552,7 +552,7 @@ class ExperimentTracker:
             Format to export results in. Options: "csv", "json", "excel".
         """
         results_df = self.get_results(experiment_id=experiment_id, as_dataframe=True)
-        if results_df.empty:
+        if hasattr(results_df, "empty") and results_df.empty:
             raise ValueError("No results to export")
         os.makedirs(os.path.dirname(os.path.abspath(filepath)), exist_ok=True)
         if format == "csv":

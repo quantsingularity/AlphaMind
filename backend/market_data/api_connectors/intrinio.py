@@ -27,7 +27,7 @@ class IntrinioConnector(APIConnector):
         Whether to use the sandbox environment.
     """
 
-    def __init__(self, api_key: str, sandbox: bool = False) -> Any:
+    def __init__(self, api_key: str, sandbox: bool = False) -> None:
         credentials = APICredentials(api_key=api_key)
         if sandbox:
             base_url = "https://sandbox-api.intrinio.com"
@@ -369,7 +369,7 @@ class IntrinioConnector(APIConnector):
             Response containing the real-time price.
         """
         endpoint = f"securities/{identifier}/prices/realtime"
-        params = {}
+        params: Dict[str, Any] = {}
         if source:
             params["source"] = source
         return self.request(

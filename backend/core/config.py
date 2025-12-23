@@ -16,7 +16,7 @@ import yaml
 class ConfigurationException(Exception):
     """Custom exception raised for configuration errors."""
 
-    def __init__(self, message: str, error_code: str, details: Dict[str, Any]) -> Any:
+    def __init__(self, message: str, error_code: str, details: Dict[str, Any]) -> None:
         super().__init__(message)
         self.error_code = error_code
         self.details = details
@@ -59,7 +59,7 @@ class ConfigManager:
     Manages configuration settings, supporting schema registration, multiple load sources, and validation.
     """
 
-    def __init__(self) -> Any:
+    def __init__(self) -> None:
         """Initialize configuration manager."""
         self.config: Dict[str, Any] = {}
         self.schema: Dict[str, ConfigItem] = {}
@@ -135,7 +135,7 @@ class ConfigManager:
             with open(file_path, "r") as f:
                 config_dict = yaml.safe_load(f)
             if config_dict is None:
-                config_dict = {}
+                config_dict: Dict[str, Any] = {}
             self.load_from_dict(config_dict, source=file_path)
         except Exception as e:
             raise ConfigurationException(
@@ -153,7 +153,7 @@ class ConfigManager:
         Args:
             prefix: Prefix for environment variables
         """
-        config_dict = {}
+        config_dict: Dict[str, Any] = {}
         for key, value in os.environ.items():
             if key.startswith(prefix):
                 config_key = key[len(prefix) :].lower()
@@ -167,7 +167,7 @@ class ConfigManager:
         Returns:
             List of validation error messages. Returns empty list if validation passes.
         """
-        errors = []
+        errors: List[Any] = []
         for key, item in self.schema.items():
             value = self.config.get(key)
             if not item.validate(value):
@@ -198,7 +198,7 @@ class ConfigManager:
                 details={"errors": errors},
             )
 
-    def get(self, key: str, default: Any = None) -> Any:
+    def get(self, key: str, default: Optional[Any] = None) -> Any:
         """
         Get a configuration value.
 

@@ -67,7 +67,7 @@ class ExchangeCredentials:
         api_secret: str,
         passphrase: Optional[str] = None,
         additional_params: Optional[Dict[str, str]] = None,
-    ) -> Any:
+    ) -> None:
         """
         Initialize exchange credentials.
 
@@ -88,7 +88,7 @@ class ExchangeConfig:
 
     def __init__(
         self, exchange_id: str, credentials: Optional[ExchangeCredentials] = None
-    ) -> Any:
+    ) -> None:
         """
         Initialize exchange configuration.
 
@@ -273,7 +273,7 @@ class ExchangeAPIError(Exception):
 
     def __init__(
         self, message: str, code: Optional[int] = None, response: Optional[Any] = None
-    ) -> Any:
+    ) -> None:
         """
         Initialize exchange API error.
 
@@ -303,7 +303,7 @@ class Order:
         time_in_force: TimeInForce = TimeInForce.GTC,
         exchange_id: Optional[str] = None,
         exchange_order_id: Optional[str] = None,
-    ) -> Any:
+    ) -> None:
         """
         Initialize an order.
 
@@ -414,7 +414,7 @@ class Order:
 class ExchangeAPI:
     """Base class for exchange API implementations."""
 
-    def __init__(self, config: ExchangeConfig) -> Any:
+    def __init__(self, config: ExchangeConfig) -> None:
         """
         Initialize exchange API.
 
@@ -794,7 +794,7 @@ class ExchangeAPI:
 class BinanceAPI(ExchangeAPI):
     """Binance exchange API implementation."""
 
-    def __init__(self, config: ExchangeConfig) -> Any:
+    def __init__(self, config: ExchangeConfig) -> None:
         """
         Initialize Binance API.
 

@@ -12,7 +12,7 @@ class AuthenticationSystem:
     Provides user registration, login, and JWT token management
     """
 
-    def __init__(self, app: Any, secret_key: Any, token_expiration: Any = 24) -> Any:
+    def __init__(self, app: Any, secret_key: Any, token_expiration: Any = 24) -> None:
         """
         Initialize the authentication system
 

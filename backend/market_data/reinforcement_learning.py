@@ -85,7 +85,7 @@ class TradingEnvironment(ABC):
         action_space: ActionSpace = ActionSpace.DISCRETE,
         observation_type: ObservationType = ObservationType.NUMERIC,
         random_start: bool = True,
-    ) -> Any:
+    ) -> None:
         """
         Initialize trading environment.
 
@@ -487,7 +487,7 @@ class TradingEnvironment(ABC):
 class ReplayBuffer:
     """Experience replay buffer for RL algorithms."""
 
-    def __init__(self, capacity: int) -> Any:
+    def __init__(self, capacity: int) -> None:
         """
         Initialize replay buffer.
 
@@ -543,7 +543,7 @@ class DQNNetwork(nn.Module):
 
     def __init__(
         self, input_shape: Tuple[int, ...], num_actions: int, hidden_size: int = 128
-    ) -> Any:
+    ) -> None:
         """
         Initialize DQN network.
 
@@ -613,7 +613,7 @@ class DQNAgent:
         buffer_capacity: int = 10000,
         batch_size: int = 64,
         device: str = "auto",
-    ) -> Any:
+    ) -> None:
         """
         Initialize DQN agent.
 

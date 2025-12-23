@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict
 import pandas as pd
 from core.logging import get_logger
 
@@ -16,7 +16,7 @@ class StackedDenoisingAutoencoder:
     It is assumed to be trained to capture underlying features (factors).
     """
 
-    def __init__(self, layers: Any, noise: Any) -> Any:
+    def __init__(self, layers: Any, noise: Any) -> None:
         input_dim = layers[0]
         latent_dim = layers[-1]
         encoder_input = tf.keras.Input(shape=(input_dim,))
@@ -42,7 +42,7 @@ class AutoAlphaGenerator:
     using a Stacked Denoising Autoencoder for dimensionality reduction.
     """
 
-    def __init__(self, n_factors: Any = 10, lookback: Any = 63) -> Any:
+    def __init__(self, n_factors: Any = 10, lookback: Any = 63) -> None:
         self.n_factors = n_factors
         self.lookback = lookback
         input_dim_placeholder = 1260
@@ -80,7 +80,7 @@ class AutoAlphaGenerator:
         Creates a DataFrame where each row is a flattened window of historical
         returns (lookback days for all assets) at a specific time step.
         """
-        windows = {}
+        windows: Dict[str, Any] = {}
         for i in range(self.lookback):
             shifted_df = returns.shift(i)
             shifted_df.columns = [f"{col}_t-{i}" for col in returns.columns]

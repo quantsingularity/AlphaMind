@@ -30,7 +30,7 @@ class CachePolicy(ABC):
 class TTLCachePolicy(CachePolicy):
     """Time-to-live cache policy."""
 
-    def __init__(self, ttl_seconds: float = 3600):
+    def __init__(self, ttl_seconds: float = 3600) -> None:
         """
         Initialize TTL cache policy.
 
@@ -51,7 +51,7 @@ class TTLCachePolicy(CachePolicy):
 class SizeCachePolicy(CachePolicy):
     """Size-based cache policy with LRU eviction."""
 
-    def __init__(self, max_size_mb: float = 100):
+    def __init__(self, max_size_mb: float = 100) -> None:
         """
         Initialize size cache policy.
 
@@ -79,7 +79,7 @@ class CacheManager:
 
     def __init__(
         self, policy: Optional[CachePolicy] = None, namespace: str = "default"
-    ):
+    ) -> None:
         """
         Initialize cache manager.
 
@@ -98,7 +98,7 @@ class CacheManager:
             key = str(key)
         return f"{self.namespace}:{key}"
 
-    def get(self, key: Union[str, tuple], default: Any = None) -> Any:
+    def get(self, key: Union[str, tuple], default: Optional[Any] = None) -> Any:
         """
         Get value from cache.
 

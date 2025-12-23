@@ -29,7 +29,7 @@ class FeatureImportance:
         List of feature names. If None, uses X0, X1, etc.
     """
 
-    def __init__(self, model: Any, feature_names: Optional[List[str]] = None) -> Any:
+    def __init__(self, model: Any, feature_names: Optional[List[str]] = None) -> None:
         self.model = model
         self.feature_names = feature_names
         self.importance_values = None
@@ -175,7 +175,7 @@ class PartialDependence:
         List of feature names. If None, uses X0, X1, etc.
     """
 
-    def __init__(self, model: Any, feature_names: Optional[List[str]] = None) -> Any:
+    def __init__(self, model: Any, feature_names: Optional[List[str]] = None) -> None:
         self.model = model
         self.feature_names = feature_names
         self.pdp_results = {}
@@ -233,7 +233,7 @@ class PartialDependence:
             else:
                 raise ValueError(f"Invalid feature specification: {f}")
 
-        feature_indices_for_compute = []
+        feature_indices_for_compute: List[Any] = []
         for f in features:
             if isinstance(f, tuple):
                 feature_indices_for_compute.append(
@@ -430,7 +430,7 @@ class ShapExplainer:
         List of feature names. If None, uses X0, X1, etc.
     """
 
-    def __init__(self, model: Any, feature_names: Optional[List[str]] = None) -> Any:
+    def __init__(self, model: Any, feature_names: Optional[List[str]] = None) -> None:
         self.model = model
         self.feature_names = feature_names
         self.explainer = None
@@ -709,7 +709,7 @@ class PermutationImportance:
         List of feature names. If None, uses X0, X1, etc.
     """
 
-    def __init__(self, model: Any, feature_names: Optional[List[str]] = None) -> Any:
+    def __init__(self, model: Any, feature_names: Optional[List[str]] = None) -> None:
         self.model = model
         self.feature_names = feature_names
         self.importance_values = None

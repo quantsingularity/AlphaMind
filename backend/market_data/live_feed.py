@@ -46,7 +46,7 @@ class ConnectionError(Exception):
 class MarketDataConfig:
     """Configuration for market data connections and processing."""
 
-    def __init__(self, config_path: Optional[str] = None) -> Any:
+    def __init__(self, config_path: Optional[str] = None) -> None:
         """
         Initialize market data configuration.
 
@@ -180,7 +180,7 @@ class MarketDataConfig:
 class MarketDataFeed:
     """Base class for market data feeds."""
 
-    def __init__(self, config: MarketDataConfig) -> Any:
+    def __init__(self, config: MarketDataConfig) -> None:
         """
         Initialize market data feed.
 
@@ -221,7 +221,7 @@ class MarketDataFeed:
 
     async def close(self):
         """Close all connections and resources with error handling."""
-        close_errors = []
+        close_errors: List[Any] = []
         if self.session:
             try:
                 await self.session.close()
@@ -274,7 +274,7 @@ class MarketDataFeed:
         if not base_url:
             raise ValueError(f"Unknown provider: {provider}")
         url = f"{base_url}/{endpoint.lstrip('/')}"
-        headers = {}
+        headers: Dict[str, Any] = {}
         if provider in self.config.api_keys:
             if provider == "alpaca":
                 headers["APCA-API-KEY-ID"] = self.config.api_keys[provider]["key"]
@@ -283,7 +283,7 @@ class MarketDataFeed:
                 ]
             elif provider == "iex" or provider == "polygon":
                 if params is None:
-                    params = {}
+                    params: Dict[str, Any] = {}
                 params["apiKey"] = self.config.api_keys[provider]
             else:
                 headers["X-API-Key"] = self.config.api_keys[provider]
@@ -612,7 +612,7 @@ class MarketDataFeed:
                 f"Attempting to reconnect to {provider} WebSocket in {reconnect_delay:.1f} seconds..."
             )
             await asyncio.sleep(reconnect_delay)
-            symbols = []
+            symbols: List[Any] = []
             channel = "trades"
             for key in self.callbacks.keys():
                 if key.startswith(f"{provider}_"):

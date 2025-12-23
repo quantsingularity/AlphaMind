@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Optional, Any, List
 import matplotlib.pyplot as plt
 from core.logging import get_logger
 
@@ -20,7 +20,7 @@ class PortfolioOptimizer:
 
     def __init__(
         self, n_assets: Any, lookback_window: Any = 60, hidden_units: Any = 64
-    ) -> Any:
+    ) -> None:
         self.n_assets = n_assets
         self.lookback_window = lookback_window
         self.hidden_units = hidden_units
@@ -113,7 +113,7 @@ class PortfolioOptimizer:
         price_data: Any,
         volatility_data: Any,
         macro_data: Any,
-        initial_weights: Any = None,
+        initial_weights: Optional[Any] = None,
         epochs: Any = 50,
         batch_size: Any = 32,
         validation_split: Any = 0.2,
@@ -232,7 +232,7 @@ class PortfolioOptimizer:
         portfolio_value = [initial_capital]
         portfolio_weights = np.ones(self.n_assets) / self.n_assets
         drawdown_history = [0]
-        portfolio_returns = []
+        portfolio_returns: List[Any] = []
         for i in range(len(X_price)):
             optimal_weights = self.optimize_portfolio(
                 X_price[i], X_vol[i], X_macro[i], portfolio_weights

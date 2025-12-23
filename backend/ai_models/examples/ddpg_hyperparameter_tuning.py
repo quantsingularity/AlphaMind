@@ -4,7 +4,7 @@
 ## hyperparameters for the DDPG agent in various market conditions.
 """
 
-from typing import Any
+from typing import Optional, Any, Dict, List
 import os
 from core.logging import get_logger
 
@@ -40,7 +40,7 @@ def generate_sample_market_data(
         DataFrame with asset prices
     """
     np.random.seed(seed)
-    prices = {}
+    prices: Dict[str, Any] = {}
     prices["Asset1"] = np.cumprod(1 + np.random.normal(0.001, 0.01, n_days))
     noise = np.random.normal(0, 0.02, n_days)
     prices["Asset2"] = 100 + np.cumsum(noise - 0.3 * np.sign(np.cumsum(noise)))
@@ -57,7 +57,7 @@ def generate_sample_market_data(
 
 
 def create_environment(
-    data: Any = None,
+    data: Optional[Any] = None,
     window_size: Any = 10,
     transaction_cost: Any = 0.001,
     max_steps: Any = 252,
@@ -87,7 +87,7 @@ def create_environment(
 
 
 def run_hyperparameter_tuning(
-    param_grid: Any = None,
+    param_grid: Optional[Any] = None,
     n_trials: Any = 20,
     episodes_per_trial: Any = 5,
     max_steps: Any = 100,
@@ -154,7 +154,7 @@ def analyze_tuning_results(results: Any) -> Any:
     Returns:
         DataFrame with analysis
     """
-    data = []
+    data: List[Any] = []
     for result in results:
         config = result["config"]
         eval_reward = result["eval_reward"]
@@ -186,7 +186,7 @@ if __name__ == "__main__":
     import json
 
     with open("best_ddpg_config.json", "w") as f:
-        serializable_config = {}
+        serializable_config: Dict[str, Any] = {}
         for k, v in best_config.items():
             if isinstance(v, tuple):
                 serializable_config[k] = list(v)

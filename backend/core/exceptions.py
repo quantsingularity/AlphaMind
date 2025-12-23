@@ -40,8 +40,8 @@ class AlphaMindException(Exception):
         error_code: str = "UNKNOWN_ERROR",
         category: ErrorCategory = ErrorCategory.UNKNOWN,
         severity: ErrorSeverity = ErrorSeverity.ERROR,
-        details: Dict[str, Any] = None,
-    ) -> Any:
+        details: Optional[Dict[str, Any]] = None,
+    ) -> None:
         """
         Initialize AlphaMindException.
 
@@ -88,9 +88,9 @@ class ValidationException(AlphaMindException):
         self,
         message: str,
         error_code: str = "VALIDATION_ERROR",
-        details: Dict[str, Any] = None,
+        details: Optional[Dict[str, Any]] = None,
         field: Optional[str] = None,
-    ) -> Any:
+    ) -> None:
         """Initialize ValidationException."""
         details = details or {}
         if field:
@@ -111,9 +111,9 @@ class ConfigurationException(AlphaMindException):
         self,
         message: str,
         error_code: str = "CONFIG_ERROR",
-        details: Dict[str, Any] = None,
+        details: Optional[Dict[str, Any]] = None,
         config_key: Optional[str] = None,
-    ) -> Any:
+    ) -> None:
         """Initialize ConfigurationException."""
         details = details or {}
         if config_key:
@@ -134,9 +134,9 @@ class ConnectionException(AlphaMindException):
         self,
         message: str,
         error_code: str = "CONNECTION_ERROR",
-        details: Dict[str, Any] = None,
+        details: Optional[Dict[str, Any]] = None,
         service: Optional[str] = None,
-    ) -> Any:
+    ) -> None:
         """Initialize ConnectionException."""
         details = details or {}
         if service:
@@ -157,9 +157,9 @@ class ExecutionException(AlphaMindException):
         self,
         message: str,
         error_code: str = "EXECUTION_ERROR",
-        details: Dict[str, Any] = None,
+        details: Optional[Dict[str, Any]] = None,
         operation: Optional[str] = None,
-    ) -> Any:
+    ) -> None:
         """Initialize ExecutionException."""
         details = details or {}
         if operation:
@@ -180,9 +180,9 @@ class DataException(AlphaMindException):
         self,
         message: str,
         error_code: str = "DATA_ERROR",
-        details: Dict[str, Any] = None,
+        details: Optional[Dict[str, Any]] = None,
         data_source: Optional[str] = None,
-    ) -> Any:
+    ) -> None:
         """Initialize DataException."""
         details = details or {}
         if data_source:
@@ -203,8 +203,8 @@ class SystemException(AlphaMindException):
         self,
         message: str,
         error_code: str = "SYSTEM_ERROR",
-        details: Dict[str, Any] = None,
-    ) -> Any:
+        details: Optional[Dict[str, Any]] = None,
+    ) -> None:
         """Initialize SystemException."""
         super().__init__(
             message=message,
@@ -247,7 +247,7 @@ def handle_exception(
 class ErrorCollector:
     """Collects and aggregates errors, useful for batch processing or validation steps."""
 
-    def __init__(self) -> Any:
+    def __init__(self) -> None:
         """Initialize error collector."""
         self.errors: List[Dict[str, Any]] = []
 

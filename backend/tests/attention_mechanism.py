@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Optional, Any
 import numpy as np
 import tensorflow as tf
 
@@ -10,7 +10,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
     different representation subspaces at different positions.
     """
 
-    def __init__(self, d_model: Any, num_heads: Any) -> Any:
+    def __init__(self, d_model: Any, num_heads: Any) -> None:
         super().__init__()
         self.num_heads = num_heads
         self.d_model = d_model
@@ -26,7 +26,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         x = tf.reshape(x, (batch_size, -1, self.num_heads, self.depth))
         return tf.transpose(x, perm=[0, 2, 1, 3])
 
-    def call(self, v: Any, k: Any, q: Any, mask: Any = None) -> Any:
+    def call(self, v: Any, k: Any, q: Any, mask: Optional[Any] = None) -> Any:
         batch_size = tf.shape(q)[0]
         q = self.wq(q)
         k = self.wk(k)
@@ -50,7 +50,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
 class TemporalAttentionBlock(tf.keras.layers.Layer):
     """A Transformer encoder block specialized for time-series."""
 
-    def __init__(self, d_model: Any, num_heads: Any, dff: Any, rate: Any = 0.1) -> Any:
+    def __init__(self, d_model: Any, num_heads: Any, dff: Any, rate: Any = 0.1) -> None:
         super().__init__()
         self.mha = MultiHeadAttention(d_model, num_heads)
         self.ffn = tf.keras.Sequential(
@@ -64,7 +64,9 @@ class TemporalAttentionBlock(tf.keras.layers.Layer):
         self.dropout1 = tf.keras.layers.Dropout(rate)
         self.dropout2 = tf.keras.layers.Dropout(rate)
 
-    def call(self, x: Any, training: Any = None, mask: Any = None) -> Any:
+    def call(
+        self, x: Any, training: Optional[Any] = None, mask: Optional[Any] = None
+    ) -> Any:
         attn_output = self.mha(q=x, k=x, v=x, mask=mask)
         attn_output = self.dropout1(attn_output, training=training)
         out1 = self.layernorm1(x + attn_output)
@@ -100,7 +102,7 @@ class FinancialTimeSeriesTransformer(tf.keras.Model):
         input_seq_length: Any,
         output_seq_length: Any,
         rate: Any = 0.1,
-    ) -> Any:
+    ) -> None:
         super().__init__()
         self.num_layers = num_layers
         self.d_model = d_model
@@ -114,7 +116,9 @@ class FinancialTimeSeriesTransformer(tf.keras.Model):
         self.dropout = tf.keras.layers.Dropout(rate)
         self.final_layer = tf.keras.layers.Dense(output_seq_length)
 
-    def call(self, x: Any, training: Any = None, mask: Any = None) -> Any:
+    def call(
+        self, x: Any, training: Optional[Any] = None, mask: Optional[Any] = None
+    ) -> Any:
         seq_len = tf.shape(x)[1]
         x = x + self.pos_encoding[:, :seq_len, :]
         x = self.dropout(x, training=training)

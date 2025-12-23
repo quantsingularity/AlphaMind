@@ -31,14 +31,14 @@ class ExperimentConfig:
         Description of the experiment.
     """
 
-    def __init__(self, name: str, description: Optional[str] = None) -> Any:
+    def __init__(self, name: str, description: Optional[str] = None) -> None:
         self.id = str(uuid.uuid4())
         self.name = name
         self.description = description or ""
-        self.parameters = {}
-        self.variants = {}
-        self.metrics = []
-        self.settings = {
+        self.parameters: Dict[str, Any] = {}
+        self.variants: Dict[str, Any] = {}
+        self.metrics: List[str] = []
+        self.settings: Dict[str, Any] = {
             "start_date": None,
             "end_date": None,
             "sample_size": None,
@@ -254,7 +254,7 @@ class ExperimentConfig:
         errors : list
             List of validation errors.
         """
-        errors = []
+        errors: List[Any] = []
         if not self.variants:
             errors.append("No variants defined")
         if not self.metrics:
@@ -440,7 +440,7 @@ class ExperimentConfigManager:
         If None, uses in-memory storage only.
     """
 
-    def __init__(self, storage_dir: Optional[str] = None) -> Any:
+    def __init__(self, storage_dir: Optional[str] = None) -> None:
         self.storage_dir = storage_dir
         self.configs = {}
         if storage_dir and os.path.exists(storage_dir):

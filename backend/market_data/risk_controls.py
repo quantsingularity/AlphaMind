@@ -8,7 +8,7 @@
 from datetime import datetime, timedelta
 from enum import Enum
 import logging
-from typing import Callable, Dict, Optional, Tuple, Any
+from typing import Callable, Dict, Optional, Tuple, Any, List
 import numpy as np
 import pandas as pd
 
@@ -104,7 +104,7 @@ class RiskLimit:
         value: float,
         action: str = "alert",
         custom_action: Optional[Callable] = None,
-    ) -> Any:
+    ) -> None:
         """
         Initialize risk limit.
 
@@ -174,7 +174,7 @@ class StopLoss:
         value: float,
         is_trailing: bool = False,
         time_window: Optional[timedelta] = None,
-    ) -> Any:
+    ) -> None:
         """
         Initialize stop-loss.
 
@@ -313,7 +313,7 @@ class TakeProfit:
         value: float,
         is_trailing: bool = False,
         risk_reward_ratio: Optional[float] = None,
-    ) -> Any:
+    ) -> None:
         """
         Initialize take-profit.
 
@@ -441,7 +441,7 @@ class PositionSizer:
         value: float,
         max_position_size: Optional[float] = None,
         max_risk_per_trade: Optional[float] = None,
-    ) -> Any:
+    ) -> None:
         """
         Initialize position sizer.
 
@@ -560,7 +560,7 @@ class RiskMetrics:
         self,
         returns: Optional[pd.Series] = None,
         benchmark_returns: Optional[pd.Series] = None,
-    ) -> Any:
+    ) -> None:
         """
         Initialize risk metrics calculator.
 
@@ -637,7 +637,7 @@ class RiskMetrics:
         Returns:
             Dictionary of risk metrics
         """
-        metrics = {}
+        metrics: Dict[str, Any] = {}
         for metric in RiskMetric:
             if metric != RiskMetric.CUSTOM:
                 try:
@@ -697,7 +697,7 @@ class RiskMetrics:
         """
         if window is not None:
             var = self.returns.rolling(window=window).quantile(1 - confidence)
-            cvar_values = []
+            cvar_values: List[Any] = []
             for i in range(window, len(self.returns) + 1):
                 window_returns = self.returns.iloc[i - window : i]
                 window_var = var.iloc[i - 1]

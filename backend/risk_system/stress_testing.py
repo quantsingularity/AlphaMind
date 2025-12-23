@@ -6,7 +6,7 @@ from scipy.stats import multivariate_t, multivariate_normal
 
 class ExtremeScenarioGenerator:
 
-    def __init__(self, copula: Any = "t", tail_dependence: Any = 0.3) -> Any:
+    def __init__(self, copula: Any = "t", tail_dependence: Any = 0.3) -> None:
         self.copula = copula
         self.tail_dependence = tail_dependence
 

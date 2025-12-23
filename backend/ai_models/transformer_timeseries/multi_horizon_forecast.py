@@ -4,7 +4,7 @@ import tensorflow as tf
 
 class TransformerEncoder(tf.keras.layers.Layer):
 
-    def __init__(self, num_layers: Any = 4, d_model: Any = 64) -> Any:
+    def __init__(self, num_layers: Any = 4, d_model: Any = 64) -> None:
         super().__init__()
         self.num_layers = num_layers
         self.d_model = d_model
@@ -24,7 +24,7 @@ class TemporalFusionDecoder(tf.keras.layers.Layer):
 
     def __init__(
         self, num_heads: Any = 8, future_steps: Any = 24, hidden_size: Any = 32
-    ) -> Any:
+    ) -> None:
         super().__init__()
         self.num_heads = num_heads
         self.future_steps = future_steps
@@ -54,7 +54,7 @@ class TemporalFusionDecoder(tf.keras.layers.Layer):
 
 class TemporalFusionTransformer(tf.keras.Model):
 
-    def __init__(self, num_encoder_steps: Any, num_features: Any) -> Any:
+    def __init__(self, num_encoder_steps: Any, num_features: Any) -> None:
         super().__init__()
         self.encoder = TransformerEncoder(num_layers=4, d_model=64)
         self.decoder = TemporalFusionDecoder(

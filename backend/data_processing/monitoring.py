@@ -35,7 +35,7 @@ class Alert:
         value: Any,
         threshold: Any,
         timestamp: Optional[datetime.datetime] = None,
-    ):
+    ) -> None:
         """Initialize alert."""
         self.level = level
         self.message = message
@@ -59,7 +59,7 @@ class Alert:
 class MetricCollector:
     """Collects and aggregates performance metrics."""
 
-    def __init__(self, name: str, max_history: int = 1000):
+    def __init__(self, name: str, max_history: int = 1000) -> None:
         """
         Initialize metric collector.
 
@@ -133,7 +133,7 @@ class MetricCollector:
 class PerformanceMonitor:
     """Monitors performance metrics and generates alerts."""
 
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         """
         Initialize performance monitor.
 

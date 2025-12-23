@@ -32,7 +32,7 @@ class PolygonConnector(APIConnector):
         Polygon.io API key.
     """
 
-    def __init__(self, api_key: str) -> Any:
+    def __init__(self, api_key: str) -> None:
         credentials = APICredentials(api_key=api_key)
         base_url = "https://api.polygon.io"
         rate_limiter = RateLimiter(requests_per_second=5)

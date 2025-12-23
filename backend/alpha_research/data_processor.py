@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Optional, Any, List
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -13,7 +13,7 @@ class DataProcessor:
     Includes data cleaning, feature engineering, and anomaly detection.
     """
 
-    def __init__(self) -> Any:
+    def __init__(self) -> None:
         self.scalers = {}
         self.pca_models = {}
         self.anomaly_detector = None
@@ -197,7 +197,7 @@ class DataProcessor:
         self,
         data: Any,
         seq_length: Any,
-        target_col: Any = None,
+        target_col: Optional[Any] = None,
         target_horizon: Any = 1,
     ) -> Any:
         """Create sequences for time series modeling (e.g., RNN/LSTM)
@@ -212,7 +212,7 @@ class DataProcessor:
             X: Input sequences (numpy array)
             y: Target values (numpy array, if target_col is provided)
         """
-        X = []
+        X: List[Any] = []
         y = [] if target_col is not None else None
         end_idx = (
             len(data)
@@ -266,7 +266,7 @@ class DataProcessor:
             {"volatility": ["mean", "std"], "returns": ["mean", "std"]}
         )
         vol_median = regime_stats["volatility"]["mean"].median()
-        regime_names = []
+        regime_names: List[Any] = []
         for i in range(n_regimes):
             vol = regime_stats.loc[i, ("volatility", "mean")]
             ret = regime_stats.loc[i, ("returns", "mean")]
@@ -308,7 +308,7 @@ class DataProcessor:
         ax1.set_title("Asset Prices with Market Regimes")
         ax1.grid(True, linestyle="--", alpha=0.6)
         unique_regimes = regimes_aligned.unique()
-        handles = []
+        handles: List[Any] = []
         for regime_name in unique_regimes:
             color = color_map.get(regime_name, "gray")
             is_regime = regimes_aligned == regime_name

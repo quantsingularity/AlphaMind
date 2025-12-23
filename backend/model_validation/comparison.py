@@ -31,7 +31,7 @@ class ModelComparison:
 
     def __init__(
         self, models: Dict[str, Any], metrics: Optional[List[str]] = None
-    ) -> Any:
+    ) -> None:
         self.models = models
         self.metrics = metrics or ["mse", "rmse", "mae", "r2"]
         self.results = {}
@@ -72,7 +72,7 @@ class ModelComparison:
             cv = KFold(n_splits=5, shuffle=True, random_state=42)
         self.results = {model_name: [] for model_name in self.models}
         for model_name, model in self.models.items():
-            fold_results = []
+            fold_results: List[Any] = []
             for train_idx, test_idx in cv.split(X, y):
                 X_train, X_test = (X[train_idx], X[test_idx])
                 y_train, y_test = (y[train_idx], y[test_idx])
@@ -95,7 +95,7 @@ class ModelComparison:
                     task_type=task_type,
                 )
                 fold_results.append(fold_metrics)
-            avg_metrics = {}
+            avg_metrics: Dict[str, Any] = {}
             for metric in fold_results[0].keys():
                 avg_metrics[metric] = np.mean([fold[metric] for fold in fold_results])
                 avg_metrics[f"{metric}_std"] = np.std(
@@ -137,7 +137,7 @@ class ModelComparison:
         if baseline_model not in self.models:
             raise ValueError(f"Baseline model '{baseline_model}' not found in models")
         baseline = self.models[baseline_model]
-        comparison_results = {}
+        comparison_results: Dict[str, Any] = {}
         for model_name, model in self.models.items():
             if model_name == baseline_model:
                 continue
@@ -469,10 +469,10 @@ class StatisticalTests:
             List of selected model names.
         """
         rng = np.random.RandomState(random_state)
-        predictions = {}
+        predictions: Dict[str, Any] = {}
         for name, model in models.items():
             predictions[name] = model.predict(X)
-        losses = {}
+        losses: Dict[str, Any] = {}
         for name, pred in predictions.items():
             if loss_fn is None:
                 losses[name] = (y - pred) ** 2
@@ -480,24 +480,24 @@ class StatisticalTests:
                 losses[name] = np.array([loss_fn(y[i], pred[i]) for i in range(len(y))])
         model_set = list(models.keys())
         while len(model_set) > 1:
-            loss_diffs = {}
+            loss_diffs: Dict[str, Any] = {}
             for i, model_i in enumerate(model_set):
                 for j, model_j in enumerate(model_set):
                     if i < j:
                         loss_diffs[model_i, model_j] = losses[model_i] - losses[model_j]
-            t_stats = {}
+            t_stats: Dict[str, Any] = {}
             for (model_i, model_j), diff in loss_diffs.items():
                 t_stats[model_i, model_j] = np.mean(diff) / (
                     np.std(diff) / np.sqrt(len(diff))
                 )
             max_t = max((abs(t) for t in t_stats.values()))
-            max_t_boot = []
+            max_t_boot: List[Any] = []
             for _ in range(B):
                 boot_idx = rng.choice(len(y), size=len(y), replace=True)
-                boot_diffs = {}
+                boot_diffs: Dict[str, Any] = {}
                 for (model_i, model_j), diff in loss_diffs.items():
                     boot_diffs[model_i, model_j] = diff[boot_idx]
-                boot_t_stats = {}
+                boot_t_stats: Dict[str, Any] = {}
                 for (model_i, model_j), diff in boot_diffs.items():
                     boot_t_stats[model_i, model_j] = np.mean(diff) / (
                         np.std(diff) / np.sqrt(len(diff))

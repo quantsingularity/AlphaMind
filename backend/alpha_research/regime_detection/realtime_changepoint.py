@@ -18,7 +18,7 @@ class OnlineChangeDetector:
         min_size: Any = 24,
         jump: Any = 5,
         penalty: Any = 3.0,
-    ) -> Any:
+    ) -> None:
         """
         Initializes the change point detector.
 

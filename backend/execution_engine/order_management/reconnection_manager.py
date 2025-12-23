@@ -55,7 +55,7 @@ class ReconnectionConfig:
         circuit_break_threshold: int = 5,
         circuit_break_timeout: float = 300.0,
         health_check_interval: float = 30.0,
-    ) -> Any:
+    ) -> None:
         """
         Initialize reconnection configuration.
 
@@ -85,7 +85,7 @@ class ReconnectionManager:
     exponential backoff, jitter, and circuit breaking.
     """
 
-    def __init__(self, config: Optional[ReconnectionConfig] = None) -> Any:
+    def __init__(self, config: Optional[ReconnectionConfig] = None) -> None:
         """
         Initialize reconnection manager.
 
@@ -96,17 +96,17 @@ class ReconnectionManager:
         self.state = ReconnectionState.IDLE
         self.stats = ReconnectionStats()
         self.current_delay = self.config.initial_delay
-        self.circuit_break_until = None
-        self.reconnect_timer = None
-        self.health_check_timer = None
+        self.circuit_break_until: Optional[datetime.datetime] = None
+        self.reconnect_timer: Optional[threading.Timer] = None
+        self.health_check_timer: Optional[threading.Timer] = None
         self.is_running = False
-        self.connection_id = None
-        self.connect_callback = None
-        self.health_check_callback = None
-        self.on_reconnect_callback = None
-        self.on_give_up_callback = None
-        self.last_connection_time = None
-        self.disconnect_time = None
+        self.connection_id: Optional[str] = None
+        self.connect_callback: Optional[Callable[[], bool]] = None
+        self.health_check_callback: Optional[Callable[[], bool]] = None
+        self.on_reconnect_callback: Optional[Callable[[bool], None]] = None
+        self.on_give_up_callback: Optional[Callable[[], None]] = None
+        self.last_connection_time: Optional[datetime.datetime] = None
+        self.disconnect_time: Optional[datetime.datetime] = None
         logger.info("Reconnection manager initialized")
 
     def start(

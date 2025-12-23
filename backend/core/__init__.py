@@ -16,7 +16,7 @@ logger = logging.getLogger("AlphaMind.Core")
 class MarketData:
     """Standard container for processed market and alternative data."""
 
-    def __init__(self, data: pd.DataFrame, source: str = "combined") -> Any:
+    def __init__(self, data: pd.DataFrame, source: str = "combined") -> None:
         """
         Args:
             data: A Pandas DataFrame containing time series data (e.g., price, volume, sentiment).
@@ -46,7 +46,7 @@ class Signal:
         position: int,
         confidence: float,
         timestamp: datetime.datetime,
-    ) -> Any:
+    ) -> None:
         """
         Args:
             ticker: The asset symbol (e.g., 'AAPL').
@@ -72,7 +72,7 @@ class Signal:
 class ConfigManager:
     """Handles loading and accessing global configuration settings."""
 
-    def __init__(self, config_path: str = "config.json") -> Any:
+    def __init__(self, config_path: str = "config.json") -> None:
         self.config_path = config_path
         self._config: Dict[str, Any] = self._load_config()
 
@@ -92,7 +92,7 @@ class ConfigManager:
             logger.error(f"Error decoding JSON in {self.config_path}: {e}")
             return {}
 
-    def get(self, key: str, default: Any = None) -> Any:
+    def get(self, key: str, default: Optional[Any] = None) -> Any:
         """Retrieves a configuration value by key, supporting nested keys (e.g., 'API.SENTINEL_KEY')."""
         keys = key.split(".")
         value = self._config
@@ -110,7 +110,7 @@ class BaseModule(abc.ABC):
     Enforces a standard lifecycle and interface for configuration and execution.
     """
 
-    def __init__(self, module_name: str, config_manager: ConfigManager) -> Any:
+    def __init__(self, module_name: str, config_manager: ConfigManager) -> None:
         self.module_name = module_name
         self.config = config_manager
         self.logger = logging.getLogger(f"AlphaMind.{module_name}")
@@ -168,7 +168,7 @@ if __name__ == "__main__":
             self.logger.info(f"Using key: {self.config.get('API.SENTINEL_KEY', 'N/A')}")
             return True
 
-        def run(self, input_data: Any = None) -> Any:
+        def run(self, input_data: Optional[Any] = None) -> Any:
             super().run()
             data = pd.DataFrame(
                 {"close": [100, 101, 102]},

@@ -3,7 +3,7 @@ from typing import Any
 
 class AutocallablePricer:
 
-    def __init__(self, observation_dates: Any, coupon_barriers: Any) -> Any:
+    def __init__(self, observation_dates: Any, coupon_barriers: Any) -> None:
         self.schedule = ql.Schedule(
             ql.Date(),
             observation_dates[-1],

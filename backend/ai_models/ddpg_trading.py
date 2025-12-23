@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional, List
 from collections import deque, namedtuple
 from datetime import datetime
 import json
@@ -30,7 +30,7 @@ Experience = namedtuple(
 class ReplayBuffer:
     """Experience replay buffer to store and sample trading experiences"""
 
-    def __init__(self, capacity: Any = 100000) -> Any:
+    def __init__(self, capacity: Any = 100000) -> None:
         self.buffer = deque(maxlen=capacity)
 
     def add(
@@ -72,7 +72,7 @@ class OUNoise:
 
     def __init__(
         self, size: Any, mu: Any = 0.0, theta: Any = 0.15, sigma: Any = 0.2
-    ) -> Any:
+    ) -> None:
         self.mu = mu * np.ones(size)
         self.theta = theta
         self.sigma = sigma
@@ -149,7 +149,7 @@ class Critic(nn.Module):
 class DDPGAgent:
     """Deep Deterministic Policy Gradient agent for trading"""
 
-    def __init__(self, env: Any, config: Any = None) -> Any:
+    def __init__(self, env: Any, config: Optional[Any] = None) -> None:
         """Initialize the DDPG agent with environment and optional config"""
         self.env = env
         self.config = self._load_config(config)
@@ -206,7 +206,7 @@ class DDPGAgent:
             f"DDPG Agent initialized with state_dim={self.state_dim}, action_dim={self.action_dim}"
         )
 
-    def _load_config(self, config: Any = None) -> Any:
+    def _load_config(self, config: Optional[Any] = None) -> Any:
         """Load configuration with defaults"""
         default_config = {
             "actor_lr": 0.0001,
@@ -295,7 +295,9 @@ class DDPGAgent:
         self.critic_losses.append(critic_loss.item())
         return (actor_loss.item(), critic_loss.item())
 
-    def train(self, max_episodes: Any = None, max_steps: Any = None) -> Any:
+    def train(
+        self, max_episodes: Optional[Any] = None, max_steps: Optional[Any] = None
+    ) -> Any:
         """Train the agent on the environment"""
         max_episodes = max_episodes or self.config["max_episodes"]
         max_steps = max_steps or self.config["max_steps_per_episode"]
@@ -303,7 +305,7 @@ class DDPGAgent:
             f"Starting training for {max_episodes} episodes, max {max_steps} steps per episode"
         )
         total_steps = 0
-        episode_rewards = []
+        episode_rewards: List[Any] = []
         for episode in range(1, max_episodes + 1):
             state = self.env.reset()
             self.noise.reset()
@@ -347,7 +349,7 @@ class DDPGAgent:
     def evaluate(self, num_episodes: Any = 5) -> Any:
         """Evaluate the agent without exploration noise"""
         logger.info(f"Evaluating agent for {num_episodes} episodes")
-        eval_rewards = []
+        eval_rewards: List[Any] = []
         for episode in range(num_episodes):
             state = self.env.reset()
             episode_reward = 0
@@ -437,12 +439,12 @@ class TradingGymEnv(gym.Env):
     def __init__(
         self,
         data_stream: Any,
-        features: Any = None,
+        features: Optional[Any] = None,
         window_size: Any = 10,
         transaction_cost: Any = 0.001,
         reward_scaling: Any = 1.0,
         max_steps: Any = 252,
-    ) -> Any:
+    ) -> None:
         """
         Initialize the trading environment
 
@@ -579,7 +581,7 @@ class TradingGymEnv(gym.Env):
 class BacktestEngine:
     """Backtesting engine for evaluating trading strategies"""
 
-    def __init__(self, env: Any, agent: Any, data: Any = None) -> Any:
+    def __init__(self, env: Any, agent: Any, data: Optional[Any] = None) -> None:
         """
         Initialize backtesting engine
 
@@ -629,14 +631,14 @@ class BacktestEngine:
     def run(self, episodes: Any = 1, render: Any = False) -> Any:
         """Run backtest for specified number of episodes"""
         self.logger.info(f"Starting backtest for {episodes} episodes")
-        all_portfolio_values = []
+        all_portfolio_values: List[Any] = []
         all_returns = []
-        all_actions = []
+        all_actions: List[Any] = []
         for episode in range(1, episodes + 1):
             state = self.env.reset()
             done = False
             episode_values = [1.0]
-            episode_returns = []
+            episode_returns: List[Any] = []
             episode_actions = []
             while not done:
                 action = self.agent.select_action(state, add_noise=False)

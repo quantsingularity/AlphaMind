@@ -13,26 +13,27 @@ from typing import Any, Dict, List
 
 try:
     from sec_edgar_downloader import Downloader
-    from transformers import pipeline
+    from transformers import pipeline as transformer_pipeline
 except ImportError:
 
     class Downloader:
 
-        def __init__(self, *args, **kwargs) -> Any:
+        def __init__(self, *args, **kwargs) -> None:
             raise ImportError(
                 "sec_edgar_downloader is required. Install with: pip install sec-edgar-downloader"
             )
 
         def get(self, *args, **kwargs) -> Any:
-            pass
+            raise NotImplementedError("This method is not yet implemented")
 
-    class pipeline:
+    def transformer_pipeline(*args, **kwargs) -> Any:
+        """Stub for transformers pipeline"""
 
-        def __init__(self, *args, **kwargs) -> Any:
-            pass
+        class StubPipeline:
+            def __call__(self, *args, **kwargs) -> List[Dict[str, Any]]:
+                return [{"label": "unknown", "score": 0.0}]
 
-        def __call__(self, *args, **kwargs) -> Any:
-            return [{"label": "unknown", "score": 0.0}]
+        return StubPipeline()
 
 
 logging.basicConfig(
@@ -46,7 +47,7 @@ class SEC8KMonitor:
 
     def __init__(
         self, tickers: List[str], max_retries: int = 3, retry_delay: int = 5
-    ) -> Any:
+    ) -> None:
         """
         Initialize SEC 8-K monitor.
 
@@ -100,6 +101,7 @@ class SEC8KMonitor:
                         f"Failed to download {filing_type} filings for {ticker} after {self.max_retries} attempts"
                     )
                     return False
+        return False
 
     def process_filing(self, filing: Any) -> Dict[str, Any]:
         """
@@ -243,7 +245,7 @@ class SEC8KMonitor:
         if self.sentiment_model is None:
             try:
                 logger.info("Loading FinBERT sentiment model (ProsusAI/finbert)")
-                self.sentiment_model = pipeline(
+                self.sentiment_model = transformer_pipeline(
                     "text-classification", model="ProsusAI/finbert"
                 )
                 logger.info("FinBERT model loaded successfully")

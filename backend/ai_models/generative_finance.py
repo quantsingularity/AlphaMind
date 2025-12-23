@@ -1,11 +1,11 @@
-from typing import Any
+from typing import Optional, Any
 import tensorflow as tf
 from tensorflow.keras.layers import Dense, Conv1D, Flatten, LeakyReLU, Reshape, LSTM
 
 
 class TransformerGenerator(tf.keras.layers.Layer):
 
-    def __init__(self, seq_length: Any, n_features: Any) -> Any:
+    def __init__(self, seq_length: Any, n_features: Any) -> None:
         super().__init__()
         self.seq_length = seq_length
         self.n_features = n_features
@@ -21,7 +21,7 @@ class TransformerGenerator(tf.keras.layers.Layer):
 
 class TimeSeriesDiscriminator(tf.keras.layers.Layer):
 
-    def __init__(self, seq_length: Any) -> Any:
+    def __init__(self, seq_length: Any) -> None:
         super().__init__()
         self.seq_length = seq_length
         self.conv1 = Conv1D(64, kernel_size=3, strides=2, padding="same")
@@ -40,7 +40,7 @@ class TimeSeriesDiscriminator(tf.keras.layers.Layer):
 
 class RegimeClassifier(tf.keras.layers.Layer):
 
-    def __init__(self) -> Any:
+    def __init__(self) -> None:
         super().__init__()
         self.lstm = LSTM(64)
         self.dense = Dense(3, activation="softmax")
@@ -51,7 +51,7 @@ class RegimeClassifier(tf.keras.layers.Layer):
 
 
 def regime_consistency_loss(
-    regime_match: Any, expected_distribution: Any = None
+    regime_match: Any, expected_distribution: Optional[Any] = None
 ) -> Any:
     """
     Calculate consistency loss for regime classification using KL Divergence.
@@ -74,7 +74,7 @@ class MarketGAN(tf.keras.Model):
     for generating synthetic market time series data.
     """
 
-    def __init__(self, seq_length: Any, n_features: Any) -> Any:
+    def __init__(self, seq_length: Any, n_features: Any) -> None:
         super().__init__()
         self.seq_length = seq_length
         self.n_features = n_features

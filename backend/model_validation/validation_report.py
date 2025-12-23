@@ -99,7 +99,7 @@ class ValidationReport:
         sample_weights: Optional[np.ndarray] = None,
     ) -> Dict[str, float]:
         """Internal helper to calculate standard metrics based on task type."""
-        metrics = {}
+        metrics: Dict[str, Any] = {}
         if task_type == "regression":
             metrics["MSE"] = sk_metrics.mean_squared_error(
                 y_true, y_pred, sample_weight=sample_weights
@@ -195,7 +195,7 @@ class ValidationReport:
         cv_method : str, default="k-fold"
             Cross-validation method used.
         """
-        cv_summary = {}
+        cv_summary: Dict[str, Any] = {}
         for metric, values in cv_results.items():
             cv_summary[metric] = {
                 "mean": float(np.mean(values)),
@@ -725,7 +725,7 @@ class ValidationReport:
         if not metrics:
             raise ValueError("No valid metrics specified")
 
-        data = []
+        data: List[Any] = []
         for dataset in datasets:
             for metric in metrics:
                 value = self.sections["performance_metrics"][dataset].get(metric)

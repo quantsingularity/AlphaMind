@@ -44,7 +44,7 @@ class TimeSeriesSplit:
         test_size: Optional[int] = None,
         gap: int = 0,
         embargo: int = 0,
-    ) -> Any:
+    ) -> None:
         self.n_splits = n_splits
         self.max_train_size = max_train_size
         self.test_size = test_size
@@ -57,7 +57,9 @@ class TimeSeriesSplit:
             gap=gap,
         )
 
-    def split(self, X: Any, y: Any = None, groups: Any = None) -> Any:
+    def split(
+        self, X: Any, y: Optional[Any] = None, groups: Optional[Any] = None
+    ) -> Any:
         """
         Generate indices to split data into training and test set.
 
@@ -83,7 +85,12 @@ class TimeSeriesSplit:
                 test_idx = test_idx[self.embargo :]
             yield (train_idx, test_idx)
 
-    def get_n_splits(self, X: Any = None, y: Any = None, groups: Any = None) -> Any:
+    def get_n_splits(
+        self,
+        X: Optional[Any] = None,
+        y: Optional[Any] = None,
+        groups: Optional[Any] = None,
+    ) -> Any:
         """
         Returns the number of splitting iterations in the cross-validator.
 
@@ -133,14 +140,16 @@ class BlockingTimeSeriesSplit:
         train_blocks: int = 10,
         test_blocks: int = 2,
         gap_blocks: int = 1,
-    ) -> Any:
+    ) -> None:
         self.n_splits = n_splits
         self.block_size = block_size
         self.train_blocks = train_blocks
         self.test_blocks = test_blocks
         self.gap_blocks = gap_blocks
 
-    def split(self, X: Any, y: Any = None, groups: Any = None) -> Any:
+    def split(
+        self, X: Any, y: Optional[Any] = None, groups: Optional[Any] = None
+    ) -> Any:
         """
         Generate indices to split data into training and test set.
 
@@ -190,7 +199,12 @@ class BlockingTimeSeriesSplit:
             test_indices = np.arange(test_start, test_end)
             yield (train_indices, test_indices)
 
-    def get_n_splits(self, X: Any = None, y: Any = None, groups: Any = None) -> Any:
+    def get_n_splits(
+        self,
+        X: Optional[Any] = None,
+        y: Optional[Any] = None,
+        groups: Optional[Any] = None,
+    ) -> Any:
         """
         Returns the number of splitting iterations in the cross-validator.
 
@@ -230,14 +244,18 @@ class PurgedKFold:
 
     def __init__(
         self, n_splits: int = 5, purge_overlap: bool = True, embargo: float = 0.0
-    ) -> Any:
+    ) -> None:
         self.n_splits = n_splits
         self.purge_overlap = purge_overlap
         self.embargo = embargo
         self._kf = KFold(n_splits=n_splits, shuffle=False)
 
     def split(
-        self, X: Any, y: Any = None, groups: Any = None, times: Any = None
+        self,
+        X: Any,
+        y: Optional[Any] = None,
+        groups: Optional[Any] = None,
+        times: Optional[Any] = None,
     ) -> Any:
         """
         Generate indices to split data into training and test set.
@@ -283,7 +301,12 @@ class PurgedKFold:
                     test_idx = sorted_test_idx[embargo_size:]
             yield (train_idx, test_idx)
 
-    def get_n_splits(self, X: Any = None, y: Any = None, groups: Any = None) -> Any:
+    def get_n_splits(
+        self,
+        X: Optional[Any] = None,
+        y: Optional[Any] = None,
+        groups: Optional[Any] = None,
+    ) -> Any:
         """
         Returns the number of splitting iterations in the cross-validator.
 

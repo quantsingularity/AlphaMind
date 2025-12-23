@@ -4,7 +4,7 @@ import QuantLib as ql
 
 class StochasticVolatilitySurface:
 
-    def __init__(self, calibration_data: Any) -> Any:
+    def __init__(self, calibration_data: Any) -> None:
         self.calibration_data = calibration_data
         self.helpers = []
         self.model = ql.HestonModel(

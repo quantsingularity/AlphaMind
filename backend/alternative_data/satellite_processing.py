@@ -15,7 +15,7 @@ class SatelliteFeatureExtractor:
     Sentinel satellite imagery and converts them into financial time series.
     """
 
-    def __init__(self, client_id: str, client_secret: str, instance_id: str) -> Any:
+    def __init__(self, client_id: str, client_secret: str, instance_id: str) -> None:
         """
         Initializes the Sentinel Hub configuration and API request parameters.
 
@@ -94,14 +94,14 @@ class SatelliteFeatureExtractor:
         if not facilities:
             logger.warning(f"No facilities found for ticker {ticker}.")
             return pd.DataFrame()
-        all_timeseries = {}
+        all_timeseries: Dict[str, Any] = {}
         for facil in facilities:
             time_range = "2020-01-01/2023-06-30"
             ts = self.process_geospatial(facil["coordinates"], time_range)
             if not ts.empty:
                 all_timeseries[facil["name"]] = ts
         final_df = pd.DataFrame(all_timeseries)
-        if final_df.empty:
+        if hasattr(final_df, "empty") and final_df.empty:
             logger.info(f"No valid time series data was generated for {ticker}.")
         else:
             logger.info(
@@ -119,7 +119,7 @@ class SatelliteFeatureExtractor:
         Returns:
             A single NumPy array ready for model prediction (Batch_Size, Height, Width, Channels).
         """
-        processed_images = []
+        processed_images: List[Any] = []
         for img in images:
             normalized = img.astype(np.float32) / 255.0
             processed_images.append(normalized)

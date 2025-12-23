@@ -7,7 +7,7 @@
 
 from datetime import datetime, timedelta
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 import dash
 from dash import Input, Output, dcc, html
 import dash_bootstrap_components as dbc
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 class DashboardMetrics:
     """Class for calculating and storing dashboard metrics."""
 
-    def __init__(self) -> Any:
+    def __init__(self) -> None:
         """Initialize dashboard metrics."""
         self.portfolio_value_history = []
         self.cash_history = []
@@ -280,7 +280,7 @@ class DashboardServer:
         port: int = 8050,
         debug: bool = False,
         metrics: Optional[DashboardMetrics] = None,
-    ) -> Any:
+    ) -> None:
         """
         Initialize dashboard server.
 
@@ -799,7 +799,7 @@ class DashboardServer:
         def update_asset_allocation(n):
             summary = self.metrics.get_summary()
             positions = summary["portfolio"]["positions"]
-            labels = []
+            labels: List[Any] = []
             values = []
             for symbol, pos_data in positions.items():
                 market_value = pos_data.get("market_value", 0.0)
@@ -837,7 +837,7 @@ class DashboardServer:
             positions = summary["portfolio"]["positions"]
             if not positions:
                 return html.P("No active positions.")
-            data = []
+            data: List[Any] = []
             for symbol, pos_data in positions.items():
                 unrealized_pnl = pos_data.get("unrealized_pnl", 0.0)
                 pnl_class = "text-success" if unrealized_pnl >= 0 else "text-danger"
@@ -1269,7 +1269,7 @@ class DashboardServer:
             active_orders = summary["trading"]["active_orders"]
             if not active_orders:
                 return html.P("No active orders.")
-            data = []
+            data: List[Any] = []
             for order in active_orders[-10:]:
                 data.append(
                     (
@@ -1325,7 +1325,7 @@ class DashboardServer:
             trades = self.metrics.trades_history
             if not trades:
                 return html.P("No recent trades.")
-            data = []
+            data: List[Any] = []
             for trade in trades[-10:]:
                 pnl = trade.get("realized_pnl")
                 pnl_class = (

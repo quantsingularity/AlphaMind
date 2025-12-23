@@ -48,7 +48,7 @@ class EnhancedVenueAdapter(VenueAdapter):
         self,
         config: VenueConfig,
         reconnection_config: Optional[ReconnectionConfig] = None,
-    ) -> Any:
+    ) -> None:
         """
         Initialize enhanced venue adapter.
 
@@ -286,7 +286,10 @@ class EnhancedVenueAdapter(VenueAdapter):
         )
 
     def configure_failure_mode(
-        self, mode: FailureMode, probability: float = 0.0, config: Dict[str, Any] = None
+        self,
+        mode: FailureMode,
+        probability: float = 0.0,
+        config: Optional[Dict[str, Any]] = None,
     ) -> None:
         """
         Configure a failure simulation mode.
@@ -439,7 +442,7 @@ class EnhancedMarketConnectivityManager(MarketConnectivityManager):
     failure simulation, and monitoring capabilities.
     """
 
-    def __init__(self) -> Any:
+    def __init__(self) -> None:
         """Initialize enhanced market connectivity manager."""
         super().__init__()
         self.global_failure_simulation_enabled = False
@@ -482,7 +485,7 @@ class EnhancedMarketConnectivityManager(MarketConnectivityManager):
         venue_id: str,
         mode: FailureMode,
         probability: float = 0.0,
-        config: Dict[str, Any] = None,
+        config: Optional[Dict[str, Any]] = None,
     ) -> bool:
         """
         Configure failure simulation for a specific venue.

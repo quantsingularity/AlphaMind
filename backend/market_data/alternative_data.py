@@ -111,7 +111,7 @@ class PluginMetadata:
         rate_limit: Optional[int] = None,
         documentation_url: Optional[str] = None,
         tags: Optional[List[str]] = None,
-    ) -> Any:
+    ) -> None:
         """
         Initialize plugin metadata.
 
@@ -243,7 +243,7 @@ class PluginMetadata:
 class DataSourcePlugin(ABC):
     """Base class for data source plugins."""
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None) -> Any:
+    def __init__(self, config: Optional[Dict[str, Any]] = None) -> None:
         """
         Initialize data source plugin.
 
@@ -655,7 +655,7 @@ class DataSourcePlugin(ABC):
 class PluginManager:
     """Manager for data source plugins with enhanced error handling and monitoring."""
 
-    def __init__(self, plugin_dir: Optional[str] = None) -> Any:
+    def __init__(self, plugin_dir: Optional[str] = None) -> None:
         """
         Initialize plugin manager.
 
@@ -683,7 +683,7 @@ class PluginManager:
         Returns:
             List of discovered plugin names
         """
-        discovered = []
+        discovered: List[Any] = []
         try:
             builtin_plugins = await self._discover_builtin_plugins()
             discovered.extend(builtin_plugins)
@@ -714,7 +714,7 @@ class PluginManager:
         Returns:
             List of discovered plugin names
         """
-        discovered = []
+        discovered: List[Any] = []
         return discovered
 
     async def _discover_directory_plugins(self) -> List[str]:
@@ -724,7 +724,7 @@ class PluginManager:
         Returns:
             List of discovered plugin names
         """
-        discovered = []
+        discovered: List[Any] = []
         if not self.plugin_dir or not os.path.exists(self.plugin_dir):
             return discovered
         try:

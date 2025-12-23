@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Optional, Any, Dict
 import gym
 from core.logging import get_logger
 
@@ -16,7 +16,7 @@ class PortfolioGymEnv(gym.Env):
 
     metadata = {"render_modes": ["human"], "render_fps": 30}
 
-    def __init__(self, universe: Any, transaction_cost: Any = 0.001) -> Any:
+    def __init__(self, universe: Any, transaction_cost: Any = 0.001) -> None:
         super().__init__()
         self.universe = universe
         self.n_assets = len(universe)
@@ -86,7 +86,7 @@ class PortfolioGymEnv(gym.Env):
             "macro": np.random.normal(0, 1, (5,)).astype(np.float32),
         }
 
-    def reset(self, seed: Any = None, options: Any = None) -> Any:
+    def reset(self, seed: Optional[Any] = None, options: Optional[Any] = None) -> Any:
         """Reset environment to initial state."""
         super().reset(seed=seed)
         self.current_step = 0
@@ -95,7 +95,7 @@ class PortfolioGymEnv(gym.Env):
             np.float32
         )
         observation = self._get_obs()
-        info = {}
+        info: Dict[str, Any] = {}
         return (observation, info)
 
 
@@ -104,7 +104,7 @@ class PPOAgent:
     A Proximal Policy Optimization (PPO) agent for training in the PortfolioGymEnv.
     """
 
-    def __init__(self, env: Any) -> Any:
+    def __init__(self, env: Any) -> None:
         self.model = PPO(
             "MultiInputPolicy",
             env,

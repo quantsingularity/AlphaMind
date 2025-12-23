@@ -1,13 +1,13 @@
-from typing import Any
+from typing import Any, Dict
 
 
 class LatencyOptimizedRouter:
 
-    def __init__(self, venue_latencies: Any) -> Any:
+    def __init__(self, venue_latencies: Any) -> None:
         self.latencies = venue_latencies
 
     def route_order(self, order: Any, market_data: Any) -> Any:
-        adjusted_prices = {}
+        adjusted_prices: Dict[str, Any] = {}
         for venue in self.latencies:
             future_price = self._predict_price(
                 market_data[venue], self.latencies[venue]

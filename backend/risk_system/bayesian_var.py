@@ -7,7 +7,7 @@ import arviz as az
 
 class BayesianVaR:
 
-    def __init__(self, returns: Any) -> Any:
+    def __init__(self, returns: Any) -> None:
         self.returns = np.asarray(returns)
         self.model = None
         self.trace = None

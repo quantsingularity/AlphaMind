@@ -9,7 +9,7 @@ market_data_schema = '\n{\n    "type": "record",\n    "name": "MarketData",\n   
 
 class MarketDataPipeline:
 
-    def __init__(self, schema_registry_url: Any) -> Any:
+    def __init__(self, schema_registry_url: Any) -> None:
         self.schema_registry = SchemaRegistryClient({"url": schema_registry_url})
         self.avro_deserializer = AvroDeserializer(
             schema_registry_client=self.schema_registry, schema_str=market_data_schema

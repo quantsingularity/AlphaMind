@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 import keras
 import numpy as np
 import tensorflow as tf
@@ -22,7 +22,7 @@ class AdvancedTimeSeriesForecaster:
         num_heads: Any = 8,
         num_layers: Any = 4,
         dropout_rate: Any = 0.1,
-    ) -> Any:
+    ) -> None:
         self.input_seq_length = input_seq_length
         self.output_seq_length = output_seq_length
         self.model = FinancialTimeSeriesTransformer(
@@ -67,7 +67,7 @@ class AdvancedTimeSeriesForecaster:
         y_train: Any,
         epochs: Any = 100,
         batch_size: Any = 32,
-        validation_data: Any = None,
+        validation_data: Optional[Any] = None,
     ) -> Any:
         """
         Train the forecasting model.

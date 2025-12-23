@@ -43,7 +43,7 @@ class RiskLimit:
 class PositionRisk:
     """Manages risk calculations for individual positions."""
 
-    def __init__(self, position_id: str, instrument_type: str) -> Any:
+    def __init__(self, position_id: str, instrument_type: str) -> None:
         """
         Initialize position risk calculator.
 
@@ -128,7 +128,7 @@ class PositionRisk:
         Returns:
             dict: {metric_name: (is_breached, severity)}
         """
-        results = {}
+        results: Dict[str, Any] = {}
         for metric_name, value in self.risk_metrics.items():
             if metric_name in self.risk_limits:
                 is_breached, severity = self.risk_limits[metric_name].is_breached(value)
@@ -143,7 +143,7 @@ class PositionRisk:
 class PortfolioRiskAggregator:
     """Aggregates risk across multiple positions in a portfolio."""
 
-    def __init__(self, portfolio_id: str) -> Any:
+    def __init__(self, portfolio_id: str) -> None:
         """
         Initialize portfolio risk aggregator.
 
@@ -230,7 +230,7 @@ class PortfolioRiskAggregator:
 
     def check_portfolio_limits(self) -> Dict[str, Tuple[bool, str]]:
         """Check portfolio-level risk limits."""
-        results = {}
+        results: Dict[str, Any] = {}
         for metric_name, value in self.portfolio_risk_metrics.items():
             if metric_name in self.portfolio_risk_limits:
                 is_breached, severity = self.portfolio_risk_limits[

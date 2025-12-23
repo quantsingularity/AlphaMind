@@ -14,7 +14,7 @@ class MarketSentimentAnalyzer:
 
     def __init__(
         self, vocab_size: Any = 10000, embedding_dim: Any = 128, max_length: Any = 200
-    ) -> Any:
+    ) -> None:
         self.vocab_size = vocab_size
         self.embedding_dim = embedding_dim
         self.max_length = max_length
@@ -122,7 +122,7 @@ class SentimentBasedStrategy:
 
     def __init__(
         self, sentiment_analyzer: MarketSentimentAnalyzer, price_data: pd.DataFrame
-    ) -> Any:
+    ) -> None:
         self.sentiment_analyzer = sentiment_analyzer
         self.price_data = price_data.copy()
         self.performance_metrics: Dict[str, float] = {}

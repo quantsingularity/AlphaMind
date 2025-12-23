@@ -587,7 +587,7 @@ class ExperimentVisualizer:
             Matplotlib figure.
         """
         df = results[results[metric_col].isin(metrics)].copy()
-        if df.empty:
+        if hasattr(df, "empty") and df.empty:
             raise ValueError(f"No data found for metrics: {metrics}")
         n_metrics = len(metrics)
         n_cols = min(3, n_metrics)
@@ -661,7 +661,7 @@ class ExperimentVisualizer:
             Matplotlib figure.
         """
         df = results[results[metric_col].isin(funnel_stages)].copy()
-        if df.empty:
+        if hasattr(df, "empty") and df.empty:
             raise ValueError(f"No data found for funnel stages: {funnel_stages}")
         funnel_data = (
             df.groupby([variant_col, metric_col])[value_col].mean().reset_index()
