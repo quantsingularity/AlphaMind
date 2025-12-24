@@ -60,6 +60,11 @@ class DataResponse:
 class RateLimiter:
     """Rate limiter for API calls."""
 
+    @property
+    def is_success(self) -> bool:
+        """Check if the response was successful."""
+        return self.success
+
     def __init__(self, calls_per_minute: int = 5) -> None:
         """
         Initialize rate limiter.

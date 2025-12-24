@@ -437,7 +437,7 @@ class MultipleTestingCorrection:
             corrected_sorted_p_values[i] = min(
                 corrected_sorted_p_values[i], corrected_sorted_p_values[i + 1]
             )
-        corrected_p_values = [0] * n_tests
+        corrected_p_values: list[float] = [0] * n_tests
         for i, idx in enumerate(sorted_indices):
             corrected_p_values[idx] = corrected_sorted_p_values[i]
         return corrected_p_values
@@ -468,7 +468,7 @@ class MultipleTestingCorrection:
             corrected_sorted_p_values[i] = max(
                 corrected_sorted_p_values[i], corrected_sorted_p_values[i + 1]
             )
-        corrected_p_values = [0] * n_tests
+        corrected_p_values: list[float] = [0] * n_tests
         for i, idx in enumerate(sorted_indices):
             corrected_p_values[idx] = corrected_sorted_p_values[i]
         return corrected_p_values

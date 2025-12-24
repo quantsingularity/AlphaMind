@@ -41,7 +41,7 @@ class YahooFinanceConnector(APIConnector):
         credentials = APICredentials(api_key=rapid_api_key)
         if rapid_api_key:
             base_url = "https://apidojo-yahoo-finance-v1.p.rapidapi.com"
-            rate_limiter = RateLimiter(requests_per_second=5, requests_per_day=500)
+            rate_limiter = RateLimiter(max_requests=60, time_window=60)
         else:
             base_url = "https://query1.finance.yahoo.com"
             rate_limiter = RateLimiter(requests_per_minute=100)
@@ -113,7 +113,7 @@ class YahooFinanceConnector(APIConnector):
             params = {"symbols": symbol, "region": "US"}
         else:
             endpoint = "/v7/finance/quote"
-            params = {"symbols": symbol}
+            params.update({"symbols": symbol})
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -169,13 +169,15 @@ class YahooFinanceConnector(APIConnector):
             params = {"symbol": symbol, "region": "US"}
         else:
             endpoint = "/v8/finance/chart/" + symbol
-            params = {
-                "period1": period1_timestamp,
-                "period2": period2_timestamp,
-                "interval": interval,
-                "includePrePost": str(include_prepost).lower(),
-                "events": events,
-            }
+            params.update(
+                {
+                    "period1": period1_timestamp,
+                    "period2": period2_timestamp,
+                    "interval": interval,
+                    "includePrePost": str(include_prepost).lower(),
+                    "events": events,
+                }
+            )
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -243,9 +245,11 @@ class YahooFinanceConnector(APIConnector):
             params = {"symbol": symbol, "region": "US"}
         else:
             endpoint = "/v11/finance/quoteSummary/" + symbol
-            params = {
-                "modules": "assetProfile,summaryProfile,summaryDetail,esgScores,price,incomeStatementHistory,incomeStatementHistoryQuarterly,balanceSheetHistory,balanceSheetHistoryQuarterly,cashflowStatementHistory,cashflowStatementHistoryQuarterly,defaultKeyStatistics,financialData,calendarEvents,secFilings,recommendationTrend,upgradeDowngradeHistory,institutionOwnership,fundOwnership,majorDirectHolders,majorHoldersBreakdown,insiderTransactions,insiderHolders,netSharePurchaseActivity,earnings,earningsHistory,earningsTrend,industryTrend,indexTrend,sectorTrend"
-            }
+            params.update(
+                {
+                    "modules": "assetProfile,summaryProfile,summaryDetail,esgScores,price,incomeStatementHistory,incomeStatementHistoryQuarterly,balanceSheetHistory,balanceSheetHistoryQuarterly,cashflowStatementHistory,cashflowStatementHistoryQuarterly,defaultKeyStatistics,financialData,calendarEvents,secFilings,recommendationTrend,upgradeDowngradeHistory,institutionOwnership,fundOwnership,majorDirectHolders,majorHoldersBreakdown,insiderTransactions,insiderHolders,netSharePurchaseActivity,earnings,earningsHistory,earningsTrend,industryTrend,indexTrend,sectorTrend"
+                }
+            )
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -306,7 +310,7 @@ class YahooFinanceConnector(APIConnector):
                 )
             else:
                 raise ValueError(f"Invalid statement type: {statement_type}")
-            params = {"modules": module}
+            params.update({"modules": module})
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -334,7 +338,7 @@ class YahooFinanceConnector(APIConnector):
             params = {"symbol": symbol, "region": "US"}
         else:
             endpoint = "/v11/finance/quoteSummary/" + symbol
-            params = {"modules": "recommendationTrend,upgradeDowngradeHistory"}
+            params.update({"modules": "recommendationTrend,upgradeDowngradeHistory"})
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -362,7 +366,7 @@ class YahooFinanceConnector(APIConnector):
             params = {"symbol": symbol, "region": "US"}
         else:
             endpoint = "/v11/finance/quoteSummary/" + symbol
-            params = {"modules": "earnings,earningsHistory,earningsTrend"}
+            params.update({"modules": "earnings,earningsHistory,earningsTrend"})
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -405,12 +409,14 @@ class YahooFinanceConnector(APIConnector):
             params = {"q": query, "region": "US"}
         else:
             endpoint = "/v1/finance/search"
-            params = {
-                "q": query,
-                "quotesCount": quote_count,
-                "newsCount": news_count,
-                "enableFuzzyQuery": str(enable_fuzzy_query).lower(),
-            }
+            params.update(
+                {
+                    "q": query,
+                    "quotesCount": quote_count,
+                    "newsCount": news_count,
+                    "enableFuzzyQuery": str(enable_fuzzy_query).lower(),
+                }
+            )
             if quote_type_filter:
                 params["quoteType"] = ",".join(quote_type_filter)
         return self.request(
@@ -440,7 +446,7 @@ class YahooFinanceConnector(APIConnector):
             params = {"region": region}
         else:
             endpoint = "/v6/finance/quote/marketSummary"
-            params = {"lang": "en", "region": region}
+            params.update({"lang": "en", "region": region})
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -500,7 +506,7 @@ class YahooFinanceConnector(APIConnector):
             params = {"region": region, "category": category}
         else:
             endpoint = "/v2/finance/news"
-            params = {"category": category, "region": region}
+            params.update({"category": category, "region": region})
         return self.request(
             endpoint=endpoint,
             params=params,
@@ -539,7 +545,7 @@ class YahooFinanceConnector(APIConnector):
             }
         else:
             endpoint = "/v8/finance/chart/" + symbol
-            params = {"interval": interval, "range": range}
+            params.update({"interval": interval, "range": range})
         return self.request(
             endpoint=endpoint,
             params=params,

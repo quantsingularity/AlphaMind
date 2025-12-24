@@ -337,7 +337,6 @@ class TaskManager:
                     self.logger.debug(f"Submitting task: {task_id}")
                     func = self.tasks[task_id]
                     futures[executor.submit(func)] = task_id
-                ready_tasks: List[Any] = []
                 if futures:
                     done, _ = concurrent.futures.wait(
                         futures.keys(), return_when=concurrent.futures.FIRST_COMPLETED
@@ -428,8 +427,8 @@ class WorkerPool:
         self.n_workers = n_workers or mp.cpu_count()
         self.use_threads = use_threads
         QueueClass = queue.Queue if use_threads else mp.Queue
-        self.task_queue: QueueClass = QueueClass()
-        self.result_queue: QueueClass = QueueClass()
+        self.task_queue = QueueClass()
+        self.result_queue = QueueClass()
         self.workers: List[Union[threading.Thread, mp.Process]] = []
         self.running = False
         self.logger = logger.getChild(self.__class__.__name__)
