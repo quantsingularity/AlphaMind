@@ -12,7 +12,7 @@ import random
 import threading
 import time
 from typing import Any, Dict, Optional, Tuple
-from AlphaMind.backend.execution_engine.order_management.market_connectivity import (
+from execution_engine.order_management.market_connectivity import (
     ConnectionStatus,
     MarketConnectivityManager,
     MarketDataUpdate,
@@ -38,9 +38,9 @@ class FailureMode(Enum):
     HIGH_LATENCY = "high_latency"
 
 
-class EnhancedVenueAdapter(VenueAdapter):
+class VenueAdapter(VenueAdapter):
     """
-    Enhanced venue adapter with reconnection logic and failure simulation.
+    Venue adapter with reconnection logic and failure simulation.
     Extends the base VenueAdapter with robust connection management.
     """
 
@@ -50,7 +50,7 @@ class EnhancedVenueAdapter(VenueAdapter):
         reconnection_config: Optional[ReconnectionConfig] = None,
     ) -> None:
         """
-        Initialize enhanced venue adapter.
+        Initialize venue adapter.
 
         Args:
             config: Venue configuration
@@ -77,7 +77,7 @@ class EnhancedVenueAdapter(VenueAdapter):
         self.connection_failures = 0
         self.last_error_time = None
         self.error_count = 0
-        logger.info(f"Enhanced venue adapter initialized for {config.venue_id}")
+        logger.info(f"Venue adapter initialized for {config.venue_id}")
 
     def connect(self) -> bool:
         """
@@ -349,7 +349,7 @@ class EnhancedVenueAdapter(VenueAdapter):
             self.messages_sent += 1
         return result
 
-    def process_market_data(self, data: Dict) -> Optional[MarketDataUpdate]:
+    def process_market_data(self, data: Dict) -> Optional["MarketDataUpdate"]:
         """
         Process market data with failure simulation and validation.
 
@@ -436,9 +436,9 @@ class EnhancedVenueAdapter(VenueAdapter):
         return enhanced_status
 
 
-class EnhancedMarketConnectivityManager(MarketConnectivityManager):
+class MarketConnectivityManager(MarketConnectivityManager):
     """
-    Enhanced market connectivity manager with improved connection handling,
+    Market connectivity manager with improved connection handling,
     failure simulation, and monitoring capabilities.
     """
 
@@ -453,15 +453,13 @@ class EnhancedMarketConnectivityManager(MarketConnectivityManager):
         self.max_status_history = 100
         logger.info("Enhanced market connectivity manager initialized")
 
-    def add_venue(
-        self, config: VenueConfig, adapter_class: Any = EnhancedVenueAdapter
-    ) -> None:
+    def add_venue(self, config: VenueConfig, adapter_class: Any = VenueAdapter) -> None:
         """
         Add a new venue with enhanced adapter.
 
         Args:
             config: Venue configuration
-            adapter_class: Class to use for the venue adapter (default: EnhancedVenueAdapter)
+            adapter_class: Class to use for the venue adapter (default: VenueAdapter)
         """
         super().add_venue(config, adapter_class)
 
@@ -474,7 +472,7 @@ class EnhancedMarketConnectivityManager(MarketConnectivityManager):
         """
         self.global_failure_simulation_enabled = enabled
         for venue_id, venue in self.venues.items():
-            if isinstance(venue, EnhancedVenueAdapter):
+            if isinstance(venue, VenueAdapter):
                 venue.enable_failure_simulation(enabled)
         logger.info(
             f"Global failure simulation {('enabled' if enabled else 'disabled')}"
@@ -503,8 +501,8 @@ class EnhancedMarketConnectivityManager(MarketConnectivityManager):
             logger.warning(f"Venue {venue_id} not found")
             return False
         venue = self.venues[venue_id]
-        if not isinstance(venue, EnhancedVenueAdapter):
-            logger.warning(f"Venue {venue_id} is not an EnhancedVenueAdapter")
+        if not isinstance(venue, VenueAdapter):
+            logger.warning(f"Venue {venue_id} is not an VenueAdapter")
             return False
         venue.configure_failure_mode(mode, probability, config)
         return True
@@ -553,7 +551,7 @@ class EnhancedMarketConnectivityManager(MarketConnectivityManager):
                             f"Venue {venue_id} is not connected, attempting reconnection"
                         )
                         venue = self.venues[venue_id]
-                        if isinstance(venue, EnhancedVenueAdapter):
+                        if isinstance(venue, VenueAdapter):
                             venue.reconnection_manager.connection_lost()
             except Exception as e:
                 logger.error(f"Error in connection monitoring: {str(e)}")
@@ -576,7 +574,7 @@ class EnhancedMarketConnectivityManager(MarketConnectivityManager):
         }
         for venue_id, venue in self.venues.items():
             venue_status = venue.get_status()
-            if isinstance(venue, EnhancedVenueAdapter):
+            if isinstance(venue, VenueAdapter):
                 venue_health = {
                     "status": venue_status["status"],
                     "enabled": venue_status["enabled"],
@@ -631,7 +629,7 @@ class EnhancedMarketConnectivityManager(MarketConnectivityManager):
         venue.status = ConnectionStatus.ERROR
         venue.last_error = "Simulated complete failure"
         venue.last_error_time = datetime.datetime.now()
-        if isinstance(venue, EnhancedVenueAdapter):
+        if isinstance(venue, VenueAdapter):
             venue.reconnection_manager.connection_lost()
         return True
 
@@ -652,8 +650,8 @@ class EnhancedMarketConnectivityManager(MarketConnectivityManager):
             logger.warning(f"Venue {venue_id} not found")
             return False
         venue = self.venues[venue_id]
-        if not isinstance(venue, EnhancedVenueAdapter):
-            logger.warning(f"Venue {venue_id} is not an EnhancedVenueAdapter")
+        if not isinstance(venue, VenueAdapter):
+            logger.warning(f"Venue {venue_id} is not an VenueAdapter")
             return False
         venue.enable_failure_simulation(True)
         venue.configure_failure_mode(issue_type, 1.0)
@@ -664,6 +662,6 @@ class EnhancedMarketConnectivityManager(MarketConnectivityManager):
         """Reset all failure simulations to disabled state."""
         self.global_failure_simulation_enabled = False
         for venue_id, venue in self.venues.items():
-            if isinstance(venue, EnhancedVenueAdapter):
+            if isinstance(venue, VenueAdapter):
                 venue.enable_failure_simulation(False)
         logger.info("Reset all failure simulations")

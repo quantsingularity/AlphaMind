@@ -1,7 +1,7 @@
 """
-Tests for the enhanced market connectivity module.
+Tests for the market connectivity module.
 
-This module contains tests for the enhanced market connectivity functionality,
+This module contains tests for the market connectivity functionality,
 including reconnection logic, failure simulation, and data feed stability.
 """
 

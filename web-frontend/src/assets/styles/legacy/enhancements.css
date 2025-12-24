@@ -53,7 +53,7 @@ body.dark-mode {
   }
 }
 
-/* Enhanced responsive design */
+/* Responsive design */
 @media (max-width: 576px) {
   h1 {
     font-size: 2.25rem;

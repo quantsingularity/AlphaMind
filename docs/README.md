@@ -9,7 +9,6 @@ The documentation directory contains comprehensive guides, references, and resou
 ## Directory Contents
 
 - `CONTRIBUTING.md` - Guidelines for contributing to the AlphaMind project
-- `ENHANCEMENTS.md` - Planned enhancements and feature roadmap
 - `KNOWN_LIMITATIONS.md` - Current limitations and known issues
 - `api-documentation.md` - Detailed API reference documentation
 - `architecture.md` - System architecture overview and component relationships
@@ -37,7 +36,6 @@ The documentation directory contains comprehensive guides, references, and resou
 
 ### Project Management
 
-- **Enhancements**: `ENHANCEMENTS.md` - Planned features and improvements
 - **Known Limitations**: `KNOWN_LIMITATIONS.md` - Current limitations and issues
 
 ## Using the Documentation
@@ -99,9 +97,3 @@ The `images/` directory contains:
 - Performance charts
 
 These resources are used throughout the documentation and can be referenced in new documentation.
-
-## Related Resources
-
-- [Main README](../README.md) - Project overview and quick reference
-- [Backend Documentation](../backend/README.md) - Backend system documentation
-- [Scripts Documentation](../scripts/README.md) - Utility scripts reference

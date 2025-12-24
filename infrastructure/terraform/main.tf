@@ -18,7 +18,7 @@ terraform {
   backend "s3" {
     # Backend configuration can be provided via -backend-config flag
     # For local development, you can skip backend initialization
-    # Enhanced backend configuration for compliance
+    # Backend configuration for compliance
     encrypt        = true
     kms_key_id     = "alias/terraform-state-key"
     dynamodb_table = "terraform-state-lock"
@@ -174,7 +174,7 @@ module "network" {
   database_subnet_cidrs = var.database_subnet_cidrs
   kms_key_id            = aws_kms_key.main.arn
 
-  # Enhanced security features
+  # Security features
   enable_vpc_flow_logs = true
   enable_dns_hostnames = true
   enable_dns_support   = true

@@ -19,15 +19,6 @@ If you find a bug, please create an issue with the following information:
 - Screenshots (if applicable)
 - Environment details (OS, browser, etc.)
 
-### Suggesting Enhancements
-
-We welcome suggestions for enhancements! Please create an issue with:
-
-- A clear, descriptive title
-- Detailed description of the proposed enhancement
-- Any relevant examples, mockups, or references
-- Explanation of why this enhancement would be valuable
-
 ### Pull Requests
 
 1. Fork the repository
