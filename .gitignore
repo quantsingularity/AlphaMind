@@ -81,12 +81,12 @@ yarn-error.log
 # yarn.lock
 
 # Frontend build artifacts
-/code/frontend/build/
-/code/frontend/dist/
+/code/web-frontend/build/
+/code/web-frontend/dist/
 .cache/
 
 # Jest cache
-/code/frontend/.jest-cache
+/code/web-frontend/.jest-cache
 
 # Webpack cache
 .webpack/

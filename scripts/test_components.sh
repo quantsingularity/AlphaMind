@@ -13,7 +13,7 @@ echo "Testing frontend components..."
 
 # Check if all HTML files are valid
 echo "Checking HTML validity..."
-for file in /AlphaMind/frontend/*.html; do
+for file in /AlphaMind/web-frontend/*.html; do
   filename=$(basename "$file")
   echo "Testing $filename..."
 
@@ -55,7 +55,7 @@ done
 
 # Check if all CSS files are valid
 echo "Checking CSS files..."
-for file in /AlphaMind/frontend/css/*.css; do
+for file in /AlphaMind/web-frontend/css/*.css; do
   filename=$(basename "$file")
   echo "Testing $filename..."
 
@@ -88,7 +88,7 @@ done
 
 # Check if all JS files are valid
 echo "Checking JavaScript files..."
-for file in /AlphaMind/frontend/js/*.js; do
+for file in /AlphaMind/web-frontend/js/*.js; do
   filename=$(basename "$file")
   echo "Testing $filename..."
 
@@ -121,8 +121,8 @@ done
 
 # Check if all image files exist
 echo "Checking image files..."
-for file in $(grep -o 'images/[^"]*' /AlphaMind/frontend/*.html | sort | uniq); do
-  filepath="/AlphaMind/frontend/$file"
+for file in $(grep -o 'images/[^"]*' /AlphaMind/web-frontend/*.html | sort | uniq); do
+  filepath="/AlphaMind/web-frontend/$file"
   echo "Testing $file..."
 
   # Check if file exists
