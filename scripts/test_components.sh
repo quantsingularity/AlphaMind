@@ -6,14 +6,14 @@
 echo "Starting AlphaMind test suite..."
 
 # Create test directory if it doesn't exist
-mkdir -p /home/ubuntu/AlphaMind/tests/results
+mkdir -p /AlphaMind/tests/results
 
 # Test frontend components
 echo "Testing frontend components..."
 
 # Check if all HTML files are valid
 echo "Checking HTML validity..."
-for file in /home/ubuntu/AlphaMind/frontend/*.html; do
+for file in /AlphaMind/frontend/*.html; do
   filename=$(basename "$file")
   echo "Testing $filename..."
 
@@ -55,7 +55,7 @@ done
 
 # Check if all CSS files are valid
 echo "Checking CSS files..."
-for file in /home/ubuntu/AlphaMind/frontend/css/*.css; do
+for file in /AlphaMind/frontend/css/*.css; do
   filename=$(basename "$file")
   echo "Testing $filename..."
 
@@ -88,7 +88,7 @@ done
 
 # Check if all JS files are valid
 echo "Checking JavaScript files..."
-for file in /home/ubuntu/AlphaMind/frontend/js/*.js; do
+for file in /AlphaMind/frontend/js/*.js; do
   filename=$(basename "$file")
   echo "Testing $filename..."
 
@@ -121,8 +121,8 @@ done
 
 # Check if all image files exist
 echo "Checking image files..."
-for file in $(grep -o 'images/[^"]*' /home/ubuntu/AlphaMind/frontend/*.html | sort | uniq); do
-  filepath="/home/ubuntu/AlphaMind/frontend/$file"
+for file in $(grep -o 'images/[^"]*' /AlphaMind/frontend/*.html | sort | uniq); do
+  filepath="/AlphaMind/frontend/$file"
   echo "Testing $file..."
 
   # Check if file exists
@@ -162,7 +162,7 @@ done
 
 # Check if backend Python files are valid
 echo "Checking backend Python files..."
-for file in $(find /home/ubuntu/AlphaMind/backend -name "*.py"); do
+for file in $(find /AlphaMind/backend -name "*.py"); do
   filename=$(basename "$file")
   echo "Testing $filename..."
 
@@ -190,14 +190,14 @@ done
 echo "Testing new AI model components..."
 
 # Test attention_mechanism.py
-if [ -f "/home/ubuntu/AlphaMind/backend/ai_models/attention_mechanism.py" ]; then
+if [ -f "/AlphaMind/backend/ai_models/attention_mechanism.py" ]; then
   echo "Testing attention_mechanism.py..."
 
   # Create a simple test script
-  cat > /home/ubuntu/AlphaMind/tests/test_attention.py << 'EOF'
+  cat > /AlphaMind/tests/test_attention.py << 'EOF'
 import sys
 import os
-sys.path.append('/home/ubuntu/AlphaMind/backend')
+sys.path.append('/AlphaMind/backend')
 try:
     from ai_models.attention_mechanism import MultiHeadAttention, TemporalAttentionBlock
     print("✓ Successfully imported MultiHeadAttention and TemporalAttentionBlock")
@@ -217,19 +217,19 @@ except Exception as e:
 EOF
 
   # Run the test script
-  python3 /home/ubuntu/AlphaMind/tests/test_attention.py
+  python3 /AlphaMind/tests/test_attention.py
   echo ""
 fi
 
 # Test sentiment_analysis.py
-if [ -f "/home/ubuntu/AlphaMind/backend/alternative_data/sentiment_analysis.py" ]; then
+if [ -f "/AlphaMind/backend/alternative_data/sentiment_analysis.py" ]; then
   echo "Testing sentiment_analysis.py..."
 
   # Create a simple test script
-  cat > /home/ubuntu/AlphaMind/tests/test_sentiment.py << 'EOF'
+  cat > /AlphaMind/tests/test_sentiment.py << 'EOF'
 import sys
 import os
-sys.path.append('/home/ubuntu/AlphaMind/backend')
+sys.path.append('/AlphaMind/backend')
 try:
     from alternative_data.sentiment_analysis import MarketSentimentAnalyzer
     print("✓ Successfully imported MarketSentimentAnalyzer")
@@ -245,19 +245,19 @@ except Exception as e:
 EOF
 
   # Run the test script
-  python3 /home/ubuntu/AlphaMind/tests/test_sentiment.py
+  python3 /AlphaMind/tests/test_sentiment.py
   echo ""
 fi
 
 # Test portfolio_optimization.py
-if [ -f "/home/ubuntu/AlphaMind/backend/alpha_research/portfolio_optimization.py" ]; then
+if [ -f "/AlphaMind/backend/alpha_research/portfolio_optimization.py" ]; then
   echo "Testing portfolio_optimization.py..."
 
   # Create a simple test script
-  cat > /home/ubuntu/AlphaMind/tests/test_portfolio.py << 'EOF'
+  cat > /AlphaMind/tests/test_portfolio.py << 'EOF'
 import sys
 import os
-sys.path.append('/home/ubuntu/AlphaMind/backend')
+sys.path.append('/AlphaMind/backend')
 try:
     from alpha_research.portfolio_optimization import PortfolioOptimizer
     print("✓ Successfully imported PortfolioOptimizer")
@@ -273,19 +273,19 @@ except Exception as e:
 EOF
 
   # Run the test script
-  python3 /home/ubuntu/AlphaMind/tests/test_portfolio.py
+  python3 /AlphaMind/tests/test_portfolio.py
   echo ""
 fi
 
 # Test authentication.py
-if [ -f "/home/ubuntu/AlphaMind/backend/infrastructure/authentication.py" ]; then
+if [ -f "/AlphaMind/backend/infrastructure/authentication.py" ]; then
   echo "Testing authentication.py..."
 
   # Create a simple test script
-  cat > /home/ubuntu/AlphaMind/tests/test_auth.py << 'EOF'
+  cat > /AlphaMind/tests/test_auth.py << 'EOF'
 import sys
 import os
-sys.path.append('/home/ubuntu/AlphaMind/backend')
+sys.path.append('/AlphaMind/backend')
 try:
     from infrastructure.authentication import AuthenticationSystem
     print("✓ Successfully imported AuthenticationSystem")
@@ -315,7 +315,7 @@ except Exception as e:
 EOF
 
   # Run the test script
-  python3 /home/ubuntu/AlphaMind/tests/test_auth.py
+  python3 /AlphaMind/tests/test_auth.py
   echo ""
 fi
 
