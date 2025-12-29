@@ -61,11 +61,13 @@ def regime_consistency_loss(
     """
     if expected_distribution is None:
         expected_distribution = tf.constant([0.6, 0.3, 0.1], dtype=tf.float32)
+    expected_distribution = expected_distribution / tf.reduce_sum(expected_distribution)
     regime_match = tf.clip_by_value(regime_match, 1e-08, 1.0)
-    kl_div = tf.reduce_sum(
-        expected_distribution * tf.math.log(expected_distribution / regime_match)
+    expected_broadcast = tf.broadcast_to(expected_distribution, tf.shape(regime_match))
+    kl_per_sample = tf.reduce_sum(
+        expected_broadcast * tf.math.log(expected_broadcast / regime_match), axis=-1
     )
-    return kl_div
+    return tf.reduce_mean(kl_per_sample)
 
 
 class MarketGAN(tf.keras.Model):
@@ -99,11 +101,11 @@ class MarketGAN(tf.keras.Model):
         Args:
             real_data: A batch of real time series data.
         """
-        self.batch_size = tf.shape(real_data)[0]
-        noise = tf.random.normal((self.batch_size, self.latent_dim))
+        batch_size = tf.shape(real_data)[0]
+        noise = tf.random.normal(shape=[batch_size, self.latent_dim])
         fake_data = self.generator(noise)
-        real_labels = tf.ones((self.batch_size, 1))
-        fake_labels = tf.zeros((self.batch_size, 1))
+        real_labels = tf.ones((batch_size, 1))
+        fake_labels = tf.zeros((batch_size, 1))
         with tf.GradientTape() as d_tape:
             real_pred = self.discriminator(real_data)
             fake_pred = self.discriminator(fake_data)
@@ -114,7 +116,7 @@ class MarketGAN(tf.keras.Model):
         self.d_optimizer.apply_gradients(
             zip(d_grads, self.discriminator.trainable_variables)
         )
-        noise = tf.random.normal((self.batch_size, self.latent_dim))
+        noise = tf.random.normal(shape=[batch_size, self.latent_dim])
         with tf.GradientTape() as g_tape:
             fake_data = self.generator(noise)
             validity = self.discriminator(fake_data)

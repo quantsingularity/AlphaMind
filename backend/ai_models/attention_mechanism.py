@@ -38,7 +38,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         dk = tf.cast(tf.shape(k)[-1], tf.float32)
         scaled_attention_logits = matmul_qk / tf.math.sqrt(dk)
         if mask is not None:
-            scaled_attention_logits += mask * -1000000000.0
+            scaled_attention_logits += (1.0 - mask) * -1000000000.0
         attention_weights = tf.nn.softmax(scaled_attention_logits, axis=-1)
         output = tf.matmul(attention_weights, v)
         output = tf.transpose(output, perm=[0, 2, 1, 3])

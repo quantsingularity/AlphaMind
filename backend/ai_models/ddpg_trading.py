@@ -16,12 +16,6 @@ import torch.optim as optim
 from core.logging import get_logger
 
 logger = get_logger(__name__)
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.FileHandler("ddpg_trading.log"), logging.StreamHandler()],
-)
-logger = logging.getLogger("DDPG_Trading")
 Experience = namedtuple(
     "Experience", ["state", "action", "reward", "next_state", "done"]
 )
@@ -155,6 +149,8 @@ class DDPGAgent:
         self.config = self._load_config(config)
         if isinstance(env.observation_space, spaces.Dict):
             sample_obs = env.reset()
+            if isinstance(sample_obs, tuple):
+                sample_obs = sample_obs[0]
             flat_obs = self._flatten_observation(sample_obs)
             self.state_dim = len(flat_obs)
         else:

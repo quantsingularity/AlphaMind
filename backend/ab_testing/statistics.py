@@ -9,6 +9,9 @@ and Bayesian analysis.
 from typing import Dict, List, Any
 import numpy as np
 import scipy.stats as stats
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class StatisticalTest:
@@ -107,56 +110,48 @@ class TTest(StatisticalTest):
         results : dict
             Test results.
         """
-        control_mean = np.mean(control)
-        treatment_mean = np.mean(treatment)
-        control_std = np.std(control, ddof=1)
-        treatment_std = np.std(treatment, ddof=1)
+        control = np.asarray(control, dtype=float)
+        treatment = np.asarray(treatment, dtype=float)
+        control = control[~np.isnan(control)]
+        treatment = treatment[~np.isnan(treatment)]
         control_n = len(control)
         treatment_n = len(treatment)
+        if control_n < 2 or treatment_n < 2:
+            raise ValueError("Both groups must have at least two observations")
+        control_mean = float(np.mean(control))
+        treatment_mean = float(np.mean(treatment))
+        control_std = float(np.std(control, ddof=1))
+        treatment_std = float(np.std(treatment, ddof=1))
         t_stat, p_value = stats.ttest_ind(
             treatment, control, equal_var=equal_var, alternative=alternative
         )
         if equal_var:
-            pooled_std = np.sqrt(
-                (
-                    (control_n - 1) * control_std**2
-                    + (treatment_n - 1) * treatment_std**2
-                )
-                / (control_n + treatment_n - 2)
-            )
+            pooled_var = (
+                (control_n - 1) * control_std**2 + (treatment_n - 1) * treatment_std**2
+            ) / (control_n + treatment_n - 2)
+            pooled_std = float(np.sqrt(pooled_var))
             cohens_d = (treatment_mean - control_mean) / pooled_std
+            se = pooled_std * np.sqrt(1.0 / control_n + 1.0 / treatment_n)
+            df = control_n + treatment_n - 2
         else:
             cohens_d = (treatment_mean - control_mean) / np.sqrt(
-                (control_std**2 + treatment_std**2) / 2
+                (control_std**2 + treatment_std**2) / 2.0
             )
+            se = np.sqrt(control_std**2 / control_n + treatment_std**2 / treatment_n)
+            num = (control_std**2 / control_n + treatment_std**2 / treatment_n) ** 2
+            den = (control_std**4 / (control_n**2 * (control_n - 1))) + (
+                treatment_std**4 / (treatment_n**2 * (treatment_n - 1))
+            )
+            df = num / den
         if alternative == "two-sided":
             ci_lower, ci_upper = stats.t.interval(
-                0.95,
-                control_n + treatment_n - 2,
-                loc=treatment_mean - control_mean,
-                scale=np.sqrt(
-                    control_std**2 / control_n + treatment_std**2 / treatment_n
-                ),
+                0.95, df, loc=treatment_mean - control_mean, scale=se
             )
         elif alternative == "less":
             ci_lower = -np.inf
-            ci_upper = stats.t.ppf(
-                0.95,
-                control_n + treatment_n - 2,
-                loc=treatment_mean - control_mean,
-                scale=np.sqrt(
-                    control_std**2 / control_n + treatment_std**2 / treatment_n
-                ),
-            )
+            ci_upper = (treatment_mean - control_mean) + stats.t.ppf(0.95, df) * se
         elif alternative == "greater":
-            ci_lower = stats.t.ppf(
-                0.05,
-                control_n + treatment_n - 2,
-                loc=treatment_mean - control_mean,
-                scale=np.sqrt(
-                    control_std**2 / control_n + treatment_std**2 / treatment_n
-                ),
-            )
+            ci_lower = (treatment_mean - control_mean) + stats.t.ppf(0.05, df) * se
             ci_upper = np.inf
         self.results = {
             "test": "t-test",
@@ -216,10 +211,16 @@ class MannWhitneyU(StatisticalTest):
         results : dict
             Test results.
         """
-        control_median = np.median(control)
-        treatment_median = np.median(treatment)
+        control = np.asarray(control, dtype=float)
+        treatment = np.asarray(treatment, dtype=float)
+        control = control[~np.isnan(control)]
+        treatment = treatment[~np.isnan(treatment)]
         control_n = len(control)
         treatment_n = len(treatment)
+        if control_n < 1 or treatment_n < 1:
+            raise ValueError("Both groups must have at least one observation")
+        control_median = float(np.median(control))
+        treatment_median = float(np.median(treatment))
         u_stat, p_value = stats.mannwhitneyu(
             treatment, control, alternative=alternative, use_continuity=use_continuity
         )
@@ -286,15 +287,21 @@ class BayesianABTest(StatisticalTest):
         results : dict
             Test results.
         """
-        control_mean = np.mean(control)
-        treatment_mean = np.mean(treatment)
-        control_std = np.std(control, ddof=1)
-        treatment_std = np.std(treatment, ddof=1)
+        control = np.asarray(control, dtype=float)
+        treatment = np.asarray(treatment, dtype=float)
+        control = control[~np.isnan(control)]
+        treatment = treatment[~np.isnan(treatment)]
         control_n = len(control)
         treatment_n = len(treatment)
-        if set(np.unique(control)).issubset({0, 1}) and set(
+        if control_n < 1 or treatment_n < 1:
+            raise ValueError("Both groups must have at least one observation")
+        control_mean = float(np.mean(control))
+        treatment_mean = float(np.mean(treatment))
+        control_std = float(np.std(control, ddof=1))
+        treatment_std = float(np.std(treatment, ddof=1))
+        if set(np.unique(control)).issubset({0.0, 1.0}) and set(
             np.unique(treatment)
-        ).issubset({0, 1}):
+        ).issubset({0.0, 1.0}):
             control_successes = np.sum(control)
             treatment_successes = np.sum(treatment)
             control_alpha = prior_alpha + control_successes
@@ -437,7 +444,7 @@ class MultipleTestingCorrection:
             corrected_sorted_p_values[i] = min(
                 corrected_sorted_p_values[i], corrected_sorted_p_values[i + 1]
             )
-        corrected_p_values: list[float] = [0] * n_tests
+        corrected_p_values: List[float] = [0.0] * n_tests
         for i, idx in enumerate(sorted_indices):
             corrected_p_values[idx] = corrected_sorted_p_values[i]
         return corrected_p_values
@@ -468,7 +475,7 @@ class MultipleTestingCorrection:
             corrected_sorted_p_values[i] = max(
                 corrected_sorted_p_values[i], corrected_sorted_p_values[i + 1]
             )
-        corrected_p_values: list[float] = [0] * n_tests
+        corrected_p_values: List[float] = [0.0] * n_tests
         for i, idx in enumerate(sorted_indices):
             corrected_p_values[idx] = corrected_sorted_p_values[i]
         return corrected_p_values

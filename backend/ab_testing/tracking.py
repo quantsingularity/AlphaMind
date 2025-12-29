@@ -12,7 +12,10 @@ import sqlite3
 from typing import Dict, List, Optional, Union, Any
 import uuid
 import pandas as pd
-from ab_testing.experiment import Experiment, ExperimentStatus
+import logging
+from .experiment import Experiment, ExperimentStatus
+
+logger = logging.getLogger(__name__)
 
 
 class ExperimentResult:
@@ -121,17 +124,14 @@ class ExperimentTracker:
     ) -> None:
         self.storage_dir = storage_dir
         self.db_path = db_path
-        self.experiments = {}
+        self.experiments: Dict[str, Experiment] = {}
         self.in_memory = storage_dir is None
+        self._conn: Optional[sqlite3.Connection] = None
         self._init_db()
 
     def _init_db(self) -> None:
         """Initialize the database for storing results."""
-        if self.db_path:
-            os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
-            conn = sqlite3.connect(self.db_path)
-        else:
-            conn = sqlite3.connect(":memory:")
+        conn = self._get_connection()
         cursor = conn.cursor()
         cursor.execute(
             "\n        CREATE TABLE IF NOT EXISTS experiments (\n            id TEXT PRIMARY KEY,\n            name TEXT NOT NULL,\n            description TEXT,\n            status TEXT NOT NULL,\n            start_date TEXT,\n            end_date TEXT,\n            creation_date TEXT NOT NULL,\n            data BLOB\n        )\n        "
@@ -140,14 +140,17 @@ class ExperimentTracker:
             "\n        CREATE TABLE IF NOT EXISTS results (\n            id TEXT PRIMARY KEY,\n            experiment_id TEXT NOT NULL,\n            variant TEXT NOT NULL,\n            metric TEXT NOT NULL,\n            value REAL NOT NULL,\n            timestamp TEXT NOT NULL,\n            metadata BLOB,\n            FOREIGN KEY (experiment_id) REFERENCES experiments (id)\n        )\n        "
         )
         conn.commit()
-        conn.close()
+        if self.db_path:
+            conn.close()
 
     def _get_connection(self) -> sqlite3.Connection:
         """Get a connection to the database."""
         if self.db_path:
+            os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
             return sqlite3.connect(self.db_path)
-        else:
-            return sqlite3.connect(":memory:")
+        if self._conn is None:
+            self._conn = sqlite3.connect(":memory:")
+        return self._conn
 
     def add_experiment(self, experiment: Experiment, save: bool = True) -> None:
         """Add an experiment to the tracker.
@@ -188,7 +191,8 @@ class ExperimentTracker:
             ),
         )
         conn.commit()
-        conn.close()
+        if self.db_path:
+            conn.close()
         if self.storage_dir:
             os.makedirs(self.storage_dir, exist_ok=True)
             experiment.save(self.storage_dir)
@@ -239,7 +243,8 @@ class ExperimentTracker:
             (experiment_id,),
         )
         row = cursor.fetchone()
-        conn.close()
+        if self.db_path:
+            conn.close()
         if row:
             experiment = pickle.loads(row[0])
             return experiment
@@ -286,7 +291,8 @@ class ExperimentTracker:
             if experiment_id not in self.experiments:
                 experiment = pickle.loads(data)
                 self.experiments[experiment_id] = experiment
-        conn.close()
+        if self.db_path:
+            conn.close()
         if self.storage_dir and os.path.exists(self.storage_dir):
             for filename in os.listdir(self.storage_dir):
                 if filename.endswith(".json"):
@@ -295,8 +301,8 @@ class ExperimentTracker:
                         experiment = Experiment.load(filepath)
                         if experiment.id not in self.experiments:
                             self.experiments[experiment.id] = experiment
-                    except:
-                        pass
+                    except Exception as e:
+                        logger.error(f"Failed to load experiment from {filepath}: {e}")
 
     def update_experiment(self, experiment: Experiment, save: bool = True) -> None:
         """Update an experiment in the tracker.
@@ -330,7 +336,8 @@ class ExperimentTracker:
                 "DELETE FROM results WHERE experiment_id = ?", (experiment_id,)
             )
             conn.commit()
-            conn.close()
+            if self.db_path:
+                conn.close()
             if self.storage_dir:
                 for filename in os.listdir(self.storage_dir):
                     if filename.startswith(f"{experiment_id}_") and filename.endswith(
@@ -339,8 +346,8 @@ class ExperimentTracker:
                         filepath = os.path.join(self.storage_dir, filename)
                         try:
                             os.remove(filepath)
-                        except:
-                            pass
+                        except Exception as e:
+                            logger.error(f"Failed to remove file {filepath}: {e}")
 
     def add_result(self, result: ExperimentResult, save: bool = True) -> None:
         """Add a result to the tracker.
@@ -388,7 +395,8 @@ class ExperimentTracker:
             ),
         )
         conn.commit()
-        conn.close()
+        if self.db_path:
+            conn.close()
 
     def get_results(
         self,
@@ -464,7 +472,8 @@ class ExperimentTracker:
             if meta:
                 result.metadata = pickle.loads(meta)
             results.append(result)
-        conn.close()
+        if self.db_path:
+            conn.close()
         if as_dataframe:
             data: List[Any] = []
             for result in results:
@@ -605,12 +614,13 @@ class ExperimentTracker:
             cursor.execute("DELETE FROM experiments")
             cursor.execute("DELETE FROM results")
             conn.commit()
-            conn.close()
+            if self.db_path:
+                conn.close()
             if self.storage_dir and os.path.exists(self.storage_dir):
                 for filename in os.listdir(self.storage_dir):
                     if filename.endswith(".json"):
                         filepath = os.path.join(self.storage_dir, filename)
                         try:
                             os.remove(filepath)
-                        except:
-                            pass
+                        except Exception as e:
+                            logger.error(f"Failed to remove file {filepath}: {e}")

@@ -1,9 +1,9 @@
 from typing import Optional, Any, Dict
-import gym
+import gymnasium as gym
 from core.logging import get_logger
 
 logger = get_logger(__name__)
-from gym import spaces
+from gymnasium import spaces
 import numpy as np
 from stable_baselines3 import PPO
 
@@ -33,10 +33,11 @@ class PortfolioGymEnv(gym.Env):
         )
         self.current_step = 0
         self.returns = np.zeros((100, self.n_assets), dtype=np.float32)
-        self.current_weights = np.zeros(self.n_assets, dtype=np.float32)
+        self.current_weights = np.ones(self.n_assets, dtype=np.float32) / self.n_assets
 
     def step(self, action: Any) -> Any:
         """Execute one time step within the environment."""
+        action = np.asarray(action, dtype=np.float32).reshape(self.n_assets)
         new_weights = self._normalize_weights(action)
         cost = self._transaction_cost(new_weights)
         reward = self._sharpe_ratio(new_weights) - cost
@@ -51,12 +52,14 @@ class PortfolioGymEnv(gym.Env):
         NOTE: This is a placeholder using static returns data. In a real environment,
         this would use the returns realized *after* taking the action.
         """
-        returns = np.dot(
-            self.returns[self.current_step - 10 : self.current_step], weights
-        )
+        if self.current_step == 0:
+            return 0.0
+        start = max(0, self.current_step - 10)
+        window = self.returns[start : self.current_step]
+        returns = np.dot(window, weights)
         risk_free_rate = 0.02 / 252
         std = np.std(returns)
-        if std == 0:
+        if std == 0 or np.isnan(std):
             return -1.0
         return (np.mean(returns) - risk_free_rate) / std
 
@@ -65,9 +68,11 @@ class PortfolioGymEnv(gym.Env):
         weights = np.tanh(action)
         sum_abs_weights = np.sum(np.abs(weights))
         if sum_abs_weights == 0:
-            return np.ones(self.n_assets) / self.n_assets
+            return (np.ones(self.n_assets, dtype=np.float32) / self.n_assets).astype(
+                np.float32
+            )
         weights = weights / sum_abs_weights
-        return weights
+        return weights.astype(np.float32)
 
     def _transaction_cost(self, new_weights: Any) -> Any:
         """Calculate transaction costs from rebalancing (based on turnover)."""
@@ -90,7 +95,7 @@ class PortfolioGymEnv(gym.Env):
         """Reset environment to initial state."""
         super().reset(seed=seed)
         self.current_step = 0
-        self.current_weights = np.zeros(self.n_assets, dtype=np.float32)
+        self.current_weights = np.ones(self.n_assets, dtype=np.float32) / self.n_assets
         self.returns = np.random.normal(0.0005, 0.01, (100, self.n_assets)).astype(
             np.float32
         )

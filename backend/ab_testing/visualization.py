@@ -224,8 +224,15 @@ class ExperimentVisualizer:
                         .rolling(window=rolling_window, min_periods=1)
                         .std()
                     )
+                    rolling_count = (
+                        group[value_col]
+                        .rolling(window=rolling_window, min_periods=1)
+                        .count()
+                    )
                     z_score = stats.norm.ppf(1 - (1 - confidence_interval) / 2)
-                    margin = z_score * rolling_std / np.sqrt(rolling_window)
+                    margin = (
+                        z_score * rolling_std / np.sqrt(rolling_count.clip(lower=1))
+                    )
                     ax.fill_between(
                         group[time_col],
                         rolling_avg - margin,
@@ -296,11 +303,9 @@ class ExperimentVisualizer:
             )
             if confidence_interval is not None:
                 z_score = stats.norm.ppf(1 - (1 - confidence_interval) / 2)
-                margin = (
-                    z_score
-                    * group["cumulative_std"]
-                    / np.sqrt(group["cumulative_count"])
-                )
+                std_filled = group["cumulative_std"].fillna(0)
+                count = pd.Series(group["cumulative_count"]).clip(lower=1)
+                margin = z_score * std_filled / np.sqrt(count)
                 ax.fill_between(
                     group[time_col],
                     group["cumulative_mean"] - margin,
@@ -586,6 +591,8 @@ class ExperimentVisualizer:
         fig : Figure
             Matplotlib figure.
         """
+        if metric_col not in results.columns:
+            raise ValueError(f"Metric column '{metric_col}' not found")
         df = results[results[metric_col].isin(metrics)].copy()
         if hasattr(df, "empty") and df.empty:
             raise ValueError(f"No data found for metrics: {metrics}")
