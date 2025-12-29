@@ -1,11 +1,11 @@
 from typing import Optional, Any, Dict
 import gymnasium as gym
 from core.logging import get_logger
-
-logger = get_logger(__name__)
 from gymnasium import spaces
 import numpy as np
 from stable_baselines3 import PPO
+
+logger = get_logger(__name__)
 
 
 class PortfolioGymEnv(gym.Env):

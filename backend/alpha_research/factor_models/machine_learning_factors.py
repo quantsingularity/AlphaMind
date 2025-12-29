@@ -1,13 +1,13 @@
 from typing import Any, Dict
 import pandas as pd
 from core.logging import get_logger
-
-logger = get_logger(__name__)
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import RobustScaler
 from sklearn.linear_model import LassoCV
 import tensorflow as tf
+
+logger = get_logger(__name__)
 
 
 class StackedDenoisingAutoencoder:

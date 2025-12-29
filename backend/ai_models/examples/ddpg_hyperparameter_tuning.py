@@ -7,12 +7,12 @@
 from typing import Optional, Any, Dict, List
 import os
 from core.logging import get_logger
-
-logger = get_logger(__name__)
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
+logger = get_logger(__name__)
 
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
