@@ -6,17 +6,17 @@ in financial applications, including experiment tracking, statistical analysis,
 visualization tools, and experiment configuration management.
 """
 
-from ab_testing.config import ExperimentConfig
-from ab_testing.experiment import Experiment, ExperimentGroup
-from ab_testing.statistics import (
+from .config import ExperimentConfig
+from .experiment import Experiment, ExperimentGroup
+from .statistics import (
     BayesianABTest,
     MannWhitneyU,
     MultipleTestingCorrection,
     StatisticalTest,
     TTest,
 )
-from ab_testing.tracking import ExperimentResult, ExperimentTracker
-from ab_testing.visualization import ExperimentVisualizer
+from .tracking import ExperimentResult, ExperimentTracker
+from .visualization import ExperimentVisualizer
 
 __all__ = [
     "Experiment",

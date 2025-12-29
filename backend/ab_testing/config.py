@@ -9,10 +9,14 @@ experiment settings.
 import copy
 import datetime
 import json
+import logging
 import os
+import re
 from typing import Any, Dict, List, Optional
 import uuid
 import yaml
+
+logger = logging.getLogger(__name__)
 
 
 class ExperimentConfig:
@@ -74,7 +78,7 @@ class ExperimentConfig:
             Constraints for the parameter (e.g., min, max, choices).
         """
         self.parameters[name] = {
-            "default_value": default_value,
+            "default_value": copy.deepcopy(default_value),
             "description": description or "",
             "type_hint": type_hint or type(default_value).__name__,
             "constraints": constraints or {},
@@ -101,14 +105,17 @@ class ExperimentConfig:
         """
         if parameters is None:
             parameters = {
-                name: param["default_value"] for name, param in self.parameters.items()
+                param_name: param["default_value"]
+                for param_name, param in self.parameters.items()
             }
         for param_name, value in parameters.items():
             if param_name not in self.parameters:
                 raise ValueError(f"Parameter '{param_name}' not defined in experiment")
             param_def = self.parameters[param_name]
             expected_type = param_def["type_hint"]
-            if expected_type == "int" and (not isinstance(value, int)):
+            if expected_type == "int" and (
+                not isinstance(value, int) or isinstance(value, bool)
+            ):
                 raise TypeError(f"Parameter '{param_name}' should be an integer")
             elif expected_type == "float" and (not isinstance(value, (int, float))):
                 raise TypeError(f"Parameter '{param_name}' should be a float")
@@ -254,7 +261,7 @@ class ExperimentConfig:
         errors : list
             List of validation errors.
         """
-        errors: List[Any] = []
+        errors: List[str] = []
         if not self.variants:
             errors.append("No variants defined")
         if not self.metrics:
@@ -328,7 +335,7 @@ class ExperimentConfig:
         config_yaml : str
             YAML representation of the experiment configuration.
         """
-        return yaml.dump(self.to_dict(), default_flow_style=False)
+        return yaml.safe_dump(self.to_dict(), default_flow_style=False)
 
     def save(self, filepath: str, format: str = "json") -> None:
         """
@@ -442,20 +449,32 @@ class ExperimentConfigManager:
 
     def __init__(self, storage_dir: Optional[str] = None) -> None:
         self.storage_dir = storage_dir
-        self.configs = {}
+        self.configs: Dict[str, ExperimentConfig] = {}
         if storage_dir and os.path.exists(storage_dir):
             self._load_configs()
 
     def _load_configs(self) -> None:
         """Load configurations from storage directory."""
+        if not self.storage_dir:
+            return
+
         for filename in os.listdir(self.storage_dir):
             if filename.endswith((".json", ".yaml", ".yml")):
                 filepath = os.path.join(self.storage_dir, filename)
                 try:
                     config = ExperimentConfig.load(filepath)
                     self.configs[config.id] = config
-                except:
-                    pass
+                except Exception as e:
+                    logger.error(f"Failed to load config from {filepath}: {e}")
+
+    def _get_filepath(self, config: ExperimentConfig) -> str:
+        """Generate a safe filepath for the configuration."""
+        if not self.storage_dir:
+            raise ValueError("Storage directory not set")
+
+        # Sanitize name: replace non-alphanumeric characters with underscore
+        safe_name = re.sub(r"[^\w\s-]", "", config.name).strip().replace(" ", "_")
+        return os.path.join(self.storage_dir, f"{config.id}_{safe_name}.json")
 
     def add_config(self, config: ExperimentConfig, save: bool = True) -> None:
         """
@@ -471,10 +490,11 @@ class ExperimentConfigManager:
         self.configs[config.id] = config
         if save and self.storage_dir:
             os.makedirs(self.storage_dir, exist_ok=True)
-            filepath = os.path.join(
-                self.storage_dir, f"{config.id}_{config.name.replace(' ', '_')}.json"
-            )
-            config.save(filepath)
+            try:
+                filepath = self._get_filepath(config)
+                config.save(filepath)
+            except Exception as e:
+                logger.error(f"Failed to save config {config.id}: {e}")
 
     def get_config(self, config_id: str) -> ExperimentConfig:
         """
@@ -532,10 +552,11 @@ class ExperimentConfigManager:
         self.configs[config.id] = config
         if save and self.storage_dir:
             os.makedirs(self.storage_dir, exist_ok=True)
-            filepath = os.path.join(
-                self.storage_dir, f"{config.id}_{config.name.replace(' ', '_')}.json"
-            )
-            config.save(filepath)
+            try:
+                filepath = self._get_filepath(config)
+                config.save(filepath)
+            except Exception as e:
+                logger.error(f"Failed to update config {config.id}: {e}")
 
     def delete_config(self, config_id: str) -> None:
         """
@@ -549,15 +570,18 @@ class ExperimentConfigManager:
         if config_id in self.configs:
             del self.configs[config_id]
             if self.storage_dir:
-                for filename in os.listdir(self.storage_dir):
-                    if filename.startswith(f"{config_id}_") and filename.endswith(
-                        (".json", ".yaml", ".yml")
-                    ):
-                        filepath = os.path.join(self.storage_dir, filename)
-                        try:
-                            os.remove(filepath)
-                        except:
-                            pass
+                try:
+                    for filename in os.listdir(self.storage_dir):
+                        if filename.startswith(f"{config_id}_") and filename.endswith(
+                            (".json", ".yaml", ".yml")
+                        ):
+                            filepath = os.path.join(self.storage_dir, filename)
+                            try:
+                                os.remove(filepath)
+                            except Exception as e:
+                                logger.error(f"Failed to remove file {filepath}: {e}")
+                except Exception as e:
+                    logger.error(f"Failed to list directory {self.storage_dir}: {e}")
 
     def export_configs(self, directory: str, format: str = "json") -> None:
         """
@@ -572,10 +596,12 @@ class ExperimentConfigManager:
         """
         os.makedirs(directory, exist_ok=True)
         for config in self.configs.values():
-            filepath = os.path.join(
-                directory, f"{config.id}_{config.name.replace(' ', '_')}.{format}"
-            )
-            config.save(filepath, format=format)
+            safe_name = re.sub(r"[^\w\s-]", "", config.name).strip().replace(" ", "_")
+            filepath = os.path.join(directory, f"{config.id}_{safe_name}.{format}")
+            try:
+                config.save(filepath, format=format)
+            except Exception as e:
+                logger.error(f"Failed to export config {config.id}: {e}")
 
     def import_configs(self, directory: str) -> int:
         """
@@ -592,13 +618,20 @@ class ExperimentConfigManager:
             Number of configurations imported.
         """
         count = 0
-        for filename in os.listdir(directory):
-            if filename.endswith((".json", ".yaml", ".yml")):
-                filepath = os.path.join(directory, filename)
-                try:
-                    config = ExperimentConfig.load(filepath)
-                    self.add_config(config, save=False)
-                    count += 1
-                except:
-                    pass
+        if not os.path.exists(directory):
+            logger.warning(f"Directory {directory} does not exist.")
+            return 0
+
+        try:
+            for filename in os.listdir(directory):
+                if filename.endswith((".json", ".yaml", ".yml")):
+                    filepath = os.path.join(directory, filename)
+                    try:
+                        config = ExperimentConfig.load(filepath)
+                        self.add_config(config, save=False)
+                        count += 1
+                    except Exception as e:
+                        logger.error(f"Failed to import config from {filepath}: {e}")
+        except Exception as e:
+            logger.error(f"Failed to list directory {directory}: {e}")
         return count
