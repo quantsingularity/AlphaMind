@@ -10,9 +10,13 @@ import datetime
 from enum import Enum
 import json
 import os
+import re
 from typing import Any, Dict, List, Optional, Union
 import uuid
 import pandas as pd
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class ExperimentStatus(Enum):
@@ -202,7 +206,18 @@ class Experiment:
             value = row[value_col]
             timestamp = None
             if timestamp_col and timestamp_col in row:
-                timestamp = row[timestamp_col]
+                ts_val = row[timestamp_col]
+                try:
+                    if isinstance(ts_val, str):
+                        timestamp = datetime.datetime.fromisoformat(ts_val)
+                    elif hasattr(ts_val, "to_pydatetime"):
+                        timestamp = ts_val.to_pydatetime()
+                    elif isinstance(ts_val, datetime.datetime):
+                        timestamp = ts_val
+                    else:
+                        timestamp = None
+                except Exception as e:
+                    logger.warning(f"Failed to parse timestamp '{ts_val}': {e}")
             self.add_result(variant, metric, value, timestamp)
 
     def get_results(
@@ -375,7 +390,8 @@ class Experiment:
             Path to the saved file.
         """
         os.makedirs(directory, exist_ok=True)
-        filename = f"{self.id}_{self.name.replace(' ', '_')}.json"
+        safe_name = re.sub(r"[^\w\s-]", "", self.name).strip().replace(" ", "_")
+        filename = f"{self.id}_{safe_name}.json"
         filepath = os.path.join(directory, filename)
         with open(filepath, "w") as f:
             f.write(self.to_json(include_results=include_results))
@@ -678,7 +694,8 @@ class ExperimentGroup:
             Path to the saved file.
         """
         os.makedirs(directory, exist_ok=True)
-        filename = f"{self.id}_{self.name.replace(' ', '_')}.json"
+        safe_name = re.sub(r"[^\w\s-]", "", self.name).strip().replace(" ", "_")
+        filename = f"{self.id}_{safe_name}.json"
         filepath = os.path.join(directory, filename)
         if save_experiments:
             experiments_dir = os.path.join(directory, f"{self.id}_experiments")
