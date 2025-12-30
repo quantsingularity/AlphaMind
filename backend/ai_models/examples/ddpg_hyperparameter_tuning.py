@@ -17,12 +17,61 @@ logger = get_logger(__name__)
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-from AlphaMind.backend.ai_models.ddpg_trading import (
+
+from backend.ai_models.ddpg_trading import (
     BacktestEngine,
     DDPGAgent,
-    HyperparameterTuner,
     TradingGymEnv,
 )
+
+
+class HyperparameterTuner:
+    def __init__(
+        self,
+        env_creator: Any,
+        param_grid: Dict[str, Any],
+        n_trials: Any,
+        episodes_per_trial: Any,
+        max_steps: Any,
+    ) -> None:
+        self.env_creator = env_creator
+        self.param_grid = param_grid
+        self.n_trials = int(n_trials)
+        self.episodes_per_trial = int(episodes_per_trial)
+        self.max_steps = int(max_steps)
+        self.results: List[Dict[str, Any]] = []
+
+    def _sample_config(self) -> Dict[str, Any]:
+        config: Dict[str, Any] = {}
+        for key, values in self.param_grid.items():
+            idx = np.random.randint(0, len(values))
+            config[key] = values[idx]
+        return config
+
+    def run(self) -> Any:
+        best_config: Dict[str, Any] = {}
+        best_reward = -np.inf
+        self.results = []
+        for trial in range(1, self.n_trials + 1):
+            env = self.env_creator()
+            config = self._sample_config()
+            agent = DDPGAgent(env, config=config)
+            agent.train(max_episodes=self.episodes_per_trial, max_steps=self.max_steps)
+            eval_reward = agent.evaluate(num_episodes=3)
+            self.results.append(
+                {
+                    "trial": trial,
+                    "config": config,
+                    "eval_reward": float(eval_reward),
+                }
+            )
+            if eval_reward > best_reward:
+                best_reward = float(eval_reward)
+                best_config = config
+            logger.info(
+                f"Trial {trial}/{self.n_trials} | Eval Reward: {eval_reward:.2f}"
+            )
+        return (best_config, self.results)
 
 
 def generate_sample_market_data(
@@ -164,11 +213,14 @@ def analyze_tuning_results(results: Any) -> Any:
     plt.figure(figsize=(15, 10))
     params = [col for col in df.columns if col not in ["trial", "eval_reward"]]
     for i, param in enumerate(params):
-        if isinstance(df[param].iloc[0], tuple):
-            df[f"{param}_str"] = df[param].astype(str)
-            param = f"{param}_str"
+        x_series = df[param]
+        if not np.issubdtype(x_series.dtype, np.number):
+            codes, _ = pd.factorize(x_series.astype(str))
+            x_vals = codes
+        else:
+            x_vals = x_series.values
         plt.subplot(3, 3, i + 1)
-        plt.scatter(df[param], df["eval_reward"])
+        plt.scatter(x_vals, df["eval_reward"])
         plt.title(f"{param} vs Reward")
         plt.xlabel(param)
         plt.ylabel("Reward")
