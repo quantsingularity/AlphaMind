@@ -2,7 +2,7 @@ from typing import Any, Optional
 import keras
 import numpy as np
 import tensorflow as tf
-from ai_models.attention_mechanism import FinancialTimeSeriesTransformer
+from backend.ai_models.attention_mechanism import FinancialTimeSeriesTransformer
 from core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -95,19 +95,21 @@ class AdvancedTimeSeriesForecaster:
             val_dataset = val_dataset.batch(batch_size)
         history = {"loss": [], "val_loss": []}
         for epoch in range(epochs):
-            train_loss_metric.reset_states()
+            train_loss_metric.reset_state()
             if validation_data is not None:
-                val_loss_metric.reset_states()
+                val_loss_metric.reset_state()
             for x_batch, y_batch in train_dataset:
                 x_projected_batch = self.feature_projection(x_batch)
                 with tf.GradientTape() as tape:
                     predictions = self.model(x_projected_batch, training=True)
                     loss = loss_fn(y_batch, predictions)
-                gradients = tape.gradient(loss, self.model.trainable_variables)
-                gradients, _ = tf.clip_by_global_norm(gradients, clip_norm=1.0)
-                self.optimizer.apply_gradients(
-                    zip(gradients, self.model.trainable_variables)
+                variables = (
+                    self.model.trainable_variables
+                    + self.feature_projection.trainable_variables
                 )
+                gradients = tape.gradient(loss, variables)
+                gradients, _ = tf.clip_by_global_norm(gradients, clip_norm=1.0)
+                self.optimizer.apply_gradients(zip(gradients, variables))
                 train_loss_metric.update_state(loss)
             if validation_data is not None:
                 for x_val_batch, y_val_batch in val_dataset:
