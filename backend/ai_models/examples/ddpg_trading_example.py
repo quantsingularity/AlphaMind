@@ -96,6 +96,7 @@ def train_and_backtest_ddpg_agent() -> Any:
     plt.ylabel("Reward")
     plt.grid(True)
     plt.savefig("training_rewards.png")
+    plt.close()
     logger.info("Backtesting trained agent...")
     backtest = BacktestEngine(env, agent)
     results = backtest.run(episodes=1, render=False)
@@ -115,6 +116,6 @@ if __name__ == "__main__":
     logger.info("Starting DDPG trading module demonstration...")
     results = train_and_backtest_ddpg_agent()
     logger.info(
-        "\nDemonstration complete! Results saved to 'backtest_results.png' and 'training_rewards.png'"
+        "\nDemonstration complete! Results saved to 'backtest_portfolio.png' and 'training_rewards.png'"
     )
     logger.info("Trained model saved to 'saved_models/ddpg_agent'")
