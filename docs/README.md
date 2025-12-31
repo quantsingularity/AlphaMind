@@ -1,99 +1,104 @@
 # AlphaMind Documentation
 
-[![License](https://img.shields.io/github/license/abrar2030/AlphaMind)](https://github.com/abrar2030/AlphaMind/blob/main/LICENSE)
+**AlphaMind** is an institutional-grade quantitative AI trading system that combines alternative data sources, machine learning algorithms, and high-frequency execution strategies to deliver superior trading performance.
 
-## Overview
+## Table of Contents
 
-The documentation directory contains comprehensive guides, references, and resources for understanding, using, and contributing to the AlphaMind quantitative trading system. This documentation covers everything from architecture overviews to detailed API references and troubleshooting guides.
+### Getting Started
 
-## Directory Contents
+- [Installation Guide](INSTALLATION.md) - System requirements and installation options
+- [Usage Guide](USAGE.md) - Common usage patterns and workflows
+- [Configuration](CONFIGURATION.md) - Configuration options and environment variables
 
-- `CONTRIBUTING.md` - Guidelines for contributing to the AlphaMind project
-- `KNOWN_LIMITATIONS.md` - Current limitations and known issues
-- `api-documentation.md` - Detailed API reference documentation
-- `architecture.md` - System architecture overview and component relationships
-- `deployment.md` - Deployment instructions and configuration
-- `development-guide.md` - Guide for developers working on the project
-- `getting-started.md` - Quick start guide for new users
-- `images/` - Images and diagrams used in documentation
-- `scripts-documentation.md` - Documentation for utility scripts
-- `troubleshooting.md` - Common issues and their solutions
+### API & CLI Reference
 
-## Documentation Structure
+- [API Reference](API.md) - REST API endpoints and schemas
+- [CLI Reference](CLI.md) - Command-line interface documentation
 
-### User Documentation
+### Features & Architecture
 
-- **Getting Started Guide**: `getting-started.md` - Essential information for new users
-- **API Reference**: `api-documentation.md` - Complete API documentation
-- **Troubleshooting**: `troubleshooting.md` - Solutions to common problems
+- [Feature Matrix](FEATURE_MATRIX.md) - Complete feature overview
+- [Architecture](ARCHITECTURE.md) - System design and components
+- [Examples](EXAMPLES/) - Working code examples
 
-### Developer Documentation
+### Development & Contributing
 
-- **Contributing Guidelines**: `CONTRIBUTING.md` - How to contribute to the project
-- **Development Guide**: `development-guide.md` - Development workflow and standards
-- **Architecture Overview**: `architecture.md` - System design and component relationships
-- **Scripts Documentation**: `scripts-documentation.md` - Utility scripts reference
+- [Contributing Guide](CONTRIBUTING.md) - How to contribute to the project
+- [Troubleshooting](TROUBLESHOOTING.md) - Common issues and solutions
 
-### Project Management
+### Internal
 
-- **Known Limitations**: `KNOWN_LIMITATIONS.md` - Current limitations and issues
+- [Deliverable Checklist](DELIVERABLE_CHECKLIST.md) - Documentation completeness verification
 
-## Using the Documentation
+## Quickstart (3 Steps)
 
-### For New Users
+AlphaMind is a comprehensive quantitative trading platform designed for institutional-grade performance. Get up and running in minutes:
 
-Start with the `getting-started.md` guide, which provides:
+### 1. Clone and Install
 
-- System requirements
-- Installation instructions
-- Basic usage examples
-- Configuration guidance
+```bash
+git clone https://github.com/abrar2030/AlphaMind.git
+cd AlphaMind
+./scripts/setup_environment.sh
+```
 
-### For Developers
+### 2. Configure
 
-1. Review the `CONTRIBUTING.md` guidelines
-2. Understand the system architecture in `architecture.md`
-3. Follow the development workflow in `development-guide.md`
-4. Reference the API documentation in `api-documentation.md`
+```bash
+cp backend/.env.example backend/.env
+# Edit backend/.env with your API keys and configuration
+```
 
-### For Deployment
+### 3. Run
 
-The `deployment.md` guide covers:
+```bash
+./scripts/run_alphamind.sh
+# Access web interface at http://localhost:3000
+# Access API docs at http://localhost:8000/docs
+```
 
-- Environment setup
-- Configuration requirements
-- Deployment procedures
-- Monitoring and maintenance
+## System Overview
+
+AlphaMind provides:
+
+- **Advanced AI Models**: Temporal Fusion Transformers, Deep RL (DDPG/SAC), Generative Models
+- **Alternative Data**: SEC filings, sentiment analysis, satellite imagery, web scraping
+- **Risk Management**: Bayesian VaR, stress testing, counterparty risk, position sizing
+- **Execution Engine**: Smart order routing, liquidity forecasting, HFT capabilities
+- **Multi-Platform**: Web dashboard, mobile app, REST/GraphQL/WebSocket APIs
 
 ## Documentation Standards
 
-All documentation in this directory follows these standards:
+All documentation follows:
 
-1. **Markdown Format**: All documentation uses GitHub-flavored Markdown
-2. **Code Examples**: Include practical, runnable code examples
-3. **Screenshots**: Use images to illustrate complex concepts
-4. **Cross-References**: Link to related documentation
-5. **Version Specificity**: Note when features are version-specific
+- **Markdown format** with GitHub-flavored syntax
+- **Runnable examples** with clear expected outputs
+- **Beautiful tables** for structured information
+- **Relative links** for cross-references
+- **Version-specific notes** where applicable
 
-## Contributing to Documentation
+## Quick Links
 
-When contributing to the documentation:
+| Purpose          | Document                                 | Description                               |
+| ---------------- | ---------------------------------------- | ----------------------------------------- |
+| **Install**      | [INSTALLATION.md](INSTALLATION.md)       | Get AlphaMind running on your system      |
+| **Use**          | [USAGE.md](USAGE.md)                     | Learn common workflows and patterns       |
+| **Configure**    | [CONFIGURATION.md](CONFIGURATION.md)     | Understand all configuration options      |
+| **API**          | [API.md](API.md)                         | Integrate with AlphaMind programmatically |
+| **Develop**      | [CONTRIBUTING.md](CONTRIBUTING.md)       | Contribute code or documentation          |
+| **Troubleshoot** | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Resolve common issues                     |
 
-1. Follow the existing format and style
-2. Update documentation when adding or changing features
-3. Include code examples for technical concepts
-4. Add diagrams for complex systems or workflows
-5. Ensure all links are valid and point to the correct resources
+## Support and Community
 
-For more details, see the [Contributing Guidelines](CONTRIBUTING.md).
+- **GitHub Issues**: Report bugs and request features at [GitHub Issues](https://github.com/abrar2030/AlphaMind/issues)
+- **Documentation**: Full documentation at [docs/](https://github.com/abrar2030/AlphaMind/tree/main/docs)
+- **License**: MIT License - see [LICENSE](../LICENSE) file
 
-## Image Resources
+## Version Information
 
-The `images/` directory contains:
+- **Current Version**: 1.0.0
+- **Python**: 3.10+
+- **Node.js**: 16+
+- **Test Coverage**: 78%
 
-- System architecture diagrams
-- UI screenshots
-- Workflow illustrations
-- Performance charts
-
-These resources are used throughout the documentation and can be referenced in new documentation.
+For detailed version history and changelog, see the main [README.md](../README.md).
