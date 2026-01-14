@@ -311,16 +311,6 @@ infrastructure/
 
 This infrastructure configuration is provided under the same license as the main AlphaMind project. See the [LICENSE](../LICENSE) file for details.
 
-## Disclaimer
-
-This infrastructure configuration is designed to meet common financial industry compliance requirements. However, compliance requirements may vary by organization, jurisdiction, and specific use case. It is recommended to consult with legal and compliance experts to ensure all applicable requirements are met for your specific situation.
-
----
-
-**Last Updated**: $(date)
-**Version**: 2.0.0
-**Compliance Standards**: PCI DSS v4.0, GDPR, SOX, NIST CSF 2.0, ISO 27001:2022
-
 ---
 
 ## Quick Start Deployment Guide
