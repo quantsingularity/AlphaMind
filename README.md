@@ -254,31 +254,38 @@ yarn test
 
 AlphaMind uses GitHub Actions for continuous integration and deployment:
 
-| Stage                      | Task                         | Detail                                                |
-| :------------------------- | :--------------------------- | :---------------------------------------------------- |
-| **Continuous Integration** | Automated Testing            | On each pull request and push to main branch          |
-|                            | Code Quality Checks          | With `flake8`, `black`, and `ESLint`                  |
-|                            | Test Coverage Reporting      | To track and enforce minimum coverage                 |
-|                            | Security Scanning            | For vulnerabilities in code and dependencies          |
-|                            | Performance Benchmarking     | To prevent performance regressions                    |
-| **Continuous Deployment**  | Automated Staging Deployment | On merge to main branch                               |
-|                            | Production Promotion         | Manual promotion to production after staging approval |
-|                            | Image Management             | Docker image building and publishing to registry      |
-|                            | Infrastructure as Code       | Infrastructure updates via Terraform                  |
-|                            | Database Management          | Automated database migration management               |
+| Stage                   | Control Area                    | Institutional-Grade Detail                                                              |
+| :---------------------- | :------------------------------ | :-------------------------------------------------------------------------------------- |
+| **CI Formatting Check** | Change Triggers                 | Enforced on all `push` and `pull_request` events to `main` and `develop`                |
+|                         | Manual Oversight                | On-demand execution via controlled `workflow_dispatch`                                  |
+|                         | Source Integrity                | Full repository checkout with complete Git history for auditability                     |
+|                         | Python Runtime Standardization  | Python 3.10 with deterministic dependency caching                                       |
+|                         | Backend Code Hygiene            | `autoflake` to detect unused imports/variables using non-mutating diff-based validation |
+|                         | Backend Style Compliance        | `black --check` to enforce institutional formatting standards                           |
+|                         | Non-Intrusive Validation        | Temporary workspace comparison to prevent unauthorized source modification              |
+|                         | Node.js Runtime Control         | Node.js 18 with locked dependency installation via `npm ci`                             |
+|                         | Web Frontend Formatting Control | Prettier checks for web-facing assets                                                   |
+|                         | Mobile Frontend Formatting      | Prettier enforcement for mobile application codebases                                   |
+|                         | Documentation Governance        | Repository-wide Markdown formatting enforcement                                         |
+|                         | Infrastructure Configuration    | Prettier validation for YAML/YML infrastructure definitions                             |
+|                         | Compliance Gate                 | Any formatting deviation fails the pipeline and blocks merge                            |
 
 ## Documentation
 
 For detailed documentation, please refer to the following resources:
 
-| Document                   | Path                                                 | Description                                         |
-| :------------------------- | :--------------------------------------------------- | :-------------------------------------------------- |
-| **API Reference**          | `web-frontend/docs/api/api-reference.md`             | Detailed documentation for all API endpoints        |
-| **Getting Started Guide**  | `web-frontend/docs/tutorials/getting-started.md`     | Step-by-step guide to setting up the project        |
-| **User Guide**             | `web-frontend/docs/tutorials/user-guide.md`          | Comprehensive guide for end-users of the platform   |
-| **Backtesting Example**    | `web-frontend/docs/tutorials/backtesting_example.md` | Example of how to run and interpret a backtest      |
-| **Architecture Overview**  | `docs/architecture.md`                               | Detailed overview of the microservices architecture |
-| **Development Guidelines** | `docs/development.md`                                | Guidelines for contributing to the codebase         |
+| Document                    | Path                 | Description                                                 |
+| :-------------------------- | :------------------- | :---------------------------------------------------------- |
+| **README**                  | `README.md`          | High-level overview, project scope, and quickstart          |
+| **API Reference**           | `API.md`             | Detailed documentation for all API endpoints                |
+| **CLI Reference**           | `CLI.md`             | Command-line interface usage, commands, and examples        |
+| **Installation Guide**      | `INSTALLATION.md`    | Step-by-step installation and environment setup             |
+| **User Guide**              | `USAGE.md`           | Comprehensive guide for end-users, workflows, and examples  |
+| **Contributing Guidelines** | `CONTRIBUTING.md`    | Contribution process, coding standards, and PR requirements |
+| **Architecture Overview**   | `ARCHITECTURE.md`    | System architecture, components, and design rationale       |
+| **Configuration Guide**     | `CONFIGURATION.md`   | Configuration options, environment variables, and tuning    |
+| **Feature Matrix**          | `FEATURE_MATRIX.md`  | Feature capabilities, coverage, and roadmap alignment       |
+| **Troubleshooting**         | `TROUBLESHOOTING.md` | Common issues, diagnostics, and remediation steps           |
 
 ### Development Guidelines
 
