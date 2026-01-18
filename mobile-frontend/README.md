@@ -205,8 +205,6 @@ Current test suites:
 - ✅ Configuration tests
 - ✅ API integration tests
 
-See `TESTING.md` for detailed testing documentation.
-
 ## Code Quality
 
 ### Linting
@@ -367,36 +365,3 @@ eas build --platform ios
 - HTTPS enforcement for API calls
 - Token expiration handling
 - Input validation and sanitization
-
-## Contributing
-
-1. Follow existing code structure and patterns
-2. Write tests for new features
-3. Run linting and formatting before committing
-4. Update documentation for new features
-5. Follow React Native and Redux best practices
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/abrar2030/AlphaMind/blob/main/LICENSE) file for details.
-
-## Support
-
-For issues and questions:
-
-- GitHub Issues: https://github.com/abrar2030/AlphaMind/issues
-- Documentation: See `/docs` in repository root
-
-## Changelog
-
-### v1.0.0 (Current)
-
-- ✅ Complete authentication system (login/register)
-- ✅ Redux state management implementation
-- ✅ API integration with backend
-- ✅ Portfolio dashboard with real-time KPIs
-- ✅ Research papers browsing
-- ✅ Settings with theme and notification preferences
-- ✅ Mock data support for offline development
-- ✅ Comprehensive test suite
-- ✅ Production-ready build configuration

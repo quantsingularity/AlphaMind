@@ -556,5 +556,5 @@ export CACHE_TTL_SECONDS=3600
 ## Getting Help
 
 - **Documentation**: Browse [docs/README.md](README.md)
-- **Issues**: Report problems at [GitHub Issues](https://github.com/abrar2030/AlphaMind/issues)
+- **Issues**: Report problems at [GitHub Issues](https://github.com/quantsingularity/AlphaMind/issues)
 - **Examples**: Study working examples in [EXAMPLES/](EXAMPLES/)

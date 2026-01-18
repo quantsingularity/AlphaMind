@@ -1,7 +1,7 @@
 # AlphaMind Tests
 
-[![Test Coverage](https://img.shields.io/badge/coverage-78%25-yellowgreen)](https://github.com/abrar2030/AlphaMind/tree/main/tests)
-[![License](https://img.shields.io/github/license/abrar2030/AlphaMind)](https://github.com/abrar2030/AlphaMind/blob/main/LICENSE)
+[![Test Coverage](https://img.shields.io/badge/coverage-78%25-yellowgreen)](https://github.com/quantsingularity/AlphaMind/tree/main/tests)
+[![License](https://img.shields.io/github/license/quantsingularity/AlphaMind)](https://github.com/quantsingularity/AlphaMind/blob/main/LICENSE)
 
 ## Overview
 

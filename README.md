@@ -1,8 +1,8 @@
 # AlphaMind
 
-![CI/CD Status](https://img.shields.io/github/actions/workflow/status/abrar2030/AlphaMind/cicd.yml?branch=main&label=CI/CD&logo=github)
-[![Test Coverage](https://img.shields.io/badge/coverage-78%25-yellowgreen)](https://github.com/abrar2030/AlphaMind/tree/main/tests)
-[![License](https://img.shields.io/github/license/abrar2030/AlphaMind)](https://github.com/abrar2030/AlphaMind/blob/main/LICENSE)
+![CI/CD Status](https://img.shields.io/github/actions/workflow/status/quantsingularity/AlphaMind/cicd.yml?branch=main&label=CI/CD&logo=github)
+[![Test Coverage](https://img.shields.io/badge/coverage-78%25-yellowgreen)](https://github.com/quantsingularity/AlphaMind/tree/main/tests)
+[![License](https://img.shields.io/github/license/quantsingularity/AlphaMind)](https://github.com/quantsingularity/AlphaMind/blob/main/LICENSE)
 
 ## 🧠 Institutional-Grade Quantitative AI Trading System
 
@@ -139,7 +139,7 @@ AlphaMind/
 
 ```bash
 # Clone the repository
-git clone https://github.com/abrar2030/AlphaMind.git
+git clone https://github.com/quantsingularity/AlphaMind.git
 cd AlphaMind
 
 # Run the setup script
@@ -154,7 +154,7 @@ cd AlphaMind
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/abrar2030/AlphaMind.git
+   git clone https://github.com/quantsingularity/AlphaMind.git
    cd AlphaMind
    ```
 

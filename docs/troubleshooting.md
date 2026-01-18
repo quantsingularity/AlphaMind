@@ -680,7 +680,7 @@ tail -f logs/alphamind.log
 ### Support Channels
 
 1. **Documentation**: Check [docs/](README.md) first
-2. **GitHub Issues**: Search [existing issues](https://github.com/abrar2030/AlphaMind/issues)
+2. **GitHub Issues**: Search [existing issues](https://github.com/quantsingularity/AlphaMind/issues)
 3. **Create Issue**: Use issue templates for bug reports/feature requests
 4. **Community**: GitHub Discussions for questions
 

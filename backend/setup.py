@@ -20,7 +20,7 @@ setup(
     description="Institutional-Grade Quantitative AI Trading System",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/abrar2030/AlphaMind",
+    url="https://github.com/quantsingularity/AlphaMind",
     packages=find_packages(exclude=["tests", "tests.*", "research", "research.*"]),
     classifiers=[
         "Development Status :: 4 - Beta",

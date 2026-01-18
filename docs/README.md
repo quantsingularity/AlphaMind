@@ -37,7 +37,7 @@ AlphaMind is a comprehensive quantitative trading platform designed for institut
 ### 1. Clone and Install
 
 ```bash
-git clone https://github.com/abrar2030/AlphaMind.git
+git clone https://github.com/quantsingularity/AlphaMind.git
 cd AlphaMind
 ./scripts/setup_environment.sh
 ```
@@ -90,8 +90,8 @@ All documentation follows:
 
 ## Support and Community
 
-- **GitHub Issues**: Report bugs and request features at [GitHub Issues](https://github.com/abrar2030/AlphaMind/issues)
-- **Documentation**: Full documentation at [docs/](https://github.com/abrar2030/AlphaMind/tree/main/docs)
+- **GitHub Issues**: Report bugs and request features at [GitHub Issues](https://github.com/quantsingularity/AlphaMind/issues)
+- **Documentation**: Full documentation at [docs/](https://github.com/quantsingularity/AlphaMind/tree/main/docs)
 - **License**: MIT License - see [LICENSE](../LICENSE) file
 
 ## Version Information

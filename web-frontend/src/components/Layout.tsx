@@ -128,7 +128,7 @@ export const Layout: React.FC = () => {
             </p>
             <div className="flex space-x-6">
               <a
-                href="https://github.com/abrar2030/AlphaMind"
+                href="https://github.com/quantsingularity/AlphaMind"
                 className="text-gray-400 hover:text-gray-500"
               >
                 <span className="sr-only">GitHub</span>

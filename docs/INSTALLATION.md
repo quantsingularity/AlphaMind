@@ -43,7 +43,7 @@ The automated setup script handles all dependencies and configuration:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/abrar2030/AlphaMind.git
+git clone https://github.com/quantsingularity/AlphaMind.git
 cd AlphaMind
 
 # 2. Run the setup script
@@ -216,7 +216,7 @@ sudo apt-get update
 sudo apt-get install -y python3.10 python3.10-venv build-essential nodejs npm git
 
 # 5. Clone and install AlphaMind
-git clone https://github.com/abrar2030/AlphaMind.git
+git clone https://github.com/quantsingularity/AlphaMind.git
 cd AlphaMind
 ./scripts/setup_environment.sh
 ```
@@ -364,4 +364,4 @@ After successful installation:
 
 - **Issues**: Check [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
 - **Documentation**: Browse [docs/README.md](README.md)
-- **Community**: Open an issue at [GitHub Issues](https://github.com/abrar2030/AlphaMind/issues)
+- **Community**: Open an issue at [GitHub Issues](https://github.com/quantsingularity/AlphaMind/issues)

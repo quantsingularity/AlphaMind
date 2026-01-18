@@ -114,7 +114,7 @@ export const Home: React.FC = () => {
                   </div>
                   <div className="mt-3 sm:mt-0 sm:ml-3">
                     <a
-                      href="https://github.com/abrar2030/AlphaMind"
+                      href="https://github.com/quantsingularity/AlphaMind"
                       className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 md:py-4 md:text-lg md:px-10"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -306,7 +306,7 @@ export const Home: React.FC = () => {
               <pre className="text-gray-100 text-sm">
                 <code>
                   {`# Clone repository
-git clone https://github.com/abrar2030/AlphaMind.git
+git clone https://github.com/quantsingularity/AlphaMind.git
 cd AlphaMind
 
 # Install dependencies

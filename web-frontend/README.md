@@ -286,4 +286,4 @@ npx tsc --noEmit
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](https://github.com/abrar2030/AlphaMind/blob/main/LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/quantsingularity/AlphaMind/blob/main/LICENSE) file for details.
