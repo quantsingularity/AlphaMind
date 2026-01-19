@@ -32,6 +32,24 @@ AlphaMind is an advanced quantitative trading system that combines alternative d
 
 AlphaMind represents the cutting edge of quantitative trading technology, designed to process vast amounts of market and alternative data through sophisticated machine learning models to generate alpha. The system combines advanced AI techniques with high-performance execution strategies to capitalize on market inefficiencies across multiple asset classes and timeframes.
 
+## Project Structure
+
+The project is organized into several main components:
+
+```
+AlphaMind/
+├── backend/                # Core backend logic, services, and shared utilities
+├── docs/                   # Project documentation
+├── infrastructure/         # DevOps, deployment, and infra-related code
+├── mobile-frontend/        # Mobile application
+├── web-frontend/           # Web dashboard
+├── scripts/                # Automation, setup, and utility scripts
+├── LICENSE                 # License information
+├── README.md               # Project overview and instructions
+├── eslint.config.js        # ESLint configuration
+└── package.json            # Node.js project metadata and dependencies
+```
+
 ## Key Features
 
 | Category                        | Feature                       | Description                                               |
@@ -56,13 +74,6 @@ AlphaMind represents the cutting edge of quantitative trading technology, design
 |                                 | Market Impact Modeling        | Transaction cost analysis and minimization                |
 |                                 | Adaptive Execution Algorithms | TWAP, VWAP, and ML-enhanced variants                      |
 |                                 | High-Frequency Capabilities   | Sub-millisecond order management                          |
-
-## Project Structure
-
-| Component    | Description                                                                |
-| :----------- | :------------------------------------------------------------------------- |
-| **Backend**  | Core trading logic, AI models, data processing, and execution              |
-| **Frontend** | User interfaces for web and mobile, including dashboards and configuration |
 
 ## Technology Stack
 
