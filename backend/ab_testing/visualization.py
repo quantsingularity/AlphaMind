@@ -6,13 +6,14 @@ and tracking experiment progress over time.
 """
 
 import datetime
-from typing import Dict, List, Optional, Tuple, Any
-from matplotlib.axes import Axes
-from matplotlib.figure import Figure
+from typing import Any, Dict, List, Optional, Tuple
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 from scipy import stats
 
 

@@ -5,8 +5,10 @@ This module contains tests for the portfolio risk aggregation functionality.
 """
 
 import unittest
+
 import numpy as np
 import pandas as pd
+
 from backend.risk_system.risk_aggregation.portfolio_risk import (
     PortfolioRiskAggregator,
     PositionRisk,

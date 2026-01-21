@@ -1,4 +1,5 @@
-from typing import Optional, Any, List
+from typing import Any, List, Optional
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd

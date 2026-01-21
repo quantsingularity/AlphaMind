@@ -5,21 +5,19 @@ This module contains tests for the market connectivity functionality,
 including reconnection logic, failure simulation, and data feed stability.
 """
 
-from typing import Any
 import datetime
 import os
 import sys
 import unittest
+from typing import Any
 from unittest.mock import MagicMock
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 from order_management.market_connectivity import (
+    ConnectionStatus,
+    FailureMode,
     MarketConnectivityManager,
     VenueAdapter,
-    FailureMode,
-)
-from order_management.market_connectivity import (
-    ConnectionStatus,
     VenueConfig,
     VenueType,
 )

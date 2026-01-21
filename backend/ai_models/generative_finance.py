@@ -1,6 +1,7 @@
-from typing import Optional, Any
+from typing import Any, Optional
+
 import tensorflow as tf
-from tensorflow.keras.layers import Dense, Conv1D, Flatten, LeakyReLU, Reshape, LSTM
+from tensorflow.keras.layers import LSTM, Conv1D, Dense, Flatten, LeakyReLU, Reshape
 
 
 class TransformerGenerator(tf.keras.layers.Layer):

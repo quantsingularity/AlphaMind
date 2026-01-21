@@ -6,9 +6,10 @@
 ## company information, and more.
 """
 
-from datetime import datetime, timedelta
 import logging
-from typing import Dict, List, Optional, Union, Any
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional, Union
+
 import requests
 from market_data.api_connectors.base import (
     APIConnector,

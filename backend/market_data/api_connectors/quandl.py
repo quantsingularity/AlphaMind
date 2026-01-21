@@ -1,9 +1,10 @@
 """"""
 
 ""
-from datetime import date, datetime
 import logging
+from datetime import date, datetime
 from typing import Any, Dict, List, Optional, Union
+
 import pandas as pd
 from market_data.api_connectors.base import (
     APIConnector,

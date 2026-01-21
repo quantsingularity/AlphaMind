@@ -6,13 +6,13 @@
 ## and connection health monitoring.
 """
 
-from dataclasses import dataclass
 import datetime
-from enum import Enum
 import logging
 import random
 import threading
 import time
+from dataclasses import dataclass
+from enum import Enum
 from typing import Any, Callable, Dict, Optional
 
 logger = logging.getLogger(__name__)

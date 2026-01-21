@@ -1,8 +1,9 @@
 from typing import Any
+
+import pandas as pd
 from confluent_kafka import DeserializingConsumer, KafkaException
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroDeserializer
-import pandas as pd
 
 market_data_schema = '\n{\n    "type": "record",\n    "name": "MarketData",\n    "fields": [\n        {"name": "timestamp", "type": "long"},\n        {"name": "symbol", "type": "string"},\n        {"name": "bid_price", "type": "double"},\n        {"name": "ask_price", "type": "double"},\n        {"name": "bid_size", "type": "double"},\n        {"name": "ask_size", "type": "double"},\n        {"name": "volume", "type": "double"},\n        {"name": "open_interest", "type": "double"},\n    ]\n}\n'
 

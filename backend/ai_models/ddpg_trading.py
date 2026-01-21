@@ -1,12 +1,12 @@
-from typing import Any, Optional, List
-from collections import deque, namedtuple
-from datetime import datetime
 import json
 import logging
 import os
 import random
+from collections import deque, namedtuple
+from datetime import datetime
+from typing import Any, List, Optional
+
 import gym
-from gym import spaces
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -14,6 +14,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from core.logging import get_logger
+from gym import spaces
 
 logger = get_logger(__name__)
 Experience = namedtuple(

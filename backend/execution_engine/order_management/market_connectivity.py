@@ -6,12 +6,13 @@
 """
 
 import datetime
-from enum import Enum
 import logging
 import random
 import threading
 import time
+from enum import Enum
 from typing import Any, Dict, Optional, Tuple
+
 from execution_engine.order_management.market_connectivity import (
     ConnectionStatus,
     MarketConnectivityManager,

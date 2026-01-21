@@ -4,13 +4,14 @@
 ## and backtest the trained agent on market data.
 """
 
-from typing import Any, Dict
 import os
-from core.logging import get_logger
 import sys
+from typing import Any, Dict
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from core.logging import get_logger
 
 logger = get_logger(__name__)
 

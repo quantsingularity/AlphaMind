@@ -1,7 +1,8 @@
 from typing import Any
+
 import numpy as np
 import pandas as pd
-from scipy.stats import multivariate_t, multivariate_normal
+from scipy.stats import multivariate_normal, multivariate_t
 
 
 class ExtremeScenarioGenerator:

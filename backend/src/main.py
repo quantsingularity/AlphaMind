@@ -1,6 +1,6 @@
-from typing import Any
 import os
 import sys
+from typing import Any
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from flask import Flask, jsonify

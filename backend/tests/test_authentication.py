@@ -1,11 +1,12 @@
-from typing import Any
-from functools import wraps
 import os
 import sys
 import time
-from flask import Flask, jsonify, request
+from functools import wraps
+from typing import Any
+
 import jwt
 import pytest
+from flask import Flask, jsonify, request
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 backend_dir = os.path.dirname(os.path.dirname(current_dir))

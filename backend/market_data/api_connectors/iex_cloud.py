@@ -1,7 +1,8 @@
 """IEX Cloud API connector."""
 
-from market_data.api_connectors.base import APIConnector, DataResponse
 import time
+
+from market_data.api_connectors.base import APIConnector, DataResponse
 
 
 class IEXCloudConnector(APIConnector):

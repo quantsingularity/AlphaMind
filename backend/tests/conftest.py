@@ -1,6 +1,7 @@
-from typing import Any
 import os
 import sys
+from typing import Any
+
 import pytest
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

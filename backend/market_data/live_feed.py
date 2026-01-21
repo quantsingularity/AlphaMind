@@ -7,15 +7,16 @@
 """
 
 import asyncio
-from datetime import datetime
 import json
 import logging
 import os
 import time
+from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional
+
 import aiohttp
-from confluent_kafka import Producer
 import websockets
+from confluent_kafka import Producer
 
 logging.basicConfig(
     level=logging.INFO,

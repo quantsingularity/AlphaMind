@@ -1,7 +1,8 @@
-from typing import Any
 import time
 import unittest
+from typing import Any
 from unittest.mock import MagicMock
+
 from order_management.reconnection_manager import (
     ReconnectionConfig,
     ReconnectionManager,

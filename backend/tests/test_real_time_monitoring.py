@@ -4,9 +4,10 @@ Unit tests for the real-time risk monitoring module.
 This module contains tests for the real-time risk monitoring functionality.
 """
 
-from datetime import datetime
 import time
 import unittest
+from datetime import datetime
+
 from backend.risk_system.risk_aggregation.real_time_monitoring import (
     AlertChannel,
     AlertSeverity,

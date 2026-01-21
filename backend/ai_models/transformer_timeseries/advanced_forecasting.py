@@ -1,9 +1,11 @@
 from typing import Any, Optional
+
 import keras
 import numpy as np
 import tensorflow as tf
-from backend.ai_models.attention_mechanism import FinancialTimeSeriesTransformer
 from core.logging import get_logger
+
+from backend.ai_models.attention_mechanism import FinancialTimeSeriesTransformer
 
 logger = get_logger(__name__)
 

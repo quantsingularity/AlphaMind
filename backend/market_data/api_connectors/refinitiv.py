@@ -10,9 +10,10 @@
 ## Refinitiv API access credentials.
 """
 
-from datetime import date, datetime
 import logging
+from datetime import date, datetime
 from typing import Any, Dict, List, Optional, Union
+
 from market_data.api_connectors.base import (
     APIConnector,
     APICredentials,

@@ -4,10 +4,12 @@ Integration test for the risk management and execution engine modules.
 This module tests the integration between risk management and execution engine components.
 """
 
-from datetime import datetime
 import unittest
+from datetime import datetime
+
 import numpy as np
 import pandas as pd
+
 from backend.execution_engine.order_management.order_manager import (
     OrderFill,
     OrderManager,

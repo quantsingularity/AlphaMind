@@ -2,9 +2,10 @@
 Tests for AlphaMind API endpoints.
 """
 
-from fastapi.testclient import TestClient
-import sys
 import os
+import sys
+
+from fastapi.testclient import TestClient
 
 # Add backend to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))

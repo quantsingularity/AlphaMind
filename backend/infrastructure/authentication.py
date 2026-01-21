@@ -1,9 +1,10 @@
-from typing import Any
 import datetime
 from functools import wraps
+from typing import Any
+
 import bcrypt
-from flask import jsonify, request
 import jwt
+from flask import jsonify, request
 
 
 class AuthenticationSystem:

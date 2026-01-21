@@ -1,8 +1,9 @@
-from typing import Optional, Any, Dict
+from typing import Any, Dict, Optional
+
 import gymnasium as gym
+import numpy as np
 from core.logging import get_logger
 from gymnasium import spaces
-import numpy as np
 from stable_baselines3 import PPO
 
 logger = get_logger(__name__)

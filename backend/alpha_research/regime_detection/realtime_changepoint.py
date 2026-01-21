@@ -1,8 +1,8 @@
 from typing import Any
+
 import numpy as np
 from ruptures import Binseg
-from ruptures.costs import CostL2
-from ruptures.costs import CostRbf
+from ruptures.costs import CostL2, CostRbf
 
 
 class OnlineChangeDetector:

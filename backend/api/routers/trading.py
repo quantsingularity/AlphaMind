@@ -1,9 +1,10 @@
 """Trading operations router."""
 
-from fastapi import APIRouter, HTTPException
-from typing import List
-from pydantic import BaseModel
 from datetime import datetime
+from typing import List
+
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 
 router = APIRouter()
 

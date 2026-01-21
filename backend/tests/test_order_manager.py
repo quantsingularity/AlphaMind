@@ -4,8 +4,9 @@ Unit tests for the order management module.
 This module contains tests for the order management functionality.
 """
 
-from datetime import datetime
 import unittest
+from datetime import datetime
+
 from backend.execution_engine.order_management.order_manager import (
     Order,
     OrderFill,

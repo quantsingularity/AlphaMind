@@ -5,11 +5,12 @@ This module provides utilities for loading, validating, and accessing
 configuration settings throughout the AlphaMind system.
 """
 
-from dataclasses import dataclass
 import json
 import logging
 import os
+from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Optional, Union
+
 import yaml
 
 

@@ -8,7 +8,8 @@ the temporal nature of financial data, including:
 - Purged k-fold cross-validation to prevent data leakage
 """
 
-from typing import Optional, Any
+from typing import Any, Optional
+
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import KFold

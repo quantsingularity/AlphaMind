@@ -1,6 +1,7 @@
-import QuantLib as ql
+from typing import Any, Dict, List, Tuple
+
 import numpy as np
-from typing import List, Dict, Any, Tuple
+import QuantLib as ql
 
 
 class CVAcalculator:

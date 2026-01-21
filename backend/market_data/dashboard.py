@@ -5,16 +5,17 @@
 ## market data, portfolio status, and system health metrics.
 """
 
-from datetime import datetime, timedelta
 import logging
-from typing import Any, Dict, Optional, List
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
+
 import dash
-from dash import Input, Output, dcc, html
 import dash_bootstrap_components as dbc
-from flask import Flask
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+from dash import Input, Output, dcc, html
+from flask import Flask
 from plotly.subplots import make_subplots
 
 logging.basicConfig(

@@ -5,10 +5,10 @@ This module monitors and processes SEC 8-K filings for specified tickers,
 extracting relevant information and performing sentiment analysis.
 """
 
-from datetime import datetime
 import logging
 import re
 import time
+from datetime import datetime
 from typing import Any, Dict, List
 
 try:

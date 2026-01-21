@@ -6,10 +6,11 @@ on A/B test results, including hypothesis testing, confidence intervals,
 and Bayesian analysis.
 """
 
-from typing import Dict, List, Any
+import logging
+from typing import Any, Dict, List
+
 import numpy as np
 import scipy.stats as stats
-import logging
 
 logger = logging.getLogger(__name__)
 

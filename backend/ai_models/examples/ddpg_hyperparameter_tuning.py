@@ -4,13 +4,14 @@
 ## hyperparameters for the DDPG agent in various market conditions.
 """
 
-from typing import Optional, Any, Dict, List
 import os
-from core.logging import get_logger
 import sys
+from typing import Any, Dict, List, Optional
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from core.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -18,11 +19,7 @@ sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
 
-from backend.ai_models.ddpg_trading import (
-    BacktestEngine,
-    DDPGAgent,
-    TradingGymEnv,
-)
+from backend.ai_models.ddpg_trading import BacktestEngine, DDPGAgent, TradingGymEnv
 
 
 class HyperparameterTuner:

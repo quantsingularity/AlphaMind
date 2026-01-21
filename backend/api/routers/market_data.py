@@ -1,9 +1,10 @@
 """Market data router."""
 
+from datetime import datetime
+from typing import List
+
 from fastapi import APIRouter, Query
 from pydantic import BaseModel
-from typing import List
-from datetime import datetime
 
 router = APIRouter()
 

@@ -1,9 +1,10 @@
+import logging
+from typing import Any, Dict, List, Union
+
 import numpy as np
 import pandas as pd
-from sentinelhub import WmsRequest, DataCollection, MimeType, SHConfig, CRS
+from sentinelhub import CRS, DataCollection, MimeType, SHConfig, WmsRequest
 from tensorflow.keras.models import load_model
-from typing import List, Dict, Union, Any
-import logging
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

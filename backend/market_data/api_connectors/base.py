@@ -2,13 +2,13 @@
 Base classes for API connectors.
 """
 
+import logging
+import threading
+import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-import logging
 from typing import Any, Dict, Optional
-import time
-import threading
 
 logger = logging.getLogger(__name__)
 
