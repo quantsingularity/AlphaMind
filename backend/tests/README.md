@@ -1,8 +1,5 @@
 # AlphaMind Tests
 
-[![Test Coverage](https://img.shields.io/badge/coverage-78%25-yellowgreen)](https://github.com/quantsingularity/AlphaMind/tree/main/tests)
-[![License](https://img.shields.io/github/license/quantsingularity/AlphaMind)](https://github.com/quantsingularity/AlphaMind/blob/main/LICENSE)
-
 ## Overview
 
 The tests directory contains comprehensive test suites for the AlphaMind quantitative trading system. These tests ensure the reliability, correctness, and performance of the system's components, from AI models to order execution and risk management. With approximately 78% test coverage, the test suite provides confidence in the system's functionality and helps prevent regressions during development.
@@ -148,20 +145,3 @@ Test data is provided through:
 - Fixtures defined in `conftest.py`
 - Static test data files in the `tests/data` directory
 - Dynamically generated test data
-
-## Contributing
-
-When contributing to the test suite:
-
-1. Add tests for new features or bug fixes
-2. Maintain or improve test coverage
-3. Ensure tests are properly documented
-4. Follow the existing test style and organization
-
-For more details, see the [Contributing Guidelines](../docs/CONTRIBUTING.md).
-
-## Related Documentation
-
-- [Development Guide](../docs/development-guide.md)
-- [CI/CD Pipeline](../docs/deployment.md)
-- [Troubleshooting Guide](../docs/troubleshooting.md)
