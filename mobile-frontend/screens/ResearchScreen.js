@@ -1,6 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, ScrollView, Alert, Text, RefreshControl } from "react-native";
-import { Headline, Paragraph, Card, Title, Button, useTheme } from "react-native-paper";
+import {
+  StyleSheet,
+  ScrollView,
+  Alert,
+  Text,
+  RefreshControl,
+} from "react-native";
+import {
+  Headline,
+  Paragraph,
+  Card,
+  Title,
+  Button,
+  useTheme,
+} from "react-native-paper";
 import { researchService } from "../services/researchService";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
@@ -60,14 +73,22 @@ export default function ResearchScreen() {
 
   return (
     <ScrollView
-      contentContainerStyle={[styles.container, { backgroundColor: theme.colors.background }]}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      contentContainerStyle={[
+        styles.container,
+        { backgroundColor: theme.colors.background },
+      ]}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     >
       <Headline style={styles.title}>
         <Text>Research Insights</Text>
       </Headline>
       <Paragraph style={styles.paragraph}>
-        <Text>Explore the latest publications and findings from the AlphaMind research team.</Text>
+        <Text>
+          Explore the latest publications and findings from the AlphaMind
+          research team.
+        </Text>
       </Paragraph>
 
       {papers.map((item) => (
@@ -79,8 +100,12 @@ export default function ResearchScreen() {
             <Paragraph>
               <Text>{item.summary}</Text>
             </Paragraph>
-            {item.authors && <Text style={styles.authors}>By: {item.authors.join(", ")}</Text>}
-            {item.date && <Text style={styles.date}>Published: {item.date}</Text>}
+            {item.authors && (
+              <Text style={styles.authors}>By: {item.authors.join(", ")}</Text>
+            )}
+            {item.date && (
+              <Text style={styles.date}>Published: {item.date}</Text>
+            )}
           </Card.Content>
           <Card.Actions>
             <Button onPress={() => handlePress(item)}>

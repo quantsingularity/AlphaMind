@@ -2,14 +2,19 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { portfolioService } from "../../services/portfolioService";
 
 // Async thunks
-export const fetchPortfolio = createAsyncThunk("portfolio/fetch", async (_, thunkAPI) => {
-  try {
-    const data = await portfolioService.getPortfolio();
-    return data;
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error.message || "Failed to fetch portfolio");
-  }
-});
+export const fetchPortfolio = createAsyncThunk(
+  "portfolio/fetch",
+  async (_, thunkAPI) => {
+    try {
+      const data = await portfolioService.getPortfolio();
+      return data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.message || "Failed to fetch portfolio",
+      );
+    }
+  },
+);
 
 export const fetchPerformance = createAsyncThunk(
   "portfolio/fetchPerformance",
@@ -18,19 +23,26 @@ export const fetchPerformance = createAsyncThunk(
       const data = await portfolioService.getPerformance(timeframe);
       return data;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.message || "Failed to fetch performance");
+      return thunkAPI.rejectWithValue(
+        error.message || "Failed to fetch performance",
+      );
     }
   },
 );
 
-export const fetchHoldings = createAsyncThunk("portfolio/fetchHoldings", async (_, thunkAPI) => {
-  try {
-    const data = await portfolioService.getHoldings();
-    return data;
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error.message || "Failed to fetch holdings");
-  }
-});
+export const fetchHoldings = createAsyncThunk(
+  "portfolio/fetchHoldings",
+  async (_, thunkAPI) => {
+    try {
+      const data = await portfolioService.getHoldings();
+      return data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.message || "Failed to fetch holdings",
+      );
+    }
+  },
+);
 
 const initialState = {
   data: null,

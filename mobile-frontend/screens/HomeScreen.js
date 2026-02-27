@@ -1,5 +1,11 @@
 import React, { useEffect, useMemo } from "react";
-import { StyleSheet, View, ScrollView, Text, RefreshControl } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  Text,
+  RefreshControl,
+} from "react-native";
 import { Headline, Paragraph, useTheme } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 import KPICard from "../components/KPICard";
@@ -138,21 +144,34 @@ export default function HomeScreen() {
   }
 
   if (error && !data) {
-    return <ErrorMessage message={error} onRetry={() => dispatch(fetchPortfolio())} />;
+    return (
+      <ErrorMessage
+        message={error}
+        onRetry={() => dispatch(fetchPortfolio())}
+      />
+    );
   }
 
   return (
     <ScrollView
       contentContainerStyle={styles.container}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     >
-      {user && <Text style={styles.welcome}>Welcome back, {user.name || user.email}!</Text>}
+      {user && (
+        <Text style={styles.welcome}>
+          Welcome back, {user.name || user.email}!
+        </Text>
+      )}
 
       <Headline style={styles.title}>
         <Text>AlphaMind Dashboard</Text>
       </Headline>
       <Paragraph style={styles.paragraph}>
-        <Text>Real-time overview of your quantitative trading performance.</Text>
+        <Text>
+          Real-time overview of your quantitative trading performance.
+        </Text>
       </Paragraph>
 
       <View style={styles.kpiContainer}>
@@ -163,7 +182,8 @@ export default function HomeScreen() {
 
       <Paragraph style={styles.infoText}>
         <Text>
-          Navigate using the bottom tabs to explore features, documentation, and research.
+          Navigate using the bottom tabs to explore features, documentation, and
+          research.
         </Text>
       </Paragraph>
     </ScrollView>

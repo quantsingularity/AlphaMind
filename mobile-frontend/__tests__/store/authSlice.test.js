@@ -32,7 +32,9 @@ describe("authSlice", () => {
   });
 
   it("should handle loginUser.pending", () => {
-    const nextState = authReducer(initialState, { type: loginUser.pending.type });
+    const nextState = authReducer(initialState, {
+      type: loginUser.pending.type,
+    });
     expect(nextState.loading).toBe(true);
     expect(nextState.error).toBeNull();
   });

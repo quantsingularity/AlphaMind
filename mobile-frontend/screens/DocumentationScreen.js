@@ -1,6 +1,12 @@
 import React from "react";
 import { StyleSheet, ScrollView, Alert, Text } from "react-native"; // Added Text import
-import { Surface, Headline, Paragraph, List, useTheme } from "react-native-paper";
+import {
+  Surface,
+  Headline,
+  Paragraph,
+  List,
+  useTheme,
+} from "react-native-paper";
 
 export default function DocumentationScreen() {
   const theme = useTheme();
@@ -13,13 +19,19 @@ export default function DocumentationScreen() {
 
   return (
     <ScrollView
-      contentContainerStyle={[styles.container, { backgroundColor: theme.colors.background }]}
+      contentContainerStyle={[
+        styles.container,
+        { backgroundColor: theme.colors.background },
+      ]}
     >
       <Headline style={styles.title}>
         <Text>Documentation</Text>
       </Headline>
       <Paragraph style={styles.paragraph}>
-        <Text>Access comprehensive resources to help you get the most out of AlphaMind.</Text>
+        <Text>
+          Access comprehensive resources to help you get the most out of
+          AlphaMind.
+        </Text>
       </Paragraph>
 
       <Surface style={styles.listContainer} elevation={1}>
@@ -27,7 +39,9 @@ export default function DocumentationScreen() {
           <List.Item
             title="User Guide"
             description="Step-by-step instructions for setting up and using the platform."
-            left={(props) => <List.Icon {...props} icon="book-open-page-variant-outline" />}
+            left={(props) => (
+              <List.Icon {...props} icon="book-open-page-variant-outline" />
+            )}
             onPress={() => handlePress("User Guide")}
           />
           <List.Item

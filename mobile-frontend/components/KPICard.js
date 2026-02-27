@@ -3,18 +3,41 @@ import { View, StyleSheet } from "react-native";
 import { Card, Title, Text, useTheme } from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
-export default function KPICard({ title, value, change, changeColor, icon, isLoading }) {
+export default function KPICard({
+  title,
+  value,
+  change,
+  changeColor,
+  icon,
+  isLoading,
+}) {
   const theme = useTheme();
 
   return (
     <Card style={styles.card}>
       <Card.Content style={styles.cardContent}>
-        {icon && <Icon name={icon} size={32} color={theme.colors.primary} style={styles.icon} />}
+        {icon && (
+          <Icon
+            name={icon}
+            size={32}
+            color={theme.colors.primary}
+            style={styles.icon}
+          />
+        )}
         <View style={styles.textContainer}>
-          <Text style={[styles.title, { color: theme.colors.onSurfaceVariant }]}>{title}</Text>
+          <Text
+            style={[styles.title, { color: theme.colors.onSurfaceVariant }]}
+          >
+            {title}
+          </Text>
           <Title style={styles.value}>{isLoading ? "..." : value}</Title>
           {change && (
-            <Text style={[styles.change, { color: changeColor || theme.colors.onSurface }]}>
+            <Text
+              style={[
+                styles.change,
+                { color: changeColor || theme.colors.onSurface },
+              ]}
+            >
               {change}
             </Text>
           )}

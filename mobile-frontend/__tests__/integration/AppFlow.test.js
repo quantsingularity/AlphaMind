@@ -1,5 +1,10 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react-native";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+} from "@testing-library/react-native";
 import { Provider } from "react-redux";
 import { Provider as PaperProvider } from "react-native-paper";
 import { NavigationContainer } from "@react-navigation/native";
@@ -15,7 +20,9 @@ describe("App Integration Flow", () => {
   });
 
   it("shows login screen when not authenticated", async () => {
-    authService.authService.isAuthenticated = jest.fn().mockResolvedValue(false);
+    authService.authService.isAuthenticated = jest
+      .fn()
+      .mockResolvedValue(false);
 
     render(
       <Provider store={store}>
@@ -33,7 +40,9 @@ describe("App Integration Flow", () => {
   });
 
   it("completes login flow successfully", async () => {
-    authService.authService.isAuthenticated = jest.fn().mockResolvedValue(false);
+    authService.authService.isAuthenticated = jest
+      .fn()
+      .mockResolvedValue(false);
     authService.authService.login = jest.fn().mockResolvedValue({
       token: "test-token",
       user: { id: 1, email: "test@example.com", name: "Test User" },

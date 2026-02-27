@@ -1,4 +1,8 @@
-import { API_BASE_URL, API_ENDPOINTS, STORAGE_KEYS } from "../../constants/config";
+import {
+  API_BASE_URL,
+  API_ENDPOINTS,
+  STORAGE_KEYS,
+} from "../../constants/config";
 
 describe("Configuration Constants", () => {
   it("should have API_BASE_URL defined", () => {

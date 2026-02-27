@@ -28,16 +28,19 @@ describe("AuthService", () => {
         email: "test@example.com",
         password: "password123",
       });
-      expect(AsyncStorage.setItem).toHaveBeenCalledWith("@alphamind/auth_token", "test-token");
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+        "@alphamind/auth_token",
+        "test-token",
+      );
       expect(result).toEqual(mockResponse.data);
     });
 
     it("should throw error on login failure", async () => {
       api.post.mockRejectedValue(new Error("Invalid credentials"));
 
-      await expect(authService.login("test@example.com", "wrong")).rejects.toThrow(
-        "Invalid credentials",
-      );
+      await expect(
+        authService.login("test@example.com", "wrong"),
+      ).rejects.toThrow("Invalid credentials");
     });
   });
 
@@ -48,7 +51,9 @@ describe("AuthService", () => {
       const result = await authService.isAuthenticated();
 
       expect(result).toBe(true);
-      expect(AsyncStorage.getItem).toHaveBeenCalledWith("@alphamind/auth_token");
+      expect(AsyncStorage.getItem).toHaveBeenCalledWith(
+        "@alphamind/auth_token",
+      );
     });
 
     it("should return false when token does not exist", async () => {

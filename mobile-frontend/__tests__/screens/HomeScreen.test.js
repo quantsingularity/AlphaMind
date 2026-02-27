@@ -41,7 +41,11 @@ describe("HomeScreen", () => {
 
   it("renders dashboard with portfolio data", async () => {
     const store = mockStore({
-      auth: { user: { name: "John Doe" }, isAuthenticated: true, loading: false },
+      auth: {
+        user: { name: "John Doe" },
+        isAuthenticated: true,
+        loading: false,
+      },
       portfolio: {
         data: {
           value: 1250345.67,

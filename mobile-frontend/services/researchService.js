@@ -6,7 +6,8 @@ const mockResearchPapers = [
   {
     id: "1",
     title: "Deep Learning for Market Prediction",
-    summary: "Exploring the efficacy of LSTM networks in forecasting short-term market movements.",
+    summary:
+      "Exploring the efficacy of LSTM networks in forecasting short-term market movements.",
     authors: ["Dr. John Smith", "Dr. Jane Doe"],
     date: "2025-11-15",
     category: "Machine Learning",
@@ -25,7 +26,8 @@ const mockResearchPapers = [
   {
     id: "3",
     title: "High-Frequency Trading Algorithms",
-    summary: "Analysis of optimal execution strategies in volatile market conditions.",
+    summary:
+      "Analysis of optimal execution strategies in volatile market conditions.",
     authors: ["Dr. Bob Wilson", "Dr. Carol Brown"],
     date: "2025-09-10",
     category: "Execution",

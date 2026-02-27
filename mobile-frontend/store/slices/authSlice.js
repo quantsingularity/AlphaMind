@@ -2,45 +2,57 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { authService } from "../../services/authService";
 
 // Async thunks
-export const loginUser = createAsyncThunk("auth/login", async ({ email, password }, thunkAPI) => {
-  try {
-    const response = await authService.login(email, password);
-    return response;
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error.message || "Login failed");
-  }
-});
-
-export const registerUser = createAsyncThunk("auth/register", async (userData, thunkAPI) => {
-  try {
-    const response = await authService.register(userData);
-    return response;
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error.message || "Registration failed");
-  }
-});
-
-export const logoutUser = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
-  try {
-    await authService.logout();
-    return null;
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error.message || "Logout failed");
-  }
-});
-
-export const checkAuth = createAsyncThunk("auth/checkAuth", async (_, thunkAPI) => {
-  try {
-    const isAuthenticated = await authService.isAuthenticated();
-    if (isAuthenticated) {
-      const userData = await authService.getUserData();
-      return { isAuthenticated: true, user: userData };
+export const loginUser = createAsyncThunk(
+  "auth/login",
+  async ({ email, password }, thunkAPI) => {
+    try {
+      const response = await authService.login(email, password);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message || "Login failed");
     }
-    return { isAuthenticated: false, user: null };
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error.message || "Auth check failed");
-  }
-});
+  },
+);
+
+export const registerUser = createAsyncThunk(
+  "auth/register",
+  async (userData, thunkAPI) => {
+    try {
+      const response = await authService.register(userData);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message || "Registration failed");
+    }
+  },
+);
+
+export const logoutUser = createAsyncThunk(
+  "auth/logout",
+  async (_, thunkAPI) => {
+    try {
+      await authService.logout();
+      return null;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message || "Logout failed");
+    }
+  },
+);
+
+export const checkAuth = createAsyncThunk(
+  "auth/checkAuth",
+  async (_, thunkAPI) => {
+    try {
+      const isAuthenticated = await authService.isAuthenticated();
+      if (isAuthenticated) {
+        const userData = await authService.getUserData();
+        return { isAuthenticated: true, user: userData };
+      }
+      return { isAuthenticated: false, user: null };
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message || "Auth check failed");
+    }
+  },
+);
 
 const initialState = {
   user: null,

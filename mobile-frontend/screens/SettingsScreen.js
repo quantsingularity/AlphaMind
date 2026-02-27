@@ -45,7 +45,10 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView
-      contentContainerStyle={[styles.container, { backgroundColor: theme.colors.background }]}
+      contentContainerStyle={[
+        styles.container,
+        { backgroundColor: theme.colors.background },
+      ]}
     >
       <Headline style={styles.title}>
         <Text>Settings</Text>
@@ -73,7 +76,10 @@ export default function SettingsScreen() {
         </List.Subheader>
         <View style={styles.radioGroup}>
           <Text style={styles.radioLabel}>Theme</Text>
-          <RadioButton.Group onValueChange={handleThemeChange} value={settings.theme}>
+          <RadioButton.Group
+            onValueChange={handleThemeChange}
+            value={settings.theme}
+          >
             <View style={styles.radioButtonItem}>
               <RadioButton value="light" />
               <Text>Light</Text>

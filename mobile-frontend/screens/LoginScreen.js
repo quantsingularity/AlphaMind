@@ -1,6 +1,19 @@
 import React, { useState } from "react";
-import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
-import { TextInput, Button, Text, Headline, useTheme, Snackbar } from "react-native-paper";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import {
+  TextInput,
+  Button,
+  Text,
+  Headline,
+  useTheme,
+  Snackbar,
+} from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser, clearError } from "../store/slices/authSlice";
 
@@ -30,10 +43,15 @@ export default function LoginScreen({ navigation }) {
       style={styles.container}
     >
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, { backgroundColor: theme.colors.background }]}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { backgroundColor: theme.colors.background },
+        ]}
       >
         <Headline style={styles.title}>Welcome to AlphaMind</Headline>
-        <Text style={styles.subtitle}>Login to access your trading dashboard</Text>
+        <Text style={styles.subtitle}>
+          Login to access your trading dashboard
+        </Text>
 
         <TextInput
           label="Email"

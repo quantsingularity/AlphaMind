@@ -2,7 +2,10 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import { ActivityIndicator, Text } from "react-native-paper";
 
-export default function LoadingSpinner({ message = "Loading...", size = "large" }) {
+export default function LoadingSpinner({
+  message = "Loading...",
+  size = "large",
+}) {
   return (
     <View style={styles.container}>
       <ActivityIndicator size={size} />

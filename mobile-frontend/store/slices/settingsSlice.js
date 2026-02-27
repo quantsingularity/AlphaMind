@@ -34,7 +34,10 @@ const settingsSlice = createSlice({
       AsyncStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(state));
     },
     setDisplayPreferences: (state, action) => {
-      state.displayPreferences = { ...state.displayPreferences, ...action.payload };
+      state.displayPreferences = {
+        ...state.displayPreferences,
+        ...action.payload,
+      };
       // Persist to AsyncStorage
       AsyncStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(state));
     },
@@ -48,6 +51,11 @@ const settingsSlice = createSlice({
   },
 });
 
-export const { setTheme, setNotifications, setDisplayPreferences, loadSettings, resetSettings } =
-  settingsSlice.actions;
+export const {
+  setTheme,
+  setNotifications,
+  setDisplayPreferences,
+  loadSettings,
+  resetSettings,
+} = settingsSlice.actions;
 export default settingsSlice.reducer;

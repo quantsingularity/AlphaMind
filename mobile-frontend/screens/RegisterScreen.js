@@ -1,6 +1,19 @@
 import React, { useState } from "react";
-import { View, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
-import { TextInput, Button, Text, Headline, useTheme, Snackbar } from "react-native-paper";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import {
+  TextInput,
+  Button,
+  Text,
+  Headline,
+  useTheme,
+  Snackbar,
+} from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser, clearError } from "../store/slices/authSlice";
 
@@ -50,7 +63,10 @@ export default function RegisterScreen({ navigation }) {
       style={styles.container}
     >
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, { backgroundColor: theme.colors.background }]}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { backgroundColor: theme.colors.background },
+        ]}
       >
         <Headline style={styles.title}>Create Account</Headline>
         <Text style={styles.subtitle}>Join AlphaMind to start trading</Text>
@@ -117,7 +133,11 @@ export default function RegisterScreen({ navigation }) {
           Register
         </Button>
 
-        <Button mode="text" onPress={() => navigation.navigate("Login")} style={styles.linkButton}>
+        <Button
+          mode="text"
+          onPress={() => navigation.navigate("Login")}
+          style={styles.linkButton}
+        >
           Already have an account? Login
         </Button>
 
