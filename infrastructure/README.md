@@ -8,7 +8,7 @@ This infrastructure directory contains comprehensive security and compliance con
 
 ```
 infrastructure/
-├── README.md                           # This comprehensive guide
+├── README.md                          # This comprehensive guide
 ├── ansible/                           # Configuration management
 │   ├── inventory/
 │   │   └── hosts.yml                  # Environment-specific hosts
@@ -24,41 +24,41 @@ infrastructure/
 │           ├── defaults/main.yml      # Security default variables
 │           └── templates/             # Security configuration templates
 ├── kubernetes/                        # Container orchestration
-│   ├── base/                         # Base Kubernetes manifests
-│   │   ├── app-configmap.yaml        # application configuration
-│   │   ├── app-secrets.yaml          # Encrypted secrets management
-│   │   ├── backend-deployment.yaml   # Backend service deployment
-│   │   ├── database-service.yaml     # Database service configuration
-│   │   ├── frontend-deployment.yaml  # Frontend service deployment
-│   │   ├── ingress.yaml              # Ingress configuration
-│   │   ├── network-policies.yaml     # Network microsegmentation
-│   │   ├── pod-security-policy.yaml  # Pod security policies
-│   │   ├── rbac.yaml                 # Role-based access control
-│   │   └── redis-*.yaml              # Redis configuration files
-│   └── environments/                 # Environment-specific configs
+│   ├── base/                          # Base Kubernetes manifests
+│   │   ├── app-configmap.yaml         # application configuration
+│   │   ├── app-secrets.yaml           # Encrypted secrets management
+│   │   ├── backend-deployment.yaml    # Backend service deployment
+│   │   ├── database-service.yaml      # Database service configuration
+│   │   ├── frontend-deployment.yaml   # Frontend service deployment
+│   │   ├── ingress.yaml               # Ingress configuration
+│   │   ├── network-policies.yaml      # Network microsegmentation
+│   │   ├── pod-security-policy.yaml   # Pod security policies
+│   │   ├── rbac.yaml                  # Role-based access control
+│   │   └── redis-*.yaml               # Redis configuration files
+│   └── environments/                  # Environment-specific configs
 │       ├── dev/values.yaml
 │       ├── staging/values.yaml
 │       └── prod/values.yaml
-└── terraform/                        # Infrastructure as Code
-    ├── main.tf                       # main configuration
-    ├── variables.tf                  # Comprehensive variable definitions
-    ├── outputs.tf                    # Infrastructure outputs
-    ├── environments/                 # Environment-specific variables
+└── terraform/                         # Infrastructure as Code
+    ├── main.tf                        # main configuration
+    ├── variables.tf                   # Comprehensive variable definitions
+    ├── outputs.tf                     # Infrastructure outputs
+    ├── environments/                  # Environment-specific variables
     │   ├── dev/terraform.tfvars
     │   ├── staging/terraform.tfvars
     │   └── prod/terraform.tfvars
-    └── modules/                      # Reusable infrastructure modules
-        ├── backup/                   # Disaster recovery and backup
-        ├── cloudtrail/               # Audit logging (SOX compliance)
-        ├── compute/                  # EC2 instances and Auto Scaling
-        ├── config/                   # AWS Config for compliance monitoring
-        ├── database/                 # RDS with encryption and backup
-        ├── guardduty/                # Threat detection
-        ├── monitoring/               # CloudWatch monitoring and alerting
-        ├── network/                  # VPC, subnets, and network security
-        ├── security/                 # Security groups, WAF, and IAM
-        ├── security_hub/             # Centralized security findings
-        └── storage/                  # S3 with encryption and lifecycle
+    └── modules/                       # Reusable infrastructure modules
+        ├── backup/                    # Disaster recovery and backup
+        ├── cloudtrail/                # Audit logging (SOX compliance)
+        ├── compute/                   # EC2 instances and Auto Scaling
+        ├── config/                    # AWS Config for compliance monitoring
+        ├── database/                  # RDS with encryption and backup
+        ├── guardduty/                 # Threat detection
+        ├── monitoring/                # CloudWatch monitoring and alerting
+        ├── network/                   # VPC, subnets, and network security
+        ├── security/                  # Security groups, WAF, and IAM
+        ├── security_hub/              # Centralized security findings
+        └── storage/                   # S3 with encryption and lifecycle
 ```
 
 ## Security
@@ -178,138 +178,6 @@ infrastructure/
    # For production
    kubectl apply -f environments/prod/
    ```
-
-## Compliance Monitoring
-
-### Automated Compliance Checks
-
-- **Daily**: Vulnerability scans and configuration compliance
-- **Weekly**: Security baseline verification
-- **Monthly**: Comprehensive compliance reporting
-- **Quarterly**: PCI DSS assessment preparation
-
-### Key Metrics Monitored
-
-- Failed login attempts and authentication anomalies
-- Privileged access usage and escalation
-- Data access patterns and anomalies
-- Network traffic analysis and intrusion detection
-- System resource utilization and performance
-- Backup success rates and recovery testing
-
-### Alerting Thresholds
-
-- **Critical**: Immediate notification (< 5 minutes)
-- **High**: Notification within 15 minutes
-- **Medium**: Notification within 1 hour
-- **Low**: Daily summary reports
-
-## Disaster Recovery
-
-### Backup Strategy
-
-- **RTO (Recovery Time Objective)**: 4 hours
-- **RPO (Recovery Point Objective)**: 1 hour
-- **Backup Frequency**: Continuous replication + daily snapshots
-- **Geographic Distribution**: Multi-region backup storage
-- **Retention Policy**: 7 years for financial data
-
-### Recovery Procedures
-
-1. **Database Recovery**: Point-in-time recovery from encrypted backups
-2. **Application Recovery**: Blue-green deployment for zero-downtime
-3. **Infrastructure Recovery**: Infrastructure as Code for rapid rebuild
-4. **Data Recovery**: Encrypted backup restoration with integrity verification
-
-## Security Incident Response
-
-### Response Team Contacts
-
-- **Security Team**: security@company.com
-- **Compliance Officer**: compliance@company.com
-- **Incident Commander**: incident-response@company.com
-
-### Response Procedures
-
-1. **Detection**: Automated monitoring and manual reporting
-2. **Analysis**: Threat assessment and impact evaluation
-3. **Containment**: Immediate threat isolation and mitigation
-4. **Eradication**: Root cause elimination and system hardening
-5. **Recovery**: Service restoration and monitoring
-6. **Lessons Learned**: Post-incident review and improvement
-
-## Compliance Auditing
-
-### Audit Preparation
-
-- **Documentation**: All policies, procedures, and configurations documented
-- **Evidence Collection**: Automated evidence gathering and retention
-- **Access Logs**: Comprehensive audit trails for all system access
-- **Change Management**: All changes tracked and approved
-- **Risk Assessments**: Regular risk assessments and mitigation plans
-
-### Audit Support
-
-- **24/7 Support**: Dedicated compliance support during audits
-- **Documentation Access**: Centralized compliance documentation portal
-- **Evidence Retrieval**: Automated evidence collection and presentation
-- **Remediation Tracking**: Issue tracking and resolution monitoring
-
-## Cost Optimization
-
-### Resource Optimization
-
-- **Auto Scaling**: Dynamic resource allocation based on demand
-- **Reserved Instances**: Cost optimization for predictable workloads
-- **Lifecycle Policies**: Automated data archiving and cleanup
-- **Resource Tagging**: Comprehensive cost allocation and tracking
-
-### Estimated Monthly Costs (Production)
-
-- **Compute**: $800-1,200 (Auto Scaling Group)
-- **Database**: $400-600 (RDS Multi-AZ)
-- **Storage**: $200-400 (S3, EBS, backups)
-- **Security Services**: $300-500 (GuardDuty, Config, CloudTrail)
-- **Monitoring**: $100-200 (CloudWatch, alerts)
-- **Total**: $1,800-2,900/month
-
-## Support and Maintenance
-
-### Regular Maintenance Tasks
-
-- **Weekly**: Security patches and updates
-- **Monthly**: Compliance reporting and review
-- **Quarterly**: Security assessments and penetration testing
-- **Annually**: Full compliance audit and certification renewal
-
-### Support Channels
-
-- **Technical Support**: tech-support@company.com
-- **Security Issues**: security@company.com
-- **Compliance Questions**: compliance@company.com
-- **Emergency Hotline**: +1-XXX-XXX-XXXX (24/7)
-
-## Contributing
-
-### Development Guidelines
-
-1. All changes must be tested in development environment first
-2. Security configurations require security team approval
-3. Compliance changes require compliance officer review
-4. Infrastructure changes must include documentation updates
-5. All deployments must pass automated security scans
-
-### Code Review Process
-
-1. **Security Review**: All security-related changes reviewed by security team
-2. **Compliance Review**: All compliance changes reviewed by compliance officer
-3. **Technical Review**: All technical changes peer-reviewed
-4. **Testing**: All changes must pass automated testing suite
-5. **Documentation**: All changes must include updated documentation
-
-## License
-
-This infrastructure configuration is provided under the same license as the main AlphaMind project. See the [LICENSE](../LICENSE) file for details.
 
 ---
 
