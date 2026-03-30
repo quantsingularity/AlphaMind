@@ -1,6 +1,6 @@
-import React from "react";
-import { useStrategies } from "../hooks/useStrategies";
+import type React from "react";
 import { Link } from "react-router-dom";
+import { useStrategies } from "../hooks/useStrategies";
 import { formatPercentage } from "../utils/format";
 
 export const Strategies: React.FC = () => {

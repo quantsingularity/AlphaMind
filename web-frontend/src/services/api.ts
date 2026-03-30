@@ -1,15 +1,15 @@
-import axios, { type AxiosInstance, type AxiosError } from "axios";
+import axios, { type AxiosError, type AxiosInstance } from "axios";
 import type {
-  Strategy,
+  AlternativeDataSource,
+  ApiError,
+  ApiResponse,
+  BacktestResult,
   MarketData,
+  Order,
   Portfolio,
   Position,
-  Order,
-  BacktestResult,
   RiskMetrics,
-  AlternativeDataSource,
-  ApiResponse,
-  ApiError,
+  Strategy,
 } from "../types";
 
 class ApiService {

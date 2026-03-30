@@ -288,18 +288,18 @@ a:focus {
   .footer,
   .btn,
   .hamburger {
-    display: none !important;
+    display: none;
   }
 
   body {
-    background-color: white !important;
-    color: black !important;
+    background-color: white;
+    color: black;
   }
 
   .container {
-    width: 100% !important;
-    max-width: none !important;
-    padding: 0 !important;
+    width: 100%;
+    max-width: none;
+    padding: 0;
   }
 
   .hero,
@@ -307,13 +307,13 @@ a:focus {
   .ai-ml-core,
   .performance,
   .getting-started {
-    padding: 1rem 0 !important;
-    background: none !important;
+    padding: 1rem 0;
+    background: none;
   }
 
   .hero .container,
   .ai-ml-content {
-    flex-direction: column !important;
+    flex-direction: column;
   }
 
   h1,
@@ -322,17 +322,17 @@ a:focus {
   h4,
   h5,
   h6 {
-    color: black !important;
+    color: black;
   }
 
   a {
-    color: black !important;
-    text-decoration: underline !important;
+    color: black;
+    text-decoration: underline;
   }
 
   .feature-card,
   .metrics-table {
-    box-shadow: none !important;
-    border: 1px solid #ddd !important;
+    box-shadow: none;
+    border: 1px solid #ddd;
   }
 }

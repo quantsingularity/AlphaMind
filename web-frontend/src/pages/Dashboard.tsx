@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { usePortfolio, usePositions } from "../hooks/usePortfolio";
-import { formatCurrency, getColorForValue } from "../utils/format";
+import type React from "react";
+import { useEffect, useState } from "react";
 import {
-  AreaChart,
   Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from "recharts";
+import { usePortfolio, usePositions } from "../hooks/usePortfolio";
+import { formatCurrency, getColorForValue } from "../utils/format";
 
 export const Dashboard: React.FC = () => {
   const { data: portfolio, isLoading: portfolioLoading } = usePortfolio();
