@@ -498,7 +498,7 @@ class TiingoConnector(APIConnector):
         response : DataResponse
             Response containing the historical price data.
         """
-        endpoint = f"tiingo/crypto/prices"
+        endpoint = "tiingo/crypto/prices"
         params = {
             "tickers": ticker,
             "baseCurrency": base_currency,

@@ -247,7 +247,7 @@ class PortfolioOptimizer:
             portfolio_weights = optimal_weights
             peak = np.max(portfolio_value)
             drawdown_history.append((new_value - peak) / peak)
-        portfolio_values_series = pd.Series(portfolio_value[1:])
+        pd.Series(portfolio_value[1:])
         portfolio_returns_series = pd.Series(portfolio_returns)
         sharpe_ratio = (
             portfolio_returns_series.mean()

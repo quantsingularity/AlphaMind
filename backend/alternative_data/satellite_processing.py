@@ -58,7 +58,7 @@ class SatelliteFeatureExtractor:
         bbox = BBox(coordinates, crs=CRS.WGS84)
         wms_request = WmsRequest(
             data_collection=DataCollection.SENTINEL2_L2A,
-            layer=f"TRUE-COLOR-S2L2A",
+            layer="TRUE-COLOR-S2L2A",
             bbox=bbox,
             time=time_range,
             width=512,

@@ -580,7 +580,7 @@ class BacktestEngine:
                 )
                 annual_return / volatility if volatility > 0 else 0
                 drawdown_df = pd.DataFrame(self.performance["drawdowns"])
-                max_drawdown = (
+                (
                     drawdown_df["drawdown"].max() if not drawdown_df.empty else 0
                 )
                 trades_df = pd.DataFrame(self.performance["trades"])

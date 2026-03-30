@@ -241,7 +241,7 @@ class ModelComparison:
         results_df = results_df[metric_cols]
         fig, ax = plt.subplots(figsize=figsize)
         im = ax.imshow(results_df.values, cmap=cmap)
-        cbar = ax.figure.colorbar(im, ax=ax)
+        ax.figure.colorbar(im, ax=ax)
         ax.set_xticks(np.arange(len(metric_cols)))
         ax.set_yticks(np.arange(len(results_df.index)))
         ax.set_xticklabels(metric_cols)

@@ -535,7 +535,7 @@ class ValidationReport:
                 importance = item.get("Importance", 0)
                 report.write(f"| {feature} | {importance:.4f} |\n")
             if len(fi_list) > 20:
-                report.write(f"| ... | ... |\n")
+                report.write("| ... | ... |\n")
             report.write("\n")
 
         if self.sections["diagnostics"]:

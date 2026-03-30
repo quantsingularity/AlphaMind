@@ -115,7 +115,7 @@ class SEC8KMonitor:
         """
         try:
             if not self._validate_filing(filing):
-                logger.warning(f"Invalid filing encountered.")
+                logger.warning("Invalid filing encountered.")
                 return {
                     "filing_date": getattr(filing, "date", datetime.now().isoformat()),
                     "mentioned_tickers": [],

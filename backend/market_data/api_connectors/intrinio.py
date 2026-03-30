@@ -739,7 +739,7 @@ class IntrinioConnector(APIConnector):
         response : DataResponse
             Response containing the options chain.
         """
-        endpoint = f"options/chain"
+        endpoint = "options/chain"
         params = {"symbol": symbol, "page_size": page_size}
         if expiration:
             if isinstance(expiration, (date, datetime)):
@@ -775,7 +775,7 @@ class IntrinioConnector(APIConnector):
         response : DataResponse
             Response containing the options expirations.
         """
-        endpoint = f"options/expirations"
+        endpoint = "options/expirations"
         params = {"symbol": symbol}
         return self.request(
             endpoint=endpoint,

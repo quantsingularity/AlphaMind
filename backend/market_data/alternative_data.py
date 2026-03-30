@@ -673,7 +673,7 @@ class PluginManager:
             "last_discovery": None,
         }
         logger.info(
-            f"Initialized plugin manager"
+            "Initialized plugin manager"
             + (f" with plugin directory: {plugin_dir}" if plugin_dir else "")
         )
 
