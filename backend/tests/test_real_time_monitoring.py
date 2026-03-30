@@ -1,3 +1,5 @@
+from typing import Any
+
 """
 Unit tests for the real-time risk monitoring module.
 

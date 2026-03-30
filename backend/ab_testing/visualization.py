@@ -6,7 +6,7 @@ and tracking experiment progress over time.
 """
 
 import datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
