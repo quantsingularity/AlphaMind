@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { BottomNavigation } from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-
-import HomeScreen from "../screens/HomeScreen";
-import FeaturesScreen from "../screens/FeaturesScreen";
 import DocumentationScreen from "../screens/DocumentationScreen";
+import FeaturesScreen from "../screens/FeaturesScreen";
+import HomeScreen from "../screens/HomeScreen";
 import ResearchScreen from "../screens/ResearchScreen";
 import SettingsScreen from "../screens/SettingsScreen"; // Import SettingsScreen
 

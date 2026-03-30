@@ -1,6 +1,5 @@
-import React from "react";
-import { View, StyleSheet } from "react-native";
-import { Card, Title, Text, useTheme } from "react-native-paper";
+import { StyleSheet, View } from "react-native";
+import { Card, Text, Title, useTheme } from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 export default function KPICard({

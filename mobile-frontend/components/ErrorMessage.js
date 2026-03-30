@@ -1,6 +1,5 @@
-import React from "react";
-import { View, StyleSheet } from "react-native";
-import { Text, Button, useTheme } from "react-native-paper";
+import { StyleSheet, View } from "react-native";
+import { Button, Text, useTheme } from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 export default function ErrorMessage({ message, onRetry }) {

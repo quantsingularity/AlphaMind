@@ -1,9 +1,6 @@
 import authReducer, {
-  loginUser,
-  registerUser,
-  logoutUser,
-  checkAuth,
   clearError,
+  loginUser,
   setUser,
 } from "../../store/slices/authSlice";
 

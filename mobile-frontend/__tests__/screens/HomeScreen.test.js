@@ -1,8 +1,7 @@
-import React from "react";
-import { render, screen, waitFor } from "@testing-library/react-native";
-import { Provider } from "react-redux";
-import { Provider as PaperProvider } from "react-native-paper";
 import { configureStore } from "@reduxjs/toolkit";
+import { render, screen, waitFor } from "@testing-library/react-native";
+import { Provider as PaperProvider } from "react-native-paper";
+import { Provider } from "react-redux";
 import HomeScreen from "../../screens/HomeScreen";
 import authReducer from "../../store/slices/authSlice";
 import portfolioReducer from "../../store/slices/portfolioSlice";

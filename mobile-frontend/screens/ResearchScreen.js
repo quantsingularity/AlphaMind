@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  StyleSheet,
-  ScrollView,
   Alert,
-  Text,
   RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
 } from "react-native";
 import {
+  Button,
+  Card,
   Headline,
   Paragraph,
-  Card,
   Title,
-  Button,
   useTheme,
 } from "react-native-paper";
-import { researchService } from "../services/researchService";
-import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
+import LoadingSpinner from "../components/LoadingSpinner";
+import { researchService } from "../services/researchService";
 
 export default function ResearchScreen() {
   const theme = useTheme();
@@ -39,7 +39,7 @@ export default function ResearchScreen() {
 
   useEffect(() => {
     fetchPapers();
-  }, []);
+  }, [fetchPapers]);
 
   const onRefresh = async () => {
     setRefreshing(true);

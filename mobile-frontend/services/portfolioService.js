@@ -1,5 +1,5 @@
-import api from "./api";
 import { API_ENDPOINTS, ENABLE_MOCK_DATA } from "../constants/config";
+import api from "./api";
 
 // Mock data for development
 const mockPortfolioData = {
@@ -33,13 +33,8 @@ export const portfolioService = {
         setTimeout(() => resolve(mockPortfolioData), 500);
       });
     }
-
-    try {
-      const response = await api.get(API_ENDPOINTS.PORTFOLIO.LIST);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.get(API_ENDPOINTS.PORTFOLIO.LIST);
+    return response.data;
   },
 
   /**
@@ -51,15 +46,10 @@ export const portfolioService = {
         setTimeout(() => resolve(mockPortfolioData.performance), 500);
       });
     }
-
-    try {
-      const response = await api.get(API_ENDPOINTS.PORTFOLIO.PERFORMANCE, {
-        params: { timeframe },
-      });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.get(API_ENDPOINTS.PORTFOLIO.PERFORMANCE, {
+      params: { timeframe },
+    });
+    return response.data;
   },
 
   /**
@@ -71,24 +61,15 @@ export const portfolioService = {
         setTimeout(() => resolve(mockPortfolioData.holdings), 500);
       });
     }
-
-    try {
-      const response = await api.get(API_ENDPOINTS.PORTFOLIO.HOLDINGS);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.get(API_ENDPOINTS.PORTFOLIO.HOLDINGS);
+    return response.data;
   },
 
   /**
    * Get portfolio details by ID
    */
   getPortfolioDetails: async (id) => {
-    try {
-      const response = await api.get(API_ENDPOINTS.PORTFOLIO.DETAILS(id));
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.get(API_ENDPOINTS.PORTFOLIO.DETAILS(id));
+    return response.data;
   },
 };

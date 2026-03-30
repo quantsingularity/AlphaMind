@@ -1,16 +1,15 @@
-import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
 import {
+  fireEvent,
   render,
   screen,
-  fireEvent,
   waitFor,
 } from "@testing-library/react-native";
-import { Provider } from "react-redux";
 import { Provider as PaperProvider } from "react-native-paper";
-import { NavigationContainer } from "@react-navigation/native";
+import { Provider } from "react-redux";
 import App from "../../App";
-import store from "../../store";
 import * as authService from "../../services/authService";
+import store from "../../store";
 
 jest.mock("../../services/authService");
 

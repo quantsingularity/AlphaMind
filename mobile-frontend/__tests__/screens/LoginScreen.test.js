@@ -1,14 +1,8 @@
-import React from "react";
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-} from "@testing-library/react-native";
-import { Provider } from "react-redux";
-import { Provider as PaperProvider } from "react-native-paper";
 import { NavigationContainer } from "@react-navigation/native";
 import { configureStore } from "@reduxjs/toolkit";
+import { fireEvent, render, screen } from "@testing-library/react-native";
+import { Provider as PaperProvider } from "react-native-paper";
+import { Provider } from "react-redux";
 import LoginScreen from "../../screens/LoginScreen";
 import authReducer from "../../store/slices/authSlice";
 

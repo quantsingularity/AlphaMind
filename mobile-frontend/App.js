@@ -1,15 +1,18 @@
-import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { Provider as PaperProvider } from "react-native-paper";
-import { Provider as ReduxProvider } from "react-redux";
-import { useDispatch, useSelector } from "react-redux";
 import { StatusBar } from "expo-status-bar";
-import store from "./store";
-import { lightTheme, darkTheme } from "./constants/theme";
-import { checkAuth } from "./store/slices/authSlice";
-import AuthNavigator from "./navigation/AuthNavigator";
-import AppNavigator from "./navigation/AppNavigator";
+import { useEffect } from "react";
+import { Provider as PaperProvider } from "react-native-paper";
+import {
+  Provider as ReduxProvider,
+  useDispatch,
+  useSelector,
+} from "react-redux";
 import LoadingSpinner from "./components/LoadingSpinner";
+import { darkTheme, lightTheme } from "./constants/theme";
+import AppNavigator from "./navigation/AppNavigator";
+import AuthNavigator from "./navigation/AuthNavigator";
+import store from "./store";
+import { checkAuth } from "./store/slices/authSlice";
 
 function AppContent() {
   const dispatch = useDispatch();

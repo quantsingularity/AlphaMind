@@ -1,10 +1,9 @@
-import React from "react";
-import { StyleSheet, ScrollView, Alert, Text } from "react-native"; // Added Text import
+import { Alert, ScrollView, StyleSheet, Text } from "react-native"; // Added Text import
 import {
-  Surface,
   Headline,
-  Paragraph,
   List,
+  Paragraph,
+  Surface,
   useTheme,
 } from "react-native-paper";
 

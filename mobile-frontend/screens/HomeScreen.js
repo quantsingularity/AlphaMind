@@ -1,16 +1,16 @@
 import React, { useEffect, useMemo } from "react";
 import {
-  StyleSheet,
-  View,
-  ScrollView,
-  Text,
   RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { Headline, Paragraph, useTheme } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
+import ErrorMessage from "../components/ErrorMessage";
 import KPICard from "../components/KPICard";
 import LoadingSpinner from "../components/LoadingSpinner";
-import ErrorMessage from "../components/ErrorMessage";
 import { fetchPortfolio } from "../store/slices/portfolioSlice";
 
 export default function HomeScreen() {

@@ -1,18 +1,17 @@
-import React from "react";
-import { StyleSheet, ScrollView, View, Alert } from "react-native";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import {
-  Headline,
-  Paragraph,
-  List,
-  Switch,
-  RadioButton,
-  Text,
   Button,
+  Headline,
+  List,
+  Paragraph,
+  RadioButton,
+  Switch,
+  Text,
   useTheme,
 } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
-import { setTheme, setNotifications } from "../store/slices/settingsSlice";
 import { logoutUser } from "../store/slices/authSlice";
+import { setNotifications, setTheme } from "../store/slices/settingsSlice";
 
 export default function SettingsScreen() {
   const theme = useTheme();

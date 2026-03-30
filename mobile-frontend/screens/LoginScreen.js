@@ -1,21 +1,20 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
-  View,
-  StyleSheet,
-  ScrollView,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
+  StyleSheet,
 } from "react-native";
 import {
-  TextInput,
   Button,
-  Text,
   Headline,
-  useTheme,
   Snackbar,
+  Text,
+  TextInput,
+  useTheme,
 } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser, clearError } from "../store/slices/authSlice";
+import { clearError, loginUser } from "../store/slices/authSlice";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");

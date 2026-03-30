@@ -1,11 +1,10 @@
-import React from "react";
-import { StyleSheet, ScrollView, Text } from "react-native"; // Added Text import
+import { ScrollView, StyleSheet, Text } from "react-native"; // Added Text import
 import {
+  Card,
   // Surface, // Removed unused import
   // Text, // Removed unused import
   Headline,
   Paragraph,
-  Card,
   Title,
   useTheme,
 } from "react-native-paper";

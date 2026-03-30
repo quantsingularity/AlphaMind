@@ -1,7 +1,7 @@
 import babelParser from "@babel/eslint-parser";
+import js from "@eslint/js";
 import reactPlugin from "eslint-plugin-react";
 import reactNativePlugin from "eslint-plugin-react-native";
-import js from "@eslint/js";
 
 export default [
   {

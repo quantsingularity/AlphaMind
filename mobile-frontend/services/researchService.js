@@ -1,5 +1,5 @@
-import api from "./api";
 import { API_ENDPOINTS, ENABLE_MOCK_DATA } from "../constants/config";
+import api from "./api";
 
 // Mock research data
 const mockResearchPapers = [
@@ -45,15 +45,10 @@ export const researchService = {
         setTimeout(() => resolve(mockResearchPapers), 500);
       });
     }
-
-    try {
-      const response = await api.get(API_ENDPOINTS.RESEARCH.PAPERS, {
-        params: filters,
-      });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.get(API_ENDPOINTS.RESEARCH.PAPERS, {
+      params: filters,
+    });
+    return response.data;
   },
 
   /**
@@ -66,12 +61,7 @@ export const researchService = {
         setTimeout(() => resolve(paper || null), 500);
       });
     }
-
-    try {
-      const response = await api.get(API_ENDPOINTS.RESEARCH.DETAILS(id));
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.get(API_ENDPOINTS.RESEARCH.DETAILS(id));
+    return response.data;
   },
 };

@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { portfolioService } from "../../services/portfolioService";
 
 // Async thunks
@@ -62,7 +62,7 @@ const portfolioSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
-    resetPortfolio: (state) => {
+    resetPortfolio: (_state) => {
       return initialState;
     },
   },
