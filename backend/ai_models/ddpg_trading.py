@@ -97,7 +97,7 @@ class Actor(nn.Module):
         action_dim: Any,
         hidden_dims: Any = (256, 128),
         init_w: Any = 0.003,
-    ) -> Any:
+    ) -> None:
         super(Actor, self).__init__()
         self.layers = nn.ModuleList()
         prev_dim = state_dim
@@ -125,7 +125,7 @@ class Critic(nn.Module):
         action_dim: Any,
         hidden_dims: Any = (256, 128),
         init_w: Any = 0.003,
-    ) -> Any:
+    ) -> None:
         super(Critic, self).__init__()
         self.fc1 = nn.Linear(state_dim, hidden_dims[0])
         self.fc2 = nn.Linear(hidden_dims[0] + action_dim, hidden_dims[1])

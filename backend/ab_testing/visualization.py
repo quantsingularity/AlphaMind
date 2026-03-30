@@ -32,7 +32,7 @@ class ExperimentVisualizer:
         context: str = "notebook",
         palette: str = "deep",
         figsize: Tuple[int, int] = (10, 6),
-    ) -> Any:
+    ) -> None:
         """
         Initialize the visualizer.
 
