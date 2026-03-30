@@ -2,11 +2,15 @@ from typing import Any, Dict, Optional
 
 import gymnasium as gym
 import numpy as np
-from core.logging import get_logger
 from gymnasium import spaces
 from stable_baselines3 import PPO
+import logging
 
-logger = get_logger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 
 class PortfolioGymEnv(gym.Env):

@@ -5,6 +5,7 @@ Main FastAPI application for AlphaMind backend.
 import logging
 import os
 import sys
+import logging
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
@@ -16,10 +17,12 @@ from fastapi.responses import JSONResponse
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from api.routers import health, market_data, portfolio, strategies, trading
-from core.logging import setup_logging
 
-# Setup logging
-setup_logging()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
 logger = logging.getLogger(__name__)
 
 

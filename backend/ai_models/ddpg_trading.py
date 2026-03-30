@@ -13,10 +13,15 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from core.logging import get_logger
 from gym import spaces
+import logging
 
-logger = get_logger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
+
 Experience = namedtuple(
     "Experience", ["state", "action", "reward", "next_state", "done"]
 )
