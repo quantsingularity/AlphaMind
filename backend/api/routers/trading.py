@@ -1,7 +1,7 @@
 """Trading operations router."""
 
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -13,7 +13,7 @@ class Order(BaseModel):
     symbol: str
     quantity: float
     order_type: str
-    price: float | None = None
+    price: Optional[float] = None
 
 
 class OrderResponse(BaseModel):

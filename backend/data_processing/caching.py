@@ -10,6 +10,7 @@ import logging
 import pickle
 import time
 from abc import ABC, abstractmethod
+from functools import wraps
 from typing import Any, Callable, Dict, Optional, Union
 
 logger = logging.getLogger(__name__)
@@ -184,6 +185,7 @@ def cache_function(ttl_seconds: float = 3600, namespace: str = "function"):
     cache_mgr = CacheManager(policy=TTLCachePolicy(ttl_seconds), namespace=namespace)
 
     def decorator(func: Callable) -> Callable:
+        @wraps(func)
         def wrapper(*args, **kwargs):
             # Create cache key from function name and arguments
             key_data = {

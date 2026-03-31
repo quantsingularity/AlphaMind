@@ -10,6 +10,7 @@ import statistics
 import time
 from collections import deque
 from enum import Enum
+from functools import wraps
 from typing import Any, Callable, Dict, List, Optional, Union
 
 logger = logging.getLogger(__name__)
@@ -308,6 +309,7 @@ def monitor_execution(monitor: PerformanceMonitor, metric_prefix: str = ""):
             f"{metric_prefix}.{func.__name__}" if metric_prefix else func.__name__
         )
 
+        @wraps(func)
         def wrapper(*args, **kwargs):
             start_time = time.time()
             try:

@@ -1,47 +1,58 @@
-#!/bin/bash
-# AlphaMind Backend Startup Script (FastAPI)
+#!/usr/bin/env bash
+set -euo pipefail
 
 echo "=================================="
 echo "AlphaMind Backend Startup"
 echo "=================================="
 echo ""
 
-# Check if virtual environment exists
+# ── Virtual environment ────────────────────────────────────────────────────
 if [ ! -d "venv" ]; then
     echo "Creating virtual environment..."
     python3 -m venv venv
 fi
 
-# Activate virtual environment
 echo "Activating virtual environment..."
+# shellcheck source=/dev/null
 source venv/bin/activate
 
-# Install/upgrade pip
 echo "Upgrading pip..."
-pip install --upgrade pip -q
+pip install --upgrade pip --quiet
 
-# Install requirements
 echo "Installing dependencies (this may take a few minutes)..."
-pip install -r requirements.txt -q
+pip install --quiet -r requirements.txt
 
-# Load environment variables
+# ── Environment variables ──────────────────────────────────────────────────
 if [ -f ".env" ]; then
     echo "Loading environment variables from .env"
-    export $(cat .env | grep -v '^#' | xargs)
+    # Use set -a / set +a rather than xargs which breaks on special characters
+    set -a
+    # shellcheck source=/dev/null
+    source .env
+    set +a
 else
-    echo "Warning: .env file not found. Using default configuration."
+    echo "Warning: .env file not found."
     echo "Please copy .env.example to .env and configure appropriately."
 fi
 
+# ── Derived configuration ──────────────────────────────────────────────────
+API_HOST="${API_HOST:-0.0.0.0}"
+API_PORT="${API_PORT:-8000}"
+LOG_LEVEL="${LOG_LEVEL:-info}"
+WORKERS="${WORKERS:-1}"
+
 echo ""
-echo "Starting FastAPI backend server with Uvicorn..."
-echo "Server will be available at: http://localhost:8000"
-echo "API Documentation: http://localhost:8000/docs"
-echo "Alternative docs: http://localhost:8000/redoc"
-echo "Health check endpoint: http://localhost:8000/health"
+echo "Starting FastAPI backend with Uvicorn..."
+echo "  Host    : http://${API_HOST}:${API_PORT}"
+echo "  Docs    : http://${API_HOST}:${API_PORT}/docs"
+echo "  ReDoc   : http://${API_HOST}:${API_PORT}/redoc"
+echo "  Health  : http://${API_HOST}:${API_PORT}/health"
 echo ""
-echo "Press CTRL+C to stop the server"
+echo "Press CTRL+C to stop."
 echo ""
 
-# Start the server
-python3 -m uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+python3 -m uvicorn api.main:app \
+    --host "${API_HOST}" \
+    --port "${API_PORT}" \
+    --workers "${WORKERS}" \
+    --log-level "${LOG_LEVEL}"

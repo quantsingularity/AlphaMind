@@ -16,6 +16,7 @@ from fastapi.responses import JSONResponse
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from api.routers import health, market_data, portfolio, strategies, trading
+from infrastructure.authentication import router as auth_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -46,9 +47,14 @@ app = FastAPI(
 )
 
 # CORS middleware
+_cors_origins_raw = os.getenv(
+    "CORS_ORIGINS", "http://localhost:3000,http://localhost:3001"
+)
+_cors_origins = [o.strip() for o in _cors_origins_raw.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
+    allow_origins=_cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -56,6 +62,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(health.router, tags=["health"])
+app.include_router(auth_router)
 app.include_router(trading.router, prefix="/api/v1/trading", tags=["trading"])
 app.include_router(portfolio.router, prefix="/api/v1/portfolio", tags=["portfolio"])
 app.include_router(
@@ -92,4 +99,17 @@ if __name__ == "__main__":
         port=int(os.getenv("API_PORT", "8000")),
         reload=True,
         log_level="info",
+    )
+
+
+def run() -> None:
+    """Entry point for console_scripts."""
+    import uvicorn
+
+    uvicorn.run(
+        "api.main:app",
+        host=os.getenv("API_HOST", "0.0.0.0"),
+        port=int(os.getenv("API_PORT", "8000")),
+        reload=os.getenv("API_RELOAD", "false").lower() == "true",
+        log_level=os.getenv("LOG_LEVEL", "info").lower(),
     )

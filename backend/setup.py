@@ -45,7 +45,7 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "alphamind-api=api.main:main",
+            "alphamind-api=api.main:run",
         ],
     },
 )

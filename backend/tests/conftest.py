@@ -5,9 +5,9 @@ from typing import Any
 import pytest
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-BACKEND_PATH = os.path.join(BASE_DIR, "..", "backend")
+BACKEND_PATH = os.path.join(BASE_DIR, "..")
 if BACKEND_PATH not in sys.path:
-    sys.path.append(BACKEND_PATH)
+    sys.path.insert(0, BACKEND_PATH)
 
 
 @pytest.fixture

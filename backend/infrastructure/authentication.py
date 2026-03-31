@@ -1,88 +1,80 @@
 import datetime
-from functools import wraps
-from typing import Any
+from typing import Any, Dict, Optional
 
 import bcrypt
 import jwt
-from flask import jsonify, request
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from pydantic import BaseModel
+
+router = APIRouter(prefix="/api/auth", tags=["auth"])
+
+security = HTTPBearer()
+
+
+class RegisterRequest(BaseModel):
+    username: str
+    password: str
+
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
 
 
 class AuthenticationSystem:
     """
-    Authentication system for AlphaMind API
-    Provides user registration, login, and JWT token management
+    Authentication system for AlphaMind API.
+    Provides user registration, login, and JWT token management.
+    Compatible with FastAPI.
     """
 
-    def __init__(self, app: Any, secret_key: Any, token_expiration: Any = 24) -> None:
-        """
-        Initialize the authentication system
-
-        Args:
-            app: Flask application instance
-            secret_key: Secret key for JWT token signing
-            token_expiration: Token expiration time in hours (default: 24)
-        """
-        self.app = app
+    def __init__(self, secret_key: str, token_expiration: int = 24) -> None:
         self.secret_key = secret_key
         self.token_expiration = token_expiration
-        self.users_db = {}
-        self._register_routes()
+        self.users_db: Dict[str, Any] = {}
 
-    def _register_routes(self) -> Any:
-        """Register authentication routes with the Flask app"""
-
-        @self.app.route("/api/auth/register", methods=["POST"])
-        def register():
-            data = request.get_json()
-            if not data or not data.get("username") or (not data.get("password")):
-                return (jsonify({"message": "Missing username or password"}), 400)
-            username = data["username"]
-            password = data["password"]
-            if username in self.users_db:
-                return (jsonify({"message": "User already exists"}), 409)
-            hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
-            self.users_db[username] = {
-                "username": username,
-                "password": hashed_password,
-                "created_at": datetime.datetime.utcnow(),
-            }
-            return (jsonify({"message": "User registered successfully"}), 201)
-
-        @self.app.route("/api/auth/login", methods=["POST"])
-        def login():
-            data = request.get_json()
-            if not data or not data.get("username") or (not data.get("password")):
-                return (jsonify({"message": "Missing username or password"}), 400)
-            username = data["username"]
-            password = data["password"]
-            if username not in self.users_db:
-                return (jsonify({"message": "Invalid credentials"}), 401)
-            if not bcrypt.checkpw(
-                password.encode("utf-8"), self.users_db[username]["password"]
-            ):
-                return (jsonify({"message": "Invalid credentials"}), 401)
-            token = self.generate_token(username)
-            return (
-                jsonify(
-                    {
-                        "message": "Login successful",
-                        "token": token,
-                        "username": username,
-                    }
-                ),
-                200,
+    def register_user(self, username: str, password: str) -> Dict[str, Any]:
+        if not username or not password:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Missing username or password",
             )
+        if username in self.users_db:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="User already exists",
+            )
+        hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+        self.users_db[username] = {
+            "username": username,
+            "password": hashed_password,
+            "created_at": datetime.datetime.utcnow(),
+        }
+        return {"message": "User registered successfully"}
 
-    def generate_token(self, username: Any) -> Any:
-        """
-        Generate a JWT token for the user
+    def login_user(self, username: str, password: str) -> Dict[str, Any]:
+        if not username or not password:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Missing username or password",
+            )
+        if username not in self.users_db:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid credentials",
+            )
+        if not bcrypt.checkpw(
+            password.encode("utf-8"), self.users_db[username]["password"]
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid credentials",
+            )
+        token = self.generate_token(username)
+        return {"message": "Login successful", "token": token, "username": username}
 
-        Args:
-            username: Username to include in the token
-
-        Returns:
-            JWT token string
-        """
+    def generate_token(self, username: str) -> str:
         payload = {
             "exp": datetime.datetime.utcnow()
             + datetime.timedelta(hours=self.token_expiration),
@@ -91,53 +83,58 @@ class AuthenticationSystem:
         }
         return jwt.encode(payload, self.secret_key, algorithm="HS256")
 
-    def verify_token(self, token: Any) -> Any:
-        """
-        Verify a JWT token
+    def verify_token(self, token: str) -> str:
+        payload = jwt.decode(token, self.secret_key, algorithms=["HS256"])
+        return payload["sub"]
 
-        Args:
-            token: JWT token to verify
-
-        Returns:
-            Username if token is valid, None otherwise
-        """
+    def get_current_user(
+        self, credentials: HTTPAuthorizationCredentials = Depends(security)
+    ) -> Dict[str, Any]:
+        token = credentials.credentials
         try:
-            payload = jwt.decode(token, self.secret_key, algorithms=["HS256"])
-            return payload["sub"]
+            username = self.verify_token(token)
         except jwt.ExpiredSignatureError:
-            raise
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token is invalid or expired",
+            )
         except jwt.InvalidTokenError:
-            raise
-
-    def token_required(self, f: Any) -> Any:
-        """
-        Decorator for routes that require authentication
-
-        Usage:
-            @auth.token_required
-            def protected_route():
-                # This route requires authentication
-                pass
-        """
-
-        @wraps(f)
-        def decorated(*args, **kwargs):
-            token = None
-            auth_header = request.headers.get("Authorization")
-            if auth_header and auth_header.startswith("Bearer "):
-                token = auth_header.split(" ")[1]
-            if not token:
-                return (jsonify({"message": "Token is missing"}), 401)
-            try:
-                username = self.verify_token(token)
-            except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
-                return (jsonify({"message": "Token is invalid or expired"}), 401)
-            if not username:
-                return (jsonify({"message": "Token is invalid or expired"}), 401)
-            request.user = self.users_db[username]
-            return f(*args, **kwargs)
-
-        return decorated
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token is invalid or expired",
+            )
+        if username not in self.users_db:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token is invalid or expired",
+            )
+        return self.users_db[username]
 
 
-"\napp = Flask(__name__)\nauth = AuthenticationSystem(app, 'your-secret-key')\n\n@app.route('/api/protected', methods=['GET'])\n@auth.token_required\ndef protected():\n    return jsonify({'message': 'This is a protected route'})\n\nif __name__ == '__main__':\n    app.run(debug=True)\n"
+import os
+
+_auth_system: Optional[AuthenticationSystem] = None
+
+
+def get_auth_system() -> AuthenticationSystem:
+    global _auth_system
+    if _auth_system is None:
+        secret_key = os.getenv("SECRET_KEY", "change-this-secret-key-in-production")
+        token_expiration = int(os.getenv("JWT_EXPIRATION_HOURS", "24"))
+        _auth_system = AuthenticationSystem(
+            secret_key=secret_key,
+            token_expiration=token_expiration,
+        )
+    return _auth_system
+
+
+@router.post("/register", status_code=status.HTTP_201_CREATED)
+async def register(request: RegisterRequest) -> Dict[str, Any]:
+    auth = get_auth_system()
+    return auth.register_user(request.username, request.password)
+
+
+@router.post("/login")
+async def login(request: LoginRequest) -> Dict[str, Any]:
+    auth = get_auth_system()
+    return auth.login_user(request.username, request.password)

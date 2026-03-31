@@ -7,7 +7,7 @@ position limits across different asset classes and risk factors.
 
 import datetime
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -47,8 +47,8 @@ class PositionLimit:
     hard_limit: float
     description: str = ""
     active: bool = True
-    created_at: datetime.datetime = datetime.datetime.now()
-    updated_at: datetime.datetime = datetime.datetime.now()
+    created_at: datetime.datetime = field(default_factory=datetime.datetime.now)
+    updated_at: datetime.datetime = field(default_factory=datetime.datetime.now)
 
     def is_breached(self, value: float) -> Tuple[bool, str]:
         """Check if a value breaches the position limits."""

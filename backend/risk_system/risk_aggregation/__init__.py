@@ -72,5 +72,5 @@ def calculate_portfolio_var(
         return 0.0
     returns_array = np.asarray(portfolio_returns)
     percentile = 1.0 - confidence_level
-    var_value = -np.quantile(returns_array, percentile, interpolation="lower")
+    var_value = -np.quantile(returns_array, percentile, method="lower")
     return max(0.0, var_value)

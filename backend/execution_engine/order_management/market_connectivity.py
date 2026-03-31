@@ -13,7 +13,7 @@ import time
 from enum import Enum
 from typing import Any, Dict, Optional, Tuple
 
-from execution_engine.order_management.market_connectivity import (
+from execution_engine.order_management.market_connectivity_base import (
     ConnectionStatus,
     MarketConnectivityManager,
     MarketDataUpdate,

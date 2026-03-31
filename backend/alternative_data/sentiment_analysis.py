@@ -144,12 +144,13 @@ class SentimentBasedStrategy:
         sentiment_scores = self.sentiment_analyzer.get_sentiment_score(
             news_data["text"].values
         )
+        news_data = news_data.copy()
         news_data["sentiment_score"] = sentiment_scores
         daily_sentiment = (
             news_data.groupby("date")["sentiment_score"].mean().reset_index()
         )
         merged_data = pd.merge(self.price_data, daily_sentiment, on="date", how="left")
-        merged_data["sentiment_score"].fillna(0, inplace=True)
+        merged_data["sentiment_score"] = merged_data["sentiment_score"].fillna(0)
         merged_data["sentiment_ma"] = (
             merged_data["sentiment_score"].rolling(window=lookback_window).mean()
         )
@@ -191,7 +192,7 @@ class SentimentBasedStrategy:
         backtest_data["strategy_return"] = (
             backtest_data["position"].shift(1) * backtest_data["market_return"]
         )
-        backtest_data.fillna(0, inplace=True)
+        backtest_data = backtest_data.fillna(0)
         backtest_data["cumulative_market_return"] = (
             1 + backtest_data["market_return"]
         ).cumprod()

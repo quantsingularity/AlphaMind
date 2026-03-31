@@ -113,7 +113,7 @@ class ConfigManager:
         """
         try:
             with open(file_path, "r") as f:
-                json.load(f)
+                config_dict = json.load(f)
             self.load_from_dict(config_dict, source=file_path)
         except Exception as e:
             raise ConfigurationException(
@@ -134,9 +134,9 @@ class ConfigManager:
         """
         try:
             with open(file_path, "r") as f:
-                yaml.safe_load(f)
+                config_dict = yaml.safe_load(f)
             if config_dict is None:
-                config_dict: Dict[str, Any] = {}
+                config_dict = {}
             self.load_from_dict(config_dict, source=file_path)
         except Exception as e:
             raise ConfigurationException(

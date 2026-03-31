@@ -406,7 +406,7 @@ class WebSocketStream(DataStream):
                             if isinstance(message, str):
                                 try:
                                     data = json.loads(message)
-                                except:
+                                except Exception:
                                     data = message
                             else:
                                 data = message
@@ -558,7 +558,7 @@ class KafkaStreamAdapter(DataStream):
         """
         try:
             return json.loads(message.decode("utf-8"))
-        except:
+        except Exception:
             return message
 
 
@@ -648,7 +648,7 @@ class WebSocketStreamAdapter(DataStream):
                     if isinstance(message, str):
                         try:
                             data = json.loads(message)
-                        except:
+                        except Exception:
                             data = message
                     else:
                         data = message

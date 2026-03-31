@@ -9,7 +9,7 @@ import datetime
 import logging
 import threading
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Callable, Dict, List, Optional, Tuple
 
@@ -51,7 +51,7 @@ class RiskAlert:
     value: float
     threshold: float
     channels: List[AlertChannel]
-    metadata: Dict = None
+    metadata: Dict = field(default_factory=dict)
     acknowledged: bool = False
     acknowledged_by: Optional[str] = None
     acknowledged_at: Optional[datetime.datetime] = None
