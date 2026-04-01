@@ -4,25 +4,27 @@
 ## and backtest the trained agent on market data.
 """
 
-import logging
 import os
 import sys
+
+sys.path.append(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
+
+import logging
 from typing import Any, Dict
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from backend.ai_models.ddpg_trading import BacktestEngine, DDPGAgent, TradingGymEnv
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
-
-sys.path.append(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-)
-from backend.ai_models.ddpg_trading import BacktestEngine, DDPGAgent, TradingGymEnv
 
 
 def generate_sample_market_data(

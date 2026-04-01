@@ -1,4 +1,5 @@
 import datetime
+import os
 from typing import Any, Dict, Optional
 
 import bcrypt
@@ -110,8 +111,6 @@ class AuthenticationSystem:
             )
         return self.users_db[username]
 
-
-import os
 
 _auth_system: Optional[AuthenticationSystem] = None
 
