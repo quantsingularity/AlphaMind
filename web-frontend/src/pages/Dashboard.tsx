@@ -1,5 +1,5 @@
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import {
   Area,
   AreaChart,
@@ -15,26 +15,20 @@ import { formatCurrency, getColorForValue } from "../utils/format";
 export const Dashboard: React.FC = () => {
   const { data: portfolio, isLoading: portfolioLoading } = usePortfolio();
   const { data: positions, isLoading: positionsLoading } = usePositions();
-  const [equityData, setEquityData] = useState<any[]>([]);
 
-  useEffect(() => {
-    // Generate mock equity curve data
-    const generateEquityData = () => {
-      const data = [];
-      let value = 100000;
-      for (let i = 0; i < 30; i++) {
-        value += (Math.random() - 0.45) * 2000;
-        data.push({
-          date: new Date(
-            Date.now() - (29 - i) * 24 * 60 * 60 * 1000,
-          ).toLocaleDateString(),
-          equity: Math.round(value),
-        });
-      }
-      return data;
-    };
-
-    setEquityData(generateEquityData());
+  const equityData = useMemo(() => {
+    const data = [];
+    let value = 100000;
+    for (let i = 0; i < 30; i++) {
+      value += (Math.random() - 0.45) * 2000;
+      data.push({
+        date: new Date(
+          Date.now() - (29 - i) * 24 * 60 * 60 * 1000,
+        ).toLocaleDateString(),
+        equity: Math.round(value),
+      });
+    }
+    return data;
   }, []);
 
   if (portfolioLoading || positionsLoading) {
@@ -230,9 +224,16 @@ export const Dashboard: React.FC = () => {
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={equityData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Tooltip />
+            <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+            <YAxis
+              tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`}
+            />
+            <Tooltip
+              formatter={(value: number) => [
+                `$${value.toLocaleString()}`,
+                "Equity",
+              ]}
+            />
             <Area
               type="monotone"
               dataKey="equity"
@@ -277,7 +278,10 @@ export const Dashboard: React.FC = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {mockPositions.map((position) => (
-                <tr key={position.id}>
+                <tr
+                  key={position.id}
+                  className="hover:bg-gray-50 transition-colors"
+                >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {position.ticker}
                   </td>
@@ -296,10 +300,10 @@ export const Dashboard: React.FC = () => {
                     {formatCurrency(position.unrealizedPnL)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button className="text-blue-600 hover:text-blue-900 mr-4">
+                    <button className="text-blue-600 hover:text-blue-900 mr-4 focus:outline-none focus:underline">
                       View
                     </button>
-                    <button className="text-red-600 hover:text-red-900">
+                    <button className="text-red-600 hover:text-red-900 focus:outline-none focus:underline">
                       Close
                     </button>
                   </td>

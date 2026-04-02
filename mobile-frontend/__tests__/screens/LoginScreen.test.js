@@ -1,6 +1,11 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { configureStore } from "@reduxjs/toolkit";
-import { fireEvent, render, screen } from "@testing-library/react-native";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react-native";
 import { Provider as PaperProvider } from "react-native-paper";
 import { Provider } from "react-redux";
 import LoginScreen from "../../screens/LoginScreen";
@@ -18,15 +23,17 @@ jest.mock("@react-navigation/native", () => {
   };
 });
 
-const mockStore = configureStore({
-  reducer: {
-    auth: authReducer,
-  },
-});
+const createMockStore = () =>
+  configureStore({
+    reducer: {
+      auth: authReducer,
+    },
+  });
 
 const renderWithProviders = (component) => {
+  const store = createMockStore();
   return render(
-    <Provider store={mockStore}>
+    <Provider store={store}>
       <PaperProvider>
         <NavigationContainer>{component}</NavigationContainer>
       </PaperProvider>
@@ -56,8 +63,8 @@ describe("LoginScreen", () => {
       <LoginScreen navigation={{ navigate: mockNavigate }} />,
     );
 
-    const emailInput = screen.getByLabelText("Email");
-    const passwordInput = screen.getByLabelText("Password");
+    const emailInput = screen.getByTestId("email-input");
+    const passwordInput = screen.getByTestId("password-input");
 
     fireEvent.changeText(emailInput, "test@example.com");
     fireEvent.changeText(passwordInput, "password123");
@@ -72,10 +79,10 @@ describe("LoginScreen", () => {
     );
 
     const loginButton = screen.getByText("Login").parent;
-    expect(loginButton.props.accessibilityState.disabled).toBe(true);
+    expect(loginButton.props.accessibilityState?.disabled).toBe(true);
   });
 
-  it("navigates to register screen", () => {
+  it("navigates to register screen when link is pressed", () => {
     renderWithProviders(
       <LoginScreen navigation={{ navigate: mockNavigate }} />,
     );
@@ -84,5 +91,25 @@ describe("LoginScreen", () => {
     fireEvent.press(registerButton);
 
     expect(mockNavigate).toHaveBeenCalledWith("Register");
+  });
+
+  it("shows error for invalid email format", async () => {
+    renderWithProviders(
+      <LoginScreen navigation={{ navigate: mockNavigate }} />,
+    );
+
+    const emailInput = screen.getByTestId("email-input");
+    const passwordInput = screen.getByTestId("password-input");
+    fireEvent.changeText(emailInput, "notanemail");
+    fireEvent.changeText(passwordInput, "password123");
+
+    const loginButton = screen.getByText("Login");
+    fireEvent.press(loginButton);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("Please enter a valid email address"),
+      ).toBeTruthy();
+    });
   });
 });

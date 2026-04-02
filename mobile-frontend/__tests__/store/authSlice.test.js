@@ -1,6 +1,7 @@
 import authReducer, {
   clearError,
   loginUser,
+  logoutUser,
   setUser,
 } from "../../store/slices/authSlice";
 
@@ -28,6 +29,17 @@ describe("authSlice", () => {
     expect(nextState.isAuthenticated).toBe(true);
   });
 
+  it("should handle setUser with null (logout)", () => {
+    const loggedInState = {
+      ...initialState,
+      user: { id: 1, email: "test@example.com" },
+      isAuthenticated: true,
+    };
+    const nextState = authReducer(loggedInState, setUser(null));
+    expect(nextState.user).toBeNull();
+    expect(nextState.isAuthenticated).toBe(false);
+  });
+
   it("should handle loginUser.pending", () => {
     const nextState = authReducer(initialState, {
       type: loginUser.pending.type,
@@ -45,6 +57,7 @@ describe("authSlice", () => {
     expect(nextState.loading).toBe(false);
     expect(nextState.isAuthenticated).toBe(true);
     expect(nextState.user).toEqual(user);
+    expect(nextState.error).toBeNull();
   });
 
   it("should handle loginUser.rejected", () => {
@@ -54,5 +67,48 @@ describe("authSlice", () => {
     });
     expect(nextState.loading).toBe(false);
     expect(nextState.error).toBe("Login failed");
+    expect(nextState.isAuthenticated).toBe(false);
+  });
+
+  it("should handle logoutUser.pending", () => {
+    const loggedInState = {
+      ...initialState,
+      isAuthenticated: true,
+      user: { id: 1 },
+    };
+    const nextState = authReducer(loggedInState, {
+      type: logoutUser.pending.type,
+    });
+    expect(nextState.loading).toBe(true);
+  });
+
+  it("should handle logoutUser.fulfilled", () => {
+    const loggedInState = {
+      ...initialState,
+      isAuthenticated: true,
+      user: { id: 1 },
+    };
+    const nextState = authReducer(loggedInState, {
+      type: logoutUser.fulfilled.type,
+    });
+    expect(nextState.user).toBeNull();
+    expect(nextState.isAuthenticated).toBe(false);
+    expect(nextState.loading).toBe(false);
+    expect(nextState.error).toBeNull();
+  });
+
+  it("should handle logoutUser.rejected and still clear auth", () => {
+    const loggedInState = {
+      ...initialState,
+      isAuthenticated: true,
+      user: { id: 1 },
+    };
+    const nextState = authReducer(loggedInState, {
+      type: logoutUser.rejected.type,
+      payload: "Logout API error",
+    });
+    expect(nextState.user).toBeNull();
+    expect(nextState.isAuthenticated).toBe(false);
+    expect(nextState.loading).toBe(false);
   });
 });

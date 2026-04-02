@@ -1,0 +1,43 @@
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: alphamind-backend-pdb
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: alphamind-backend
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: alphamind-frontend-pdb
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: alphamind-frontend
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: alphamind-database-pdb
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: alphamind-database
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: alphamind-redis-pdb
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: alphamind-redis

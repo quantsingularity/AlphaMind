@@ -1,35 +1,53 @@
-import {
-  API_BASE_URL,
-  API_ENDPOINTS,
-  STORAGE_KEYS,
-} from "../../constants/config";
+describe("config constants", () => {
+  beforeEach(() => {
+    jest.resetModules();
+  });
 
-describe("Configuration Constants", () => {
-  it("should have API_BASE_URL defined", () => {
-    expect(API_BASE_URL).toBeDefined();
+  it("exports API_BASE_URL", () => {
+    const { API_BASE_URL } = require("../../constants/config");
     expect(typeof API_BASE_URL).toBe("string");
+    expect(API_BASE_URL.length).toBeGreaterThan(0);
   });
 
-  it("should have API_ENDPOINTS defined", () => {
-    expect(API_ENDPOINTS).toBeDefined();
-    expect(API_ENDPOINTS.AUTH).toBeDefined();
-    expect(API_ENDPOINTS.PORTFOLIO).toBeDefined();
+  it("exports API_TIMEOUT as a number", () => {
+    const { API_TIMEOUT } = require("../../constants/config");
+    expect(typeof API_TIMEOUT).toBe("number");
+    expect(API_TIMEOUT).toBeGreaterThan(0);
   });
 
-  it("should have correct AUTH endpoints", () => {
-    expect(API_ENDPOINTS.AUTH.LOGIN).toBe("/api/auth/login");
-    expect(API_ENDPOINTS.AUTH.REGISTER).toBe("/api/auth/register");
-    expect(API_ENDPOINTS.AUTH.LOGOUT).toBe("/api/auth/logout");
+  it("exports STORAGE_KEYS with required keys", () => {
+    const { STORAGE_KEYS } = require("../../constants/config");
+    expect(STORAGE_KEYS).toHaveProperty("AUTH_TOKEN");
+    expect(STORAGE_KEYS).toHaveProperty("USER_DATA");
+    expect(STORAGE_KEYS).toHaveProperty("SETTINGS");
+    expect(STORAGE_KEYS).toHaveProperty("THEME_PREFERENCE");
   });
 
-  it("should have STORAGE_KEYS defined", () => {
-    expect(STORAGE_KEYS).toBeDefined();
-    expect(STORAGE_KEYS.AUTH_TOKEN).toBe("@alphamind/auth_token");
-    expect(STORAGE_KEYS.USER_DATA).toBe("@alphamind/user_data");
+  it("exports API_ENDPOINTS with all required sections", () => {
+    const { API_ENDPOINTS } = require("../../constants/config");
+    expect(API_ENDPOINTS).toHaveProperty("AUTH.LOGIN");
+    expect(API_ENDPOINTS).toHaveProperty("AUTH.REGISTER");
+    expect(API_ENDPOINTS).toHaveProperty("AUTH.LOGOUT");
+    expect(API_ENDPOINTS).toHaveProperty("PORTFOLIO.LIST");
+    expect(API_ENDPOINTS).toHaveProperty("RESEARCH.PAPERS");
   });
 
-  it("should have dynamic endpoint functions", () => {
-    expect(typeof API_ENDPOINTS.PORTFOLIO.DETAILS).toBe("function");
-    expect(API_ENDPOINTS.PORTFOLIO.DETAILS("123")).toBe("/api/portfolio/123");
+  it("PORTFOLIO.DETAILS returns correct URL with id", () => {
+    const { API_ENDPOINTS } = require("../../constants/config");
+    expect(API_ENDPOINTS.PORTFOLIO.DETAILS("abc123")).toBe(
+      "/api/portfolio/abc123",
+    );
+  });
+
+  it("RESEARCH.DETAILS returns correct URL with id", () => {
+    const { API_ENDPOINTS } = require("../../constants/config");
+    expect(API_ENDPOINTS.RESEARCH.DETAILS("paper-1")).toBe(
+      "/api/research/papers/paper-1",
+    );
+  });
+
+  it("ENABLE_MOCK_DATA defaults to false", () => {
+    const { ENABLE_MOCK_DATA } = require("../../constants/config");
+    expect(typeof ENABLE_MOCK_DATA).toBe("boolean");
   });
 });

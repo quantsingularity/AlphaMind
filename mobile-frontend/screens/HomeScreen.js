@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import {
   RefreshControl,
   ScrollView,
@@ -25,7 +25,7 @@ export default function HomeScreen() {
     dispatch(fetchPortfolio());
   }, [dispatch]);
 
-  const onRefresh = React.useCallback(async () => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await dispatch(fetchPortfolio());
     setRefreshing(false);
@@ -51,24 +51,34 @@ export default function HomeScreen() {
         {
           title: "Sharpe Ratio",
           value: "0.00",
-          change: "0.00",
+          change: "",
           changeColor: "gray",
           icon: "chart-bell-curve-cumulative",
         },
         {
           title: "Active Strategies",
           value: "0",
-          change: "0",
+          change: "",
           changeColor: "gray",
           icon: "robot",
         },
       ];
     }
 
-    const portfolioValue = `$${data.value?.toLocaleString() || "0.00"}`;
-    const dailyPnL = `$${data.dailyPnL?.toLocaleString() || "0.00"}`;
-    const dailyPnLChange = `${data.dailyPnLPercent >= 0 ? "+" : ""}${data.dailyPnLPercent?.toFixed(2) || "0.00"}%`;
-    const changeColor = data.dailyPnLPercent >= 0 ? "green" : "red";
+    const portfolioValue = `$${(data.value ?? 0).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+    const dailyPnLNum = data.dailyPnL ?? 0;
+    const dailyPnL = `${dailyPnLNum >= 0 ? "+" : ""}$${Math.abs(
+      dailyPnLNum,
+    ).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+    const dailyPnLPercent = data.dailyPnLPercent ?? 0;
+    const dailyPnLChange = `${dailyPnLPercent >= 0 ? "+" : ""}${dailyPnLPercent.toFixed(2)}%`;
+    const changeColor = dailyPnLPercent >= 0 ? "green" : "red";
 
     return [
       {
@@ -87,20 +97,20 @@ export default function HomeScreen() {
       },
       {
         title: "Sharpe Ratio",
-        value: data.sharpeRatio?.toFixed(2) || "0.00",
+        value: (data.sharpeRatio ?? 0).toFixed(2),
         change: "",
-        changeColor: "blue",
+        changeColor: theme.colors.primary,
         icon: "chart-bell-curve-cumulative",
       },
       {
         title: "Active Strategies",
-        value: String(data.activeStrategies || 0),
+        value: String(data.activeStrategies ?? 0),
         change: "",
-        changeColor: "blue",
+        changeColor: theme.colors.primary,
         icon: "robot",
       },
     ];
-  }, [data]);
+  }, [data, theme.colors.primary]);
 
   const styles = useMemo(
     () =>
@@ -131,6 +141,7 @@ export default function HomeScreen() {
           textAlign: "center",
         },
         welcome: {
+          color: theme.colors.onBackground,
           fontSize: 14,
           marginBottom: 16,
           textAlign: "center",
@@ -165,13 +176,9 @@ export default function HomeScreen() {
         </Text>
       )}
 
-      <Headline style={styles.title}>
-        <Text>AlphaMind Dashboard</Text>
-      </Headline>
+      <Headline style={styles.title}>AlphaMind Dashboard</Headline>
       <Paragraph style={styles.paragraph}>
-        <Text>
-          Real-time overview of your quantitative trading performance.
-        </Text>
+        Real-time overview of your quantitative trading performance.
       </Paragraph>
 
       <View style={styles.kpiContainer}>
@@ -181,10 +188,8 @@ export default function HomeScreen() {
       </View>
 
       <Paragraph style={styles.infoText}>
-        <Text>
-          Navigate using the bottom tabs to explore features, documentation, and
-          research.
-        </Text>
+        Navigate using the bottom tabs to explore features, documentation, and
+        research.
       </Paragraph>
     </ScrollView>
   );

@@ -16,6 +16,9 @@ spec:
       labels:
         app: alphamind-database
     spec:
+      securityContext:
+        runAsUser: 999
+        fsGroup: 999
       containers:
         - name: alphamind-database
           image: mysql:8.0
@@ -50,22 +53,21 @@ spec:
           livenessProbe:
             exec:
               command:
-                ["mysqladmin", "ping", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+                - /bin/sh
+                - -c
+                - mysqladmin ping -h 127.0.0.1 -u root -p"${MYSQL_ROOT_PASSWORD}"
             initialDelaySeconds: 30
             periodSeconds: 10
+            failureThreshold: 3
           readinessProbe:
             exec:
               command:
-                [
-                  "mysql",
-                  "-u",
-                  "root",
-                  "-p${MYSQL_ROOT_PASSWORD}",
-                  "-e",
-                  "SELECT 1",
-                ]
-            initialDelaySeconds: 5
+                - /bin/sh
+                - -c
+                - mysql -h 127.0.0.1 -u root -p"${MYSQL_ROOT_PASSWORD}" -e "SELECT 1"
+            initialDelaySeconds: 10
             periodSeconds: 5
+            failureThreshold: 3
   volumeClaimTemplates:
     - metadata:
         name: alphamind-database-data

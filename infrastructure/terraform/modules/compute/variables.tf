@@ -9,7 +9,12 @@ variable "vpc_id" {
 }
 
 variable "private_subnet_ids" {
-  description = "IDs of the private subnets"
+  description = "IDs of the private subnets for EC2 instances"
+  type        = list(string)
+}
+
+variable "public_subnet_ids" {
+  description = "IDs of the public subnets for the load balancer"
   type        = list(string)
 }
 
@@ -35,14 +40,14 @@ variable "security_group_ids" {
   type        = list(string)
 }
 
-variable "public_subnet_ids" {
-  description = "IDs of the public subnets"
-  type        = list(string)
-  default     = []
-}
-
 variable "kms_key_id" {
   description = "KMS key ID for encryption"
+  type        = string
+  default     = ""
+}
+
+variable "certificate_arn" {
+  description = "ACM certificate ARN for HTTPS listener"
   type        = string
   default     = ""
 }

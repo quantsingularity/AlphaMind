@@ -1,5 +1,5 @@
 import { StyleSheet, View } from "react-native";
-import { Card, Text, Title, useTheme } from "react-native-paper";
+import { Card, Text, useTheme } from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 export default function KPICard({
@@ -13,7 +13,11 @@ export default function KPICard({
   const theme = useTheme();
 
   return (
-    <Card style={styles.card}>
+    <Card
+      style={styles.card}
+      accessible
+      accessibilityLabel={`${title}: ${isLoading ? "loading" : value}`}
+    >
       <Card.Content style={styles.cardContent}>
         {icon && (
           <Icon
@@ -25,13 +29,20 @@ export default function KPICard({
         )}
         <View style={styles.textContainer}>
           <Text
+            variant="labelSmall"
             style={[styles.title, { color: theme.colors.onSurfaceVariant }]}
           >
             {title}
           </Text>
-          <Title style={styles.value}>{isLoading ? "..." : value}</Title>
-          {change && (
+          <Text
+            variant="titleMedium"
+            style={[styles.value, { color: theme.colors.onSurface }]}
+          >
+            {isLoading ? "—" : value}
+          </Text>
+          {!!change && (
             <Text
+              variant="labelSmall"
               style={[
                 styles.change,
                 { color: changeColor || theme.colors.onSurface },
@@ -57,8 +68,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   change: {
-    fontSize: 12,
     marginTop: 2,
+    textAlign: "center",
   },
   icon: {
     marginBottom: 8,
@@ -67,13 +78,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: 12,
     marginBottom: 2,
     textAlign: "center",
   },
   value: {
-    fontSize: 16,
-    lineHeight: 20,
     textAlign: "center",
   },
 });

@@ -1,0 +1,47 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    image: alphamind-frontend:latest
+    container_name: alphamind-frontend
+    ports:
+      - "3000:80"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - alphamind-network
+
+  # Development service with hot-reload
+  frontend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: alphamind-frontend-dev:latest
+    container_name: alphamind-frontend-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_BASE_URL=http://localhost:5000
+    restart: unless-stopped
+    networks:
+      - alphamind-network
+    profiles:
+      - dev
+
+networks:
+  alphamind-network:
+    name: alphamind-network
+    driver: bridge

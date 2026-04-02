@@ -64,8 +64,9 @@ run_remote() {
     return 1
   fi
 
-  print_info "Running on $REMOTE_HOST: $1"
-  ssh $SSH_OPTIONS "$REMOTE_HOST" "$1"
+  local remote_target="${REMOTE_USER:-$(whoami)}@${REMOTE_HOST}"
+  print_info "Running on $remote_target: $1"
+  ssh $SSH_OPTIONS "$remote_target" "$1"
 }
 
 # Function to transfer files/dirs using scp
@@ -78,8 +79,9 @@ transfer_files() {
   local source="$1"
   local dest="$2"
 
-  print_info "Transferring $source to $REMOTE_HOST:$dest"
-  scp $SSH_OPTIONS -r "$source" "$REMOTE_HOST:$dest"
+  local remote_target="${REMOTE_USER:-$(whoami)}@${REMOTE_HOST}"
+  print_info "Transferring $source to $remote_target:$dest"
+  scp -P "$REMOTE_PORT" -r "$source" "$remote_target:$dest"
 }
 
 # --- Initialization ---
@@ -171,7 +173,7 @@ mkdir -p "$LOG_DIR"
 LOG_FILE="$LOG_DIR/deploy-$(date +%Y%m%d-%H%M%S).log"
 
 # Start logging
-exec > >(tee -a "$LOG_FILE") 2>&1
+exec > >(stdbuf -oL tee -a "$LOG_FILE") 2>&1
 print_info "Logging to $LOG_FILE"
 
 # Load deployment configuration
@@ -305,6 +307,15 @@ EOF
   fi
 fi
 
+# Set defaults before loading config (in case config is missing some vars)
+REMOTE_HOST="${REMOTE_HOST:-localhost}"
+REMOTE_PORT="${REMOTE_PORT:-22}"
+REMOTE_DIR="${REMOTE_DIR:-/var/www/alphamind}"
+USE_DOCKER="${USE_DOCKER:-false}"
+DEPLOYMENT_STRATEGY="${DEPLOYMENT_STRATEGY:-direct}"
+KEEP_RELEASES="${KEEP_RELEASES:-5}"
+DOCKER_COMPOSE_FILE="${DOCKER_COMPOSE_FILE:-docker-compose.yml}"
+
 # Load configuration
 source "$CONFIG_FILE"
 
@@ -357,7 +368,7 @@ if [[ "$SKIP_TESTS" == "false" && "$ROLLBACK" == "false" ]]; then
       TEST_ARGS="$TEST_ARGS --component $COMPONENT"
     fi
 
-    if ! bash "$PROJECT_ROOT/scripts/run_tests.sh" $TEST_ARGS; then
+    if ! bash "$PROJECT_ROOT/run_tests.sh" $TEST_ARGS; then
       print_error "Tests failed!"
       if [[ "$FORCE" != "true" ]]; then
         print_info "Exiting. Run with --force to deploy anyway."
@@ -386,7 +397,7 @@ if [[ "$SKIP_BUILD" == "false" && "$ROLLBACK" == "false" ]]; then
       BUILD_ARGS="$BUILD_ARGS --component $COMPONENT"
     fi
 
-    if ! bash "$PROJECT_ROOT/scripts/build.sh" $BUILD_ARGS; then
+    if ! bash "$PROJECT_ROOT/build.sh" $BUILD_ARGS; then
       print_error "Build failed!"
       exit 1
     else
@@ -832,7 +843,7 @@ $(tail -n 50 "$LOG_FILE")
       You can access it at the following URL:
     </p>
     <p>
-      <strong>URL:</strong> ${DEPLOY_ENV:+https://}${DEPLOY_ENV:+${DEPLOY_ENV}${DEPLOY_ENV:+.}}${DEPLOY_ENV:+alphamind.example.com}${DEPLOY_ENV:-http://localhost}
+      <strong>URL:</strong> $(case "$DEPLOY_ENV" in production) echo "https://alphamind.example.com";; staging) echo "https://staging.alphamind.example.com";; *) echo "http://localhost:8000";; esac)
     </p>
     <p>
       If you need to roll back to the previous version, run:

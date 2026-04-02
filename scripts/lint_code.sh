@@ -50,6 +50,13 @@ print_info() {
 # Exit immediately if a command exits with a non-zero status
 set -euo pipefail
 
+# Initialize path arrays early to avoid unbound variable errors
+PYTHON_PATHS=()
+JS_PATHS=()
+
+_venv_cleanup() { deactivate 2>/dev/null || true; }
+trap _venv_cleanup EXIT
+
 # Define project root directory (assuming the script is in the project root)
 PROJECT_ROOT="$(pwd)"
 
@@ -124,7 +131,7 @@ if [[ -d "venv" ]]; then
 else
   print_warning "Python virtual environment not found. Running setup_environment.sh..."
   if [[ -f "./setup_environment.sh" ]]; then
-    bash "$PROJECT_ROOT/scripts/setup_environment.sh" --type development
+    bash "$PROJECT_ROOT/setup_environment.sh" --type development
     source venv/bin/activate
   else
     print_error "setup_environment.sh not found. Please set up the environment first."
@@ -270,7 +277,7 @@ run_python_linters() {
 
   # Run Pylint (comprehensive linter)
   print_info "Running Pylint..."
-  pylint "${PYTHON_FILES[@]}" --output="$REPORT_DIR/python/pylint.log" || true
+  pylint "${PYTHON_FILES[@]}" 2>&1 | tee "$REPORT_DIR/python/pylint.log" || true
   print_info "Pylint completed, report saved to $REPORT_DIR/python/pylint.log"
 
   print_success "Python linting completed"
@@ -298,7 +305,7 @@ run_js_linters() {
 
     print_info "Linting $path..."
 
-    cd "$path"
+    cd "$path" || { print_warning "Cannot cd into $path, skipping"; continue; }
 
     # Check if package.json exists
     if [[ ! -f "package.json" ]]; then

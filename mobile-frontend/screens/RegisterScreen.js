@@ -16,12 +16,16 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { clearError, registerUser } from "../store/slices/authSlice";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_PASSWORD_LENGTH = 8;
+
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [localError, setLocalError] = useState("");
 
   const dispatch = useDispatch();
@@ -29,9 +33,32 @@ export default function RegisterScreen({ navigation }) {
   const theme = useTheme();
 
   const handleRegister = async () => {
-    // Validation
-    if (!name || !email || !password || !confirmPassword) {
-      setLocalError("All fields are required");
+    setLocalError("");
+
+    if (!name.trim()) {
+      setLocalError("Full name is required");
+      return;
+    }
+
+    if (!email.trim()) {
+      setLocalError("Email is required");
+      return;
+    }
+
+    if (!EMAIL_REGEX.test(email.trim())) {
+      setLocalError("Please enter a valid email address");
+      return;
+    }
+
+    if (!password) {
+      setLocalError("Password is required");
+      return;
+    }
+
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      setLocalError(
+        `Password must be at least ${MIN_PASSWORD_LENGTH} characters`,
+      );
       return;
     }
 
@@ -40,13 +67,9 @@ export default function RegisterScreen({ navigation }) {
       return;
     }
 
-    if (password.length < 8) {
-      setLocalError("Password must be at least 8 characters");
-      return;
-    }
-
-    setLocalError("");
-    dispatch(registerUser({ name, email, password }));
+    dispatch(
+      registerUser({ name: name.trim(), email: email.trim(), password }),
+    );
   };
 
   const handleDismissError = () => {
@@ -54,7 +77,10 @@ export default function RegisterScreen({ navigation }) {
     setLocalError("");
   };
 
-  const displayError = error || localError;
+  const displayError = localError || error;
+
+  const isFormValid =
+    name.trim() && email.trim() && password && confirmPassword;
 
   return (
     <KeyboardAvoidingView
@@ -66,6 +92,7 @@ export default function RegisterScreen({ navigation }) {
           styles.scrollContent,
           { backgroundColor: theme.colors.background },
         ]}
+        keyboardShouldPersistTaps="handled"
       >
         <Headline style={styles.title}>Create Account</Headline>
         <Text style={styles.subtitle}>Join AlphaMind to start trading</Text>
@@ -77,8 +104,10 @@ export default function RegisterScreen({ navigation }) {
           mode="outlined"
           autoCapitalize="words"
           autoComplete="name"
+          autoCorrect={false}
           style={styles.input}
           left={<TextInput.Icon icon="account" />}
+          testID="name-input"
         />
 
         <TextInput
@@ -89,8 +118,10 @@ export default function RegisterScreen({ navigation }) {
           keyboardType="email-address"
           autoCapitalize="none"
           autoComplete="email"
+          autoCorrect={false}
           style={styles.input}
           left={<TextInput.Icon icon="email" />}
+          testID="email-input"
         />
 
         <TextInput
@@ -100,7 +131,7 @@ export default function RegisterScreen({ navigation }) {
           mode="outlined"
           secureTextEntry={!showPassword}
           autoCapitalize="none"
-          autoComplete="password"
+          autoComplete="new-password"
           style={styles.input}
           left={<TextInput.Icon icon="lock" />}
           right={
@@ -109,6 +140,7 @@ export default function RegisterScreen({ navigation }) {
               onPress={() => setShowPassword(!showPassword)}
             />
           }
+          testID="password-input"
         />
 
         <TextInput
@@ -116,18 +148,27 @@ export default function RegisterScreen({ navigation }) {
           value={confirmPassword}
           onChangeText={setConfirmPassword}
           mode="outlined"
-          secureTextEntry={!showPassword}
+          secureTextEntry={!showConfirmPassword}
           autoCapitalize="none"
+          autoComplete="new-password"
           style={styles.input}
           left={<TextInput.Icon icon="lock-check" />}
+          right={
+            <TextInput.Icon
+              icon={showConfirmPassword ? "eye-off" : "eye"}
+              onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+            />
+          }
+          testID="confirm-password-input"
         />
 
         <Button
           mode="contained"
           onPress={handleRegister}
           loading={loading}
-          disabled={loading || !name || !email || !password || !confirmPassword}
+          disabled={loading || !isFormValid}
           style={styles.button}
+          contentStyle={styles.buttonContent}
         >
           Register
         </Button>
@@ -136,6 +177,7 @@ export default function RegisterScreen({ navigation }) {
           mode="text"
           onPress={() => navigation.navigate("Login")}
           style={styles.linkButton}
+          disabled={loading}
         >
           Already have an account? Login
         </Button>
@@ -143,7 +185,7 @@ export default function RegisterScreen({ navigation }) {
         <Snackbar
           visible={!!displayError}
           onDismiss={handleDismissError}
-          duration={3000}
+          duration={4000}
           action={{
             label: "Dismiss",
             onPress: handleDismissError,
@@ -159,6 +201,9 @@ export default function RegisterScreen({ navigation }) {
 const styles = StyleSheet.create({
   button: {
     marginTop: 16,
+  },
+  buttonContent: {
+    paddingVertical: 4,
   },
   container: {
     flex: 1,

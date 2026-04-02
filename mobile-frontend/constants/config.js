@@ -1,18 +1,23 @@
 import Constants from "expo-constants";
 
-// API Configuration
 export const API_BASE_URL =
   Constants.expoConfig?.extra?.apiBaseUrl ||
+  process.env.EXPO_PUBLIC_API_BASE_URL ||
   process.env.API_BASE_URL ||
   "http://localhost:5000";
 
-export const API_TIMEOUT = 30000;
+export const API_TIMEOUT = Number(process.env.API_TIMEOUT) || 30000;
 
-// Feature Flags
-export const ENABLE_MOCK_DATA = process.env.ENABLE_MOCK_DATA === "true";
-export const ENABLE_OFFLINE_MODE = process.env.ENABLE_OFFLINE_MODE !== "false";
+export const ENABLE_MOCK_DATA =
+  process.env.EXPO_PUBLIC_ENABLE_MOCK_DATA === "true" ||
+  process.env.ENABLE_MOCK_DATA === "true";
 
-// AsyncStorage Keys
+export const ENABLE_OFFLINE_MODE =
+  process.env.EXPO_PUBLIC_ENABLE_OFFLINE_MODE !== "false" &&
+  process.env.ENABLE_OFFLINE_MODE !== "false";
+
+export const APP_VERSION = Constants.expoConfig?.version || "1.0.0";
+
 export const STORAGE_KEYS = {
   AUTH_TOKEN: "@alphamind/auth_token",
   USER_DATA: "@alphamind/user_data",
@@ -20,7 +25,6 @@ export const STORAGE_KEYS = {
   SETTINGS: "@alphamind/settings",
 };
 
-// API Endpoints
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: "/api/auth/login",

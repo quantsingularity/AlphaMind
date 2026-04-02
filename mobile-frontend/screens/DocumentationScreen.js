@@ -1,4 +1,4 @@
-import { Alert, ScrollView, StyleSheet, Text } from "react-native"; // Added Text import
+import { Alert, ScrollView, StyleSheet } from "react-native";
 import {
   Headline,
   List,
@@ -12,8 +12,6 @@ export default function DocumentationScreen() {
 
   const handlePress = (title) => {
     Alert.alert("Navigate", `Opening documentation for: ${title}`);
-    // In a real app, you would navigate to the specific document/screen
-    // e.g., navigation.navigate('DocViewer', { docId: title });
   };
 
   return (
@@ -23,18 +21,14 @@ export default function DocumentationScreen() {
         { backgroundColor: theme.colors.background },
       ]}
     >
-      <Headline style={styles.title}>
-        <Text>Documentation</Text>
-      </Headline>
+      <Headline style={styles.title}>Documentation</Headline>
       <Paragraph style={styles.paragraph}>
-        <Text>
-          Access comprehensive resources to help you get the most out of
-          AlphaMind.
-        </Text>
+        Access comprehensive resources to help you get the most out of
+        AlphaMind.
       </Paragraph>
 
       <Surface style={styles.listContainer} elevation={1}>
-        <List.Section title={<Text>Getting Started</Text>}>
+        <List.Section title="Getting Started">
           <List.Item
             title="User Guide"
             description="Step-by-step instructions for setting up and using the platform."
@@ -51,7 +45,7 @@ export default function DocumentationScreen() {
           />
         </List.Section>
 
-        <List.Section title={<Text>API Reference</Text>}>
+        <List.Section title="API Reference">
           <List.Item
             title="REST API Docs"
             description="Detailed reference for all available API endpoints."
@@ -66,7 +60,7 @@ export default function DocumentationScreen() {
           />
         </List.Section>
 
-        <List.Section title={<Text>Examples & Tutorials</Text>}>
+        <List.Section title="Examples & Tutorials">
           <List.Item
             title="Backtesting Example"
             description="Learn how to backtest trading strategies effectively."
@@ -93,7 +87,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     borderRadius: 8,
-    width: "100%", // Optional: Add some rounding
+    width: "100%",
   },
   paragraph: {
     marginBottom: 24,

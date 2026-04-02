@@ -3,17 +3,17 @@
   hosts: all
   become: true
   roles:
-    - ../roles/common
-    - ../roles/security
+    - common
+    - security
 
 - name: Configure Database Servers
   hosts: database
   become: true
   roles:
-    - ../roles/database
+    - database
 
 - name: Configure Web Servers
   hosts: webservers
   become: true
   roles:
-    - ../roles/webserver
+    - webserver

@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { portfolioService } from "../../services/portfolioService";
+import { logoutUser } from "./authSlice";
 
-// Async thunks
 export const fetchPortfolio = createAsyncThunk(
   "portfolio/fetch",
   async (_, thunkAPI) => {
@@ -62,13 +62,12 @@ const portfolioSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
-    resetPortfolio: (_state) => {
+    resetPortfolio: () => {
       return initialState;
     },
   },
   extraReducers: (builder) => {
     builder
-      // Fetch Portfolio
       .addCase(fetchPortfolio.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -83,7 +82,6 @@ const portfolioSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Fetch Performance
       .addCase(fetchPerformance.pending, (state) => {
         state.performanceLoading = true;
       })
@@ -95,7 +93,6 @@ const portfolioSlice = createSlice({
         state.performanceLoading = false;
         state.error = action.payload;
       })
-      // Fetch Holdings
       .addCase(fetchHoldings.pending, (state) => {
         state.holdingsLoading = true;
       })
@@ -106,6 +103,12 @@ const portfolioSlice = createSlice({
       .addCase(fetchHoldings.rejected, (state, action) => {
         state.holdingsLoading = false;
         state.error = action.payload;
+      })
+      .addCase(logoutUser.fulfilled, () => {
+        return initialState;
+      })
+      .addCase(logoutUser.rejected, () => {
+        return initialState;
       });
   },
 });

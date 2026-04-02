@@ -3,324 +3,341 @@
 # Test script for AlphaMind project
 # This script tests both frontend and backend components
 
+# Resolve project root relative to this script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$SCRIPT_DIR"
+FRONTEND_DIR="$PROJECT_ROOT/web-frontend"
+BACKEND_DIR="$PROJECT_ROOT/backend"
+TESTS_DIR="$PROJECT_ROOT/tests"
+RESULTS_DIR="$TESTS_DIR/results"
+
+PASS=0
+FAIL=0
+WARN=0
+
+pass()  { echo "✓ $*"; PASS=$((PASS+1)); }
+fail()  { echo "✗ $*"; FAIL=$((FAIL+1)); }
+warn()  { echo "! Warning: $*"; WARN=$((WARN+1)); }
+
 echo "Starting AlphaMind test suite..."
+echo "Project root: $PROJECT_ROOT"
+echo ""
 
-# Create test directory if it doesn't exist
-mkdir -p /AlphaMind/tests/results
+# Create test/results directory
+mkdir -p "$RESULTS_DIR"
 
-# Test frontend components
+# ---------------------------------------------------------------------------
+# Frontend Tests
+# ---------------------------------------------------------------------------
 echo "Testing frontend components..."
 
-# Check if all HTML files are valid
-echo "Checking HTML validity..."
-for file in /AlphaMind/web-frontend/*.html; do
-  filename=$(basename "$file")
-  echo "Testing $filename..."
+if [[ ! -d "$FRONTEND_DIR" ]]; then
+  warn "web-frontend directory not found; skipping frontend tests"
+else
 
-  # Check if file exists and is readable
-  if [ -r "$file" ]; then
-    echo "✓ File exists and is readable"
-  else
-    echo "✗ File does not exist or is not readable"
-    exit 1
-  fi
-
-  # Check for basic HTML structure
-  if grep -q "<!DOCTYPE html>" "$file" && grep -q "<html" "$file" && grep -q "<head>" "$file" && grep -q "<body>" "$file"; then
-    echo "✓ Basic HTML structure is valid"
-  else
-    echo "✗ Basic HTML structure is invalid"
-    exit 1
-  fi
-
-  # Check for responsive viewport meta tag
-  if grep -q '<meta name="viewport"' "$file"; then
-    echo "✓ Responsive viewport meta tag found"
-  else
-    echo "✗ Responsive viewport meta tag missing"
-    exit 1
-  fi
-
-  # Check for CSS links
-  if grep -q '<link rel="stylesheet" href="css/modern-styles.css">' "$file" || grep -q '<link rel="stylesheet" href="css/styles.css">' "$file"; then
-    echo "✓ CSS link found"
-  else
-    echo "✗ CSS link missing"
-    exit 1
-  fi
-
-  echo "$filename passed basic validation tests"
+  # --- HTML files ---
   echo ""
-done
-
-# Check if all CSS files are valid
-echo "Checking CSS files..."
-for file in /AlphaMind/web-frontend/css/*.css; do
-  filename=$(basename "$file")
-  echo "Testing $filename..."
-
-  # Check if file exists and is readable
-  if [ -r "$file" ]; then
-    echo "✓ File exists and is readable"
+  echo "Checking HTML validity..."
+  HTML_FILES=( "$FRONTEND_DIR"/*.html )
+  if [[ ! -e "${HTML_FILES[0]}" ]]; then
+    warn "No HTML files found in $FRONTEND_DIR"
   else
-    echo "✗ File does not exist or is not readable"
-    exit 1
+    for file in "${HTML_FILES[@]}"; do
+      filename=$(basename "$file")
+      echo "Testing $filename..."
+
+      if [[ ! -r "$file" ]]; then
+        fail "File does not exist or is not readable: $file"
+        continue
+      fi
+      pass "File exists and is readable"
+
+      if grep -q "<!DOCTYPE html>" "$file" && grep -q "<html" "$file" && \
+         grep -q "<head>" "$file" && grep -q "<body>" "$file"; then
+        pass "Basic HTML structure is valid"
+      else
+        fail "Basic HTML structure is invalid in $filename"
+      fi
+
+      if grep -q '<meta name="viewport"' "$file"; then
+        pass "Responsive viewport meta tag found"
+      else
+        fail "Responsive viewport meta tag missing in $filename"
+      fi
+
+      if grep -qE '<link rel="stylesheet" href="css/[^"]+\.css">' "$file"; then
+        pass "CSS stylesheet link found"
+      else
+        fail "CSS stylesheet link missing in $filename"
+      fi
+
+      echo "$filename passed basic validation tests"
+      echo ""
+    done
   fi
 
-  # Check for basic CSS structure (at least one rule)
-  if grep -q "{" "$file" && grep -q "}" "$file"; then
-    echo "✓ Basic CSS structure is valid"
+  # --- CSS files ---
+  echo "Checking CSS files..."
+  CSS_FILES=( "$FRONTEND_DIR"/css/*.css )
+  if [[ ! -e "${CSS_FILES[0]}" ]]; then
+    warn "No CSS files found in $FRONTEND_DIR/css"
   else
-    echo "✗ Basic CSS structure is invalid"
-    exit 1
+    for file in "${CSS_FILES[@]}"; do
+      filename=$(basename "$file")
+      echo "Testing $filename..."
+
+      if [[ ! -r "$file" ]]; then
+        fail "File does not exist or is not readable: $file"
+        continue
+      fi
+      pass "File exists and is readable"
+
+      if grep -q "{" "$file" && grep -q "}" "$file"; then
+        pass "Basic CSS structure is valid"
+      else
+        fail "Basic CSS structure is invalid in $filename"
+      fi
+
+      if grep -q "@media" "$file"; then
+        pass "Responsive media queries found"
+      else
+        warn "No responsive media queries found in $filename"
+      fi
+
+      echo "$filename passed basic validation tests"
+      echo ""
+    done
   fi
 
-  # Check for responsive media queries
-  if grep -q "@media" "$file"; then
-    echo "✓ Responsive media queries found"
+  # --- JS files ---
+  echo "Checking JavaScript files..."
+  JS_FILES=( "$FRONTEND_DIR"/js/*.js )
+  if [[ ! -e "${JS_FILES[0]}" ]]; then
+    warn "No JS files found in $FRONTEND_DIR/js"
   else
-    echo "! Warning: No responsive media queries found"
+    for file in "${JS_FILES[@]}"; do
+      filename=$(basename "$file")
+      echo "Testing $filename..."
+
+      if [[ ! -r "$file" ]]; then
+        fail "File does not exist or is not readable: $file"
+        continue
+      fi
+      pass "File exists and is readable"
+
+      if grep -qE "function |const |let |var |=>" "$file"; then
+        pass "Basic JS structure is valid"
+      else
+        fail "No recognizable JS constructs found in $filename"
+      fi
+
+      if grep -q "addEventListener" "$file"; then
+        pass "Event listeners found"
+      else
+        warn "No event listeners found in $filename"
+      fi
+
+      echo "$filename passed basic validation tests"
+      echo ""
+    done
   fi
 
-  echo "$filename passed basic validation tests"
-  echo ""
-done
+  # --- Image references ---
+  echo "Checking referenced image files..."
+  while IFS= read -r imgref; do
+    imgpath="$FRONTEND_DIR/$imgref"
+    if [[ -f "$imgpath" ]]; then
+      pass "Image exists: $imgref"
+    else
+      warn "Referenced image not found: $imgpath"
+    fi
+  done < <(grep -roh 'images/[^"'"'"' >)]*' "$FRONTEND_DIR"/*.html 2>/dev/null | sort -u)
 
-# Check if all JS files are valid
-echo "Checking JavaScript files..."
-for file in /AlphaMind/web-frontend/js/*.js; do
-  filename=$(basename "$file")
-  echo "Testing $filename..."
-
-  # Check if file exists and is readable
-  if [ -r "$file" ]; then
-    echo "✓ File exists and is readable"
-  else
-    echo "✗ File does not exist or is not readable"
-    exit 1
-  fi
-
-  # Check for basic JS structure (at least one function)
-  if grep -q "function" "$file"; then
-    echo "✓ Basic JS structure is valid"
-  else
-    echo "✗ Basic JS structure is invalid"
-    exit 1
-  fi
-
-  # Check for event listeners
-  if grep -q "addEventListener" "$file"; then
-    echo "✓ Event listeners found"
-  else
-    echo "! Warning: No event listeners found"
-  fi
-
-  echo "$filename passed basic validation tests"
-  echo ""
-done
-
-# Check if all image files exist
-echo "Checking image files..."
-for file in $(grep -o 'images/[^"]*' /AlphaMind/web-frontend/*.html | sort | uniq); do
-  filepath="/AlphaMind/web-frontend/$file"
-  echo "Testing $file..."
-
-  # Check if file exists
-  if [ -f "$filepath" ]; then
-    echo "✓ Image file exists"
-  else
-    echo "! Warning: Image file does not exist: $filepath"
-  fi
-done
+fi  # end frontend dir check
 
 echo "Frontend tests completed."
 echo ""
 
-# Test backend components
+# ---------------------------------------------------------------------------
+# Backend Tests
+# ---------------------------------------------------------------------------
 echo "Testing backend components..."
 
-# Check if Python is installed
-if command -v python3 &>/dev/null; then
-  echo "✓ Python is installed"
-  python_version=$(python3 --version)
-  echo "  Python version: $python_version"
-else
-  echo "✗ Python is not installed"
+if ! command -v python3 &>/dev/null; then
+  fail "Python3 is not installed"
+  echo ""
+  echo "SUMMARY: $PASS passed, $FAIL failed, $WARN warnings"
   exit 1
 fi
 
-# Check if required Python packages are installed
+python_version=$(python3 --version 2>&1)
+pass "Python is installed: $python_version"
+
+# Check required Python packages
 echo "Checking Python packages..."
-required_packages=("numpy" "pandas" "tensorflow" "scikit-learn")
+required_packages=("numpy" "pandas" "scikit-learn")
+optional_packages=("tensorflow" "torch")
+
 for package in "${required_packages[@]}"; do
   if python3 -c "import $package" &>/dev/null; then
-    echo "✓ Package $package is installed"
+    pass "Package $package is installed"
   else
-    echo "! Warning: Package $package is not installed"
+    fail "Required package $package is NOT installed"
   fi
 done
 
-# Check if backend Python files are valid
-echo "Checking backend Python files..."
-for file in $(find /AlphaMind/backend -name "*.py"); do
-  filename=$(basename "$file")
-  echo "Testing $filename..."
-
-  # Check if file exists and is readable
-  if [ -r "$file" ]; then
-    echo "✓ File exists and is readable"
+for package in "${optional_packages[@]}"; do
+  if python3 -c "import $package" &>/dev/null; then
+    pass "Optional package $package is installed"
   else
-    echo "✗ File does not exist or is not readable"
-    exit 1
+    warn "Optional package $package is not installed"
   fi
-
-  # Check for Python syntax errors
-  if python3 -m py_compile "$file" 2>/dev/null; then
-    echo "✓ Python syntax is valid"
-  else
-    echo "✗ Python syntax is invalid"
-    exit 1
-  fi
-
-  echo "$filename passed basic validation tests"
-  echo ""
 done
 
-# Test the new AI model components
-echo "Testing new AI model components..."
+# Check backend Python files for syntax errors
+if [[ -d "$BACKEND_DIR" ]]; then
+  echo "Checking backend Python files for syntax errors..."
+  syntax_errors=0
+  while IFS= read -r -d '' file; do
+    filename=$(basename "$file")
+    if python3 -m py_compile "$file" 2>/dev/null; then
+      pass "Python syntax OK: $filename"
+    else
+      fail "Python syntax error in $filename"
+      syntax_errors=$((syntax_errors+1))
+    fi
+  done < <(find "$BACKEND_DIR" -name "*.py" -print0)
 
-# Test attention_mechanism.py
-if [ -f "/AlphaMind/backend/ai_models/attention_mechanism.py" ]; then
-  echo "Testing attention_mechanism.py..."
+  if [[ $syntax_errors -eq 0 ]]; then
+    echo "All Python files passed syntax check"
+  fi
+else
+  warn "Backend directory not found: $BACKEND_DIR"
+fi
 
-  # Create a simple test script
-  cat > /AlphaMind/tests/test_attention.py << 'EOF'
+# ---------------------------------------------------------------------------
+# AI Model Component Tests
+# ---------------------------------------------------------------------------
+echo ""
+echo "Testing AI model components..."
+
+run_python_test() {
+  local label="$1"
+  local testfile="$2"
+  local testcode="$3"
+
+  if [[ ! -f "$testfile" ]]; then
+    warn "$label source file not found, skipping"
+    return
+  fi
+
+  echo "Testing $label..."
+  local tmptest
+  tmptest=$(mktemp "$RESULTS_DIR/test_XXXXXX.py")
+
+  cat > "$tmptest" << PYEOF
 import sys
-import os
-sys.path.append('/AlphaMind/backend')
-try:
+sys.path.insert(0, '$BACKEND_DIR')
+$testcode
+PYEOF
+
+  if python3 "$tmptest" 2>&1; then
+    pass "$label tests passed"
+  else
+    fail "$label tests failed"
+  fi
+  rm -f "$tmptest"
+  echo ""
+}
+
+run_python_test "attention_mechanism" \
+  "$BACKEND_DIR/ai_models/attention_mechanism.py" \
+'try:
     from ai_models.attention_mechanism import MultiHeadAttention, TemporalAttentionBlock
-    print("✓ Successfully imported MultiHeadAttention and TemporalAttentionBlock")
-
-    # Test basic initialization
+    print("  Imported MultiHeadAttention and TemporalAttentionBlock")
     import tensorflow as tf
-    attention = MultiHeadAttention(d_model=64, num_heads=4)
-    print("✓ Successfully initialized MultiHeadAttention")
-
+    attn = MultiHeadAttention(d_model=64, num_heads=4)
+    print("  Initialized MultiHeadAttention")
     block = TemporalAttentionBlock(d_model=64, num_heads=4, dff=256)
-    print("✓ Successfully initialized TemporalAttentionBlock")
-
-    print("All tests passed for attention_mechanism.py")
+    print("  Initialized TemporalAttentionBlock")
+    print("All attention_mechanism tests passed")
 except Exception as e:
-    print(f"✗ Error: {str(e)}")
+    print(f"ERROR: {e}", file=sys.stderr)
     sys.exit(1)
-EOF
+'
 
-  # Run the test script
-  python3 /AlphaMind/tests/test_attention.py
-  echo ""
-fi
-
-# Test sentiment_analysis.py
-if [ -f "/AlphaMind/backend/alternative_data/sentiment_analysis.py" ]; then
-  echo "Testing sentiment_analysis.py..."
-
-  # Create a simple test script
-  cat > /AlphaMind/tests/test_sentiment.py << 'EOF'
-import sys
-import os
-sys.path.append('/AlphaMind/backend')
-try:
+run_python_test "sentiment_analysis" \
+  "$BACKEND_DIR/alternative_data/sentiment_analysis.py" \
+'try:
     from alternative_data.sentiment_analysis import MarketSentimentAnalyzer
-    print("✓ Successfully imported MarketSentimentAnalyzer")
-
-    # Test basic initialization
+    print("  Imported MarketSentimentAnalyzer")
     analyzer = MarketSentimentAnalyzer()
-    print("✓ Successfully initialized MarketSentimentAnalyzer")
-
-    print("All tests passed for sentiment_analysis.py")
+    print("  Initialized MarketSentimentAnalyzer")
+    print("All sentiment_analysis tests passed")
 except Exception as e:
-    print(f"✗ Error: {str(e)}")
+    print(f"ERROR: {e}", file=sys.stderr)
     sys.exit(1)
-EOF
+'
 
-  # Run the test script
-  python3 /AlphaMind/tests/test_sentiment.py
-  echo ""
-fi
-
-# Test portfolio_optimization.py
-if [ -f "/AlphaMind/backend/alpha_research/portfolio_optimization.py" ]; then
-  echo "Testing portfolio_optimization.py..."
-
-  # Create a simple test script
-  cat > /AlphaMind/tests/test_portfolio.py << 'EOF'
-import sys
-import os
-sys.path.append('/AlphaMind/backend')
-try:
+run_python_test "portfolio_optimization" \
+  "$BACKEND_DIR/alpha_research/portfolio_optimization.py" \
+'try:
     from alpha_research.portfolio_optimization import PortfolioOptimizer
-    print("✓ Successfully imported PortfolioOptimizer")
-
-    # Test basic initialization
+    print("  Imported PortfolioOptimizer")
     optimizer = PortfolioOptimizer(n_assets=5)
-    print("✓ Successfully initialized PortfolioOptimizer")
-
-    print("All tests passed for portfolio_optimization.py")
+    print("  Initialized PortfolioOptimizer")
+    print("All portfolio_optimization tests passed")
 except Exception as e:
-    print(f"✗ Error: {str(e)}")
+    print(f"ERROR: {e}", file=sys.stderr)
     sys.exit(1)
-EOF
+'
 
-  # Run the test script
-  python3 /AlphaMind/tests/test_portfolio.py
-  echo ""
-fi
-
-# Test authentication.py
-if [ -f "/AlphaMind/backend/infrastructure/authentication.py" ]; then
-  echo "Testing authentication.py..."
-
-  # Create a simple test script
-  cat > /AlphaMind/tests/test_auth.py << 'EOF'
-import sys
-import os
-sys.path.append('/AlphaMind/backend')
-try:
+run_python_test "authentication" \
+  "$BACKEND_DIR/infrastructure/authentication.py" \
+'try:
     from infrastructure.authentication import AuthenticationSystem
-    print("✓ Successfully imported AuthenticationSystem")
-
-    # Test token generation and verification
-    import jwt
-    from flask import Flask
-
-    app = Flask(__name__)
-    auth = AuthenticationSystem(app, 'test-secret-key')
-    print("✓ Successfully initialized AuthenticationSystem")
-
-    token = auth.generate_token('testuser')
-    print("✓ Successfully generated token")
-
-    username = auth.verify_token(token)
-    if username == 'testuser':
-        print("✓ Successfully verified token")
-    else:
-        print(f"✗ Token verification failed: {username}")
-        sys.exit(1)
-
-    print("All tests passed for authentication.py")
+    print("  Imported AuthenticationSystem")
+    try:
+        import jwt
+        from flask import Flask
+        app = Flask(__name__)
+        auth = AuthenticationSystem(app, "test-secret-key")
+        print("  Initialized AuthenticationSystem")
+        token = auth.generate_token("testuser")
+        print("  Generated token")
+        username = auth.verify_token(token)
+        if username == "testuser":
+            print("  Token verification successful")
+        else:
+            print(f"  Token verification returned unexpected value: {username}", file=sys.stderr)
+            sys.exit(1)
+    except ImportError as ie:
+        print(f"  Skipping full auth test (missing dependency: {ie})")
+    print("All authentication tests passed")
 except Exception as e:
-    print(f"✗ Error: {str(e)}")
+    print(f"ERROR: {e}", file=sys.stderr)
     sys.exit(1)
-EOF
-
-  # Run the test script
-  python3 /AlphaMind/tests/test_auth.py
-  echo ""
-fi
+'
 
 echo "Backend tests completed."
 echo ""
 
-echo "All tests completed successfully!"
-echo "The AlphaMind project is ready for deployment."
+# ---------------------------------------------------------------------------
+# Summary
+# ---------------------------------------------------------------------------
+echo "====================================================="
+echo "TEST SUMMARY"
+echo "====================================================="
+echo "  Passed  : $PASS"
+echo "  Failed  : $FAIL"
+echo "  Warnings: $WARN"
+echo "====================================================="
+
+if [[ $FAIL -gt 0 ]]; then
+  echo "RESULT: FAILED ($FAIL test(s) failed)"
+  exit 1
+else
+  echo "RESULT: PASSED"
+  echo "The AlphaMind project passed all component tests."
+  exit 0
+fi

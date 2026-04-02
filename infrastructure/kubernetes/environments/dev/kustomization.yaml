@@ -1,8 +1,10 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-bases:
+resources:
   - ../../base
+
+namespace: alphamind-dev
 
 namePrefix: dev-
 
@@ -37,3 +39,23 @@ patches:
       - op: replace
         path: /spec/rules/0/host
         value: dev.alphamind.example.com
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: alphamind-backend-hpa
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 1
+      - op: replace
+        path: /spec/maxReplicas
+        value: 3
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: alphamind-frontend-hpa
+    patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 1
+      - op: replace
+        path: /spec/maxReplicas
+        value: 3

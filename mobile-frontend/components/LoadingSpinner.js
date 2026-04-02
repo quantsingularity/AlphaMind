@@ -1,14 +1,34 @@
 import { StyleSheet, View } from "react-native";
-import { ActivityIndicator, Text } from "react-native-paper";
+import { ActivityIndicator, Text, useTheme } from "react-native-paper";
 
 export default function LoadingSpinner({
   message = "Loading...",
   size = "large",
+  fullScreen = true,
 }) {
+  const theme = useTheme();
+
   return (
-    <View style={styles.container}>
-      <ActivityIndicator size={size} />
-      {message && <Text style={styles.message}>{message}</Text>}
+    <View
+      style={[
+        fullScreen ? styles.container : styles.inline,
+        {
+          backgroundColor: fullScreen ? theme.colors.background : "transparent",
+        },
+      ]}
+      accessible
+      accessibilityRole="progressbar"
+      accessibilityLabel={message}
+    >
+      <ActivityIndicator size={size} color={theme.colors.primary} />
+      {!!message && (
+        <Text
+          variant="bodyMedium"
+          style={[styles.message, { color: theme.colors.onSurfaceVariant }]}
+        >
+          {message}
+        </Text>
+      )}
     </View>
   );
 }
@@ -18,6 +38,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flex: 1,
     justifyContent: "center",
+  },
+  inline: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 20,
   },
   message: {
     marginTop: 16,

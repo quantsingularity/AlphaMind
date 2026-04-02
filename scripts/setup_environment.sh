@@ -181,10 +181,12 @@ if [[ "$SKIP_PYTHON" == "false" ]]; then
   print_header "Setting up Python Environment"
 
   # Check for Python 3.10+
-  if command_exists python3.10; then
-    PYTHON_CMD="python3.10"
+  if command_exists python3.12; then
+    PYTHON_CMD="python3.12"
   elif command_exists python3.11; then
     PYTHON_CMD="python3.11"
+  elif command_exists python3.10; then
+    PYTHON_CMD="python3.10"
   elif command_exists python3; then
     PY_VERSION=$(python3 --version | cut -d' ' -f2)
     if [[ $(echo "$PY_VERSION" | cut -d. -f1,2 | sed 's/\.//') -ge 310 ]]; then
@@ -269,19 +271,19 @@ if [[ "$SKIP_NODE" == "false" ]]; then
   # Check for Node.js
   if command_exists node; then
     NODE_VERSION=$(node --version | cut -d'v' -f2)
-    if [[ $(echo "$NODE_VERSION" | cut -d. -f1) -ge 16 ]]; then
+    if [[ $(echo "$NODE_VERSION" | cut -d. -f1) -ge 18 ]]; then
       print_success "Using Node.js $NODE_VERSION"
     else
-      print_warning "Node.js 16+ is required but found $NODE_VERSION"
+      print_warning "Node.js 18+ is required but found $NODE_VERSION"
 
       if [[ "$OS" == "linux" ]]; then
-        print_info "Installing Node.js 16 via NodeSource..."
-        curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+        print_info "Installing Node.js 18 via NodeSource..."
+        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
         sudo apt-get install -y nodejs
       elif [[ "$OS" == "macos" ]]; then
-        print_info "Installing Node.js 16 via Homebrew..."
-        brew install node@16
-        brew link --force node@16
+        print_info "Installing Node.js 18 via Homebrew..."
+        brew install node@18
+        brew link --force node@18
       fi
 
       print_success "Node.js $(node --version) installed"
@@ -290,11 +292,11 @@ if [[ "$SKIP_NODE" == "false" ]]; then
     print_info "Node.js not found, installing..."
 
     if [[ "$OS" == "linux" ]]; then
-      curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+      curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
       sudo apt-get install -y nodejs
     elif [[ "$OS" == "macos" ]]; then
-      brew install node@16
-      brew link --force node@16
+      brew install node@18
+      brew link --force node@18
     fi
 
     print_success "Node.js $(node --version) installed"
@@ -430,7 +432,7 @@ if [[ "$SKIP_PYTHON" == "false" ]]; then
       print_warning "pytest not found in virtual environment"
     fi
 
-    if [[ "$SETUP_TYPE" == "development" && ! $(pip list | grep -q "black") ]]; then
+    if [[ "$SETUP_TYPE" == "development" ]] && ! pip list | grep -q "black"; then
       print_warning "black not found in virtual environment"
     fi
 
@@ -554,7 +556,7 @@ if [[ "$SKIP_NODE" == "false" ]]; then
   echo -e "npm: ${COLOR_CYAN}$(npm --version)${COLOR_RESET}"
 fi
 
-if [[ "$SKIP_DOCKER" == "false" && $(command_exists docker) ]]; then
+if [[ "$SKIP_DOCKER" == "false" ]] && command_exists docker; then
   echo -e "Docker: ${COLOR_CYAN}$(docker --version)${COLOR_RESET}"
   if command_exists docker-compose; then
     echo -e "Docker Compose: ${COLOR_CYAN}$(docker-compose --version)${COLOR_RESET}"

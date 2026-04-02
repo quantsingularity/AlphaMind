@@ -26,6 +26,8 @@ describe("Layout Component", () => {
       </BrowserRouter>,
     );
 
-    expect(screen.getByText(/© 2025 AlphaMind/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/AlphaMind\. All rights reserved\./i),
+    ).toBeInTheDocument();
   });
 });

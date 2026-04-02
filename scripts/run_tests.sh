@@ -50,6 +50,10 @@ print_info() {
 # Exit immediately if a command exits with a non-zero status
 set -euo pipefail
 
+# Ensure venv is deactivated on exit
+_venv_cleanup() { deactivate 2>/dev/null || true; }
+trap _venv_cleanup EXIT
+
 # Define project root directory (assuming the script is in the project root)
 PROJECT_ROOT="$(pwd)"
 
@@ -131,7 +135,7 @@ if [[ -d "venv" ]]; then
 else
   print_warning "Python virtual environment not found. Running setup_environment.sh..."
   if [[ -f "./setup_environment.sh" ]]; then
-    bash "$PROJECT_ROOT/scripts/setup_environment.sh" --type testing
+    bash "$PROJECT_ROOT/setup_environment.sh" --type testing
     source venv/bin/activate
   else
     print_error "setup_environment.sh not found. Please set up the environment first."
@@ -189,7 +193,7 @@ print_success "Test environment setup complete"
 print_header "Configuring Tests"
 
 # Set up pytest arguments
-PYTEST_ARGS=""
+PYTEST_ARGS="--tb=short"
 
 if [[ "$VERBOSE" == "true" ]]; then
   PYTEST_ARGS="$PYTEST_ARGS -v"
@@ -200,7 +204,7 @@ if [[ "$COVERAGE" == "true" ]]; then
 fi
 
 if [[ "$PARALLEL" == "true" ]]; then
-  PYTEST_ARGS="$PYTEST_ARGS -xvs"
+  PYTEST_ARGS="$PYTEST_ARGS -n auto"
 fi
 
 if [[ "$FAIL_FAST" == "true" ]]; then
@@ -260,9 +264,9 @@ run_unit_tests() {
     if [[ -f "package.json" ]]; then
       if grep -q "\"test\"" package.json; then
         if [[ -f "yarn.lock" ]]; then
-          yarn test --coverage --reporters=default --reporters=jest-junit
+          CI=true yarn test --coverage --reporters=default --reporters=jest-junit
         else
-          npm test -- --coverage --reporters=default --reporters=jest-junit
+          CI=true npm test -- --coverage --reporters=default --reporters=jest-junit
         fi
 
         # Copy test reports
@@ -292,9 +296,9 @@ run_unit_tests() {
     if [[ -f "package.json" ]]; then
       if grep -q "\"test\"" package.json; then
         if [[ -f "yarn.lock" ]]; then
-          yarn test --coverage --reporters=default --reporters=jest-junit
+          CI=true yarn test --coverage --reporters=default --reporters=jest-junit
         else
-          npm test -- --coverage --reporters=default --reporters=jest-junit
+          CI=true npm test -- --coverage --reporters=default --reporters=jest-junit
         fi
 
         # Copy test reports

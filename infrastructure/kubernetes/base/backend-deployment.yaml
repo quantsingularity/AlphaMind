@@ -15,6 +15,11 @@ spec:
       labels:
         app: alphamind-backend
     spec:
+      serviceAccountName: alphamind-service-account
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
       containers:
         - name: alphamind-backend
           image: alphamind/backend:latest
@@ -28,29 +33,54 @@ spec:
             requests:
               cpu: 250m
               memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           env:
             - name: NODE_ENV
               value: production
             - name: DATABASE_URL
-              valueFro            secretKeyRef:
-                name: alphamind-secrets
-                key: database-url
+              valueFrom:
+                secretKeyRef:
+                  name: alphamind-secrets
+                  key: database-url
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: alphamind-secrets
                   key: jwt-secret
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: alphamind-config
+                  key: REDIS_HOST
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: alphamind-config
+                  key: REDIS_PORT
           livenessProbe:
             httpGet:
               path: /health
               port: 8080
             initialDelaySeconds: 30
             periodSeconds: 10
+            failureThreshold: 3
           readinessProbe:
             httpGet:
               path: /health
               port: 8080
             initialDelaySeconds: 5
             periodSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: tmp-dir
+              mountPath: /tmp
+      volumes:
+        - name: tmp-dir
+          emptyDir: {}
       imagePullSecrets:
         - name: regcred

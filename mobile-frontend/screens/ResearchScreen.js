@@ -1,16 +1,17 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   RefreshControl,
   ScrollView,
   StyleSheet,
-  Text,
+  View,
 } from "react-native";
 import {
   Button,
   Card,
   Headline,
   Paragraph,
+  Text,
   Title,
   useTheme,
 } from "react-native-paper";
@@ -25,7 +26,7 @@ export default function ResearchScreen() {
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  const fetchPapers = async () => {
+  const fetchPapers = useCallback(async () => {
     try {
       setError(null);
       const data = await researchService.getPapers();
@@ -35,7 +36,7 @@ export default function ResearchScreen() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchPapers();
@@ -56,7 +57,6 @@ export default function ResearchScreen() {
       {
         text: "Open",
         onPress: () => {
-          // In production, open paper URL or navigate to detail screen
           console.log("Opening paper:", paper.url);
         },
       },
@@ -81,39 +81,46 @@ export default function ResearchScreen() {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-      <Headline style={styles.title}>
-        <Text>Research Insights</Text>
-      </Headline>
+      <Headline style={styles.title}>Research Insights</Headline>
       <Paragraph style={styles.paragraph}>
-        <Text>
-          Explore the latest publications and findings from the AlphaMind
-          research team.
-        </Text>
+        Explore the latest publications and findings from the AlphaMind research
+        team.
       </Paragraph>
 
-      {papers.map((item) => (
-        <Card key={item.id} style={styles.card}>
-          <Card.Content>
-            <Title>
-              <Text>{item.title}</Text>
-            </Title>
-            <Paragraph>
-              <Text>{item.summary}</Text>
-            </Paragraph>
-            {item.authors && (
-              <Text style={styles.authors}>By: {item.authors.join(", ")}</Text>
-            )}
-            {item.date && (
-              <Text style={styles.date}>Published: {item.date}</Text>
-            )}
-          </Card.Content>
-          <Card.Actions>
-            <Button onPress={() => handlePress(item)}>
-              <Text>Read More</Text>
-            </Button>
-          </Card.Actions>
-        </Card>
-      ))}
+      {papers.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={[styles.emptyText, { color: theme.colors.outline }]}>
+            No research papers available at this time.
+          </Text>
+        </View>
+      ) : (
+        papers.map((item) => (
+          <Card key={item.id} style={styles.card}>
+            <Card.Content>
+              <Title>{item.title}</Title>
+              <Paragraph>{item.summary}</Paragraph>
+              {item.authors && (
+                <Text style={styles.authors}>
+                  By: {item.authors.join(", ")}
+                </Text>
+              )}
+              {item.date && (
+                <Text style={styles.date}>Published: {item.date}</Text>
+              )}
+              {item.category && (
+                <Text
+                  style={[styles.category, { color: theme.colors.primary }]}
+                >
+                  {item.category}
+                </Text>
+              )}
+            </Card.Content>
+            <Card.Actions>
+              <Button onPress={() => handlePress(item)}>Read More</Button>
+            </Card.Actions>
+          </Card>
+        ))
+      )}
     </ScrollView>
   );
 }
@@ -128,6 +135,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     width: "100%",
   },
+  category: {
+    fontSize: 12,
+    fontWeight: "bold",
+    marginTop: 4,
+  },
   container: {
     alignItems: "center",
     flexGrow: 1,
@@ -136,6 +148,15 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 12,
     marginTop: 4,
+  },
+  emptyContainer: {
+    alignItems: "center",
+    marginTop: 40,
+    padding: 20,
+  },
+  emptyText: {
+    fontSize: 16,
+    textAlign: "center",
   },
   paragraph: {
     marginBottom: 24,

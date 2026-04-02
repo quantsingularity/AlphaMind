@@ -8,7 +8,7 @@ resource "aws_security_group" "app" {
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "HTTP"
+    description = "HTTP - redirects to HTTPS"
   }
 
   ingress {
@@ -23,8 +23,8 @@ resource "aws_security_group" "app" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "SSH"
+    cidr_blocks = var.allowed_cidr_blocks
+    description = "SSH from allowed CIDRs only"
   }
 
   egress {
@@ -51,7 +51,7 @@ resource "aws_security_group" "db" {
     to_port         = 3306
     protocol        = "tcp"
     security_groups = [aws_security_group.app.id]
-    description     = "MySQL from application"
+    description     = "MySQL from application security group only"
   }
 
   egress {
@@ -64,6 +64,41 @@ resource "aws_security_group" "db" {
 
   tags = {
     Name        = "${var.app_name}-${var.environment}-db-sg"
+    Environment = var.environment
+  }
+}
+
+resource "aws_security_group" "monitoring" {
+  name        = "${var.app_name}-${var.environment}-monitoring-sg"
+  description = "Security group for monitoring components"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port       = 9090
+    to_port         = 9090
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app.id]
+    description     = "Prometheus from app SG"
+  }
+
+  ingress {
+    from_port       = 3000
+    to_port         = 3000
+    protocol        = "tcp"
+    security_groups = [aws_security_group.app.id]
+    description     = "Grafana from app SG"
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all outbound traffic"
+  }
+
+  tags = {
+    Name        = "${var.app_name}-${var.environment}-monitoring-sg"
     Environment = var.environment
   }
 }

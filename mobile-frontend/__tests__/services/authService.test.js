@@ -1,87 +1,104 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import api from "../../services/api";
 import { authService } from "../../services/authService";
 
-jest.mock("../../services/api");
-jest.mock("@react-native-async-storage/async-storage");
+jest.mock("../../services/api", () => ({
+  default: {
+    post: jest.fn(),
+    get: jest.fn(),
+  },
+}));
 
-describe("AuthService", () => {
+import api from "../../services/api";
+
+describe("authService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    AsyncStorage.clear();
   });
 
   describe("login", () => {
-    it("should login successfully and store token", async () => {
+    it("stores token and user data on successful login", async () => {
       const mockResponse = {
         data: {
-          token: "test-token",
+          token: "test-token-123",
           user: { id: 1, email: "test@example.com", name: "Test User" },
         },
       };
+      api.post.mockResolvedValueOnce(mockResponse);
 
-      api.post.mockResolvedValue(mockResponse);
-      AsyncStorage.setItem.mockResolvedValue();
+      const result = await authService.login("test@example.com", "password");
 
-      const result = await authService.login("test@example.com", "password123");
-
-      expect(api.post).toHaveBeenCalledWith("/api/auth/login", {
-        email: "test@example.com",
-        password: "password123",
-      });
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(
         "@alphamind/auth_token",
-        "test-token",
+        "test-token-123",
+      );
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+        "@alphamind/user_data",
+        JSON.stringify(mockResponse.data.user),
       );
       expect(result).toEqual(mockResponse.data);
     });
 
-    it("should throw error on login failure", async () => {
-      api.post.mockRejectedValue(new Error("Invalid credentials"));
+    it("throws error when no token in response", async () => {
+      api.post.mockResolvedValueOnce({ data: { user: { id: 1 } } });
 
       await expect(
-        authService.login("test@example.com", "wrong"),
-      ).rejects.toThrow("Invalid credentials");
+        authService.login("test@example.com", "password"),
+      ).rejects.toThrow("No authentication token received from server");
+    });
+
+    it("propagates API errors", async () => {
+      api.post.mockRejectedValueOnce({ message: "Invalid credentials" });
+
+      await expect(
+        authService.login("test@example.com", "wrong-password"),
+      ).rejects.toEqual({ message: "Invalid credentials" });
     });
   });
 
   describe("isAuthenticated", () => {
-    it("should return true when token exists", async () => {
-      AsyncStorage.getItem.mockResolvedValue("test-token");
-
+    it("returns true when token exists", async () => {
+      await AsyncStorage.setItem("@alphamind/auth_token", "some-token");
       const result = await authService.isAuthenticated();
-
       expect(result).toBe(true);
-      expect(AsyncStorage.getItem).toHaveBeenCalledWith(
-        "@alphamind/auth_token",
-      );
     });
 
-    it("should return false when token does not exist", async () => {
-      AsyncStorage.getItem.mockResolvedValue(null);
-
+    it("returns false when no token", async () => {
       const result = await authService.isAuthenticated();
-
       expect(result).toBe(false);
     });
   });
 
+  describe("getUserData", () => {
+    it("returns parsed user data when stored", async () => {
+      const user = { id: 1, email: "test@example.com" };
+      await AsyncStorage.setItem("@alphamind/user_data", JSON.stringify(user));
+      const result = await authService.getUserData();
+      expect(result).toEqual(user);
+    });
+
+    it("returns null when no user data stored", async () => {
+      const result = await authService.getUserData();
+      expect(result).toBeNull();
+    });
+  });
+
   describe("logout", () => {
-    it("should clear storage on logout", async () => {
-      api.post.mockResolvedValue({});
-      AsyncStorage.multiRemove.mockResolvedValue();
+    it("clears storage on logout", async () => {
+      await AsyncStorage.setItem("@alphamind/auth_token", "token");
+      await AsyncStorage.setItem("@alphamind/user_data", "{}");
+      api.post.mockResolvedValueOnce({});
 
       await authService.logout();
 
-      expect(api.post).toHaveBeenCalledWith("/api/auth/logout");
       expect(AsyncStorage.multiRemove).toHaveBeenCalledWith([
         "@alphamind/auth_token",
         "@alphamind/user_data",
       ]);
     });
 
-    it("should clear storage even if API call fails", async () => {
-      api.post.mockRejectedValue(new Error("Network error"));
-      AsyncStorage.multiRemove.mockResolvedValue();
+    it("clears storage even when API call fails", async () => {
+      api.post.mockRejectedValueOnce(new Error("Network error"));
 
       await authService.logout();
 

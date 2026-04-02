@@ -2,47 +2,50 @@ import { render, screen } from "@testing-library/react-native";
 import { Provider as PaperProvider } from "react-native-paper";
 import KPICard from "../../components/KPICard";
 
-const renderWithProvider = (component) => {
-  return render(<PaperProvider>{component}</PaperProvider>);
-};
+const renderWithPaper = (component) =>
+  render(<PaperProvider>{component}</PaperProvider>);
 
-describe("KPICard Component", () => {
+describe("KPICard", () => {
   const defaultProps = {
     title: "Portfolio Value",
     value: "$1,250,345.67",
-    change: "+1.2%",
+    change: "+1.27%",
     changeColor: "green",
     icon: "chart-line",
+    isLoading: false,
   };
 
-  it("renders all props correctly", () => {
-    renderWithProvider(<KPICard {...defaultProps} />);
-
+  it("renders title and value correctly", () => {
+    renderWithPaper(<KPICard {...defaultProps} />);
     expect(screen.getByText("Portfolio Value")).toBeTruthy();
     expect(screen.getByText("$1,250,345.67")).toBeTruthy();
-    expect(screen.getByText("+1.2%")).toBeTruthy();
   });
 
-  it("shows loading state", () => {
-    renderWithProvider(<KPICard {...defaultProps} isLoading={true} />);
-
-    expect(screen.getByText("Portfolio Value")).toBeTruthy();
-    expect(screen.getByText("...")).toBeTruthy();
+  it("renders change text when provided", () => {
+    renderWithPaper(<KPICard {...defaultProps} />);
+    expect(screen.getByText("+1.27%")).toBeTruthy();
   });
 
-  it("renders without change value", () => {
-    const propsWithoutChange = { ...defaultProps, change: undefined };
-    renderWithProvider(<KPICard {...propsWithoutChange} />);
-
-    expect(screen.getByText("Portfolio Value")).toBeTruthy();
-    expect(screen.getByText("$1,250,345.67")).toBeTruthy();
-    expect(screen.queryByText("+1.2%")).toBeNull();
+  it("does not render change text when change is empty string", () => {
+    renderWithPaper(<KPICard {...defaultProps} change="" />);
+    expect(screen.queryByText("")).toBeNull();
   });
 
-  it("renders without icon", () => {
-    const propsWithoutIcon = { ...defaultProps, icon: undefined };
-    renderWithProvider(<KPICard {...propsWithoutIcon} />);
+  it("shows loading dash when isLoading is true", () => {
+    renderWithPaper(<KPICard {...defaultProps} isLoading={true} />);
+    expect(screen.getByText("—")).toBeTruthy();
+    expect(screen.queryByText("$1,250,345.67")).toBeNull();
+  });
 
+  it("renders without icon gracefully", () => {
+    renderWithPaper(<KPICard {...defaultProps} icon={undefined} />);
     expect(screen.getByText("Portfolio Value")).toBeTruthy();
+  });
+
+  it("renders with accessibility label", () => {
+    renderWithPaper(<KPICard {...defaultProps} />);
+    expect(
+      screen.getByLabelText("Portfolio Value: $1,250,345.67"),
+    ).toBeTruthy();
   });
 });

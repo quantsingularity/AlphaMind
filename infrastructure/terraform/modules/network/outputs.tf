@@ -15,5 +15,5 @@ output "private_subnet_ids" {
 
 output "database_subnet_ids" {
   description = "IDs of database subnets"
-  value       = try(aws_subnet.database[*].id, [])
+  value       = aws_subnet.database[*].id
 }

@@ -1,5 +1,4 @@
 ---
-# roles/common/tasks/main.yml
 - name: Update all packages
   ansible.builtin.yum:
     name: "*"
@@ -20,14 +19,15 @@
     state: present
 
 - name: Set timezone
-  timezone:
+  community.general.timezone:
     name: UTC
 
-- name: Configure firewall
-  firewalld:
+- name: Configure firewall rules
+  ansible.posix.firewalld:
     service: "{{ item }}"
     permanent: true
     state: enabled
+    immediate: true
   loop:
     - http
     - https
@@ -40,3 +40,19 @@
     state: started
     enabled: true
   when: ansible_os_family == "RedHat"
+
+- name: Disable root SSH login
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^PermitRootLogin"
+    line: "PermitRootLogin no"
+    state: present
+  notify: Restart sshd
+
+- name: Disable SSH password authentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^PasswordAuthentication"
+    line: "PasswordAuthentication no"
+    state: present
+  notify: Restart sshd

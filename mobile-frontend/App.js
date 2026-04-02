@@ -1,6 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
+import { useColorScheme } from "react-native";
 import { Provider as PaperProvider } from "react-native-paper";
 import {
   Provider as ReduxProvider,
@@ -13,18 +14,27 @@ import AppNavigator from "./navigation/AppNavigator";
 import AuthNavigator from "./navigation/AuthNavigator";
 import store from "./store";
 import { checkAuth } from "./store/slices/authSlice";
+import { loadSavedSettings } from "./store/slices/settingsSlice";
 
 function AppContent() {
   const dispatch = useDispatch();
   const { isAuthenticated, loading } = useSelector((state) => state.auth);
   const { theme: themePreference } = useSelector((state) => state.settings);
+  const systemColorScheme = useColorScheme();
 
   useEffect(() => {
     dispatch(checkAuth());
+    dispatch(loadSavedSettings());
   }, [dispatch]);
 
-  // Determine theme based on preference
-  const theme = themePreference === "dark" ? darkTheme : lightTheme;
+  const effectiveTheme =
+    themePreference === "system"
+      ? systemColorScheme === "dark"
+        ? "dark"
+        : "light"
+      : themePreference;
+
+  const theme = effectiveTheme === "dark" ? darkTheme : lightTheme;
 
   if (loading) {
     return <LoadingSpinner message="Loading AlphaMind..." />;
@@ -32,7 +42,7 @@ function AppContent() {
 
   return (
     <PaperProvider theme={theme}>
-      <StatusBar style={themePreference === "dark" ? "light" : "dark"} />
+      <StatusBar style={effectiveTheme === "dark" ? "light" : "dark"} />
       <NavigationContainer>
         {isAuthenticated ? <AppNavigator /> : <AuthNavigator />}
       </NavigationContainer>

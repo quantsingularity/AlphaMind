@@ -1,25 +1,28 @@
 import { render, screen } from "@testing-library/react-native";
+import { Provider as PaperProvider } from "react-native-paper";
 import LoadingSpinner from "../../components/LoadingSpinner";
 
-describe("LoadingSpinner Component", () => {
+const renderWithPaper = (component) =>
+  render(<PaperProvider>{component}</PaperProvider>);
+
+describe("LoadingSpinner", () => {
   it("renders with default message", () => {
-    render(<LoadingSpinner />);
+    renderWithPaper(<LoadingSpinner />);
     expect(screen.getByText("Loading...")).toBeTruthy();
   });
 
   it("renders with custom message", () => {
-    render(<LoadingSpinner message="Loading data..." />);
-    expect(screen.getByText("Loading data...")).toBeTruthy();
+    renderWithPaper(<LoadingSpinner message="Fetching data..." />);
+    expect(screen.getByText("Fetching data...")).toBeTruthy();
   });
 
-  it("renders without message when null is passed", () => {
-    render(<LoadingSpinner message={null} />);
+  it("does not render message when message is empty string", () => {
+    renderWithPaper(<LoadingSpinner message="" />);
     expect(screen.queryByText("Loading...")).toBeNull();
   });
 
-  it("renders ActivityIndicator", () => {
-    const { getByTestId } = render(<LoadingSpinner />);
-    // ActivityIndicator is rendered (checking component structure)
-    expect(screen.root).toBeTruthy();
+  it("has correct accessibility role", () => {
+    renderWithPaper(<LoadingSpinner message="Loading..." />);
+    expect(screen.getByRole("progressbar")).toBeTruthy();
   });
 });

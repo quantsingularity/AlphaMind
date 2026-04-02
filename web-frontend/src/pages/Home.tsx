@@ -1,5 +1,6 @@
 import type React from "react";
 import { Link } from "react-router-dom";
+import aiMlDiagram from "../assets/images/ai-ml-diagram.svg";
 
 const features = [
   {
@@ -213,7 +214,7 @@ export const Home: React.FC = () => {
             </div>
             <div className="mt-10 lg:mt-0">
               <img
-                src="/src/assets/images/ai-ml-diagram.svg"
+                src={aiMlDiagram}
                 alt="AI/ML Architecture"
                 className="w-full h-auto"
               />

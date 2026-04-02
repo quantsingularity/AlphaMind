@@ -16,25 +16,45 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { clearError, loginUser } from "../store/slices/authSlice";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [localError, setLocalError] = useState("");
 
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.auth);
   const theme = useTheme();
 
   const handleLogin = async () => {
-    if (!email || !password) {
+    setLocalError("");
+
+    if (!email.trim()) {
+      setLocalError("Email is required");
       return;
     }
-    dispatch(loginUser({ email, password }));
+
+    if (!EMAIL_REGEX.test(email.trim())) {
+      setLocalError("Please enter a valid email address");
+      return;
+    }
+
+    if (!password) {
+      setLocalError("Password is required");
+      return;
+    }
+
+    dispatch(loginUser({ email: email.trim(), password }));
   };
 
   const handleDismissError = () => {
     dispatch(clearError());
+    setLocalError("");
   };
+
+  const displayError = localError || error;
 
   return (
     <KeyboardAvoidingView
@@ -46,6 +66,7 @@ export default function LoginScreen({ navigation }) {
           styles.scrollContent,
           { backgroundColor: theme.colors.background },
         ]}
+        keyboardShouldPersistTaps="handled"
       >
         <Headline style={styles.title}>Welcome to AlphaMind</Headline>
         <Text style={styles.subtitle}>
@@ -60,8 +81,10 @@ export default function LoginScreen({ navigation }) {
           keyboardType="email-address"
           autoCapitalize="none"
           autoComplete="email"
+          autoCorrect={false}
           style={styles.input}
           left={<TextInput.Icon icon="email" />}
+          testID="email-input"
         />
 
         <TextInput
@@ -71,7 +94,7 @@ export default function LoginScreen({ navigation }) {
           mode="outlined"
           secureTextEntry={!showPassword}
           autoCapitalize="none"
-          autoComplete="password"
+          autoComplete="current-password"
           style={styles.input}
           left={<TextInput.Icon icon="lock" />}
           right={
@@ -80,6 +103,7 @@ export default function LoginScreen({ navigation }) {
               onPress={() => setShowPassword(!showPassword)}
             />
           }
+          testID="password-input"
         />
 
         <Button
@@ -88,6 +112,7 @@ export default function LoginScreen({ navigation }) {
           loading={loading}
           disabled={loading || !email || !password}
           style={styles.button}
+          contentStyle={styles.buttonContent}
         >
           Login
         </Button>
@@ -96,20 +121,21 @@ export default function LoginScreen({ navigation }) {
           mode="text"
           onPress={() => navigation.navigate("Register")}
           style={styles.linkButton}
+          disabled={loading}
         >
-          Don't have an account? Register
+          Don&apos;t have an account? Register
         </Button>
 
         <Snackbar
-          visible={!!error}
+          visible={!!displayError}
           onDismiss={handleDismissError}
-          duration={3000}
+          duration={4000}
           action={{
             label: "Dismiss",
             onPress: handleDismissError,
           }}
         >
-          {error}
+          {displayError}
         </Snackbar>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -119,6 +145,9 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
   button: {
     marginTop: 16,
+  },
+  buttonContent: {
+    paddingVertical: 4,
   },
   container: {
     flex: 1,

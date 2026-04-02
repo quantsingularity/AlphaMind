@@ -366,3 +366,9 @@ variable "enable_security_hub" {
   type        = bool
   default     = true
 }
+
+variable "certificate_arn" {
+  description = "ACM certificate ARN for HTTPS listener on the load balancer"
+  type        = string
+  default     = ""
+}

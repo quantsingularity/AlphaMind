@@ -1,0 +1,14 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install dependencies
+COPY package.json package-lock.json ./
+RUN npm ci --frozen-lockfile
+
+# Source is mounted as volume for hot-reload
+COPY . .
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]

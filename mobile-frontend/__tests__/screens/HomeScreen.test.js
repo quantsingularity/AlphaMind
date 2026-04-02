@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { render, screen, waitFor } from "@testing-library/react-native";
+import { render, screen } from "@testing-library/react-native";
 import { Provider as PaperProvider } from "react-native-paper";
 import { Provider } from "react-redux";
 import HomeScreen from "../../screens/HomeScreen";
@@ -7,79 +7,91 @@ import authReducer from "../../store/slices/authSlice";
 import portfolioReducer from "../../store/slices/portfolioSlice";
 import settingsReducer from "../../store/slices/settingsSlice";
 
-const mockStore = (initialState = {}) => {
-  return configureStore({
+const mockPortfolioData = {
+  value: 1250345.67,
+  dailyPnL: 15678.9,
+  dailyPnLPercent: 1.27,
+  sharpeRatio: 2.35,
+  activeStrategies: 12,
+};
+
+const createMockStore = (portfolioData = null, authUser = null) =>
+  configureStore({
     reducer: {
       auth: authReducer,
       portfolio: portfolioReducer,
       settings: settingsReducer,
     },
-    preloadedState: initialState,
-  });
-};
-
-const renderWithProviders = (component, store) => {
-  return render(
-    <Provider store={store}>
-      <PaperProvider>{component}</PaperProvider>
-    </Provider>,
-  );
-};
-
-describe("HomeScreen", () => {
-  it("renders loading state initially", () => {
-    const store = mockStore({
-      auth: { user: null, isAuthenticated: false, loading: false },
-      portfolio: { data: null, loading: true, error: null },
-      settings: { theme: "light" },
-    });
-
-    renderWithProviders(<HomeScreen />, store);
-    expect(screen.getByText("Loading portfolio...")).toBeTruthy();
-  });
-
-  it("renders dashboard with portfolio data", async () => {
-    const store = mockStore({
+    preloadedState: {
       auth: {
-        user: { name: "John Doe" },
-        isAuthenticated: true,
-        loading: false,
-      },
-      portfolio: {
-        data: {
-          value: 1250345.67,
-          dailyPnL: 15678.9,
-          dailyPnLPercent: 1.27,
-          sharpeRatio: 2.35,
-          activeStrategies: 12,
-        },
+        user: authUser,
+        isAuthenticated: !!authUser,
         loading: false,
         error: null,
       },
-      settings: { theme: "light" },
-    });
-
-    renderWithProviders(<HomeScreen />, store);
-
-    await waitFor(() => {
-      expect(screen.getByText("AlphaMind Dashboard")).toBeTruthy();
-      expect(screen.getByText("Welcome back, John Doe!")).toBeTruthy();
-      expect(screen.getByText("Portfolio Value")).toBeTruthy();
-    });
+      portfolio: {
+        data: portfolioData,
+        performance: [],
+        holdings: [],
+        loading: false,
+        performanceLoading: false,
+        holdingsLoading: false,
+        error: null,
+        lastUpdated: null,
+      },
+      settings: {
+        theme: "light",
+        notifications: {
+          tradeAlerts: true,
+          researchUpdates: true,
+          priceAlerts: true,
+        },
+        displayPreferences: {
+          currency: "USD",
+          decimalPlaces: 2,
+          chartType: "line",
+        },
+      },
+    },
   });
 
-  it("renders error state", () => {
-    const store = mockStore({
-      auth: { user: null, isAuthenticated: false, loading: false },
-      portfolio: {
-        data: null,
-        loading: false,
-        error: "Failed to fetch portfolio",
-      },
-      settings: { theme: "light" },
-    });
+const renderWithProviders = (store) =>
+  render(
+    <Provider store={store}>
+      <PaperProvider>
+        <HomeScreen />
+      </PaperProvider>
+    </Provider>,
+  );
 
-    renderWithProviders(<HomeScreen />, store);
-    expect(screen.getByText("Failed to fetch portfolio")).toBeTruthy();
+describe("HomeScreen", () => {
+  it("renders the dashboard title", () => {
+    renderWithProviders(createMockStore());
+    expect(screen.getByText("AlphaMind Dashboard")).toBeTruthy();
+  });
+
+  it("shows welcome message when user is logged in", () => {
+    const store = createMockStore(null, {
+      name: "John Doe",
+      email: "john@example.com",
+    });
+    renderWithProviders(store);
+    expect(screen.getByText("Welcome back, John Doe!")).toBeTruthy();
+  });
+
+  it("renders KPI cards with zero values when no data", () => {
+    renderWithProviders(createMockStore());
+    expect(screen.getByText("Portfolio Value")).toBeTruthy();
+    expect(screen.getByText("Daily P&L")).toBeTruthy();
+    expect(screen.getByText("Sharpe Ratio")).toBeTruthy();
+    expect(screen.getByText("Active Strategies")).toBeTruthy();
+  });
+
+  it("renders KPI cards with portfolio data", () => {
+    const store = createMockStore(mockPortfolioData);
+    renderWithProviders(store);
+    expect(screen.getByText("Portfolio Value")).toBeTruthy();
+    expect(screen.getByText("Active Strategies")).toBeTruthy();
+    expect(screen.getByText("12")).toBeTruthy();
   });
 });

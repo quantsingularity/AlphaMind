@@ -1,0 +1,62 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: alphamind-backend-monitor
+  labels:
+    app: alphamind-backend
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: alphamind-backend
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: alphamind-alerts
+  labels:
+    app: alphamind
+    release: prometheus
+spec:
+  groups:
+    - name: alphamind.backend
+      rules:
+        - alert: BackendDown
+          expr: up{job="alphamind-backend"} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "AlphaMind backend is down"
+            description: "Backend has been down for more than 1 minute."
+        - alert: HighErrorRate
+          expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.05
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High error rate on backend"
+            description: "Error rate is above 5% for 2 minutes."
+        - alert: HighMemoryUsage
+          expr: container_memory_usage_bytes{pod=~"alphamind-backend.*"} / container_spec_memory_limit_bytes > 0.85
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High memory usage on backend pod"
+            description: "Memory usage is above 85% of limit."
+        - alert: DatabaseConnectionFailure
+          expr: alphamind_db_connections_failed_total > 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Database connection failures detected"
+            description: "AlphaMind backend is failing to connect to the database."

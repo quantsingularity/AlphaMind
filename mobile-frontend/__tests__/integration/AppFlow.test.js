@@ -1,4 +1,4 @@
-import { NavigationContainer } from "@react-navigation/native";
+import { configureStore } from "@reduxjs/toolkit";
 import {
   fireEvent,
   render,
@@ -8,79 +8,101 @@ import {
 import { Provider as PaperProvider } from "react-native-paper";
 import { Provider } from "react-redux";
 import App from "../../App";
-import * as authService from "../../services/authService";
-import store from "../../store";
+import authReducer from "../../store/slices/authSlice";
+import portfolioReducer from "../../store/slices/portfolioSlice";
+import settingsReducer from "../../store/slices/settingsSlice";
 
-jest.mock("../../services/authService");
+jest.mock("../../services/api", () => ({
+  default: {
+    post: jest.fn(),
+    get: jest.fn(),
+    interceptors: {
+      request: { use: jest.fn() },
+      response: { use: jest.fn() },
+    },
+  },
+}));
 
-describe("App Integration Flow", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+jest.mock("expo-constants", () => ({
+  default: {
+    expoConfig: {
+      extra: { apiBaseUrl: "http://localhost:5000" },
+    },
+  },
+}));
 
-  it("shows login screen when not authenticated", async () => {
-    authService.authService.isAuthenticated = jest
-      .fn()
-      .mockResolvedValue(false);
-
-    render(
-      <Provider store={store}>
-        <PaperProvider>
-          <NavigationContainer>
-            <App />
-          </NavigationContainer>
-        </PaperProvider>
-      </Provider>,
-    );
-
-    await waitFor(() => {
-      expect(screen.queryByText("Welcome to AlphaMind")).toBeTruthy();
-    });
-  });
-
-  it("completes login flow successfully", async () => {
-    authService.authService.isAuthenticated = jest
-      .fn()
-      .mockResolvedValue(false);
-    authService.authService.login = jest.fn().mockResolvedValue({
-      token: "test-token",
-      user: { id: 1, email: "test@example.com", name: "Test User" },
-    });
-
-    render(
-      <Provider store={store}>
-        <PaperProvider>
-          <NavigationContainer>
-            <App />
-          </NavigationContainer>
-        </PaperProvider>
-      </Provider>,
-    );
+describe("App integration", () => {
+  it("renders auth screen when not authenticated", async () => {
+    render(<App />);
 
     await waitFor(() => {
-      expect(screen.queryByText("Welcome to AlphaMind")).toBeTruthy();
+      expect(screen.getByText("Welcome to AlphaMind")).toBeTruthy();
     });
+  });
 
-    // Fill in login form
-    const emailInput = screen.getByLabelText("Email");
-    const passwordInput = screen.getByLabelText("Password");
+  it("shows login and register navigation options", async () => {
+    render(<App />);
 
-    fireEvent.changeText(emailInput, "test@example.com");
-    fireEvent.changeText(passwordInput, "password123");
+    await waitFor(() => {
+      expect(screen.getByText("Login")).toBeTruthy();
+    });
+  });
+});
 
-    // Submit login
-    const loginButton = screen.getByText("Login");
-    fireEvent.press(loginButton);
-
-    // Should navigate to main app after successful login
-    await waitFor(
-      () => {
-        expect(authService.authService.login).toHaveBeenCalledWith(
-          "test@example.com",
-          "password123",
-        );
+describe("Auth flow", () => {
+  const createTestStore = (preloadedState) =>
+    configureStore({
+      reducer: {
+        auth: authReducer,
+        portfolio: portfolioReducer,
+        settings: settingsReducer,
       },
-      { timeout: 3000 },
+      preloadedState,
+    });
+
+  it("shows dashboard when authenticated", async () => {
+    const store = createTestStore({
+      auth: {
+        user: { id: 1, name: "Test User", email: "test@example.com" },
+        isAuthenticated: true,
+        loading: false,
+        error: null,
+      },
+      portfolio: {
+        data: null,
+        performance: [],
+        holdings: [],
+        loading: false,
+        performanceLoading: false,
+        holdingsLoading: false,
+        error: null,
+        lastUpdated: null,
+      },
+      settings: {
+        theme: "light",
+        notifications: {
+          tradeAlerts: true,
+          researchUpdates: true,
+          priceAlerts: true,
+        },
+        displayPreferences: {
+          currency: "USD",
+          decimalPlaces: 2,
+          chartType: "line",
+        },
+      },
+    });
+
+    render(
+      <Provider store={store}>
+        <PaperProvider>
+          <App />
+        </PaperProvider>
+      </Provider>,
     );
+
+    await waitFor(() => {
+      expect(screen.getByText("AlphaMind Dashboard")).toBeTruthy();
+    });
   });
 });

@@ -50,10 +50,20 @@ export const Portfolio: React.FC = () => {
     },
   ];
 
+  const totalMarketValue = mockPositions.reduce(
+    (sum, p) => sum + p.quantity * p.currentPrice,
+    0,
+  );
+
   const allocationData = mockPositions.map((p) => ({
     name: p.ticker,
     value: p.quantity * p.currentPrice,
   }));
+
+  const totalUnrealizedPnL = mockPositions.reduce(
+    (sum, p) => sum + p.unrealizedPnL,
+    0,
+  );
 
   return (
     <div className="space-y-6">
@@ -76,9 +86,13 @@ export const Portfolio: React.FC = () => {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={(props: any) =>
-                  `${props.name || ""} ${props.percent ? (props.percent * 100).toFixed(0) : 0}%`
-                }
+                label={(props) => {
+                  const { name, percent } = props as {
+                    name: string;
+                    percent: number;
+                  };
+                  return `${name ?? ""} ${percent != null ? (percent * 100).toFixed(0) : 0}%`;
+                }}
                 outerRadius={80}
                 fill="#8884d8"
                 dataKey="value"
@@ -90,7 +104,13 @@ export const Portfolio: React.FC = () => {
                   />
                 ))}
               </Pie>
-              <Tooltip formatter={(value: number) => formatCurrency(value)} />
+              <Tooltip
+                formatter={(value) =>
+                  formatCurrency(
+                    typeof value === "number" ? value : Number(value),
+                  )
+                }
+              />
               <Legend />
             </PieChart>
           </ResponsiveContainer>
@@ -109,6 +129,14 @@ export const Portfolio: React.FC = () => {
             </div>
             <div className="flex justify-between">
               <dt className="text-sm font-medium text-gray-500">
+                Invested Value
+              </dt>
+              <dd className="text-sm font-semibold text-gray-900">
+                {formatCurrency(totalMarketValue)}
+              </dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-sm font-medium text-gray-500">
                 Cash Balance
               </dt>
               <dd className="text-sm font-semibold text-gray-900">
@@ -116,9 +144,13 @@ export const Portfolio: React.FC = () => {
               </dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-sm font-medium text-gray-500">Total P&L</dt>
-              <dd className={`text-sm font-semibold ${getColorForValue(2340)}`}>
-                {formatCurrency(2340.25)}
+              <dt className="text-sm font-medium text-gray-500">
+                Unrealized P&L
+              </dt>
+              <dd
+                className={`text-sm font-semibold ${getColorForValue(totalUnrealizedPnL)}`}
+              >
+                {formatCurrency(totalUnrealizedPnL)}
               </dd>
             </div>
             <div className="flex justify-between">
@@ -163,7 +195,10 @@ export const Portfolio: React.FC = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {mockPositions.map((position) => (
-                <tr key={position.id}>
+                <tr
+                  key={position.id}
+                  className="hover:bg-gray-50 transition-colors"
+                >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {position.ticker}
                   </td>

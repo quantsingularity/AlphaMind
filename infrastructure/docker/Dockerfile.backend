@@ -1,0 +1,45 @@
+# ---- Build Stage ----
+FROM python:3.11-slim AS builder
+
+WORKDIR /build
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        gcc \
+        libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY backend/requirements.txt .
+RUN pip install --upgrade pip \
+    && pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# ---- Runtime Stage ----
+FROM python:3.11-slim AS runtime
+
+LABEL maintainer="AlphaMind Engineering <engineering@alphamind.io>"
+LABEL org.opencontainers.image.title="AlphaMind Backend"
+LABEL org.opencontainers.image.description="AlphaMind backend API service"
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libpq5 \
+        curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --gid 1000 appgroup \
+    && useradd --uid 1000 --gid appgroup --shell /bin/sh --create-home appuser
+
+COPY --from=builder /install /usr/local
+
+WORKDIR /app
+COPY --chown=appuser:appgroup backend/ .
+
+USER appuser
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PORT=8080
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]

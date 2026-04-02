@@ -1,6 +1,7 @@
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import {
   Button,
+  Divider,
   Headline,
   List,
   Paragraph,
@@ -11,7 +12,11 @@ import {
 } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../store/slices/authSlice";
-import { setNotifications, setTheme } from "../store/slices/settingsSlice";
+import {
+  resetSettings,
+  setNotifications,
+  setTheme,
+} from "../store/slices/settingsSlice";
 
 export default function SettingsScreen() {
   const theme = useTheme();
@@ -42,6 +47,21 @@ export default function SettingsScreen() {
     ]);
   };
 
+  const handleResetSettings = () => {
+    Alert.alert(
+      "Reset Settings",
+      "Are you sure you want to reset all settings to defaults?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Reset",
+          onPress: () => dispatch(resetSettings()),
+          style: "destructive",
+        },
+      ],
+    );
+  };
+
   return (
     <ScrollView
       contentContainerStyle={[
@@ -49,58 +69,47 @@ export default function SettingsScreen() {
         { backgroundColor: theme.colors.background },
       ]}
     >
-      <Headline style={styles.title}>
-        <Text>Settings</Text>
-      </Headline>
+      <Headline style={styles.title}>Settings</Headline>
       <Paragraph style={styles.paragraph}>
-        <Text>Customize your app experience.</Text>
+        Customize your app experience.
       </Paragraph>
 
       {user && (
-        <List.Section>
-          <List.Subheader>
-            <Text>Account</Text>
-          </List.Subheader>
-          <List.Item
-            title={user.name || "User"}
-            description={user.email}
-            left={(props) => <List.Icon {...props} icon="account" />}
-          />
-        </List.Section>
+        <>
+          <List.Section>
+            <List.Subheader>Account</List.Subheader>
+            <List.Item
+              title={user.name || "User"}
+              description={user.email}
+              left={(props) => <List.Icon {...props} icon="account-circle" />}
+            />
+          </List.Section>
+          <Divider />
+        </>
       )}
 
       <List.Section>
-        <List.Subheader>
-          <Text>Appearance</Text>
-        </List.Subheader>
+        <List.Subheader>Appearance</List.Subheader>
         <View style={styles.radioGroup}>
           <Text style={styles.radioLabel}>Theme</Text>
           <RadioButton.Group
             onValueChange={handleThemeChange}
             value={settings.theme}
           >
-            <View style={styles.radioButtonItem}>
-              <RadioButton value="light" />
-              <Text>Light</Text>
-            </View>
-            <View style={styles.radioButtonItem}>
-              <RadioButton value="dark" />
-              <Text>Dark</Text>
-            </View>
-            <View style={styles.radioButtonItem}>
-              <RadioButton value="system" />
-              <Text>System Default</Text>
-            </View>
+            <RadioButton.Item label="Light" value="light" />
+            <RadioButton.Item label="Dark" value="dark" />
+            <RadioButton.Item label="System Default" value="system" />
           </RadioButton.Group>
         </View>
       </List.Section>
 
+      <Divider />
+
       <List.Section>
-        <List.Subheader>
-          <Text>Notifications</Text>
-        </List.Subheader>
+        <List.Subheader>Notifications</List.Subheader>
         <List.Item
-          title="Enable Trade Alerts"
+          title="Trade Alerts"
+          description="Get notified when trades are executed"
           right={() => (
             <Switch
               value={settings.notifications.tradeAlerts}
@@ -109,7 +118,8 @@ export default function SettingsScreen() {
           )}
         />
         <List.Item
-          title="Enable Research Updates"
+          title="Research Updates"
+          description="Receive new research paper notifications"
           right={() => (
             <Switch
               value={settings.notifications.researchUpdates}
@@ -118,7 +128,8 @@ export default function SettingsScreen() {
           )}
         />
         <List.Item
-          title="Enable Price Alerts"
+          title="Price Alerts"
+          description="Alert on significant price movements"
           right={() => (
             <Switch
               value={settings.notifications.priceAlerts}
@@ -128,44 +139,59 @@ export default function SettingsScreen() {
         />
       </List.Section>
 
-      <Button
-        mode="contained"
-        onPress={handleLogout}
-        style={styles.logoutButton}
-        buttonColor={theme.colors.error}
-      >
-        <Text style={{ color: "white" }}>Logout</Text>
-      </Button>
+      <Divider />
+
+      <View style={styles.buttonGroup}>
+        <Button
+          mode="outlined"
+          onPress={handleResetSettings}
+          style={styles.resetButton}
+        >
+          Reset to Defaults
+        </Button>
+
+        <Button
+          mode="contained"
+          onPress={handleLogout}
+          style={styles.logoutButton}
+          buttonColor={theme.colors.error}
+          textColor={theme.colors.onError}
+        >
+          Logout
+        </Button>
+      </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  buttonGroup: {
+    gap: 12,
+    marginTop: 32,
+    paddingHorizontal: 4,
+  },
   container: {
     flexGrow: 1,
     padding: 20,
   },
   logoutButton: {
-    marginTop: 32,
+    marginBottom: 16,
   },
   paragraph: {
     marginBottom: 24,
     textAlign: "center",
   },
-  radioButtonItem: {
-    alignItems: "center",
-    flexDirection: "row",
-    marginBottom: 4,
-  },
   radioGroup: {
-    marginBottom: 16,
+    marginBottom: 8,
     paddingHorizontal: 16,
   },
   radioLabel: {
     fontSize: 16,
     fontWeight: "bold",
-    marginBottom: 8,
+    marginBottom: 4,
+    marginTop: 8,
   },
+  resetButton: {},
   title: {
     marginBottom: 16,
     textAlign: "center",

@@ -1,0 +1,79 @@
+version: "3.9"
+
+services:
+  # ── Development server (Expo web) ──────────────────────────────────────────
+  mobile-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: alphamind-mobile-dev
+    volumes:
+      # Hot-reload: mount source code (exclude node_modules)
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "8081:8081" # Metro bundler
+      - "19000:19000" # Expo Go
+      - "19001:19001" # Expo DevTools
+    environment:
+      - NODE_ENV=development
+      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
+      - REACT_NATIVE_PACKAGER_HOSTNAME=0.0.0.0
+      - EXPO_PUBLIC_API_BASE_URL=${API_BASE_URL:-http://localhost:5000}
+      - EXPO_PUBLIC_ENABLE_MOCK_DATA=${ENABLE_MOCK_DATA:-true}
+      - EXPO_PUBLIC_ENABLE_OFFLINE_MODE=${ENABLE_OFFLINE_MODE:-true}
+    env_file:
+      - .env
+    networks:
+      - alphamind-network
+    restart: unless-stopped
+    profiles:
+      - dev
+
+  # ── Production web server ───────────────────────────────────────────────────
+  mobile-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      args:
+        API_BASE_URL: ${API_BASE_URL:-http://localhost:5000}
+    container_name: alphamind-mobile-prod
+    ports:
+      - "3000:80"
+    networks:
+      - alphamind-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    profiles:
+      - prod
+
+  # ── Test runner ─────────────────────────────────────────────────────────────
+  mobile-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: alphamind-mobile-test
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=test
+      - CI=true
+    command: ["npx", "jest", "--coverage", "--watchAll=false", "--forceExit"]
+    networks:
+      - alphamind-network
+    profiles:
+      - test
+
+networks:
+  alphamind-network:
+    name: alphamind-network
+    driver: bridge

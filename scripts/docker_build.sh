@@ -11,48 +11,45 @@ COLOR_CYAN="\e[36m"
 
 # --- Helper Functions ---
 
-# Function to check if a command exists
 command_exists() {
   command -v "$1" >/dev/null 2>&1
 }
 
-# Function to print section headers
 print_header() {
   echo -e "\n${COLOR_BLUE}===========================================================${COLOR_RESET}"
   echo -e "${COLOR_BLUE} $1 ${COLOR_RESET}"
   echo -e "${COLOR_BLUE}===========================================================${COLOR_RESET}"
 }
 
-# Function to print success messages
 print_success() {
   echo -e "${COLOR_GREEN}[SUCCESS] $1${COLOR_RESET}"
 }
 
-# Function to print error messages
 print_error() {
   echo -e "${COLOR_RED}[ERROR] $1${COLOR_RESET}" >&2
 }
 
-# Function to print info messages
+print_warning() {
+  echo -e "${COLOR_YELLOW}[WARNING] $1${COLOR_RESET}"
+}
+
 print_info() {
   echo -e "${COLOR_CYAN}[INFO] $1${COLOR_RESET}"
 }
 
 # --- Initialization ---
 
-# Exit immediately if a command exits with a non-zero status, treat unset variables as an error, and fail if any command in a pipeline fails
 set -euo pipefail
 
-# Define project root directory
 PROJECT_ROOT="$(pwd)"
 
-# Parse command line arguments
 IMAGE_NAME="alphamind"
 TAG="latest"
 BUILD_ARGS=""
 NO_CACHE=false
 PUSH=false
 COMPONENT="all"
+REGISTRY=""
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -76,6 +73,10 @@ while [[ $# -gt 0 ]]; do
       PUSH=true
       shift
       ;;
+    --registry)
+      REGISTRY="$2"
+      shift 2
+      ;;
     --component)
       COMPONENT="$2"
       shift 2
@@ -89,6 +90,7 @@ while [[ $# -gt 0 ]]; do
       echo "  --build-arg ARG        Pass a build-arg to Docker (can be used multiple times)"
       echo "  --no-cache             Do not use cache when building the image"
       echo "  --push                 Push the image to the registry after building"
+      echo "  --registry REGISTRY    Registry prefix for the image (e.g., myregistry.io/myorg)"
       echo "  --component COMPONENT  Component to build: backend, web-frontend, or all (default: all)"
       echo "  --help                 Show this help message"
       exit 0
@@ -100,12 +102,24 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# Validate component value
+if [[ "$COMPONENT" != "all" && "$COMPONENT" != "backend" && "$COMPONENT" != "web-frontend" ]]; then
+  print_error "Invalid component: $COMPONENT. Supported: all, backend, web-frontend."
+  exit 1
+fi
+
 # --- Prerequisite Check ---
 
 print_header "Checking Prerequisites"
 
 if ! command_exists docker; then
   print_error "Docker command not found. Please install Docker."
+  exit 1
+fi
+
+# Verify Docker daemon is running
+if ! docker info >/dev/null 2>&1; then
+  print_error "Docker daemon is not running. Please start Docker."
   exit 1
 fi
 
@@ -119,21 +133,28 @@ build_backend_image() {
     return 0
   fi
 
-  local full_tag="$IMAGE_NAME-backend:$TAG"
+  local image_base="${IMAGE_NAME}-backend"
+  if [[ -n "$REGISTRY" ]]; then
+    image_base="${REGISTRY}/${image_base}"
+  fi
+  local full_tag="${image_base}:${TAG}"
+
   local cache_option=""
   if [[ "$NO_CACHE" == "true" ]]; then
     cache_option="--no-cache"
   fi
 
   print_info "Building image: $full_tag"
-  docker build -f backend/Dockerfile -t "$full_tag" $cache_option $BUILD_ARGS .
+  # shellcheck disable=SC2086
+  docker build -f backend/Dockerfile -t "$full_tag" $cache_option $BUILD_ARGS "$PROJECT_ROOT"
 
   if [[ "$PUSH" == "true" ]]; then
     print_info "Pushing image: $full_tag"
     docker push "$full_tag"
+    print_success "Backend image pushed: $full_tag"
   fi
 
-  print_success "Backend image $full_tag built and optionally pushed."
+  print_success "Backend image built: $full_tag"
 }
 
 build_web_frontend_image() {
@@ -144,21 +165,28 @@ build_web_frontend_image() {
     return 0
   fi
 
-  local full_tag="$IMAGE_NAME-web:$TAG"
+  local image_base="${IMAGE_NAME}-web"
+  if [[ -n "$REGISTRY" ]]; then
+    image_base="${REGISTRY}/${image_base}"
+  fi
+  local full_tag="${image_base}:${TAG}"
+
   local cache_option=""
   if [[ "$NO_CACHE" == "true" ]]; then
     cache_option="--no-cache"
   fi
 
   print_info "Building image: $full_tag"
-  docker build -f web-frontend/Dockerfile -t "$full_tag" $cache_option $BUILD_ARGS .
+  # shellcheck disable=SC2086
+  docker build -f web-frontend/Dockerfile -t "$full_tag" $cache_option $BUILD_ARGS "$PROJECT_ROOT"
 
   if [[ "$PUSH" == "true" ]]; then
     print_info "Pushing image: $full_tag"
     docker push "$full_tag"
+    print_success "Web frontend image pushed: $full_tag"
   fi
 
-  print_success "Web frontend image $full_tag built and optionally pushed."
+  print_success "Web frontend image built: $full_tag"
 }
 
 # --- Main Execution ---

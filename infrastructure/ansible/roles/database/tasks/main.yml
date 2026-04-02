@@ -1,5 +1,4 @@
 ---
-# roles/database/tasks/main.yml
 - name: Install database packages
   ansible.builtin.yum:
     name:
@@ -12,36 +11,61 @@
   ansible.builtin.template:
     src: my.cnf.j2
     dest: /etc/my.cnf.d/server.cnf
+    owner: root
+    group: root
+    mode: "0644"
   notify: Restart MariaDB
 
 - name: Start and enable MariaDB
-  systemd:
+  ansible.builtin.systemd:
     name: mariadb
     state: started
     enabled: true
 
 - name: Set root password
-  mysql_user:
+  community.mysql.mysql_user:
     name: root
     password: "{{ db_root_password }}"
     host_all: true
     state: present
+    login_unix_socket: /var/lib/mysql/mysql.sock
+  no_log: true
+
+- name: Remove anonymous users
+  community.mysql.mysql_user:
+    name: ""
+    host_all: true
+    state: absent
+    login_user: root
+    login_password: "{{ db_root_password }}"
+  no_log: true
+
+- name: Remove test database
+  community.mysql.mysql_db:
+    name: test
+    state: absent
+    login_user: root
+    login_password: "{{ db_root_password }}"
   no_log: true
 
 - name: Create application database
-  mysql_db:
+  community.mysql.mysql_db:
     name: "{{ db_name }}"
     state: present
     login_user: root
     login_password: "{{ db_root_password }}"
+  no_log: true
 
 - name: Create application database user
-  mysql_user:
+  community.mysql.mysql_user:
     name: "{{ db_user }}"
     password: "{{ db_password }}"
-    priv: "{{ db_name }}.*:ALL"
-    host: "%"
+    priv: "{{ db_name }}.*:SELECT,INSERT,UPDATE,DELETE,CREATE,INDEX,ALTER"
+    host: "{{ item }}"
     state: present
     login_user: root
     login_password: "{{ db_root_password }}"
+  loop:
+    - "localhost"
+    - "{{ db_allowed_host | default('%') }}"
   no_log: true

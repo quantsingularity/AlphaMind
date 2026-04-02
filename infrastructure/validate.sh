@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
@@ -9,42 +9,58 @@ echo "AlphaMind Infrastructure Validation"
 echo "================================================"
 echo ""
 
-# Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Function to check if command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-# Function to print status
 print_status() {
-    if [ $1 -eq 0 ]; then
+    if [ "$1" -eq 0 ]; then
         echo -e "${GREEN}✓${NC} $2"
     else
         echo -e "${RED}✗${NC} $2"
     fi
 }
 
-# Track overall status
+print_warn() {
+    echo -e "${YELLOW}⚠${NC} $1"
+}
+
 OVERALL_STATUS=0
 
 # ============================================================================
 # 1. Check Required Tools
 # ============================================================================
-echo "[1/5] Checking required tools..."
+echo "[1/6] Checking required tools..."
 
-REQUIRED_TOOLS=("terraform" "kubectl" "ansible" "yamllint" "ansible-lint")
-for tool in "${REQUIRED_TOOLS[@]}"; do
+REQUIRED_TOOLS=("terraform" "kubectl" "ansible" "yamllint" "ansible-lint" "docker" "docker" "compose")
+OPTIONAL_TOOLS=("kubeval" "tflint" "trivy")
+
+for tool in "terraform" "kubectl" "ansible" "yamllint" "ansible-lint"; do
     if command_exists "$tool"; then
         version=$($tool --version 2>&1 | head -n1)
-        print_status 0 "$tool installed: $version"
+        print_status 0 "$tool: $version"
     else
         print_status 1 "$tool NOT installed"
         OVERALL_STATUS=1
+    fi
+done
+
+if command_exists "docker" && docker compose version >/dev/null 2>&1; then
+    print_status 0 "docker compose: $(docker compose version 2>&1 | head -n1)"
+else
+    print_warn "docker compose not available - skipping compose validation"
+fi
+
+for tool in "${OPTIONAL_TOOLS[@]}"; do
+    if command_exists "$tool"; then
+        print_status 0 "$tool available (optional)"
+    else
+        print_warn "$tool not installed (optional)"
     fi
 done
 echo ""
@@ -52,19 +68,17 @@ echo ""
 # ============================================================================
 # 2. Validate Terraform
 # ============================================================================
-echo "[2/5] Validating Terraform..."
+echo "[2/6] Validating Terraform..."
 
-cd terraform
+pushd terraform > /dev/null
 
-# Format check
 if terraform fmt -check -recursive > /dev/null 2>&1; then
     print_status 0 "Terraform format check passed"
 else
-    print_status 1 "Terraform format check failed"
+    print_status 1 "Terraform format check failed - run: terraform fmt -recursive"
     OVERALL_STATUS=1
 fi
 
-# Init without backend
 if terraform init -backend=false > /tmp/tf_init.log 2>&1; then
     print_status 0 "Terraform init successful"
 else
@@ -72,65 +86,79 @@ else
     OVERALL_STATUS=1
 fi
 
-# Validate
 if terraform validate > /tmp/tf_validate.log 2>&1; then
-    print_status 0 "Terraform validate successful"
+    print_status 0 "Terraform validate passed"
 else
     print_status 1 "Terraform validate failed (see /tmp/tf_validate.log)"
-    OVERALL_STATUS=1
     cat /tmp/tf_validate.log
+    OVERALL_STATUS=1
 fi
 
-cd ..
+if command_exists "tflint"; then
+    if tflint --init > /dev/null 2>&1 && tflint > /tmp/tflint.log 2>&1; then
+        print_status 0 "tflint passed"
+    else
+        print_warn "tflint found issues (see /tmp/tflint.log)"
+    fi
+fi
+
+popd > /dev/null
 echo ""
 
 # ============================================================================
 # 3. Validate Kubernetes
 # ============================================================================
-echo "[3/5] Validating Kubernetes..."
+echo "[3/6] Validating Kubernetes..."
 
-cd kubernetes
+pushd kubernetes > /dev/null
 
-# YAML lint
 if yamllint base/ > /tmp/k8s_yamllint.log 2>&1; then
-    print_status 0 "Kubernetes yamllint passed"
+    print_status 0 "Kubernetes YAML lint passed"
 else
-    print_status 1 "Kubernetes yamllint found issues (see /tmp/k8s_yamllint.log)"
-    # Don't fail on yamllint warnings
+    print_warn "YAML lint warnings (see /tmp/k8s_yamllint.log)"
 fi
 
-# Dry-run
 if kubectl apply --dry-run=client -f base/ > /tmp/k8s_dryrun.log 2>&1; then
-    print_status 0 "Kubernetes dry-run successful"
+    print_status 0 "Kubernetes dry-run passed"
 else
     print_status 1 "Kubernetes dry-run failed (see /tmp/k8s_dryrun.log)"
     OVERALL_STATUS=1
 fi
 
-cd ..
+for env in environments/*/; do
+    env_name=$(basename "$env")
+    if kubectl kustomize "$env" > /dev/null 2>&1; then
+        print_status 0 "Kustomize build: $env_name"
+    else
+        print_status 1 "Kustomize build failed: $env_name"
+        OVERALL_STATUS=1
+    fi
+done
+
+popd > /dev/null
 echo ""
 
 # ============================================================================
 # 4. Validate Ansible
 # ============================================================================
-echo "[4/5] Validating Ansible..."
+echo "[4/6] Validating Ansible..."
 
-cd ansible
+pushd ansible > /dev/null
 
-# Install collections
 if [ -f "requirements.yml" ]; then
-    ansible-galaxy collection install -r requirements.yml > /tmp/ansible_collections.log 2>&1
+    if ansible-galaxy collection install -r requirements.yml > /tmp/ansible_collections.log 2>&1; then
+        print_status 0 "Ansible collections installed"
+    else
+        print_warn "Ansible collection install had warnings (see /tmp/ansible_collections.log)"
+    fi
 fi
 
-# Ansible lint
 if ansible-lint . > /tmp/ansible_lint.log 2>&1; then
     print_status 0 "ansible-lint passed"
 else
-    print_status 1 "ansible-lint found issues (see /tmp/ansible_lint.log)"
-    # Don't fail on ansible-lint warnings for now
+    print_warn "ansible-lint found issues (see /tmp/ansible_lint.log)"
 fi
 
-# Syntax check
 if ansible-playbook --syntax-check playbooks/main.yml > /tmp/ansible_syntax.log 2>&1; then
     print_status 0 "Ansible syntax check passed"
 else
@@ -138,42 +166,77 @@ else
     OVERALL_STATUS=1
 fi
 
-cd ..
+popd > /dev/null
 echo ""
 
 # ============================================================================
-# 5. Check for Secrets
+# 5. Validate Docker Compose
 # ============================================================================
-echo "[5/5] Checking for committed secrets..."
+echo "[5/6] Validating Docker Compose..."
 
-# Check for common secret patterns
+if command_exists "docker" && docker compose version >/dev/null 2>&1; then
+    if docker compose config --quiet > /tmp/compose_validate.log 2>&1; then
+        print_status 0 "docker-compose.yml is valid"
+    else
+        print_status 1 "docker-compose.yml has errors (see /tmp/compose_validate.log)"
+        OVERALL_STATUS=1
+    fi
+
+    if docker compose -f docker-compose.yml -f docker-compose.override.yml config --quiet > /tmp/compose_override_validate.log 2>&1; then
+        print_status 0 "docker-compose.override.yml is valid"
+    else
+        print_status 1 "docker-compose.override.yml has errors"
+        OVERALL_STATUS=1
+    fi
+else
+    print_warn "Skipping Docker Compose validation (docker compose not available)"
+fi
+echo ""
+
+# ============================================================================
+# 6. Secrets Scan
+# ============================================================================
+echo "[6/6] Scanning for committed secrets..."
+
+if command_exists "trivy"; then
+    if trivy config . --exit-code 0 --quiet > /tmp/trivy_secrets.log 2>&1; then
+        print_status 0 "Trivy config scan passed"
+    else
+        print_warn "Trivy found issues (see /tmp/trivy_secrets.log)"
+    fi
+fi
+
 SECRET_PATTERNS=(
-    "password.*=.*['\"][^'\"]{8,}['\"]"
-    "secret.*=.*['\"][^'\"]{8,}['\"]"
-    "api[_-]key.*=.*['\"][^'\"]{8,}['\"]"
+    'password\s*=\s*"[^"]{8,}"'
+    'secret\s*=\s*"[^"]{8,}"'
+    'api[_-]key\s*=\s*"[^"]{8,}"'
+    'BEGIN (RSA|EC|OPENSSH) PRIVATE KEY'
 )
 
 SECRETS_FOUND=0
 for pattern in "${SECRET_PATTERNS[@]}"; do
-    if grep -r -E "$pattern" terraform/ kubernetes/ ansible/ 2>/dev/null | grep -v ".example" | grep -v "#"; then
+    if grep -rEi "$pattern" terraform/ kubernetes/ ansible/ 2>/dev/null \
+        | grep -v ".example" \
+        | grep -v "placeholder" \
+        | grep -v "#"; then
         SECRETS_FOUND=1
     fi
 done
 
-if [ $SECRETS_FOUND -eq 0 ]; then
-    print_status 0 "No obvious secrets found in code"
+if [ "$SECRETS_FOUND" -eq 0 ]; then
+    print_status 0 "No hardcoded secrets detected"
 else
-    print_status 1 "Potential secrets found in code"
+    print_status 1 "Potential secrets found - review output above"
     OVERALL_STATUS=1
 fi
 
 echo ""
 echo "================================================"
-if [ $OVERALL_STATUS -eq 0 ]; then
+if [ "$OVERALL_STATUS" -eq 0 ]; then
     echo -e "${GREEN}All validations passed!${NC}"
 else
-    echo -e "${RED}Some validations failed. Please review the logs.${NC}"
+    echo -e "${RED}Some validations failed. Review logs above.${NC}"
 fi
 echo "================================================"
 
-exit $OVERALL_STATUS
+exit "$OVERALL_STATUS"

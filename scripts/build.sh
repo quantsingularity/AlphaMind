@@ -70,6 +70,7 @@ BUILD_ENV="development"
 CLEAN_BUILD=false
 VERBOSE=false
 REPORT_DIR="$PROJECT_ROOT/build-reports"
+REPORT_FILE=""
 COMPONENT=""
 OPTIMIZE=true
 CACHE=true
@@ -145,7 +146,7 @@ if [[ -d "venv" ]]; then
 else
   print_warning "Python virtual environment not found. Running setup_environment.sh..."
   if [[ -f "./setup_environment.sh" ]]; then
-    bash "$PROJECT_ROOT/scripts/setup_environment.sh" --type "$BUILD_ENV"
+    bash "$PROJECT_ROOT/setup_environment.sh" --type "$BUILD_ENV"
     source venv/bin/activate
   else
     print_error "setup_environment.sh not found. Please set up the environment first."
@@ -249,7 +250,7 @@ build_backend() {
   if [[ "$CLEAN_BUILD" == "true" ]]; then
     print_info "Cleaning previous build artifacts..."
     rm -rf build dist *.egg-info
-    find . -name "__pycache__" -type d -exec rm -rf {} +
+    find . -name "__pycache__" -type d -print0 | xargs -0 rm -rf
   fi
 
   # Install backend dependencies
@@ -421,7 +422,7 @@ build_web_frontend() {
 
     # Gzip assets for serving with compression
     print_info "Creating gzipped versions of assets..."
-    find "$BUILD_DIR" -type f \( -name "*.js" -o -name "*.css" -o -name "*.html" -o -name "*.json" -o -name "*.svg" \) -exec gzip -9 -k {} \;
+    find "$BUILD_DIR" -type f \( -name "*.js" -o -name "*.css" -o -name "*.html" -o -name "*.json" -o -name "*.svg" \) | while read -r _gf; do gzip -9 -c "$_gf" > "${_gf}.gz"; done
   fi
 
   print_success "Web frontend build completed"
@@ -715,7 +716,7 @@ EOF
     if [[ -d "backend/dist" ]]; then
       echo "      <li><strong>Backend Packages:</strong>" >> "$REPORT_FILE"
       echo "        <ul>" >> "$REPORT_FILE"
-      find "backend/dist" -type f -name "*.whl" -o -name "*.tar.gz" | while read -r file; do
+      find "backend/dist" -type f \( -name "*.whl" -o -name "*.tar.gz" \) | while read -r file; do
         echo "          <li>$(basename "$file")</li>" >> "$REPORT_FILE"
       done
       echo "        </ul>" >> "$REPORT_FILE"

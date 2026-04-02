@@ -1,0 +1,49 @@
+# Development overrides - applied automatically by docker-compose
+# Do NOT use in production
+version: "3.9"
+
+services:
+  database:
+    ports:
+      - "3306:3306"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      target: builder
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: debug
+    volumes:
+      - ./backend:/app:cached
+      - backend-logs:/app/logs
+    ports:
+      - "8080:8080"
+    command:
+      [
+        "python",
+        "-m",
+        "uvicorn",
+        "main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8080",
+        "--reload",
+      ]
+    read_only: false
+
+  frontend:
+    build:
+      target: builder
+    environment:
+      REACT_APP_ENV: development
+    volumes:
+      - ./web-frontend:/build:cached
+      - /build/node_modules
+    ports:
+      - "3000:3000"
+    command: ["npm", "start"]
