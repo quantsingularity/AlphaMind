@@ -506,6 +506,9 @@ class ExchangeAPI:
         Returns:
             Order object
         """
+
+        symbol: str
+
         logger.warning(
             f"get_order not implemented for {self.config.exchange_id}. Returning mock data."
         )
