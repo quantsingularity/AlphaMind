@@ -145,9 +145,7 @@ class TestSentimentBasedStrategy(unittest.TestCase):
                 "volume": np.random.uniform(1000000, 5000000, 100),
             }
         )
-        # FIX: wrap np.random.choice result in pd.DatetimeIndex so each
-        # element is a pd.Timestamp (which supports .strftime), not a
-        # numpy.datetime64 (which does not).
+
         news_dates = pd.DatetimeIndex(np.random.choice(dates, size=50, replace=True))
         news_texts = [
             f"Market news for {date.strftime('%Y-%m-%d')}: "
