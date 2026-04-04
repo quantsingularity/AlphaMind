@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Add resource limits and health probes to Kubernetes Deployment manifests."""
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import yaml
 
