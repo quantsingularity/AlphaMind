@@ -1,20 +1,15 @@
 """
-## AlphaMind Data Processing Framework
+AlphaMind Data Processing Framework.
 
-This package provides optimized data processing capabilities for financial applications,
-including parallel processing, streaming data handling, caching mechanisms,
-and pipeline monitoring tools.
+Optimised data processing capabilities for financial applications:
 
-### Sub-Modules Overview:
-1.  **pipeline**: Defines the sequential data transformation stages (ETL).
-2.  **parallel**: Handles multi-threading, multi-processing, and distributed task execution.
-3.  **streaming**: Manages real-time data ingestion and processing.
-4.  **caching**: Provides various caching backends for performance optimization.
-5.  **monitoring**: Implements tools for performance tracking and alert generation.
+1. pipeline   — Sequential ETL transformation stages
+2. parallel   — Multi-threading, multi-processing, and distributed execution
+3. streaming  — Real-time data ingestion and processing
+4. caching    — MemoryCache, DiskCache, RedisCache backends
+5. monitoring — Performance tracking and alert generation
 """
 
-# Import necessary components from their respective sub-modules
-# These imports assume the sub-modules (e.g., caching, pipeline) are defined within the same package structure.
 from data_processing.caching import (
     CacheManager,
     CachePolicy,
@@ -40,45 +35,42 @@ from data_processing.pipeline import (
     DataPipeline,
     DataTransformer,
     PipelineStage,
+    PipelineStatus,
 )
 from data_processing.streaming import (
-    DataStream,
-    KafkaStreamAdapter,
-    StreamingPipeline,
-    StreamProcessor,
-    WebSocketStreamAdapter,
+    DataStreamProcessor,
+    KafkaStreamProcessor,
+    StreamAggregator,
+    WebSocketStreamProcessor,
 )
 
-# Define the public interface for the 'alphamind.data_processing' package.
-# This makes all listed classes directly importable from the package root:
-# `from alphamind.data_processing import DataPipeline, ParallelProcessor, CacheManager`
 __all__ = [
-    # Parallel Processing
-    "ParallelProcessor",
-    "TaskManager",
-    "WorkerPool",
-    "DistributedComputing",
-    # Streaming
-    "StreamProcessor",
-    "DataStream",
-    "StreamingPipeline",
-    "KafkaStreamAdapter",
-    "WebSocketStreamAdapter",
-    # Caching
-    "CacheManager",
+    # caching
+    "CachePolicy",
     "MemoryCache",
     "DiskCache",
     "RedisCache",
-    "CachePolicy",
-    # Monitoring
-    "PipelineMonitor",
+    "CacheManager",
+    # monitoring
     "MetricsCollector",
     "PerformanceTracker",
     "AlertManager",
-    # Pipeline
-    "DataPipeline",
+    "PipelineMonitor",
+    # parallel
+    "ParallelProcessor",
+    "WorkerPool",
+    "TaskManager",
+    "DistributedComputing",
+    # pipeline
+    "PipelineStatus",
     "PipelineStage",
-    "DataTransformer",
+    "DataPipeline",
     "DataLoader",
+    "DataTransformer",
     "DataExporter",
+    # streaming
+    "DataStreamProcessor",
+    "KafkaStreamProcessor",
+    "WebSocketStreamProcessor",
+    "StreamAggregator",
 ]

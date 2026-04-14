@@ -9,7 +9,7 @@ import unittest
 from datetime import datetime
 from typing import Any
 
-from risk_system.risk_aggregation.real_time_monitoring import (
+from risk.aggregation.real_time_monitoring import (
     AlertChannel,
     AlertSeverity,
     RiskAlert,

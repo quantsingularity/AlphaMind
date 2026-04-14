@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import tensorflow as tf
-from alternative_data.sentiment_analysis import (
+from analytics.alternative_data.sentiment_analysis import (
     MarketSentimentAnalyzer,
     SentimentBasedStrategy,
 )

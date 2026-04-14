@@ -10,8 +10,8 @@ import unittest
 from typing import Any
 from unittest.mock import MagicMock
 
-import execution_engine.order_management.market_connectivity_base as _base_module
-from execution_engine.order_management.market_connectivity import (
+import execution.order_management.market_connectivity_base as _base_module
+from execution.order_management.market_connectivity import (
     ConnectionStatus,
     FailureMode,
     MarketConnectivityManager,

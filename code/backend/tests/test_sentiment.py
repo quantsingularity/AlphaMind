@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from alternative_data.sentiment_analysis import (
+from analytics.alternative_data.sentiment_analysis import (
     MarketSentimentAnalyzer,
     SentimentBasedStrategy,
 )

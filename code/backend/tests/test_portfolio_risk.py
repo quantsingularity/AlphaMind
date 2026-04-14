@@ -9,7 +9,7 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-from risk_system.risk_aggregation.portfolio_risk import (
+from risk.aggregation.portfolio_risk import (
     PortfolioRiskAggregator,
     PositionRisk,
     RiskLimit,

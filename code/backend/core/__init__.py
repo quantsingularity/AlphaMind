@@ -1,10 +1,24 @@
+"""
+AlphaMind Core Package.
+
+Defines the fundamental domain primitives and abstract base class used
+throughout the AlphaMind system:
+
+- MarketData  — standard container for processed time series data
+- Signal      — standard container for trading signals
+- BaseModule  — abstract lifecycle base class for all functional modules
+
+Configuration management lives in core.config (ConfigManager).
+Exception hierarchy lives in core.exceptions.
+"""
+
 import abc
 import datetime
-import json
 import logging
 from typing import Any, Dict, Optional, Union
 
 import pandas as pd
+from core.config import ConfigManager  # single source of truth
 
 logging.basicConfig(
     level=logging.INFO,
@@ -18,11 +32,6 @@ class MarketData:
     """Standard container for processed market and alternative data."""
 
     def __init__(self, data: pd.DataFrame, source: str = "combined") -> None:
-        """
-        Args:
-            data: A Pandas DataFrame containing time series data (e.g., price, volume, sentiment).
-            source: The source or type of the data (e.g., 'price', 'sentiment', 'geospatial').
-        """
         if not isinstance(data, pd.DataFrame):
             raise TypeError("MarketData must be initialized with a Pandas DataFrame.")
         self.data = data
@@ -32,7 +41,7 @@ class MarketData:
         )
 
     def get_latest(self) -> Dict[str, Any]:
-        """Returns the latest data point as a dictionary."""
+        """Return the latest data point as a dictionary."""
         if self.data.empty:
             return {}
         return self.data.iloc[-1].to_dict()
@@ -48,20 +57,13 @@ class Signal:
         confidence: float,
         timestamp: datetime.datetime,
     ) -> None:
-        """
-        Args:
-            ticker: The asset symbol (e.g., 'AAPL').
-            position: The desired position (-1: Short, 0: Hold/Cash, 1: Long).
-            confidence: A score indicating the strength of the signal (0.0 to 1.0).
-            timestamp: The generation time of the signal.
-        """
         self.ticker = ticker
         self.position = position
         self.confidence = confidence
         self.timestamp = timestamp
 
     def to_dict(self) -> Dict[str, Union[str, int, float]]:
-        """Returns the signal as a dictionary for easy storage/transmission."""
+        """Return the signal as a serialisable dictionary."""
         return {
             "ticker": self.ticker,
             "position": self.position,
@@ -70,45 +72,10 @@ class Signal:
         }
 
 
-class ConfigManager:
-    """Handles loading and accessing global configuration settings."""
-
-    def __init__(self, config_path: str = "config.json") -> None:
-        self.config_path = config_path
-        self._config: Dict[str, Any] = self._load_config()
-
-    def _load_config(self) -> Dict[str, Any]:
-        """Loads configuration from a JSON file."""
-        try:
-            with open(self.config_path, "r") as f:
-                config = json.load(f)
-            logger.info(f"Configuration loaded successfully from {self.config_path}")
-            return config
-        except FileNotFoundError:
-            logger.error(
-                f"Configuration file not found at {self.config_path}. Using default settings."
-            )
-            return {}
-        except json.JSONDecodeError as e:
-            logger.error(f"Error decoding JSON in {self.config_path}: {e}")
-            return {}
-
-    def get(self, key: str, default: Optional[Any] = None) -> Any:
-        """Retrieves a configuration value by key, supporting nested keys (e.g., 'API.SENTINEL_KEY')."""
-        keys = key.split(".")
-        value = self._config
-        for k in keys:
-            if k in value:
-                value = value[k]
-            else:
-                return default
-        return value
-
-
 class BaseModule(abc.ABC):
     """
     Abstract base class for all functional modules in the AlphaMind system.
-    Enforces a standard lifecycle and interface for configuration and execution.
+    Enforces a standard lifecycle: configure → run.
     """
 
     def __init__(self, module_name: str, config_manager: ConfigManager) -> None:
@@ -120,13 +87,7 @@ class BaseModule(abc.ABC):
 
     @abc.abstractmethod
     def configure(self) -> bool:
-        """
-        Performs necessary setup, loads external resources (e.g., models, databases),
-        and validates configuration parameters. Must be called before run().
-
-        Returns:
-            True if configuration is successful, False otherwise.
-        """
+        """Perform setup and validate configuration. Must be called before run()."""
         self.is_configured = True
         self.logger.info(f"{self.module_name} configured.")
         return True
@@ -135,15 +96,7 @@ class BaseModule(abc.ABC):
     def run(
         self, input_data: Optional[Union[MarketData, Signal]] = None
     ) -> Union[MarketData, Signal, None]:
-        """
-        Executes the primary logic of the module (e.g., fetch data, analyze sentiment, generate signals).
-
-        Args:
-            input_data: Data object passed from a previous module in the workflow.
-
-        Returns:
-            The processed data or generated signal object, or None on failure.
-        """
+        """Execute the primary logic of the module."""
         if not self.is_configured:
             self.logger.error(f"{self.module_name} must be configured before running.")
             return None
@@ -151,36 +104,4 @@ class BaseModule(abc.ABC):
         return None
 
 
-if __name__ == "__main__":
-    temp_config = {
-        "GLOBAL": {"TICKERS": ["AAPL", "MSFT"]},
-        "API": {"SENTINEL_KEY": "dummy_key", "MAX_RETRIES": 5},
-    }
-    with open("config.json", "w") as f:
-        json.dump(temp_config, f)
-    config = ConfigManager()
-    tickers = config.get("GLOBAL.TICKERS")
-    logger.info(f"\nLoaded Tickers: {tickers}")
-
-    class DataFetcher(BaseModule):
-
-        def configure(self) -> Any:
-            super().configure()
-            self.logger.info(f"Using key: {self.config.get('API.SENTINEL_KEY', 'N/A')}")
-            return True
-
-        def run(self, input_data: Optional[Any] = None) -> Any:
-            super().run()
-            data = pd.DataFrame(
-                {"close": [100, 101, 102]},
-                index=pd.to_datetime(["2025-01-01", "2025-01-02", "2025-01-03"]),
-            )
-            return MarketData(data, source="price_data")
-
-    fetcher = DataFetcher("DataFetcher", config)
-    fetcher.configure()
-    data = fetcher.run()
-    if data:
-        logger.info(f"\nLatest Data Point: {data.get_latest()}")
-    signal = Signal("AAPL", 1, 0.95, datetime.datetime.now())
-    logger.info(f"Generated Signal: {signal.to_dict()}")
+__all__ = ["MarketData", "Signal", "BaseModule", "ConfigManager"]

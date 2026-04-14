@@ -11,9 +11,9 @@ import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from api.main import app
+from app.main import app
 from fastapi.testclient import TestClient
-from infrastructure.authentication import AuthenticationSystem
+from infrastructure.auth.authentication import AuthenticationSystem
 
 client = TestClient(app)
 

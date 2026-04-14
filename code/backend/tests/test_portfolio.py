@@ -8,7 +8,7 @@ import pandas as pd
 import tensorflow as tf
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from alpha_research.portfolio_optimization import PortfolioOptimizer
+from analytics.alpha_research.portfolio_optimization import PortfolioOptimizer
 
 
 class TestPortfolioOptimizer(unittest.TestCase):

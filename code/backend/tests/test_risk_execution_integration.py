@@ -11,17 +11,14 @@ from datetime import datetime
 
 import numpy as np
 import pandas as pd
-from execution_engine.order_management.order_manager import (
+from execution.order_management.order_manager import (
     OrderFill,
     OrderManager,
     OrderSide,
     OrderType,
 )
-from risk_system.risk_aggregation.portfolio_risk import (
-    PortfolioRiskAggregator,
-    PositionRisk,
-)
-from risk_system.risk_aggregation.position_limits import (
+from risk.aggregation.portfolio_risk import PortfolioRiskAggregator, PositionRisk
+from risk.aggregation.position_limits import (
     LimitScope,
     LimitType,
     PositionLimit,

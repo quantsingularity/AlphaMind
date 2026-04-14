@@ -5,13 +5,13 @@ Delegates to the FastAPI application defined in api/main.py.
 
 import os
 
-from api.main import app  # noqa: F401 - re-exported for uvicorn
+from app.main import app  # noqa: F401 - re-exported for uvicorn
 
 if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(
-        "api.main:app",
+        "app.main:app",
         host=os.getenv("API_HOST", "0.0.0.0"),
         port=int(os.getenv("API_PORT", "8000")),
         reload=os.getenv("API_DEBUG", "false").lower() == "true",

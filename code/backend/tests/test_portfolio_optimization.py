@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import tensorflow as tf
-from alpha_research.portfolio_optimization import PortfolioOptimizer
+from analytics.alpha_research.portfolio_optimization import PortfolioOptimizer
 
 N_ASSETS = 3
 LOOKBACK_WINDOW = 10
