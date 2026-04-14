@@ -4,18 +4,13 @@ Main FastAPI application for AlphaMind backend.
 
 import logging
 import os
-import sys
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
+from api.routers import health, market_data, portfolio, strategies, trading
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-
-# Add backend to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
-from api.routers import health, market_data, portfolio, strategies, trading
 from infrastructure.authentication import router as auth_router
 
 logging.basicConfig(

@@ -6,9 +6,7 @@ from typing import Any
 import numpy as np
 import tensorflow as tf
 
-sys.path.insert(
-    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "backend"))
-)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from ai_models.attention_mechanism import (
     FinancialTimeSeriesTransformer,
     MultiHeadAttention,

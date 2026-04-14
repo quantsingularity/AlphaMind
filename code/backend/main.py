@@ -4,9 +4,6 @@ Delegates to the FastAPI application defined in api/main.py.
 """
 
 import os
-import sys
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from api.main import app  # noqa: F401 - re-exported for uvicorn
 

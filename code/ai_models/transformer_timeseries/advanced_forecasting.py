@@ -4,8 +4,7 @@ from typing import Any, Optional
 import keras
 import numpy as np
 import tensorflow as tf
-
-from backend.ai_models.attention_mechanism import FinancialTimeSeriesTransformer
+from ai_models.attention_mechanism import FinancialTimeSeriesTransformer
 
 logging.basicConfig(
     level=logging.INFO,

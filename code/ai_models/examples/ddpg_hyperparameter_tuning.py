@@ -7,9 +7,7 @@
 import os
 import sys
 
-sys.path.append(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-)
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import logging
 from typing import Any, Dict, List, Optional
@@ -17,8 +15,7 @@ from typing import Any, Dict, List, Optional
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-
-from backend.ai_models.ddpg_trading import BacktestEngine, DDPGAgent, TradingGymEnv
+from ai_models.ddpg_trading import BacktestEngine, DDPGAgent, TradingGymEnv
 
 logging.basicConfig(
     level=logging.INFO,

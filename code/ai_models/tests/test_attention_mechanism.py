@@ -1,11 +1,8 @@
-import sys
 from typing import Any, List
 
 import numpy as np
 import pytest
 import tensorflow as tf
-
-sys.path.append("alphamind/backend")
 from ai_models.attention_mechanism import (
     FinancialTimeSeriesTransformer,
     MultiHeadAttention,
