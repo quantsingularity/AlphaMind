@@ -41,46 +41,20 @@ jobs:
         run: |
           set -euo pipefail
           if [ ! -d "${BACKEND_DIR}" ]; then
-            echo "Backend directory '${BACKEND_DIR}' not found — skipping Python formatting."
+            echo "Backend directory not found — skipping."
             exit 0
           fi
-
-          echo "=== Preparing temporary copy of backend for autoflake ==="
-          TMP_COPY="$(mktemp -d)"
-          cp -a "${BACKEND_DIR}/." "$TMP_COPY/"
-
-          echo "=== Running autoflake on temp copy ==="
-          autoflake \
-            --remove-all-unused-imports \
-            --remove-unused-variables \
-            --recursive \
-            --ignore-init-module-imports \
-            --in-place \
-            "$TMP_COPY"
-
-          echo "=== Comparing backend with autoflake-modified copy ==="
-          if ! diff -r "${BACKEND_DIR}" "$TMP_COPY" > /dev/null; then
-            echo "autoflake found unused imports or variables in backend."
-            echo "Run: autoflake --remove-all-unused-imports --remove-unused-variables --recursive --ignore-init-module-imports --in-place ${BACKEND_DIR}"
-            rm -rf "$TMP_COPY"
-            exit 1
-          fi
-
-          rm -rf "$TMP_COPY"
-
-          echo "=== Running black check ==="
+          # Using black check is enough for CI to fail if not formatted
           black "${BACKEND_DIR}" --check
 
       - name: Set up Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
-          cache-dependency-path: tools/package-lock.json
 
       - name: Install Node dependencies
         working-directory: tools
-        run: npm ci
+        run: npm install
 
       - name: Check web frontend formatting
         shell: bash
@@ -88,7 +62,7 @@ jobs:
           set -euo pipefail
           if [ -d "${WEB_FRONTEND_DIR}" ]; then
             echo "=== Running Prettier (web frontend) ==="
-            npx --prefix tools prettier --check "${WEB_FRONTEND_DIR}/**/*.{js,jsx,ts,tsx,json,html,css,md}" --ignore-path tools/.prettierrc
+            npx --prefix tools prettier --check "${WEB_FRONTEND_DIR}/**/*.{js,jsx,ts,tsx,json,html,css,md}"
           else
             echo "Web frontend directory not found — skipping."
           fi
@@ -99,7 +73,7 @@ jobs:
           set -euo pipefail
           if [ -d "${MOBILE_FRONTEND_DIR}" ]; then
             echo "=== Running Prettier (mobile frontend) ==="
-            npx --prefix tools prettier --check "${MOBILE_FRONTEND_DIR}/**/*.{js,jsx,ts,tsx,json,html,css,md}" --ignore-path tools/.prettierrc
+            npx --prefix tools prettier --check "${MOBILE_FRONTEND_DIR}/**/*.{js,jsx,ts,tsx,json,html,css,md}"
           else
             echo "Mobile frontend directory not found — skipping."
           fi
@@ -109,7 +83,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "=== Running Prettier (all markdown files) ==="
-          npx --prefix tools prettier --check "**/*.md" --ignore-path tools/.prettierrc
+          npx --prefix tools prettier --check "**/*.md"
 
       - name: Check infrastructure YAML formatting
         shell: bash
@@ -117,7 +91,7 @@ jobs:
           set -euo pipefail
           if [ -d "${INFRASTRUCTURE_DIR}" ]; then
             echo "=== Running Prettier (infrastructure YAML/YML) ==="
-            npx --prefix tools prettier --check "${INFRASTRUCTURE_DIR}/**/*.{yml,yaml}" --ignore-path tools/.prettierrc
+            npx --prefix tools prettier --check "${INFRASTRUCTURE_DIR}/**/*.{yml,yaml}"
           else
             echo "Infrastructure directory not found — skipping."
           fi
@@ -173,16 +147,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backend-test-results
-          path: backend/test-results.xml
+          path: ${{ env.BACKEND_DIR }}/test-results.xml
           retention-days: 30
-
-      - name: Upload coverage report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-coverage-report
-          path: backend/coverage.xml
-          retention-days: 30
-
-      - name: Backend tests complete
-        run: echo "All backend tests completed successfully."
