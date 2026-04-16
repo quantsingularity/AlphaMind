@@ -8,6 +8,9 @@ on:
   workflow_dispatch:
 
 jobs:
+  # ============================================================
+  # Job 1 -- Code Quality Checks (Python & Prettier)
+  # ============================================================
   code_quality:
     name: Code Quality Checks
     runs-on: ubuntu-latest
@@ -34,7 +37,6 @@ jobs:
           set -euo pipefail
           echo "=== Running autoflake check ==="
           autoflake --remove-all-unused-imports --remove-unused-variables --recursive --check .
-
           echo "=== Running black check ==="
           black . --check
 
@@ -51,13 +53,13 @@ jobs:
         run: |
           set -euo pipefail
           NODE_GLOBAL=$(npm root -g)
-          echo "=== Running Prettier check for all supported files ==="
+          echo "=== Running Prettier check ==="
           prettier --plugin="$NODE_GLOBAL/prettier-plugin-solidity/dist/index.js" \
             --check "**/*.{js,jsx,ts,tsx,json,html,css,md,sol,yml,yaml}"
 
-      - name: Quality checks complete
-        run: echo "All formatting and quality checks passed."
-
+  # ============================================================
+  # Job 2 -- Backend Tests (Python / Pytest)
+  # ============================================================
   backend_tests:
     name: Backend Tests
     runs-on: ubuntu-latest
@@ -77,7 +79,7 @@ jobs:
           cache: "pip"
           cache-dependency-path: code/backend/requirements.txt
 
-      - name: Install backend dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
           if [ -f "${BACKEND_DIR}/requirements.txt" ]; then
@@ -101,5 +103,42 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backend-coverage-report
-          path: ${{ env.BACKEND_DIR }}/coverage.xml
+          path: code/backend/coverage.xml
           retention-days: 30
+
+  # ============================================================
+  # Job 3 -- Web Frontend Build
+  # ============================================================
+  frontend_build:
+    name: Frontend Build
+    runs-on: ubuntu-latest
+    needs: code_quality
+
+    defaults:
+      run:
+        working-directory: web-frontend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: web-frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: web-frontend/dist/
+          retention-days: 7
