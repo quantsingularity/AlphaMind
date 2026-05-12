@@ -12,8 +12,6 @@ AlphaMind is an advanced quantitative trading system that combines alternative d
   <img src="docs/images/alphamind_dashboard.bmp" alt="AlphaMind Dashboard" width="80%">
 </div>
 
-> **Status**: Production-ready core modules with comprehensive test coverage (85%+). See [Backtest Results](docs/BACKTEST_RESULTS.md) for empirical performance validation.
-
 ## Table of Contents
 
 - [Overview](#overview)
