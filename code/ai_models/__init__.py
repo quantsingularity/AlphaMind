@@ -1,47 +1,36 @@
 """
-AlphaMind AI Models package.
+AlphaMind AI Models
+===================
+Production-grade machine-learning and reinforcement-learning components
+for quantitative trading and portfolio management.
 
-Heavy dependencies (torch, tensorflow, gym/gymnasium, pymc) are imported
-lazily so that lightweight backend deployments do not fail on startup
-if a full ML environment is not installed.
+Sub-packages
+------------
+agents        -- RL trading agents (DDPG, PPO)
+environments  -- Gymnasium trading environments
+forecasting   -- Transformer-based time-series forecasting
+generative    -- GAN-based synthetic market-data generation
+examples      -- Runnable end-to-end example scripts
+research      -- Research notebooks (Jupyter)
+tests         -- Comprehensive test suite
 """
 
 from __future__ import annotations
 
-__version__ = "1.0.0"
-
-# Lazy-import helpers — avoids ImportError in environments that install
-# only the inference subset of requirements.
+__version__ = "2.0.0"
+__all__ = [
+    "agents",
+    "environments",
+    "forecasting",
+    "generative",
+]
 
 
 def _optional(module: str):
-    """Return the module if available, else None — never raises."""
-    try:
-        import importlib
+    """Return the module if importable, else None. Never raises."""
+    import importlib
 
+    try:
         return importlib.import_module(module)
     except ImportError:
         return None
-
-
-# Expose sub-packages (import errors surface only when the sub-package is used)
-
-try:
-    pass
-except ImportError:
-    pass
-
-try:
-    pass
-except ImportError:
-    pass
-
-try:
-    pass
-except ImportError:
-    pass
-
-try:
-    pass
-except ImportError:
-    pass

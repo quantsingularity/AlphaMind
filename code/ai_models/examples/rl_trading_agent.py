@@ -294,7 +294,10 @@ class _BacktestEngineStub:
 # Try importing real modules; fall back to stubs
 # ---------------------------------------------------------------------------
 try:
-    from ai_models.ddpg_trading import BacktestEngine, DDPGAgent, TradingGymEnv
+    from ai_models.agents import DDPGTradingAgent as DDPGAgent
+    from ai_models.environments import TradingEnvironment as TradingGymEnv
+
+    BacktestEngine = None  # lightweight example; full backtest engine not required
 
     logger.info("Using real AlphaMind DDPGAgent / TradingGymEnv.")
 except ImportError:

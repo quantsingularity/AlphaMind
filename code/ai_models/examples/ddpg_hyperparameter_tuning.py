@@ -52,20 +52,38 @@ COLORS = ["#2563eb", "#ef4444", "#10b981", "#f59e0b", "#8b5cf6", "#06b6d4"]
 # Try importing real AlphaMind modules; fall back to stubs
 # ---------------------------------------------------------------------------
 try:
-    from ai_models.ddpg_trading import BacktestEngine, DDPGAgent, TradingGymEnv
+    from ai_models.agents import DDPGTradingAgent as DDPGAgent
+    from ai_models.environments import TradingEnvironment as TradingGymEnv
+
+    BacktestEngine = None  # not used in tuning loop
 
     _REAL = True
     logger.info("Using real AlphaMind modules.")
 except ImportError:
     _REAL = False
     logger.warning("AlphaMind package not found - using stubs.")
-    from rl_trading_agent import (  # type: ignore[import]
-        _DDPGAgentStub as DDPGAgent,
-        _TradingGymEnvStub as TradingGymEnv,
-        _BacktestEngineStub as BacktestEngine,
-    )
+    # stubs are defined inline below when real package not available
+    DDPGAgent = None
+    TradingGymEnv = None
+    BacktestEngine = None
 
-from rl_trading_agent import generate_market_data  # type: ignore[import]
+try:
+    from ai_models.examples.rl_trading_agent import generate_market_data
+except ImportError:
+    # Inline fallback: duplicate the data generator locally
+    def generate_market_data(n_assets=5, n_days=756, seed=42):
+        import numpy as np
+        import pandas as pd
+
+        rng = np.random.default_rng(seed)
+        dates = pd.bdate_range("2021-01-04", periods=n_days)
+        prices = 100.0 * np.cumprod(
+            1 + rng.normal(0.0005, 0.015, (n_days, n_assets)), axis=0
+        )
+        return pd.DataFrame(
+            prices, index=dates, columns=[f"ASSET_{i+1:02d}" for i in range(n_assets)]
+        )
+
 
 # ---------------------------------------------------------------------------
 # Default search space
