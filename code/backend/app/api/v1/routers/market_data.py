@@ -1,16 +1,27 @@
-"""Market data router — quotes, historical OHLCV, and subscription helpers."""
+"""
+Market data router — live quotes, OHLCV history, and ticker search.
 
-import math
-from datetime import datetime, timedelta
-from typing import List, Optional
+Route inventory
+---------------
+GET /quotes              — all reference tickers (bulk)
+GET /quotes/{ticker}     — single ticker quote   (canonical)
+GET /quote/{ticker}      — alias kept for test_api.py / test_basic_api.py
+GET /history/{ticker}    — OHLCV bars            (canonical)
+GET /historical/{ticker} — alias kept for test_api.py / test_basic_api.py
+GET /batch-quotes        — comma-separated tickers
+"""
 
-from fastapi import APIRouter, Query
+from typing import Any, Dict, List, Optional
+
+from app.services import MarketDataService, get_market_data_service
+from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
 
 router = APIRouter()
 
+
 # ---------------------------------------------------------------------------
-# Models
+# Response schemas
 # ---------------------------------------------------------------------------
 
 
@@ -25,6 +36,7 @@ class Quote(BaseModel):
     low: float
     open: float
     close: float
+    source: Optional[str] = "synthetic"
 
 
 class OHLCV(BaseModel):
@@ -36,121 +48,90 @@ class OHLCV(BaseModel):
     volume: int
 
 
-# Reference prices (deterministic — no random)
-_PRICES: dict = {
-    "AAPL": 175.5,
-    "MSFT": 338.0,
-    "GOOGL": 2950.0,
-    "TSLA": 742.0,
-    "JPM": 148.25,
-    "AMZN": 3420.0,
-    "NVDA": 875.0,
-    "META": 485.0,
-    "BRK.B": 382.0,
-    "V": 268.0,
-}
-
-
-def _deterministic_walk(base: float, i: int, vol: float = 0.018) -> float:
-    """Return a deterministic price perturbation for day i."""
-    return base * (1 + math.sin(i * 0.31) * vol + math.cos(i * 0.71) * vol * 0.5)
-
-
-def _get_price(ticker: str) -> float:
-    return _PRICES.get(ticker.upper(), 100.0)
-
-
 # ---------------------------------------------------------------------------
-# Routes
+# Routes — fixed paths registered BEFORE wildcard paths
 # ---------------------------------------------------------------------------
 
 
-@router.get("/quote/{symbol}", response_model=Quote)
-async def get_quote(symbol: str):
-    """Return a live-style quote for a symbol."""
-    price = _get_price(symbol)
-    spread = price * 0.0005
-    return {
-        "ticker": symbol.upper(),
-        "timestamp": datetime.utcnow().isoformat() + "Z",
-        "bid": round(price - spread, 2),
-        "ask": round(price + spread, 2),
-        "last": price,
-        "volume": 12_500_000,
-        "high": round(price * 1.012, 2),
-        "low": round(price * 0.988, 2),
-        "open": round(price * 0.997, 2),
-        "close": round(price * 0.994, 2),
-    }
+@router.get("/quotes", response_model=List[Quote])
+async def get_all_quotes(
+    svc: MarketDataService = Depends(get_market_data_service),
+) -> List[Dict[str, Any]]:
+    """Return quotes for all reference tickers."""
+    return await svc.get_all_quotes()
 
 
-@router.get("/quotes")
-async def get_quotes(tickers: str = Query(..., description="Comma-separated tickers")):
-    """Return quotes for multiple tickers."""
-    symbols = [t.strip().upper() for t in tickers.split(",") if t.strip()]
-    results = []
-    for sym in symbols:
-        price = _get_price(sym)
-        spread = price * 0.0005
-        results.append(
-            {
-                "ticker": sym,
-                "timestamp": datetime.utcnow().isoformat() + "Z",
-                "bid": round(price - spread, 2),
-                "ask": round(price + spread, 2),
-                "last": price,
-                "volume": 12_500_000,
-                "high": round(price * 1.012, 2),
-                "low": round(price * 0.988, 2),
-                "open": round(price * 0.997, 2),
-                "close": round(price * 0.994, 2),
-            }
-        )
-    return results
+@router.get("/batch-quotes")
+async def get_batch_quotes(
+    tickers: str = Query(..., description="Comma-separated ticker list"),
+    svc: MarketDataService = Depends(get_market_data_service),
+) -> List[Dict[str, Any]]:
+    """Return quotes for a comma-separated list of tickers."""
+    ticker_list = [t.strip().upper() for t in tickers.split(",") if t.strip()]
+    return await svc.get_quotes(ticker_list)
 
 
-@router.get("/historical/{symbol}", response_model=List[OHLCV])
-async def get_historical(
-    symbol: str,
-    days: int = Query(30, ge=1, le=730),
-    interval: str = Query("1d"),
-):
-    """Return historical OHLCV data."""
-    base = _get_price(symbol)
-    data = []
-    price = base * 0.85  # start a bit lower for an uptrend
-    for i in range(days):
-        price = _deterministic_walk(price, i)
-        ts = (datetime.utcnow() - timedelta(days=days - i)).strftime("%Y-%m-%d")
-        daily_range = price * 0.015
-        data.append(
-            {
-                "timestamp": ts,
-                "open": round(price * 0.998, 2),
-                "high": round(price + daily_range, 2),
-                "low": round(price - daily_range, 2),
-                "close": round(price, 2),
-                "volume": 12_000_000 + int(math.sin(i) * 3_000_000),
-            }
-        )
-    return data
+# ---------------------------------------------------------------------------
+# Single-ticker quote — two paths: canonical (/quotes/X) + alias (/quote/X)
+# ---------------------------------------------------------------------------
 
 
-@router.get("/")
-async def list_market_data(
-    ticker: Optional[str] = Query(None),
-    interval: Optional[str] = Query("1d"),
-):
-    """Convenience endpoint: returns historical data for a ticker."""
-    if not ticker:
-        # Return summary for all known tickers
-        return [
-            {
-                "ticker": sym,
-                "last": price,
-                "change": round(price * 0.012, 2),
-                "changePct": 1.2,
-            }
-            for sym, price in _PRICES.items()
-        ]
-    return await get_historical(ticker, days=30, interval=interval)
+async def _get_quote(
+    ticker: str,
+    svc: MarketDataService,
+) -> Dict[str, Any]:
+    return await svc.get_quote(ticker)
+
+
+@router.get("/quotes/{ticker}", response_model=Quote)
+async def get_quote_plural(
+    ticker: str,
+    svc: MarketDataService = Depends(get_market_data_service),
+) -> Dict[str, Any]:
+    """Return the latest quote for a single ticker (canonical path)."""
+    return await _get_quote(ticker, svc)
+
+
+@router.get("/quote/{ticker}", response_model=Quote)
+async def get_quote_singular(
+    ticker: str,
+    svc: MarketDataService = Depends(get_market_data_service),
+) -> Dict[str, Any]:
+    """Return the latest quote for a single ticker (alias for /quotes/{ticker})."""
+    return await _get_quote(ticker, svc)
+
+
+# ---------------------------------------------------------------------------
+# OHLCV history — two paths: canonical (/history/X) + alias (/historical/X)
+# ---------------------------------------------------------------------------
+
+
+async def _get_ohlcv(
+    ticker: str,
+    days: int,
+    interval: str,
+    svc: MarketDataService,
+) -> List[Dict[str, Any]]:
+    return await svc.get_ohlcv(ticker, days=days, interval=interval)
+
+
+@router.get("/history/{ticker}", response_model=List[OHLCV])
+async def get_ohlcv_history(
+    ticker: str,
+    days: int = Query(90, ge=1, le=1825, description="Number of calendar days"),
+    interval: str = Query("1d", description="Bar interval: 1d | 1h | 5m"),
+    svc: MarketDataService = Depends(get_market_data_service),
+) -> List[Dict[str, Any]]:
+    """Return OHLCV history for a ticker (canonical path)."""
+    return await _get_ohlcv(ticker, days, interval, svc)
+
+
+@router.get("/historical/{ticker}", response_model=List[OHLCV])
+async def get_ohlcv_historical(
+    ticker: str,
+    days: int = Query(90, ge=1, le=1825, description="Number of calendar days"),
+    interval: str = Query("1d", description="Bar interval: 1d | 1h | 5m"),
+    svc: MarketDataService = Depends(get_market_data_service),
+) -> List[Dict[str, Any]]:
+    """Return OHLCV history for a ticker (alias for /history/{ticker})."""
+    return await _get_ohlcv(ticker, days, interval, svc)

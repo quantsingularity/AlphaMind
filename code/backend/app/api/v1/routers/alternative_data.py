@@ -1,6 +1,6 @@
 """Alternative data router — satellite, sentiment, SEC filings, social media."""
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException, Query
@@ -20,13 +20,22 @@ class AlternativeDataSource(BaseModel):
     latency: str
 
 
+def _now() -> datetime:
+    """Return current UTC time (timezone-aware). Replaces deprecated utcnow()."""
+    return datetime.now(timezone.utc)
+
+
+def _iso(dt: datetime) -> str:
+    return dt.isoformat().replace("+00:00", "Z")
+
+
 _SOURCES: List[dict] = [
     {
         "id": "alt-001",
         "name": "SEC 8-K Monitor",
         "type": "sec",
         "status": "active",
-        "lastUpdate": (datetime.utcnow() - timedelta(minutes=12)).isoformat() + "Z",
+        "lastUpdate": _iso(_now() - timedelta(minutes=12)),
         "dataPoints": 142_890,
         "description": "Real-time NLP processing of SEC 8-K filings with sentiment scoring",
         "latency": "<2 min",
@@ -36,7 +45,7 @@ _SOURCES: List[dict] = [
         "name": "Satellite Imagery Intelligence",
         "type": "satellite",
         "status": "active",
-        "lastUpdate": (datetime.utcnow() - timedelta(hours=6)).isoformat() + "Z",
+        "lastUpdate": _iso(_now() - timedelta(hours=6)),
         "dataPoints": 38_400,
         "description": "Geospatial commodity intelligence — parking lots, oil tanks, crop yield",
         "latency": "6h",
@@ -46,7 +55,7 @@ _SOURCES: List[dict] = [
         "name": "Social Sentiment Engine",
         "type": "sentiment",
         "status": "active",
-        "lastUpdate": (datetime.utcnow() - timedelta(minutes=3)).isoformat() + "Z",
+        "lastUpdate": _iso(_now() - timedelta(minutes=3)),
         "dataPoints": 2_450_000,
         "description": "Real-time Twitter/Reddit/StockTwits sentiment aggregation with BERT models",
         "latency": "<1 min",
@@ -56,7 +65,7 @@ _SOURCES: List[dict] = [
         "name": "News NLP Pipeline",
         "type": "sentiment",
         "status": "active",
-        "lastUpdate": (datetime.utcnow() - timedelta(minutes=8)).isoformat() + "Z",
+        "lastUpdate": _iso(_now() - timedelta(minutes=8)),
         "dataPoints": 890_000,
         "description": "FinBERT-based news sentiment from 500+ financial news sources",
         "latency": "~5 min",
@@ -66,7 +75,7 @@ _SOURCES: List[dict] = [
         "name": "Credit Card Transaction Flow",
         "type": "social",
         "status": "inactive",
-        "lastUpdate": (datetime.utcnow() - timedelta(days=1)).isoformat() + "Z",
+        "lastUpdate": _iso(_now() - timedelta(days=1)),
         "dataPoints": 12_000_000,
         "description": "Anonymised consumer spending signals for retail sector analysis",
         "latency": "24h",
@@ -111,38 +120,31 @@ async def get_alternative_data(
 
 def _sec_sample(ticker: Optional[str], limit: int) -> List[dict]:
     tickers = [ticker.upper()] if ticker else ["AAPL", "MSFT", "GOOGL", "TSLA", "JPM"]
-    records = []
-    for i, t in enumerate(tickers[:limit]):
-        records.append(
-            {
-                "ticker": t,
-                "filingDate": (datetime.utcnow() - timedelta(days=i * 3)).strftime(
-                    "%Y-%m-%d"
-                ),
-                "formType": "8-K",
-                "sentimentScore": round(0.62 + i * 0.03, 2),
-                "headline": f"{t} reports material event",
-            }
-        )
-    return records
+    return [
+        {
+            "ticker": t,
+            "filingDate": (_now() - timedelta(days=i * 3)).strftime("%Y-%m-%d"),
+            "formType": "8-K",
+            "sentimentScore": round(0.62 + i * 0.03, 2),
+            "headline": f"{t} reports material event",
+        }
+        for i, t in enumerate(tickers[:limit])
+    ]
 
 
 def _sentiment_sample(ticker: Optional[str], limit: int) -> List[dict]:
     tickers = [ticker.upper()] if ticker else ["AAPL", "MSFT", "GOOGL", "TSLA", "JPM"]
-    records = []
-    for i, t in enumerate(tickers[:limit]):
-        records.append(
-            {
-                "ticker": t,
-                "timestamp": (datetime.utcnow() - timedelta(minutes=i * 10)).isoformat()
-                + "Z",
-                "source": "Twitter",
-                "sentimentScore": round(0.58 + i * 0.02, 2),
-                "volume": 1200 + i * 150,
-                "bullishPct": round(62 + i * 1.5, 1),
-            }
-        )
-    return records
+    return [
+        {
+            "ticker": t,
+            "timestamp": _iso(_now() - timedelta(minutes=i * 10)),
+            "source": "Twitter",
+            "sentimentScore": round(0.58 + i * 0.02, 2),
+            "volume": 1200 + i * 150,
+            "bullishPct": round(62 + i * 1.5, 1),
+        }
+        for i, t in enumerate(tickers[:limit])
+    ]
 
 
 def _satellite_sample(ticker: Optional[str], limit: int) -> List[dict]:
@@ -152,6 +154,6 @@ def _satellite_sample(ticker: Optional[str], limit: int) -> List[dict]:
             "assetType": "oil_tank",
             "fillLevel": 0.74,
             "changeWeekly": 0.05,
-            "captureDate": (datetime.utcnow() - timedelta(days=1)).strftime("%Y-%m-%d"),
+            "captureDate": (_now() - timedelta(days=1)).strftime("%Y-%m-%d"),
         }
     ]

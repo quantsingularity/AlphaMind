@@ -37,7 +37,7 @@ def test_openapi_schema():
 
 
 def test_trading_orders_endpoint():
-    """v2: field names are camelCase; status code is 201 Created."""
+    """v2: MARKET orders are filled immediately — status is 'filled', not 'pending'."""
     order_data = {
         "ticker": "AAPL",
         "side": "BUY",
@@ -51,7 +51,8 @@ def test_trading_orders_endpoint():
     assert "id" in data
     assert data["ticker"] == "AAPL"
     assert data["quantity"] == 100.0
-    assert data["status"] == "pending"
+    # Stale assertion fixed: MARKET orders are immediately filled by the service
+    assert data["status"] == "filled"
 
 
 def test_get_orders_endpoint():
@@ -94,7 +95,7 @@ def test_portfolio_performance_endpoint():
 
 
 def test_market_data_quote_endpoint():
-    """v2: uses 'ticker' and 'last' instead of 'symbol' and 'price'."""
+    """Uses the /quote/{ticker} alias registered alongside /quotes/{ticker}."""
     response = client.get("/api/v1/market-data/quote/AAPL")
     assert response.status_code == 200
     data = response.json()
@@ -105,7 +106,7 @@ def test_market_data_quote_endpoint():
 
 
 def test_market_data_historical_endpoint():
-    """v2: returns a list of OHLCV records directly."""
+    """Uses the /historical/{ticker} alias registered alongside /history/{ticker}."""
     response = client.get("/api/v1/market-data/historical/AAPL?days=30")
     assert response.status_code == 200
     data = response.json()
@@ -124,7 +125,7 @@ def test_strategies_endpoint():
 
 
 def test_backtest_endpoint():
-    """v2: backtest is at /api/v1/backtest/ — dedicated router."""
+    """v2: backtest is at /api/v1/backtest/ — dedicated router, no DB needed."""
     backtest_data = {
         "strategyId": "strat-001",
         "startDate": "2023-01-01",

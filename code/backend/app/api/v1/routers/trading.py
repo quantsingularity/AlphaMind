@@ -1,26 +1,48 @@
-"""Trading operations router — orders management."""
+"""Trading operations router — order submission and management."""
 
-import uuid
-from datetime import datetime
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from app.services import TradingService, get_trading_service
+from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel, field_validator
 
 router = APIRouter()
 
 
 # ---------------------------------------------------------------------------
-# Models
+# Request / response schemas
 # ---------------------------------------------------------------------------
 
 
 class OrderCreate(BaseModel):
     ticker: str
-    side: str  # "BUY" | "SELL"
+    side: str  # BUY | SELL
     quantity: float
-    orderType: str  # "MARKET" | "LIMIT" | "STOP"
+    orderType: str  # MARKET | LIMIT | STOP
     price: Optional[float] = None
+
+    @field_validator("side")
+    @classmethod
+    def validate_side(cls, v: str) -> str:
+        v = v.upper()
+        if v not in {"BUY", "SELL"}:
+            raise ValueError("side must be BUY or SELL")
+        return v
+
+    @field_validator("orderType")
+    @classmethod
+    def validate_order_type(cls, v: str) -> str:
+        v = v.upper()
+        if v not in {"MARKET", "LIMIT", "STOP"}:
+            raise ValueError("orderType must be MARKET, LIMIT, or STOP")
+        return v
+
+    @field_validator("quantity")
+    @classmethod
+    def validate_quantity(cls, v: float) -> float:
+        if v <= 0:
+            raise ValueError("quantity must be positive")
+        return v
 
 
 class Order(BaseModel):
@@ -29,40 +51,11 @@ class Order(BaseModel):
     side: str
     quantity: float
     orderType: str
-    price: Optional[float]
+    price: Optional[float] = None
+    filledPrice: Optional[float] = None
     status: str
-    timestamp: str
+    timestamp: Optional[str] = None
     filledAt: Optional[str] = None
-
-
-# ---------------------------------------------------------------------------
-# In-memory store
-# ---------------------------------------------------------------------------
-
-_ORDERS: List[dict] = [
-    {
-        "id": "ord-001",
-        "ticker": "AAPL",
-        "side": "BUY",
-        "quantity": 100.0,
-        "orderType": "MARKET",
-        "price": None,
-        "status": "filled",
-        "timestamp": "2024-01-15T09:30:00Z",
-        "filledAt": "2024-01-15T09:30:01Z",
-    },
-    {
-        "id": "ord-002",
-        "ticker": "MSFT",
-        "side": "BUY",
-        "quantity": 50.0,
-        "orderType": "LIMIT",
-        "price": 298.0,
-        "status": "filled",
-        "timestamp": "2024-01-20T10:15:00Z",
-        "filledAt": "2024-01-20T10:15:32Z",
-    },
-]
 
 
 # ---------------------------------------------------------------------------
@@ -71,48 +64,50 @@ _ORDERS: List[dict] = [
 
 
 @router.get("/orders", response_model=List[Order])
-async def get_orders():
-    """Return all orders."""
-    return _ORDERS
+async def get_orders(
+    status: Optional[str] = Query(None, description="Filter by status"),
+    svc: TradingService = Depends(get_trading_service),
+) -> List[Dict[str, Any]]:
+    """Return all orders, optionally filtered by status."""
+    return await svc.get_orders(status=status)
 
 
 @router.get("/orders/{order_id}", response_model=Order)
-async def get_order(order_id: str):
-    """Return a single order."""
-    order = next((o for o in _ORDERS if o["id"] == order_id), None)
-    if not order:
+async def get_order(
+    order_id: str,
+    svc: TradingService = Depends(get_trading_service),
+) -> Dict[str, Any]:
+    """Return a single order by ID."""
+    order = await svc.get_order(order_id)
+    if order is None:
         raise HTTPException(status_code=404, detail="Order not found")
     return order
 
 
 @router.post("/orders", response_model=Order, status_code=201)
-async def create_order(payload: OrderCreate):
+async def create_order(
+    payload: OrderCreate,
+    svc: TradingService = Depends(get_trading_service),
+) -> Dict[str, Any]:
     """Submit a new trading order."""
-    now = datetime.utcnow().isoformat() + "Z"
-    order = {
-        "id": f"ord-{uuid.uuid4().hex[:8]}",
-        "ticker": payload.ticker.upper(),
-        "side": payload.side,
-        "quantity": payload.quantity,
-        "orderType": payload.orderType,
-        "price": payload.price,
-        "status": "pending",
-        "timestamp": now,
-        "filledAt": None,
-    }
-    _ORDERS.append(order)
-    return order
+    return await svc.create_order(
+        ticker=payload.ticker,
+        side=payload.side,
+        quantity=payload.quantity,
+        order_type=payload.orderType,
+        price=payload.price,
+    )
 
 
 @router.delete("/orders/{order_id}", status_code=204)
-async def cancel_order(order_id: str):
+async def cancel_order(
+    order_id: str,
+    svc: TradingService = Depends(get_trading_service),
+) -> None:
     """Cancel a pending order."""
-    order = next((o for o in _ORDERS if o["id"] == order_id), None)
-    if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
-    if order["status"] != "pending":
+    result = await svc.cancel_order(order_id)
+    if result is None:
         raise HTTPException(
-            status_code=400,
-            detail=f"Cannot cancel order with status '{order['status']}'",
+            status_code=404,
+            detail="Order not found or is not in a cancellable state",
         )
-    order["status"] = "cancelled"

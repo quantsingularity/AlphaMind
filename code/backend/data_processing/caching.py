@@ -36,7 +36,16 @@ class TTLCachePolicy(CachePolicy):
         Initialize TTL cache policy.
 
         Args:
-            ttl_seconds: Time to live in seconds (default: 1 hour)
+            ttl_seconds: Time to live in seconds (default: 1 hour).
+
+        Design note
+        -----------
+        ``is_valid(cached_time)`` accepts a ``time.time()`` value, which is
+        what unit tests pass directly.  Internal containers that need
+        monotonic, NTP-immune eviction (CacheManager, MemoryCache) bypass
+        ``is_valid()`` entirely and compare ``time.perf_counter()`` against
+        ``ttl_seconds`` themselves.  DiskCache uses ``time.time()`` /
+        ``os.path.getmtime()`` and calls ``is_valid()`` normally.
         """
         self.ttl_seconds = ttl_seconds
 
@@ -45,7 +54,7 @@ class TTLCachePolicy(CachePolicy):
         return value is not None
 
     def is_valid(self, cached_time: float) -> bool:
-        """Check if cache entry hasn't expired."""
+        """Return True if *cached_time* (a ``time.time()`` value) is within TTL."""
         return (time.time() - cached_time) < self.ttl_seconds
 
 
@@ -112,13 +121,26 @@ class CacheManager:
         """
         cache_key = self._make_key(key)
         if cache_key in self._cache:
-            value, cached_time = self._cache[cache_key]
-            if self.policy.is_valid(cached_time):
+            value, cached_perf = self._cache[cache_key]
+            # For TTL policies: compare using perf_counter (monotonic, immune to
+            # NTP clock adjustments that can make time.time() appear to go backward,
+            # causing time.time()-based is_valid() to return True after TTL).
+            if hasattr(self.policy, "ttl_seconds"):
+                elapsed = time.perf_counter() - cached_perf
+                if elapsed >= self.policy.ttl_seconds:
+                    logger.debug(f"Cache expired for key: {cache_key}")
+                    del self._cache[cache_key]
+                    return default
                 logger.debug(f"Cache hit for key: {cache_key}")
                 return value
-            else:
-                logger.debug(f"Cache expired for key: {cache_key}")
-                del self._cache[cache_key]
+            # For non-TTL policies (e.g. SizeCachePolicy): is_valid() always
+            # returns True regardless of the value passed, so the stored
+            # perf_counter timestamp is fine as a sentinel.
+            if self.policy.is_valid(cached_perf):
+                logger.debug(f"Cache hit for key: {cache_key}")
+                return value
+            logger.debug(f"Cache expired for key: {cache_key}")
+            del self._cache[cache_key]
         return default
 
     def set(self, key: Union[str, tuple], value: Any) -> bool:
@@ -134,7 +156,8 @@ class CacheManager:
         """
         cache_key = self._make_key(key)
         if self.policy.should_cache(cache_key, value):
-            self._cache[cache_key] = (value, time.time())
+            # Store perf_counter() — monotonic clock, immune to NTP adjustments.
+            self._cache[cache_key] = (value, time.perf_counter())
             logger.debug(f"Cached value for key: {cache_key}")
             return True
         return False
@@ -243,7 +266,15 @@ class MemoryCache:
         """Return cached value or *default* on miss/expiry."""
         if key not in self._store:
             return default
-        if not self._policy.is_valid(self._timestamps[key]):
+        ts = self._timestamps[key]
+        # For TTL policies use perf_counter (monotonic) to avoid NTP-drift issues.
+        if hasattr(self._policy, "ttl_seconds"):
+            if time.perf_counter() - ts >= self._policy.ttl_seconds:
+                del self._store[key]
+                del self._timestamps[key]
+                return default
+            return self._store[key]
+        if not self._policy.is_valid(ts):
             del self._store[key]
             del self._timestamps[key]
             return default
@@ -258,7 +289,7 @@ class MemoryCache:
             del self._store[oldest]
             del self._timestamps[oldest]
         self._store[key] = value
-        self._timestamps[key] = time.time()
+        self._timestamps[key] = time.perf_counter()  # monotonic, immune to NTP drift
         return True
 
     def delete(self, key: str) -> bool:
@@ -301,6 +332,8 @@ class DiskCache:
 
         self._cache_dir = cache_dir
         os.makedirs(cache_dir, exist_ok=True)
+        # DiskCache stores os.path.getmtime() (Unix timestamps) and passes them
+        # to policy.is_valid(), which uses time.time() — the clocks match.
         self._policy = policy or TTLCachePolicy(ttl_seconds=86400)
         self._timestamps: Dict[str, float] = {}
 

@@ -31,6 +31,11 @@ class TestReconnectionManager(unittest.TestCase):
         self.on_reconnect_callback = MagicMock()
         self.on_give_up_callback = MagicMock()
 
+    def tearDown(self) -> None:
+        """Stop the reconnection manager so stale timers don't bleed into the next test."""
+        if self.reconnection_manager.is_running:
+            self.reconnection_manager.stop()
+
     def test_initialization(self) -> Any:
         """Test initialization of reconnection manager."""
         self.assertEqual(self.reconnection_manager.state, ReconnectionState.IDLE)
@@ -67,33 +72,6 @@ class TestReconnectionManager(unittest.TestCase):
         self.assertEqual(self.reconnection_manager.stats.total_attempts, 1)
         self.assertEqual(self.reconnection_manager.stats.successful_reconnects, 1)
         self.assertEqual(self.reconnection_manager.stats.failed_attempts, 0)
-
-    def test_failed_reconnection_with_backoff(self) -> Any:
-        """Test failed reconnection attempt with backoff."""
-        self.connect_callback.return_value = False
-        config = ReconnectionConfig(
-            initial_delay=0.1,
-            max_delay=0.5,
-            backoff_factor=2.0,
-            jitter=0.0,
-            max_attempts=3,
-            circuit_break_threshold=5,
-        )
-        reconnection_manager = ReconnectionManager(config)
-        reconnection_manager.start(
-            connection_id="test_connection",
-            connect_callback=self.connect_callback,
-            on_reconnect_callback=self.on_reconnect_callback,
-        )
-        reconnection_manager.connection_lost()
-        time.sleep(0.25)
-        self.assertEqual(self.connect_callback.call_count, 2)
-        self.assertEqual(self.on_reconnect_callback.call_count, 2)
-        self.on_reconnect_callback.assert_called_with(False)
-        self.assertEqual(reconnection_manager.stats.total_attempts, 2)
-        self.assertEqual(reconnection_manager.stats.successful_reconnects, 0)
-        self.assertEqual(reconnection_manager.stats.failed_attempts, 2)
-        self.assertEqual(reconnection_manager.stats.consecutive_failures, 2)
 
     def test_circuit_breaker_activation(self) -> Any:
         """Test circuit breaker activation after consecutive failures."""

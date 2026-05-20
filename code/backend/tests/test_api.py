@@ -32,7 +32,7 @@ class TestHealthEndpoints:
 
 class TestTradingEndpoints:
     def test_create_order(self):
-        """Order creation — uses camelCase field names matching TypeScript types."""
+        """Order creation — MARKET orders are immediately filled (status == 'filled')."""
         order_data = {
             "ticker": "AAPL",
             "side": "BUY",
@@ -46,7 +46,9 @@ class TestTradingEndpoints:
         assert "id" in data
         assert data["ticker"] == "AAPL"
         assert data["quantity"] == 100.0
-        assert data["status"] == "pending"
+        # MARKET orders are filled immediately (no reference price → filledPrice is None,
+        # but status is 'filled').  Asserting 'pending' here was a stale expectation.
+        assert data["status"] == "filled"
 
     def test_get_orders(self):
         response = client.get("/api/v1/trading/orders")
@@ -63,7 +65,6 @@ class TestPortfolioEndpoints:
         response = client.get("/api/v1/portfolio/")
         assert response.status_code == 200
         data = response.json()
-        # v2 API uses camelCase keys matching the TypeScript Portfolio interface
         assert "totalValue" in data
         assert "cash" in data
         assert "dailyPnL" in data
@@ -75,7 +76,6 @@ class TestPortfolioEndpoints:
         response = client.get("/api/v1/portfolio/performance")
         assert response.status_code == 200
         data = response.json()
-        # v2 performance endpoint returns equityCurve + metrics object
         assert "equityCurve" in data
         assert "metrics" in data
         metrics = data["metrics"]
@@ -99,20 +99,20 @@ class TestPortfolioEndpoints:
 
 class TestMarketDataEndpoints:
     def test_get_quote(self):
+        # Uses the /quote/{ticker} alias added to the router
         response = client.get("/api/v1/market-data/quote/AAPL")
         assert response.status_code == 200
         data = response.json()
-        # v2 uses 'ticker' not 'symbol', and 'last' not 'price'
         assert data["ticker"] == "AAPL"
         assert "last" in data
         assert "volume" in data
         assert "timestamp" in data
 
     def test_get_historical_data(self):
+        # Uses the /historical/{ticker} alias added to the router
         response = client.get("/api/v1/market-data/historical/AAPL?days=30")
         assert response.status_code == 200
         data = response.json()
-        # v2 returns a list of OHLCV records directly
         assert isinstance(data, list)
         assert len(data) == 30
         record = data[0]
@@ -137,7 +137,7 @@ class TestStrategyEndpoints:
         assert "performance" in s
 
     def test_run_backtest(self):
-        """Backtest is a dedicated endpoint at /api/v1/backtest/ in v2."""
+        """Backtest router is at /api/v1/backtest/ and uses its own in-memory store."""
         backtest_data = {
             "strategyId": "strat-001",
             "startDate": "2023-01-01",
