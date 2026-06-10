@@ -170,3 +170,27 @@ async def get_backtests(
 ) -> List[Dict[str, Any]]:
     """Return all backtest runs for a strategy."""
     return await svc.get_backtests(strategy_id)
+
+
+@router.get("/{strategy_id}/performance")
+async def get_strategy_performance(
+    strategy_id: str,
+    svc: StrategyService = Depends(get_strategy_service),
+) -> Dict[str, Any]:
+    """Return the performance metrics block for a strategy."""
+    perf = await svc.get_performance(strategy_id)
+    if perf is None:
+        raise HTTPException(status_code=404, detail="Strategy not found")
+    return perf
+
+
+@router.get("/{strategy_id}/equity-curve")
+async def get_strategy_equity_curve(
+    strategy_id: str,
+    svc: StrategyService = Depends(get_strategy_service),
+) -> Dict[str, Any]:
+    """Return a deterministic equity curve (value + benchmark) for a strategy."""
+    curve = await svc.get_equity_curve(strategy_id)
+    if curve is None:
+        raise HTTPException(status_code=404, detail="Strategy not found")
+    return curve

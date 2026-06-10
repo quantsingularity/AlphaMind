@@ -47,10 +47,12 @@ print_info() {
 
 # Function to run a command and measure its execution time
 run_timed() {
-  local start_time=$(date +%s)
+  local start_time
+  start_time=$(date +%s)
   "$@"
   local status=$?
-  local end_time=$(date +%s)
+  local end_time
+  end_time=$(date +%s)
   local duration=$((end_time - start_time))
 
   echo -e "${COLOR_CYAN}Command completed in ${duration}s${COLOR_RESET}"
@@ -317,6 +319,7 @@ KEEP_RELEASES="${KEEP_RELEASES:-5}"
 DOCKER_COMPOSE_FILE="${DOCKER_COMPOSE_FILE:-docker-compose.yml}"
 
 # Load configuration
+# shellcheck source=/dev/null
 source "$CONFIG_FILE"
 
 # Set up SSH options
@@ -472,7 +475,7 @@ fi
 deploy_backend() {
   print_header "Deploying Backend"
 
-  if [[ ! -d "backend" ]]; then
+  if [[ ! -d "code/backend" ]]; then
     print_warning "Backend directory not found, skipping"
     return
   fi
@@ -484,20 +487,20 @@ deploy_backend() {
 
   # Determine backend build artifacts
   BACKEND_BUILD=""
-  if [[ -d "backend/dist" ]]; then
-    BACKEND_BUILD="backend/dist"
-  elif [[ -d "backend/build" ]]; then
-    BACKEND_BUILD="backend/build"
+  if [[ -d "code/backend/dist" ]]; then
+    BACKEND_BUILD="code/backend/dist"
+  elif [[ -d "code/backend/build" ]]; then
+    BACKEND_BUILD="code/backend/build"
   else
     print_warning "No backend build artifacts found"
-    BACKEND_BUILD="backend"
+    BACKEND_BUILD="code/backend"
   fi
 
   # Transfer backend files
   if [[ "$DRY_RUN" == "false" ]]; then
     print_info "Transferring backend files..."
     transfer_files "$BACKEND_BUILD" "$RELEASE_DIR/backend"
-    transfer_files "backend/requirements.txt" "$RELEASE_DIR/backend/"
+    transfer_files "code/backend/requirements.txt" "$RELEASE_DIR/backend/"
 
     # Transfer configuration files
     if [[ -d "config" ]]; then
@@ -509,16 +512,10 @@ deploy_backend() {
     run_remote "cd $RELEASE_DIR && python3 -m venv venv"
     run_remote "cd $RELEASE_DIR && source venv/bin/activate && pip install -r backend/requirements.txt"
 
-    # Run database migrations if needed
+    # Run database migrations if needed (Alembic — backend is FastAPI)
     if [[ "$DEPLOY_ENV" != "development" ]]; then
       print_info "Running database migrations..."
-      run_remote "cd $RELEASE_DIR && source venv/bin/activate && cd backend && python manage.py migrate --noinput"
-    fi
-
-    # Collect static files if needed
-    if [[ "$DEPLOY_ENV" != "development" ]]; then
-      print_info "Collecting static files..."
-      run_remote "cd $RELEASE_DIR && source venv/bin/activate && cd backend && python manage.py collectstatic --noinput"
+      run_remote "cd $RELEASE_DIR && source venv/bin/activate && cd backend && alembic upgrade head"
     fi
   else
     print_info "Dry run: Would transfer backend files and set up environment"

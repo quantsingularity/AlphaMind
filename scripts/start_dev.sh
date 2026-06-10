@@ -89,12 +89,12 @@ fi
 start_backend() {
   print_header "Starting Backend Development Server"
 
-  if [[ ! -d "backend" ]]; then
+  if [[ ! -d "code/backend" ]]; then
     print_error "Backend directory not found."
     return 1
   fi
 
-  cd backend
+  cd code/backend || return 1
 
   if command_exists uvicorn; then
     print_info "Starting Uvicorn server on http://0.0.0.0:8000 ..."
@@ -112,11 +112,11 @@ start_backend() {
     BACKEND_PID=$!
   else
     print_error "No suitable backend server (uvicorn, gunicorn, flask) found. Please install one."
-    cd "$PROJECT_ROOT"
+    cd "$PROJECT_ROOT" || exit 1
     return 1
   fi
 
-  cd "$PROJECT_ROOT"
+  cd "$PROJECT_ROOT" || exit 1
 
   # Brief wait to detect immediate crashes
   sleep 2
@@ -140,17 +140,17 @@ start_web_frontend() {
     return 1
   fi
 
-  cd web-frontend
+  cd web-frontend || return 1
 
   if [[ ! -f "package.json" ]]; then
     print_error "No package.json found in web-frontend directory."
-    cd "$PROJECT_ROOT"
+    cd "$PROJECT_ROOT" || exit 1
     return 1
   fi
 
   if ! grep -q '"start"' package.json; then
     print_error "No 'start' script found in web-frontend/package.json."
-    cd "$PROJECT_ROOT"
+    cd "$PROJECT_ROOT" || exit 1
     return 1
   fi
 
@@ -161,7 +161,7 @@ start_web_frontend() {
     npm start
   fi
 
-  cd "$PROJECT_ROOT"
+  cd "$PROJECT_ROOT" || exit 1
 }
 
 # --- Main Execution ---

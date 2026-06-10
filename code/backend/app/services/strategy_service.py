@@ -9,6 +9,7 @@ task (not yet wired to a live execution engine — see TODO below).
 from __future__ import annotations
 
 import json
+import random
 import uuid
 from datetime import datetime, timezone
 from typing import Any, Dict, List
@@ -36,6 +37,57 @@ class StrategyService:
     async def get_strategy(self, strategy_id: str) -> Dict[str, Any] | None:
         s = await self._strategy_repo.get(strategy_id)
         return self._strategy_to_dict(s) if s else None
+
+    async def get_performance(self, strategy_id: str) -> Dict[str, Any] | None:
+        """Return just the performance metrics block for a strategy."""
+        s = await self._strategy_repo.get(strategy_id)
+        if not s:
+            return None
+        return self._strategy_to_dict(s)["performance"]
+
+    async def get_equity_curve(
+        self, strategy_id: str, days: int = 90
+    ) -> Dict[str, Any] | None:
+        """Build a deterministic equity curve for a strategy.
+
+        The curve is derived from the strategy's stored performance metrics
+        (total return / volatility) using a per-strategy seed so the result is
+        stable across requests. Returns the shape the web client expects:
+        ``{"strategyId": ..., "equityCurve": [{"day", "value", "benchmark"}]}``.
+        """
+        s = await self._strategy_repo.get(strategy_id)
+        if not s:
+            return None
+
+        total_return = float(getattr(s, "total_return", 0.0) or 0.0)
+        volatility = float(getattr(s, "volatility", 0.1) or 0.1)
+        beta = float(getattr(s, "beta", 1.0) or 1.0)
+
+        rng = random.Random(strategy_id)
+        # Per-period drift so the curve ends near the stored total return.
+        drift = total_return / days if days else 0.0
+        daily_vol = volatility / (days**0.5) if days else 0.0
+        # Benchmark grows at a flat market rate, scaled down by the strategy beta.
+        bench_drift = (0.08 / days) if days else 0.0
+
+        value = 100.0
+        benchmark = 100.0
+        curve: List[Dict[str, Any]] = [
+            {"day": 0, "value": round(value, 2), "benchmark": round(benchmark, 2)}
+        ]
+        for day in range(1, days + 1):
+            value *= 1 + drift + rng.gauss(0, daily_vol)
+            benchmark *= (
+                1 + bench_drift + rng.gauss(0, daily_vol * 0.6 / max(beta, 0.1))
+            )
+            curve.append(
+                {
+                    "day": day,
+                    "value": round(value, 2),
+                    "benchmark": round(benchmark, 2),
+                }
+            )
+        return {"strategyId": strategy_id, "equityCurve": curve}
 
     async def create_strategy(
         self,

@@ -128,8 +128,8 @@ fi
 build_backend_image() {
   print_header "Building Backend Docker Image"
 
-  if [[ ! -f "backend/Dockerfile" ]]; then
-    print_warning "backend/Dockerfile not found, skipping backend image build."
+  if [[ ! -f "code/backend/Dockerfile" ]]; then
+    print_warning "code/backend/Dockerfile not found, skipping backend image build."
     return 0
   fi
 
@@ -145,8 +145,9 @@ build_backend_image() {
   fi
 
   print_info "Building image: $full_tag"
+  # Build context is the backend dir (its Dockerfile uses context-relative COPY).
   # shellcheck disable=SC2086
-  docker build -f backend/Dockerfile -t "$full_tag" $cache_option $BUILD_ARGS "$PROJECT_ROOT"
+  docker build -f code/backend/Dockerfile -t "$full_tag" $cache_option $BUILD_ARGS "$PROJECT_ROOT/code/backend"
 
   if [[ "$PUSH" == "true" ]]; then
     print_info "Pushing image: $full_tag"
@@ -177,8 +178,9 @@ build_web_frontend_image() {
   fi
 
   print_info "Building image: $full_tag"
+  # Build context is the web-frontend dir (context-relative COPY in its Dockerfile).
   # shellcheck disable=SC2086
-  docker build -f web-frontend/Dockerfile -t "$full_tag" $cache_option $BUILD_ARGS "$PROJECT_ROOT"
+  docker build -f web-frontend/Dockerfile -t "$full_tag" $cache_option $BUILD_ARGS "$PROJECT_ROOT/web-frontend"
 
   if [[ "$PUSH" == "true" ]]; then
     print_info "Pushing image: $full_tag"

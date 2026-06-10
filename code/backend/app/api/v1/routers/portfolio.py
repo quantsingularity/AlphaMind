@@ -108,3 +108,15 @@ async def close_position(
             status_code=404, detail="Position not found or already closed"
         )
     return result
+
+
+# Defined last so it does not shadow the static routes above (/holdings, etc.).
+@router.get("/{portfolio_id}")
+async def get_portfolio_by_id(
+    portfolio_id: str,
+    svc: PortfolioService = Depends(get_portfolio_service),
+) -> Dict[str, Any]:
+    """Return a portfolio summary by ID (single-portfolio backend)."""
+    summary = await svc.get_portfolio()
+    summary["id"] = portfolio_id
+    return summary

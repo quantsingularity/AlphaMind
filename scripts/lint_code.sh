@@ -114,6 +114,11 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# Enable shell tracing when verbose output is requested.
+if [[ "$VERBOSE" == "true" ]]; then
+  set -x
+fi
+
 # --- Environment Setup ---
 
 print_header "Setting Up Lint Environment"
@@ -184,7 +189,7 @@ print_header "Configuring Linters"
 # Set up component-specific paths
 if [[ -n "$COMPONENT" ]]; then
   if [[ "$COMPONENT" == "backend" ]]; then
-    PYTHON_PATHS=("backend")
+    PYTHON_PATHS=("code/backend" "code/ai_models")
     JS_PATHS=()
   elif [[ "$COMPONENT" == "web-frontend" ]]; then
     PYTHON_PATHS=()
@@ -200,7 +205,7 @@ if [[ -n "$COMPONENT" ]]; then
     exit 1
   fi
 else
-  PYTHON_PATHS=("backend" "tests" "infrastructure" "config")
+  PYTHON_PATHS=("code/backend" "code/ai_models")
   JS_PATHS=("web-frontend" "mobile-frontend")
 fi
 

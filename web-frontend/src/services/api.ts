@@ -97,7 +97,7 @@ class ApiService {
     id: string,
     strategy: Partial<Strategy>,
   ): Promise<Strategy> {
-    const response = await this.api.put<Strategy>(
+    const response = await this.api.patch<Strategy>(
       `/api/v1/strategies/${id}`,
       strategy,
     );

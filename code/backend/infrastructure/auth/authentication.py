@@ -1,5 +1,6 @@
 import datetime
 import os
+import uuid
 from typing import Any, Dict, Optional
 
 import bcrypt
@@ -14,12 +15,17 @@ security = HTTPBearer()
 
 
 class RegisterRequest(BaseModel):
-    username: str
+    # The mobile client registers with name/email; the original API used
+    # username. Accept either so both clients work (email preferred as the id).
+    username: Optional[str] = None
+    email: Optional[str] = None
+    name: Optional[str] = None
     password: str
 
 
 class LoginRequest(BaseModel):
-    username: str
+    username: Optional[str] = None
+    email: Optional[str] = None
     password: str
 
 
@@ -35,7 +41,13 @@ class AuthenticationSystem:
         self.token_expiration = token_expiration
         self.users_db: Dict[str, Any] = {}
 
-    def register_user(self, username: str, password: str) -> Dict[str, Any]:
+    def register_user(
+        self,
+        username: str,
+        password: str,
+        name: Optional[str] = None,
+        email: Optional[str] = None,
+    ) -> Dict[str, Any]:
         if not username or not password:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -48,11 +60,30 @@ class AuthenticationSystem:
             )
         hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
         self.users_db[username] = {
+            "id": uuid.uuid4().hex,
             "username": username,
+            "email": email or username,
+            "name": name or username,
             "password": hashed_password,
             "created_at": datetime.datetime.now(datetime.timezone.utc),
         }
-        return {"message": "User registered successfully"}
+        token = self.generate_token(username)
+        return {
+            "message": "User registered successfully",
+            "token": token,
+            "username": username,
+            "user": self._public_user(self.users_db[username]),
+        }
+
+    @staticmethod
+    def _public_user(record: Dict[str, Any]) -> Dict[str, Any]:
+        """Return a user record without sensitive fields."""
+        return {
+            "id": record.get("id"),
+            "username": record.get("username"),
+            "email": record.get("email"),
+            "name": record.get("name"),
+        }
 
     def login_user(self, username: str, password: str) -> Dict[str, Any]:
         if not username or not password:
@@ -73,7 +104,12 @@ class AuthenticationSystem:
                 detail="Invalid credentials",
             )
         token = self.generate_token(username)
-        return {"message": "Login successful", "token": token, "username": username}
+        return {
+            "message": "Login successful",
+            "token": token,
+            "username": username,
+            "user": self._public_user(self.users_db[username]),
+        }
 
     def generate_token(self, username: str) -> str:
         payload = {
@@ -130,10 +166,51 @@ def get_auth_system() -> AuthenticationSystem:
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register(request: RegisterRequest) -> Dict[str, Any]:
     auth = get_auth_system()
-    return auth.register_user(request.username, request.password)
+    # Use email as the identifier when provided (mobile client), else username.
+    identifier = request.email or request.username
+    if not identifier:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Either email or username is required",
+        )
+    return auth.register_user(
+        identifier, request.password, name=request.name, email=request.email
+    )
 
 
 @router.post("/login")
 async def login(request: LoginRequest) -> Dict[str, Any]:
     auth = get_auth_system()
-    return auth.login_user(request.username, request.password)
+    identifier = request.email or request.username
+    if not identifier:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Either email or username is required",
+        )
+    return auth.login_user(identifier, request.password)
+
+
+@router.get("/profile")
+async def profile(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+) -> Dict[str, Any]:
+    auth = get_auth_system()
+    user = auth.get_current_user(credentials)
+    return auth._public_user(user)
+
+
+@router.post("/refresh")
+async def refresh(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+) -> Dict[str, Any]:
+    auth = get_auth_system()
+    user = auth.get_current_user(credentials)
+    token = auth.generate_token(user["username"])
+    return {"token": token, "user": auth._public_user(user)}
+
+
+@router.post("/logout")
+async def logout() -> Dict[str, Any]:
+    # Tokens are stateless JWTs; the client discards them on logout. This
+    # endpoint exists so clients can signal logout and is a no-op server-side.
+    return {"message": "Logged out successfully"}

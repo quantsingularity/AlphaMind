@@ -7,7 +7,7 @@ This package contains a set of comprehensive automation scripts designed to impr
 1. **setup_environment.sh** - Unified environment setup and dependency management
 2. **run_tests.sh** - Comprehensive automated testing pipeline
 3. **lint_code.sh** - Code quality and linting automation
-4. **optimized_build.sh** - Build process optimization
+4. **build.sh** - Build process optimization
 5. **deploy_automation.sh** - Deployment automation with rollback support
 
 ## Installation
@@ -112,7 +112,7 @@ These scripts can be integrated into your development workflow as follows:
 
 1. **Initial Setup**: When starting work on the project, run `setup_environment.sh` to set up your development environment.
 2. **Development Cycle**: During development, use `lint_code.sh` to ensure code quality and `run_tests.sh` to verify functionality.
-3. **Building**: When ready to build, use `optimized_build.sh` to create optimized builds for your target environment.
+3. **Building**: When ready to build, use `build.sh` to create optimized builds for your target environment.
 4. **Deployment**: Use `deploy_automation.sh` to deploy your application to the desired environment.
 
 ## CI/CD Integration
@@ -149,7 +149,7 @@ jobs:
       - name: Set up environment
         run: ./scripts/setup_environment.sh --type production
       - name: Build project
-        run: ./scripts/optimized_build.sh --env production
+        run: ./scripts/build.sh --env production
 
   deploy:
     needs: build

@@ -61,6 +61,12 @@ spec:
                 secretKeyRef:
                   name: alphamind-secrets
                   key: jwt-secret
+            # The backend signs JWTs with SECRET_KEY; source it from the same secret.
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: alphamind-secrets
+                  key: jwt-secret
             - name: REDIS_HOST
               valueFrom:
                 configMapKeyRef:

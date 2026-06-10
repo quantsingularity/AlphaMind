@@ -107,6 +107,11 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# Enable shell tracing when verbose output is requested.
+if [[ "$VERBOSE" == "true" ]]; then
+  set -x
+fi
+
 # --- OS Detection ---
 
 print_header "OS Detection"
@@ -248,13 +253,13 @@ if [[ "$SKIP_PYTHON" == "false" ]]; then
   print_info "Installing Python dependencies for $SETUP_TYPE environment..."
 
   if [[ "$SETUP_TYPE" == "development" ]]; then
-    pip install -r requirements.txt
+    pip install -r code/backend/requirements.txt
     pip install pytest pytest-cov black flake8 mypy sphinx sphinx-rtd-theme
   elif [[ "$SETUP_TYPE" == "testing" ]]; then
-    pip install -r requirements.txt
+    pip install -r code/backend/requirements.txt
     pip install pytest pytest-cov pytest-benchmark pytest-mock
   elif [[ "$SETUP_TYPE" == "production" ]]; then
-    pip install -r requirements.txt
+    pip install -r code/backend/requirements.txt
   fi
 
   print_success "Python environment setup complete"

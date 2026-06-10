@@ -16,6 +16,7 @@ from app.api.v1.routers import (
     health,
     market_data,
     portfolio,
+    research,
     risk,
     strategies,
     trading,
@@ -274,6 +275,8 @@ app.include_router(
     prefix="/api/v1/alternative-data",
     tags=["alternative-data"],
 )
+app.include_router(research.router, prefix="/api/v1/research", tags=["research"])
+app.include_router(research.router, prefix="/api/research", include_in_schema=False)
 
 # Legacy unversioned aliases (hidden from OpenAPI docs)
 app.include_router(portfolio.router, prefix="/api/portfolio", include_in_schema=False)

@@ -13,26 +13,28 @@ echo -e "${BLUE}Starting AlphaMind application...${NC}"
 
 # Resolve the project root relative to this script's location
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# The scripts live in <repo>/scripts, so the project root is one level up.
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Create Python virtual environment if it doesn't exist
-if [ ! -d "$SCRIPT_DIR/venv" ]; then
+if [ ! -d "$PROJECT_ROOT/venv" ]; then
   echo -e "${BLUE}Creating Python virtual environment...${NC}"
-  python3 -m venv "$SCRIPT_DIR/venv"
+  python3 -m venv "$PROJECT_ROOT/venv"
 fi
 
 # Start backend server
-if [ ! -d "$SCRIPT_DIR/backend" ]; then
+if [ ! -d "$PROJECT_ROOT/code/backend" ]; then
   echo -e "${RED}Backend directory not found. Exiting.${NC}"
   exit 1
 fi
 
 echo -e "${BLUE}Starting backend server...${NC}"
-cd "$SCRIPT_DIR/backend" || exit 1
-source "$SCRIPT_DIR/venv/bin/activate"
+cd "$PROJECT_ROOT/code/backend" || exit 1
+source "$PROJECT_ROOT/venv/bin/activate"
 pip install -r requirements.txt > /dev/null 2>&1
-python app.py &
+python main.py &
 BACKEND_PID=$!
-cd "$SCRIPT_DIR"
+cd "$PROJECT_ROOT" || exit 1
 
 # Wait for backend to initialize
 echo -e "${BLUE}Waiting for backend to initialize...${NC}"
@@ -45,18 +47,18 @@ if ! kill -0 "$BACKEND_PID" 2>/dev/null; then
 fi
 
 # Start frontend
-if [ ! -d "$SCRIPT_DIR/frontend" ]; then
+if [ ! -d "$PROJECT_ROOT/web-frontend" ]; then
   echo -e "${RED}Frontend directory not found. Stopping backend.${NC}"
   kill "$BACKEND_PID" 2>/dev/null
   exit 1
 fi
 
 echo -e "${BLUE}Starting frontend...${NC}"
-cd "$SCRIPT_DIR/frontend" || exit 1
+cd "$PROJECT_ROOT/web-frontend" || exit 1
 npm install > /dev/null 2>&1
 npm start &
 FRONTEND_PID=$!
-cd "$SCRIPT_DIR"
+cd "$PROJECT_ROOT" || exit 1
 
 echo -e "${GREEN}AlphaMind application is running!${NC}"
 echo -e "${GREEN}Backend running with PID: ${BACKEND_PID}${NC}"

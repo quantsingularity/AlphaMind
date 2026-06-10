@@ -213,8 +213,8 @@ fi
 
 # Set up component-specific test paths
 if [[ -n "$COMPONENT" ]]; then
-  if [[ -d "backend/$COMPONENT" ]]; then
-    BACKEND_TEST_PATH="backend/$COMPONENT"
+  if [[ -d "code/backend/$COMPONENT" ]]; then
+    BACKEND_TEST_PATH="code/backend/$COMPONENT"
   elif [[ -d "$COMPONENT" ]]; then
     BACKEND_TEST_PATH="$COMPONENT"
   else
@@ -222,7 +222,7 @@ if [[ -n "$COMPONENT" ]]; then
     exit 1
   fi
 else
-  BACKEND_TEST_PATH="backend"
+  BACKEND_TEST_PATH="code/backend"
 fi
 
 print_info "Test configuration:"
@@ -248,9 +248,19 @@ run_unit_tests() {
 
     if [[ -n "$COMPONENT" ]]; then
       print_info "Testing component: $COMPONENT"
-      python -m pytest $UNIT_TEST_ARGS "$BACKEND_TEST_PATH/tests/unit"
+      if [[ -d "$BACKEND_TEST_PATH/tests/unit" ]]; then
+        python -m pytest $UNIT_TEST_ARGS "$BACKEND_TEST_PATH/tests/unit"
+      elif [[ -d "$BACKEND_TEST_PATH/tests" ]]; then
+        python -m pytest $UNIT_TEST_ARGS "$BACKEND_TEST_PATH/tests"
+      else
+        print_warning "No backend unit tests found for component"
+      fi
+    elif [[ -d "code/backend/tests/unit" ]]; then
+      python -m pytest $UNIT_TEST_ARGS code/backend/tests/unit
+    elif [[ -d "code/backend/tests" ]]; then
+      python -m pytest $UNIT_TEST_ARGS code/backend/tests
     else
-      python -m pytest $UNIT_TEST_ARGS backend/tests/unit tests/unit
+      print_warning "No backend unit tests found"
     fi
 
     print_success "Backend unit tests completed"
@@ -334,9 +344,15 @@ run_integration_tests() {
 
     if [[ -n "$COMPONENT" ]]; then
       print_info "Testing component: $COMPONENT"
-      python -m pytest $INTEGRATION_TEST_ARGS "$BACKEND_TEST_PATH/tests/integration"
+      if [[ -d "$BACKEND_TEST_PATH/tests/integration" ]]; then
+        python -m pytest $INTEGRATION_TEST_ARGS "$BACKEND_TEST_PATH/tests/integration"
+      else
+        print_warning "No backend integration tests found for component"
+      fi
+    elif [[ -d "code/backend/tests/integration" ]]; then
+      python -m pytest $INTEGRATION_TEST_ARGS code/backend/tests/integration
     else
-      python -m pytest $INTEGRATION_TEST_ARGS backend/tests/integration tests/integration
+      print_warning "No backend integration tests found"
     fi
 
     print_success "Backend integration tests completed"
@@ -420,11 +436,8 @@ run_e2e_tests() {
 
   E2E_TEST_ARGS="$PYTEST_ARGS --html=$REPORT_DIR/e2e/backend-report.html --self-contained-html"
 
-  if [[ -d "tests/e2e" ]]; then
-    python -m pytest $E2E_TEST_ARGS tests/e2e
-    print_success "Backend E2E tests completed"
-  elif [[ -d "backend/tests/e2e" ]]; then
-    python -m pytest $E2E_TEST_ARGS backend/tests/e2e
+  if [[ -d "code/backend/tests/e2e" ]]; then
+    python -m pytest $E2E_TEST_ARGS code/backend/tests/e2e
     print_success "Backend E2E tests completed"
   else
     print_warning "No backend E2E tests found"

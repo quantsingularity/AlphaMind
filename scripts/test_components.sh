@@ -5,11 +5,13 @@
 
 # Resolve project root relative to this script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$SCRIPT_DIR"
+# The scripts live in <repo>/scripts, so the project root is one level up.
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 FRONTEND_DIR="$PROJECT_ROOT/web-frontend"
-BACKEND_DIR="$PROJECT_ROOT/backend"
-TESTS_DIR="$PROJECT_ROOT/tests"
-RESULTS_DIR="$TESTS_DIR/results"
+BACKEND_DIR="$PROJECT_ROOT/code/backend"
+AI_MODELS_DIR="$PROJECT_ROOT/code/ai_models"
+TESTS_DIR="$PROJECT_ROOT/test-reports"
+RESULTS_DIR="$TESTS_DIR/component-tests"
 
 PASS=0
 FAIL=0
@@ -238,6 +240,7 @@ run_python_test() {
   cat > "$tmptest" << PYEOF
 import sys
 sys.path.insert(0, '$BACKEND_DIR')
+sys.path.insert(0, '$PROJECT_ROOT/code')
 $testcode
 PYEOF
 
@@ -251,9 +254,9 @@ PYEOF
 }
 
 run_python_test "attention_mechanism" \
-  "$BACKEND_DIR/ai_models/attention_mechanism.py" \
+  "$AI_MODELS_DIR/examples/attention_mechanism.py" \
 'try:
-    from ai_models.attention_mechanism import MultiHeadAttention, TemporalAttentionBlock
+    from ai_models.examples.attention_mechanism import MultiHeadAttention, TemporalAttentionBlock
     print("  Imported MultiHeadAttention and TemporalAttentionBlock")
     import tensorflow as tf
     attn = MultiHeadAttention(d_model=64, num_heads=4)
@@ -267,9 +270,9 @@ except Exception as e:
 '
 
 run_python_test "sentiment_analysis" \
-  "$BACKEND_DIR/alternative_data/sentiment_analysis.py" \
+  "$BACKEND_DIR/analytics/alternative_data/sentiment_analysis.py" \
 'try:
-    from alternative_data.sentiment_analysis import MarketSentimentAnalyzer
+    from analytics.alternative_data.sentiment_analysis import MarketSentimentAnalyzer
     print("  Imported MarketSentimentAnalyzer")
     analyzer = MarketSentimentAnalyzer()
     print("  Initialized MarketSentimentAnalyzer")
@@ -280,9 +283,9 @@ except Exception as e:
 '
 
 run_python_test "portfolio_optimization" \
-  "$BACKEND_DIR/alpha_research/portfolio_optimization.py" \
+  "$BACKEND_DIR/analytics/alpha_research/portfolio_optimization.py" \
 'try:
-    from alpha_research.portfolio_optimization import PortfolioOptimizer
+    from analytics.alpha_research.portfolio_optimization import PortfolioOptimizer
     print("  Imported PortfolioOptimizer")
     optimizer = PortfolioOptimizer(n_assets=5)
     print("  Initialized PortfolioOptimizer")
@@ -293,15 +296,13 @@ except Exception as e:
 '
 
 run_python_test "authentication" \
-  "$BACKEND_DIR/infrastructure/authentication.py" \
+  "$BACKEND_DIR/infrastructure/auth/authentication.py" \
 'try:
-    from infrastructure.authentication import AuthenticationSystem
+    from infrastructure.auth.authentication import AuthenticationSystem
     print("  Imported AuthenticationSystem")
     try:
         import jwt
-        from flask import Flask
-        app = Flask(__name__)
-        auth = AuthenticationSystem(app, "test-secret-key")
+        auth = AuthenticationSystem(secret_key="test-secret-key")
         print("  Initialized AuthenticationSystem")
         token = auth.generate_token("testuser")
         print("  Generated token")

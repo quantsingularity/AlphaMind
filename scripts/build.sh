@@ -47,10 +47,12 @@ print_info() {
 
 # Function to run a command and measure its execution time
 run_timed() {
-  local start_time=$(date +%s)
+  local start_time
+  start_time=$(date +%s)
   "$@"
   local status=$?
-  local end_time=$(date +%s)
+  local end_time
+  end_time=$(date +%s)
   local duration=$((end_time - start_time))
 
   echo -e "${COLOR_CYAN}Command completed in ${duration}s${COLOR_RESET}"
@@ -239,12 +241,12 @@ echo "  Report directory: $REPORT_DIR"
 build_backend() {
   print_header "Building Backend"
 
-  if [[ ! -d "backend" ]]; then
+  if [[ ! -d "code/backend" ]]; then
     print_warning "Backend directory not found, skipping"
     return
   fi
 
-  cd backend
+  cd code/backend || exit 1
 
   # Clean build if requested
   if [[ "$CLEAN_BUILD" == "true" ]]; then
@@ -642,10 +644,10 @@ EOF
     echo "      <tr>" >> "$REPORT_FILE"
     echo "        <td>Backend</td>" >> "$REPORT_FILE"
 
-    if [[ -d "backend/dist" ]]; then
+    if [[ -d "code/backend/dist" ]]; then
       echo "        <td class=\"success\">Success</td>" >> "$REPORT_FILE"
       echo "        <td>backend/dist</td>" >> "$REPORT_FILE"
-    elif [[ -d "backend/build" ]]; then
+    elif [[ -d "code/backend/build" ]]; then
       echo "        <td class=\"success\">Success</td>" >> "$REPORT_FILE"
       echo "        <td>backend/build</td>" >> "$REPORT_FILE"
     else
@@ -713,17 +715,17 @@ EOF
 
   # List backend artifacts
   if [[ " ${COMPONENTS[*]} " =~ " backend " ]]; then
-    if [[ -d "backend/dist" ]]; then
+    if [[ -d "code/backend/dist" ]]; then
       echo "      <li><strong>Backend Packages:</strong>" >> "$REPORT_FILE"
       echo "        <ul>" >> "$REPORT_FILE"
-      find "backend/dist" -type f \( -name "*.whl" -o -name "*.tar.gz" \) | while read -r file; do
+      find "code/backend/dist" -type f \( -name "*.whl" -o -name "*.tar.gz" \) | while read -r file; do
         echo "          <li>$(basename "$file")</li>" >> "$REPORT_FILE"
       done
       echo "        </ul>" >> "$REPORT_FILE"
       echo "      </li>" >> "$REPORT_FILE"
     fi
 
-    if [[ -d "backend/docs/build/html" ]]; then
+    if [[ -d "code/backend/docs/build/html" ]]; then
       echo "      <li><strong>Backend Documentation:</strong> backend/docs/build/html</li>" >> "$REPORT_FILE"
     fi
   fi

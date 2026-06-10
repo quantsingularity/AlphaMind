@@ -70,7 +70,8 @@ httpx>=0.25.0   # for TestClient
 
 # Async DB drivers (added for full async SQLAlchemy support)
 aiosqlite>=0.20.0,<1.0.0          # SQLite async driver (dev / CI)
-asyncpg>=0.29.0,<1.0.0            # PostgreSQL async driver (production)
+asyncpg>=0.29.0,<1.0.0            # PostgreSQL async driver (production option)
+aiomysql>=0.2.0,<1.0.0           # MySQL async driver (matches infra MySQL service)
 greenlet>=3.0.0                    # required by SQLAlchemy async on some platforms
 
 # Live market data (optional — gracefully degraded when absent)

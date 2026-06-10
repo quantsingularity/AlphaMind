@@ -118,12 +118,12 @@ if ! command_exists alembic; then
   exit 1
 fi
 
-if [[ ! -d "backend" ]]; then
+if [[ ! -d "code/backend" ]]; then
   print_error "Backend directory not found."
   deactivate
   exit 1
 fi
-cd backend
+cd code/backend
 
 # --- Run Migration Action ---
 
