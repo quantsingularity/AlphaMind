@@ -1,6 +1,6 @@
 ---
 # roles/webserver/vars/main.yml
-app_name: "{{ app_name }}"
+app_name: "alphamind"
 server_name: "{{ inventory_hostname }}"
 app_port: 3000
 nginx_worker_processes: auto

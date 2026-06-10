@@ -40,11 +40,12 @@ spec:
                 - ALL
               add:
                 - NET_BIND_SERVICE
+          # NOTE: For the static Vite SPA, the API base URL is inlined at build
+          # time (VITE_API_BASE_URL build arg). The app issues relative /api/...
+          # requests that the Ingress routes to the backend, so this is empty.
           env:
-            - name: REACT_APP_API_URL
-              value: /api
-            - name: REACT_APP_ENV
-              value: production
+            - name: VITE_API_BASE_URL
+              value: ""
           livenessProbe:
             httpGet:
               path: /

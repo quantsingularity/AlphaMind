@@ -50,7 +50,7 @@ class AuthenticationSystem:
         self.users_db[username] = {
             "username": username,
             "password": hashed_password,
-            "created_at": datetime.datetime.utcnow(),
+            "created_at": datetime.datetime.now(datetime.timezone.utc),
         }
         return {"message": "User registered successfully"}
 
@@ -77,9 +77,9 @@ class AuthenticationSystem:
 
     def generate_token(self, username: str) -> str:
         payload = {
-            "exp": datetime.datetime.utcnow()
+            "exp": datetime.datetime.now(datetime.timezone.utc)
             + datetime.timedelta(hours=self.token_expiration),
-            "iat": datetime.datetime.utcnow(),
+            "iat": datetime.datetime.now(datetime.timezone.utc),
             "sub": username,
         }
         return jwt.encode(payload, self.secret_key, algorithm="HS256")

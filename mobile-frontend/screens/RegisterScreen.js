@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -9,7 +9,6 @@ import {
 import {
   Button,
   HelperText,
-  Snackbar,
   Text,
   TextInput,
   useTheme,
@@ -32,6 +31,14 @@ export default function RegisterScreen({ navigation }) {
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.auth);
   const theme = useTheme();
+
+  // Clear any stale auth error when leaving the screen so it doesn't reappear
+  // on the next visit.
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, [dispatch]);
 
   const handleRegister = async () => {
     setLocalError("");
@@ -63,16 +70,9 @@ export default function RegisterScreen({ navigation }) {
     );
   };
 
-  const handleDismissError = () => {
-    dispatch(clearError());
-    setLocalError("");
-  };
-
   const displayError = localError || error;
   const passwordsMatch =
     confirmPassword.length > 0 && password !== confirmPassword;
-  const isFormValid =
-    name.trim() && email.trim() && password && confirmPassword;
 
   const styles = StyleSheet.create({
     outerContainer: { flex: 1, backgroundColor: theme.colors.background },
@@ -282,7 +282,7 @@ export default function RegisterScreen({ navigation }) {
             Create Account
           </Button>
 
-          {!!localError && (
+          {!!displayError && (
             <Text
               style={{
                 color: "#DC2626",
@@ -291,7 +291,7 @@ export default function RegisterScreen({ navigation }) {
                 textAlign: "center",
               }}
             >
-              {localError}
+              {displayError}
             </Text>
           )}
 

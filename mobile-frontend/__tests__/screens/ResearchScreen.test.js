@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from "@testing-library/react-native";
+import { render, screen, waitFor } from "@testing-library/react-native";
 import { Provider as PaperProvider } from "react-native-paper";
 import ResearchScreen from "../../screens/ResearchScreen";
 import { researchService } from "../../services/researchService";

@@ -152,8 +152,7 @@ services:
       dockerfile: docker/Dockerfile.frontend
       target: runtime
       args:
-        REACT_APP_API_URL: /api
-        REACT_APP_ENV: ${NODE_ENV:-production}
+        VITE_API_BASE_URL: ""
     image: alphamind/frontend:${IMAGE_TAG:-latest}
     container_name: alphamind-frontend
     restart: unless-stopped

@@ -20,5 +20,4 @@ default_tags = {
   Environment = "dev"
   Project     = "app"
 }
--e 
 certificate_arn = ""  # Set to your ACM certificate ARN

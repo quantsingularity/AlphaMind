@@ -40,7 +40,7 @@ services:
     build:
       target: builder
     environment:
-      REACT_APP_ENV: development
+      VITE_DEV_PROXY_TARGET: http://backend:8080
     volumes:
       - ./web-frontend:/build:cached
       - /build/node_modules

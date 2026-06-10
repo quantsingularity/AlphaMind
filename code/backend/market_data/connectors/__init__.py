@@ -9,6 +9,8 @@ from market_data.connectors.alpha_vantage import AlphaVantageConnector
 from market_data.connectors.base import (
     APIConnector,
     APICredentials,
+    DataCategory,
+    DataFormat,
     DataProvider,
     DataRequest,
     DataResponse,
@@ -26,6 +28,8 @@ from market_data.connectors.yahoo_finance import YahooFinanceConnector
 
 __all__ = [
     "DataProvider",
+    "DataCategory",
+    "DataFormat",
     "APIConnector",
     "APICredentials",
     "DataRequest",

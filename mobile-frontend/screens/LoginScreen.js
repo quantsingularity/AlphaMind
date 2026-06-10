@@ -20,7 +20,7 @@ export default function LoginScreen({ navigation }) {
   const [localError, setLocalError] = useState("");
 
   const dispatch = useDispatch();
-  const { loading } = useSelector((state) => state.auth);
+  const { loading, error } = useSelector((state) => state.auth);
   const theme = useTheme();
 
   const handleLogin = async () => {
@@ -235,7 +235,9 @@ export default function LoginScreen({ navigation }) {
             </RNText>
           </View>
 
-          {!!localError && <Text style={styles.errorText}>{localError}</Text>}
+          {!!(localError || error) && (
+            <Text style={styles.errorText}>{localError || error}</Text>
+          )}
 
           <View style={styles.dividerRow}>
             <View style={styles.dividerLine} />

@@ -11,11 +11,12 @@ import type {
   Strategy,
 } from "../types";
 
-// Base URL: in development Vite proxies /api → backend; in production the
+// Base URL: in development Vite proxies /api -> backend; in production the
 // Nginx ingress routes /api to the backend service. The /api/v1 prefix
-// matches the backend router registration in app/main.py.
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+// matches the backend router registration in app/main.py. Default to an empty
+// string so requests are issued relative to the app origin and flow through
+// the proxy (set VITE_API_BASE_URL to an absolute URL only to bypass it).
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
 class ApiService {
   private api: AxiosInstance;

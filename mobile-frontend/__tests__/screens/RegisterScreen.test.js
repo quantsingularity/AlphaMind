@@ -163,4 +163,28 @@ describe("RegisterScreen", () => {
     fireEvent.press(screen.getByText("Already have an account? Sign In"));
     expect(mockNavigate).toHaveBeenCalledWith("Login");
   });
+
+  it("displays a server-side registration error from the store", () => {
+    const store = configureStore({
+      reducer: { auth: authReducer },
+      preloadedState: {
+        auth: {
+          user: null,
+          isAuthenticated: false,
+          loading: false,
+          error: "Email already registered",
+        },
+      },
+    });
+    render(
+      <Provider store={store}>
+        <PaperProvider>
+          <NavigationContainer>
+            <RegisterScreen navigation={{ navigate: mockNavigate }} />
+          </NavigationContainer>
+        </PaperProvider>
+      </Provider>,
+    );
+    expect(screen.getByText("Email already registered")).toBeTruthy();
+  });
 });

@@ -1,10 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react-native";
+import { render, screen } from "@testing-library/react-native";
 import { Provider as PaperProvider } from "react-native-paper";
 import { Provider } from "react-redux";
 import SettingsScreen from "../../screens/SettingsScreen";

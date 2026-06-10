@@ -58,7 +58,7 @@ class DataProcessor:
         return cleaned_data
 
     def engineer_features(
-        self, data: Any, window_sizes: Any = [5, 10, 20, 50], include_ta: Any = True
+        self, data: Any, window_sizes: Any = None, include_ta: Any = True
     ) -> Any:
         """Engineer features from financial time series data
 
@@ -70,6 +70,8 @@ class DataProcessor:
         Returns:
             DataFrame with engineered features
         """
+        if window_sizes is None:
+            window_sizes = [5, 10, 20, 50]
         df = data.copy()
         required_cols = ["open", "high", "low", "close", "volume"]
         missing_cols = [col for col in required_cols if col not in df.columns]

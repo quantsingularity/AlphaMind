@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   formatCurrency,
   formatDate,
+  formatLargeNumber,
   formatNumber,
   formatPercentage,
 } from "./format";
@@ -41,6 +42,25 @@ describe("Format Utilities", () => {
     it("formats date string correctly", () => {
       const result = formatDate("2025-01-15");
       expect(result).toMatch(/Jan/);
+    });
+  });
+
+  describe("formatLargeNumber", () => {
+    it("formats positive billions/millions/thousands", () => {
+      expect(formatLargeNumber(1_500_000_000)).toBe("1.50B");
+      expect(formatLargeNumber(2_300_000)).toBe("2.30M");
+      expect(formatLargeNumber(4_500)).toBe("4.50K");
+    });
+
+    it("formats negative large numbers with the correct suffix", () => {
+      expect(formatLargeNumber(-1_500_000_000)).toBe("-1.50B");
+      expect(formatLargeNumber(-2_300_000)).toBe("-2.30M");
+      expect(formatLargeNumber(-4_500)).toBe("-4.50K");
+    });
+
+    it("formats small numbers without a suffix", () => {
+      expect(formatLargeNumber(42)).toBe("42.00");
+      expect(formatLargeNumber(-42)).toBe("-42.00");
     });
   });
 });

@@ -215,6 +215,8 @@ class TestBacktestRepository:
             status="pending",
             created_at=datetime.now(timezone.utc),
         )
+        assert run is not None
+        assert run.id == "bt-001"
         fetched = await repo.get("bt-001")
         assert fetched is not None
         assert fetched.strategy_id == "strat-001"

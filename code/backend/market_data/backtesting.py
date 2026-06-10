@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 from datetime import datetime
 from enum import Enum
@@ -553,51 +555,127 @@ class BacktestEngine:
             strategy_fn(self.current_bar, self.portfolio, self)
             self._process_orders()
             self._update_performance()
-        self._calculate_performance_stats()
+        return self._calculate_performance_stats()
 
-    def _calculate_performance_stats(self) -> Any:
-        """Calculate performance statistics after backtest completion."""
+    def _calculate_performance_stats(self) -> Dict[str, Any]:
+        """Calculate performance statistics after backtest completion.
+
+        Computes aggregate return/risk metrics (total return, annualised
+        return, annualised volatility, Sharpe ratio, maximum drawdown) as well
+        as realised trade-level statistics (per-symbol realised PnL and overall
+        win rate). Results are stored on ``self.performance['stats']`` and also
+        returned for convenience.
+        """
+        stats: Dict[str, Any] = {
+            "total_return": 0.0,
+            "annual_return": 0.0,
+            "volatility": 0.0,
+            "sharpe_ratio": 0.0,
+            "max_drawdown": 0.0,
+            "num_trades": len(self.performance["trades"]),
+            "win_rate": 0.0,
+            "realized_pnl": 0.0,
+            "pnl_by_symbol": {},
+        }
+
         equity_df = pd.DataFrame(self.performance["equity_curve"])
-        if not equity_df.empty:
-            equity_df.set_index("time", inplace=True)
-            returns_df = pd.DataFrame(self.performance["returns"])
-            if not returns_df.empty:
-                returns_df.set_index("time", inplace=True)
-                total_return = (
-                    equity_df["equity"].iloc[-1] / self.portfolio.initial_cash - 1
-                )
-                annual_return = (
-                    (1 + total_return) ** (252 / len(returns_df)) - 1
-                    if len(returns_df) > 0
-                    else 0
-                )
-                daily_returns = returns_df["returns"]
-                volatility = (
-                    daily_returns.std() * np.sqrt(252) if len(daily_returns) > 0 else 0
-                )
-                annual_return / volatility if volatility > 0 else 0
-                drawdown_df = pd.DataFrame(self.performance["drawdowns"])
-                (drawdown_df["drawdown"].max() if not drawdown_df.empty else 0)
-                trades_df = pd.DataFrame(self.performance["trades"])
-                if not trades_df.empty:
-                    trades_df["position"] = (
-                        trades_df["side"].apply(lambda x: 1 if x == "buy" else -1)
-                        * trades_df["quantity"]
-                    )
-                    trades_by_symbol = trades_df.groupby("symbol")
-                    for symbol, group in trades_by_symbol:
-                        position = 0
-                        avg_price = 0
-                        trade_pnls: List[Any] = []
-                        for _, trade in group.iterrows():
-                            trade_qty = trade["quantity"]
-                            trade_price = trade["price"]
-                            trade_side = trade["side"]
-                            commission = trade["commission"]
-                            if trade_side == "buy":
-                                if position >= 0:
-                                    avg_price = (
-                                        position * avg_price + trade_qty * trade_price
-                                    ) / (position + trade_qty)
-                                    position += trade_qty
-                                    trade_pnls.append(-commission)
+        if equity_df.empty:
+            self.performance["stats"] = stats
+            return stats
+
+        equity_df.set_index("time", inplace=True)
+        returns_df = pd.DataFrame(self.performance["returns"])
+
+        total_return = (
+            equity_df["equity"].iloc[-1] / self.portfolio.initial_cash - 1
+            if self.portfolio.initial_cash
+            else 0.0
+        )
+        stats["total_return"] = float(total_return)
+
+        if not returns_df.empty:
+            returns_df.set_index("time", inplace=True)
+            n_periods = len(returns_df)
+            # Annualised return assuming ~252 trading periods per year.
+            annual_return = (
+                (1 + total_return) ** (252 / n_periods) - 1 if n_periods > 0 else 0.0
+            )
+            daily_returns = returns_df["returns"]
+            volatility = (
+                float(daily_returns.std() * np.sqrt(252)) if n_periods > 0 else 0.0
+            )
+            sharpe_ratio = float(annual_return / volatility) if volatility > 0 else 0.0
+            stats["annual_return"] = float(annual_return)
+            stats["volatility"] = volatility
+            stats["sharpe_ratio"] = sharpe_ratio
+
+        drawdown_df = pd.DataFrame(self.performance["drawdowns"])
+        stats["max_drawdown"] = (
+            float(drawdown_df["drawdown"].max()) if not drawdown_df.empty else 0.0
+        )
+
+        # Realised trade-level PnL using average-cost accounting per symbol.
+        trades_df = pd.DataFrame(self.performance["trades"])
+        if not trades_df.empty:
+            pnl_by_symbol: Dict[str, float] = {}
+            closing_pnls: List[float] = []
+            for symbol, group in trades_df.groupby("symbol"):
+                position = 0.0
+                avg_price = 0.0
+                symbol_pnl = 0.0
+                for _, trade in group.iterrows():
+                    trade_qty = float(trade["quantity"])
+                    trade_price = float(trade["price"])
+                    trade_side = trade["side"]
+                    commission = float(trade.get("commission", 0.0) or 0.0)
+                    symbol_pnl -= commission
+                    if trade_side == "buy":
+                        if position >= 0:
+                            # Adding to (or opening) a long position.
+                            new_position = position + trade_qty
+                            avg_price = (
+                                (position * avg_price + trade_qty * trade_price)
+                                / new_position
+                                if new_position
+                                else 0.0
+                            )
+                            position = new_position
+                        else:
+                            # Buying back a short position; realise PnL.
+                            closing_qty = min(trade_qty, -position)
+                            realized = (avg_price - trade_price) * closing_qty
+                            symbol_pnl += realized
+                            closing_pnls.append(realized - commission)
+                            position += trade_qty
+                            if position > 0:
+                                avg_price = trade_price
+                    else:  # sell
+                        if position > 0:
+                            # Closing (part of) a long position; realise PnL.
+                            closing_qty = min(trade_qty, position)
+                            realized = (trade_price - avg_price) * closing_qty
+                            symbol_pnl += realized
+                            closing_pnls.append(realized - commission)
+                            position -= trade_qty
+                            if position < 0:
+                                avg_price = trade_price
+                        else:
+                            # Opening / adding to a short position.
+                            new_position = position - trade_qty
+                            avg_price = (
+                                (abs(position) * avg_price + trade_qty * trade_price)
+                                / abs(new_position)
+                                if new_position
+                                else 0.0
+                            )
+                            position = new_position
+                pnl_by_symbol[symbol] = float(symbol_pnl)
+
+            stats["pnl_by_symbol"] = pnl_by_symbol
+            stats["realized_pnl"] = float(sum(pnl_by_symbol.values()))
+            if closing_pnls:
+                wins = sum(1 for p in closing_pnls if p > 0)
+                stats["win_rate"] = wins / len(closing_pnls)
+
+        self.performance["stats"] = stats
+        return stats
