@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet, View } from "react-native";
 import { Button, Text, useTheme } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
+import ThemeToggle from "../components/ThemeToggle";
 
 const FEATURES = [
   {
@@ -33,6 +34,9 @@ export default function LandingScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.safe} edges={["top", "bottom"]}>
+      <View style={styles.topBar}>
+        <ThemeToggle color={theme.colors.onBackground} />
+      </View>
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.hero}>
           <View style={styles.logoCircle}>
@@ -262,5 +266,10 @@ const createStyles = (theme) =>
       lineHeight: 22,
       marginBottom: 24,
       textAlign: "center",
+    },
+    topBar: {
+      alignItems: "flex-end",
+      paddingHorizontal: 8,
+      paddingTop: 4,
     },
   });

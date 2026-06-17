@@ -41,12 +41,7 @@ export const checkAuth = createAsyncThunk(
   "auth/checkAuth",
   async (_, thunkAPI) => {
     try {
-      const isAuthenticated = await authService.isAuthenticated();
-      if (isAuthenticated) {
-        const userData = await authService.getUserData();
-        return { isAuthenticated: true, user: userData };
-      }
-      return { isAuthenticated: false, user: null };
+      return await authService.getPersistedSession();
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message || "Auth check failed");
     }

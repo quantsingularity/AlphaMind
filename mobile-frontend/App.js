@@ -1,4 +1,8 @@
-import { NavigationContainer } from "@react-navigation/native";
+import {
+  DarkTheme as NavDarkTheme,
+  DefaultTheme as NavDefaultTheme,
+  NavigationContainer,
+} from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { useColorScheme } from "react-native";
@@ -37,6 +41,20 @@ function AppContent() {
 
   const theme = effectiveTheme === "dark" ? darkTheme : lightTheme;
 
+  const navTheme = effectiveTheme === "dark" ? NavDarkTheme : NavDefaultTheme;
+  const navigationTheme = {
+    ...navTheme,
+    colors: {
+      ...navTheme.colors,
+      primary: theme.colors.primary,
+      background: theme.colors.background,
+      card: theme.colors.surface,
+      text: theme.colors.onSurface,
+      border: theme.colors.outlineVariant,
+      notification: theme.colors.primary,
+    },
+  };
+
   if (loading) {
     return (
       <PaperProvider theme={theme}>
@@ -48,7 +66,7 @@ function AppContent() {
   return (
     <PaperProvider theme={theme}>
       <StatusBar style={effectiveTheme === "dark" ? "light" : "dark"} />
-      <NavigationContainer>
+      <NavigationContainer theme={navigationTheme}>
         {isAuthenticated ? <AppNavigator /> : <AuthNavigator />}
       </NavigationContainer>
     </PaperProvider>

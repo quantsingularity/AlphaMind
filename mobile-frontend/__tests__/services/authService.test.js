@@ -57,6 +57,54 @@ describe("authService", () => {
     });
   });
 
+  describe("offline demo fallback", () => {
+    it("falls back to a demo session on a connectivity error during login", async () => {
+      // The api interceptor stamps connectivity failures with status 0.
+      api.post.mockRejectedValueOnce({
+        message: "Network error - please check your connection",
+        status: 0,
+      });
+
+      const result = await authService.login("abrar@example.com", "secret");
+
+      expect(result.token).toMatch(/^demo-/);
+      expect(result.user.email).toBe("abrar@example.com");
+      expect(result.demo).toBe(true);
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith(
+        "@alphamind/auth_token",
+        result.token,
+      );
+    });
+
+    it("falls back to a demo session on a connectivity error during register", async () => {
+      api.post.mockRejectedValueOnce({
+        message: "Network error - please check your connection",
+        status: 0,
+      });
+
+      const result = await authService.register({
+        name: "Abrar Ahmed",
+        email: "abrar@example.com",
+        password: "secret",
+      });
+
+      expect(result.token).toMatch(/^demo-/);
+      expect(result.user.name).toBe("Abrar Ahmed");
+      expect(result.user.email).toBe("abrar@example.com");
+      expect(result.demo).toBe(true);
+    });
+
+    it("does NOT fall back when the server actively rejects (e.g. 401)", async () => {
+      api.post.mockRejectedValueOnce({
+        message: "Invalid credentials",
+        status: 401,
+      });
+      await expect(
+        authService.login("test@example.com", "wrong"),
+      ).rejects.toEqual({ message: "Invalid credentials", status: 401 });
+    });
+  });
+
   describe("isAuthenticated", () => {
     it("returns true when token exists", async () => {
       await AsyncStorage.setItem("@alphamind/auth_token", "some-token");

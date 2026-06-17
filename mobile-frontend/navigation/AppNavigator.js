@@ -1,6 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Icon, useTheme } from "react-native-paper";
+import ThemeToggle from "../components/ThemeToggle";
 import AboutScreen from "../screens/AboutScreen";
 import BacktestScreen from "../screens/BacktestScreen";
 import MarketDataScreen from "../screens/MarketDataScreen";
@@ -95,6 +96,7 @@ export default function AppNavigator() {
         headerTintColor: theme.colors.onSurface,
         headerTitleStyle: { fontWeight: "700" },
         contentStyle: { backgroundColor: theme.colors.background },
+        headerRight: () => <ThemeToggle color={theme.colors.onSurface} />,
       }}
     >
       <Stack.Screen

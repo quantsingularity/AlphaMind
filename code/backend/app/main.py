@@ -252,6 +252,19 @@ _cors_origins = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors_origins,
+    # Also accept any localhost / 127.0.0.1 / private-LAN origin on any port.
+    # Expo web, Vite, and other dev servers pick varying ports, and the app may
+    # be opened via localhost or the machine's LAN IP (for example when
+    # localhost forwarding or a browser VPN blocks localhost). This keeps local
+    # development working without enumerating every host or port.
+    allow_origin_regex=(
+        r"https?://("
+        r"localhost|127\.0\.0\.1|"
+        r"192\.168\.\d{1,3}\.\d{1,3}|"
+        r"10\.\d{1,3}\.\d{1,3}\.\d{1,3}|"
+        r"172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}"
+        r")(:\d+)?"
+    ),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

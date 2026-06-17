@@ -1,10 +1,32 @@
 import Constants from "expo-constants";
+import { Platform } from "react-native";
+
+// Resolve the backend URL.
+// - Web: talk to the backend on the SAME host the app was loaded from. If you
+//   open the app at http://localhost:8081 the API is http://localhost:8000; if
+//   you open it at http://192.168.x.x:8081 (handy when localhost forwarding or a
+//   browser VPN blocks localhost) the API is http://192.168.x.x:8000.
+// - Android emulator: the host machine is reachable at 10.0.2.2.
+// - iOS simulator / fallback: localhost.
+function defaultBaseUrl() {
+  const globalScope =
+    typeof globalThis !== "undefined" ? globalThis : undefined;
+  const loc = globalScope && globalScope.location;
+  if (Platform.OS === "web" && loc && loc.hostname) {
+    const protocol = loc.protocol === "https:" ? "https:" : "http:";
+    return `${protocol}//${loc.hostname}:8000`;
+  }
+  if (Platform.OS === "android") {
+    return "http://10.0.2.2:8000";
+  }
+  return "http://localhost:8000";
+}
 
 export const API_BASE_URL =
   Constants.expoConfig?.extra?.apiBaseUrl ||
   process.env.EXPO_PUBLIC_API_BASE_URL ||
   process.env.API_BASE_URL ||
-  "http://localhost:8000";
+  defaultBaseUrl();
 
 export const API_TIMEOUT =
   Number(process.env.EXPO_PUBLIC_API_TIMEOUT || process.env.API_TIMEOUT) ||

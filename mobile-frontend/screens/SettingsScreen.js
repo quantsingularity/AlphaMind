@@ -1,4 +1,4 @@
-import { Alert, ScrollView, StyleSheet, View } from "react-native";
+import { Alert, Platform, ScrollView, StyleSheet, View } from "react-native";
 import {
   Button,
   Divider,
@@ -17,6 +17,26 @@ import {
   setTheme,
 } from "../store/slices/settingsSlice";
 
+// Alert.alert is a no-op on React Native Web, so confirmation dialogs (and the
+// actions behind them, like Sign Out) never fire in the browser. Use the
+// browser's confirm there and the native Alert on devices.
+function confirmAction({ title, message, confirmLabel, onConfirm }) {
+  if (Platform.OS === "web") {
+    const globalScope =
+      typeof globalThis !== "undefined" ? globalThis : undefined;
+    const ok =
+      globalScope && typeof globalScope.confirm === "function"
+        ? globalScope.confirm(`${title}\n\n${message}`)
+        : true;
+    if (ok) onConfirm();
+    return;
+  }
+  Alert.alert(title, message, [
+    { text: "Cancel", style: "cancel" },
+    { text: confirmLabel, onPress: onConfirm, style: "destructive" },
+  ]);
+}
+
 export default function SettingsScreen() {
   const theme = useTheme();
   const dispatch = useDispatch();
@@ -30,131 +50,123 @@ export default function SettingsScreen() {
     dispatch(setDisplayPreferences({ currency }));
 
   const handleLogout = () =>
-    Alert.alert("Sign Out", "Are you sure you want to sign out?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Sign Out",
-        onPress: () => dispatch(logoutUser()),
-        style: "destructive",
-      },
-    ]);
+    confirmAction({
+      title: "Sign Out",
+      message: "Are you sure you want to sign out?",
+      confirmLabel: "Sign Out",
+      onConfirm: () => dispatch(logoutUser()),
+    });
 
   const handleResetSettings = () =>
-    Alert.alert(
-      "Reset Settings",
-      "Are you sure you want to reset all settings to defaults?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Reset",
-          onPress: () => dispatch(resetSettings()),
-          style: "destructive",
-        },
-      ],
-    );
+    confirmAction({
+      title: "Reset Settings",
+      message: "Are you sure you want to reset all settings to defaults?",
+      confirmLabel: "Reset",
+      onConfirm: () => dispatch(resetSettings()),
+    });
 
   const styles = StyleSheet.create({
     container: {
-      flexGrow: 1,
       backgroundColor: theme.colors.background,
+      flexGrow: 1,
     },
     // Header — matches web page header style
     header: {
       backgroundColor: theme.colors.surface,
+      borderBottomColor: theme.colors.outlineVariant,
+      borderBottomWidth: 1,
+      paddingBottom: 20,
       paddingHorizontal: 16,
       paddingTop: 24,
-      paddingBottom: 20,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.outlineVariant,
     },
     headerTitle: {
+      color: theme.colors.onBackground,
       fontSize: 28,
       fontWeight: "800",
-      color: theme.colors.onBackground,
       letterSpacing: -0.5,
       marginBottom: 4,
     },
     headerAccent: { color: theme.colors.primary },
     headerSubtitle: {
-      fontSize: 14,
       color: theme.colors.onSurfaceVariant,
+      fontSize: 14,
     },
     // User card — matches web card with profile info
     userCard: {
-      margin: 16,
+      alignItems: "center",
       backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.outlineVariant,
       borderRadius: 8,
       borderWidth: 1,
-      borderColor: theme.colors.outlineVariant,
-      padding: 16,
+      elevation: 2,
       flexDirection: "row",
-      alignItems: "center",
+      margin: 16,
+      padding: 16,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.05,
       shadowRadius: 3,
-      elevation: 2,
     },
     avatarCircle: {
-      width: 44,
-      height: 44,
-      borderRadius: 22,
-      backgroundColor: theme.colors.primary,
       alignItems: "center",
+      backgroundColor: theme.colors.primary,
+      borderRadius: 22,
+      height: 44,
       justifyContent: "center",
       marginRight: 12,
+      width: 44,
     },
     avatarText: {
+      color: "#FFFFFF",
       fontSize: 18,
       fontWeight: "800",
-      color: "#FFFFFF",
     },
     userInfo: { flex: 1 },
     userName: {
+      color: theme.colors.onSurface,
       fontSize: 15,
       fontWeight: "700",
-      color: theme.colors.onSurface,
     },
     userEmail: {
-      fontSize: 13,
       color: theme.colors.onSurfaceVariant,
+      fontSize: 13,
       marginTop: 1,
     },
     // Section cards — matches web shadow rounded-lg
     sectionCard: {
-      marginHorizontal: 16,
-      marginBottom: 12,
       backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.outlineVariant,
       borderRadius: 8,
       borderWidth: 1,
-      borderColor: theme.colors.outlineVariant,
+      elevation: 1,
+      marginBottom: 12,
+      marginHorizontal: 16,
       overflow: "hidden",
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.04,
       shadowRadius: 3,
-      elevation: 1,
     },
     sectionHeader: {
+      paddingBottom: 4,
       paddingHorizontal: 16,
       paddingTop: 14,
-      paddingBottom: 4,
     },
     sectionTitle: {
+      color: theme.colors.onSurfaceVariant,
       fontSize: 11,
       fontWeight: "700",
-      color: theme.colors.onSurfaceVariant,
-      textTransform: "uppercase",
       letterSpacing: 0.8,
+      textTransform: "uppercase",
     },
     radioGroupContainer: {
-      paddingHorizontal: 16,
       paddingBottom: 8,
+      paddingHorizontal: 16,
     },
     radioGroupLabel: {
+      color: theme.colors.onSurface,
       fontSize: 14,
       fontWeight: "600",
-      color: theme.colors.onSurface,
       marginBottom: 4,
       marginTop: 8,
     },
@@ -163,14 +175,14 @@ export default function SettingsScreen() {
     },
     // Footer buttons
     buttonSection: {
+      gap: 10,
+      marginBottom: 4,
       marginHorizontal: 16,
       marginTop: 8,
-      marginBottom: 4,
-      gap: 10,
     },
     resetButton: {
-      borderRadius: 6,
       borderColor: theme.colors.outline,
+      borderRadius: 6,
     },
     resetButtonContent: { paddingVertical: 4 },
     logoutButton: {
@@ -178,10 +190,10 @@ export default function SettingsScreen() {
     },
     logoutButtonContent: { paddingVertical: 4 },
     versionText: {
-      textAlign: "center",
       color: theme.colors.onSurfaceVariant,
       fontSize: 12,
       marginVertical: 20,
+      textAlign: "center",
     },
   });
 

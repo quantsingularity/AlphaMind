@@ -265,3 +265,34 @@ def test_alternative_data_sources_contract():
     _assert_fields(
         src, ["id", "name", "type", "status", "lastUpdate", "dataPoints"], "source"
     )
+
+
+# ── CORS (cross-origin web client) ───────────────────────────────────────--
+def test_cors_allows_web_client_origins():
+    """The Expo web build and other local dev servers call the API cross-origin.
+    A missing CORS header surfaces in the browser as a 'Network error'."""
+    for origin in (
+        "http://localhost:8081",
+        "http://localhost:19006",
+        "http://127.0.0.1:8081",
+        "http://localhost:3000",
+        "http://192.168.82.76:8081",
+        "http://10.0.0.5:8081",
+    ):
+        r = client.get("/api/v1/portfolio/", headers={"Origin": origin})
+        assert r.status_code == 200, r.text
+        assert (
+            r.headers.get("access-control-allow-origin") == origin
+        ), f"missing/incorrect CORS header for origin {origin}"
+
+    preflight = client.options(
+        "/api/v1/trading/orders",
+        headers={
+            "Origin": "http://localhost:8081",
+            "Access-Control-Request-Method": "POST",
+        },
+    )
+    assert preflight.status_code in (200, 204), preflight.text
+    assert (
+        preflight.headers.get("access-control-allow-origin") == "http://localhost:8081"
+    )

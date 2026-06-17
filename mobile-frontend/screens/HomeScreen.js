@@ -2,9 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
 import { Text, useTheme } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
-import ErrorMessage from "../components/ErrorMessage";
 import KPICard from "../components/KPICard";
 import LoadingSpinner from "../components/LoadingSpinner";
+import ThemeToggle from "../components/ThemeToggle";
 import { fetchPortfolio } from "../store/slices/portfolioSlice";
 
 // Performance metrics matching web Home.tsx
@@ -159,7 +159,24 @@ export default function HomeScreen() {
           backgroundColor: theme.colors.background,
           flexGrow: 1,
         },
+        notice: {
+          backgroundColor: theme.colors.surfaceVariant,
+          borderRadius: 10,
+          marginHorizontal: 16,
+          marginTop: 12,
+          padding: 12,
+        },
+        noticeText: {
+          color: theme.colors.onSurfaceVariant,
+          fontSize: 12,
+          lineHeight: 17,
+        },
         // Hero section matching web: gradient hero with blue accent
+        heroToggle: {
+          alignItems: "flex-end",
+          marginBottom: 4,
+          marginRight: -8,
+        },
         heroSection: {
           backgroundColor: theme.colors.surface,
           borderBottomColor: theme.colors.outlineVariant,
@@ -291,13 +308,6 @@ export default function HomeScreen() {
 
   if (loading && !data)
     return <LoadingSpinner message="Loading portfolio..." />;
-  if (error && !data)
-    return (
-      <ErrorMessage
-        message={error}
-        onRetry={() => dispatch(fetchPortfolio())}
-      />
-    );
 
   return (
     <ScrollView
@@ -311,8 +321,19 @@ export default function HomeScreen() {
         />
       }
     >
+      {error && !data && (
+        <View style={styles.notice}>
+          <Text style={styles.noticeText}>
+            Live data is unavailable right now, so placeholder values are shown.
+            Pull down to retry.
+          </Text>
+        </View>
+      )}
       {/* Hero Section — matches web hero */}
       <View style={styles.heroSection}>
+        <View style={styles.heroToggle}>
+          <ThemeToggle color={theme.colors.onBackground} />
+        </View>
         {user && (
           <>
             <Text style={styles.greetingText}>Welcome back, </Text>

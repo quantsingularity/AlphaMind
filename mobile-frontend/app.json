@@ -28,7 +28,7 @@
       "bundler": "metro"
     },
     "extra": {
-      "apiBaseUrl": "http://localhost:5000"
+      "_comment": "Set apiBaseUrl here (or EXPO_PUBLIC_API_BASE_URL) to point at a specific backend. When unset, the app defaults to http://localhost:8000 on web/iOS and http://10.0.2.2:8000 on the Android emulator."
     },
     "plugins": []
   }
