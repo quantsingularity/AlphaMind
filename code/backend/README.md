@@ -110,3 +110,24 @@ API docs available at `http://localhost:8000/docs`.
 cd backend
 pytest
 ```
+
+### Contract tests
+
+`tests/test_frontend_contracts.py` pins the exact response field names that the
+web and mobile clients read, so an API change that would break a client fails
+in CI rather than in production. `tests/test_security.py` covers auth hardening
+(bcrypt hashing, JWT signing, secret validation) and
+`tests/test_market_data_service.py` covers the live-data waterfall and its
+deterministic synthetic fallback.
+
+```bash
+pytest tests/test_frontend_contracts.py tests/test_security.py tests/test_market_data_service.py
+```
+
+## Security
+
+Authentication uses bcrypt password hashing and HS256-signed JWTs. The signing
+key is read from `SECRET_KEY`. In `development` the app allows a placeholder
+key, but when `ENVIRONMENT` (or `APP_ENV`) is `production`, `prod`, or
+`staging`, the app refuses to start unless `SECRET_KEY` is set to a strong value
+of at least 32 characters. Always set a real `SECRET_KEY` before deploying.

@@ -1,5 +1,5 @@
 import { StyleSheet, View } from "react-native";
-import { Text, useTheme } from "react-native-paper";
+import { Icon, Text, useTheme } from "react-native-paper";
 
 export default function KPICard({
   title,
@@ -10,13 +10,6 @@ export default function KPICard({
   isLoading,
 }) {
   const theme = useTheme();
-
-  const iconMap = {
-    "chart-line": "📈",
-    "trending-up": "💹",
-    "chart-bell-curve-cumulative": "📊",
-    robot: "🤖",
-  };
 
   const styles = StyleSheet.create({
     card: {
@@ -37,40 +30,37 @@ export default function KPICard({
     cardContent: {
       padding: 16,
     },
-    iconRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: 10,
+    change: {
+      fontSize: 12,
+      fontWeight: "600",
+      marginTop: 4,
     },
     iconContainer: {
-      width: 32,
-      height: 32,
-      borderRadius: 6,
-      backgroundColor: theme.colors.primaryLight || "#DBEAFE",
       alignItems: "center",
+      backgroundColor: theme.colors.primaryLight || "#DBEAFE",
+      borderRadius: 6,
+      height: 32,
       justifyContent: "center",
+      width: 32,
     },
-    iconText: {
-      fontSize: 16,
+    iconRow: {
+      alignItems: "center",
+      flexDirection: "row",
+      marginBottom: 10,
     },
     title: {
+      color: theme.colors.onSurfaceVariant,
       fontSize: 11,
       fontWeight: "500",
-      color: theme.colors.onSurfaceVariant,
       letterSpacing: 0.5,
       marginBottom: 4,
       textTransform: "uppercase",
     },
     value: {
+      color: theme.colors.onSurface,
       fontSize: 20,
       fontWeight: "700",
-      color: theme.colors.onSurface,
       letterSpacing: -0.3,
-    },
-    change: {
-      fontSize: 12,
-      fontWeight: "600",
-      marginTop: 4,
     },
   });
 
@@ -84,7 +74,7 @@ export default function KPICard({
         {icon && (
           <View style={styles.iconRow}>
             <View style={styles.iconContainer}>
-              <Text style={styles.iconText}>{iconMap[icon] || "📌"}</Text>
+              <Icon source={icon} size={18} color={theme.colors.primary} />
             </View>
           </View>
         )}

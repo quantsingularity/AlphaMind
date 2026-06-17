@@ -37,11 +37,13 @@ jest.mock("../../store/slices/portfolioSlice", () => {
 });
 
 const mockPortfolioData = {
-  value: 1250345.67,
+  id: "port-001",
+  name: "AlphaMind Main Portfolio",
+  totalValue: 1250345.67,
+  cash: 25430.5,
   dailyPnL: 15678.9,
-  dailyPnLPercent: 1.27,
-  sharpeRatio: 2.35,
-  activeStrategies: 12,
+  totalPnL: 25430.5,
+  allocation: [],
 };
 
 const createMockStore = (portfolioData = null, authUser = null) =>
@@ -121,21 +123,21 @@ describe("HomeScreen", () => {
     renderWithProviders(createMockStore());
     expect(screen.getByText("Portfolio Value")).toBeTruthy();
     expect(screen.getByText("Daily P&L")).toBeTruthy();
-    expect(screen.getByText("Sharpe Ratio")).toBeTruthy();
-    expect(screen.getByText("Active Strategies")).toBeTruthy();
+    expect(screen.getByText("Total P&L")).toBeTruthy();
+    expect(screen.getByText("Cash")).toBeTruthy();
   });
 
   it("renders KPI cards with zero values when no data", () => {
     renderWithProviders(createMockStore());
-    expect(screen.getByText("$0.00")).toBeTruthy();
+    expect(screen.getAllByText("$0.00")).toHaveLength(2);
     expect(screen.getAllByText("0.0%")).toHaveLength(2);
   });
 
   it("renders KPI cards with portfolio data", () => {
     const store = createMockStore(mockPortfolioData);
     renderWithProviders(store);
-    expect(screen.getByText("12")).toBeTruthy();
-    expect(screen.getByText("2.35")).toBeTruthy();
+    expect(screen.getByText("$1,250,345.67")).toBeTruthy();
+    expect(screen.getByText("+$15,678.90")).toBeTruthy();
   });
 
   it("shows subtitle text", () => {

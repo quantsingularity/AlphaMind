@@ -60,10 +60,15 @@ export const API_ENDPOINTS = {
 
   MARKET: {
     // Legacy key kept so existing tests pass
-    QUOTES: "/api/v1/market-data/",
+    QUOTES: "/api/v1/market-data/quotes",
     CHART: "/api/v1/market-data/historical", // restored — tests check for CHART
     QUOTE: (symbol) => `/api/v1/market-data/quote/${symbol}`,
     HISTORICAL: (symbol) => `/api/v1/market-data/historical/${symbol}`,
+  },
+
+  TRADING: {
+    ORDERS: "/api/v1/trading/orders",
+    CANCEL: (id) => `/api/v1/trading/orders/${id}`,
   },
 
   // Research papers — legacy endpoint path, kept for test compatibility

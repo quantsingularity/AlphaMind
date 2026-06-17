@@ -25,15 +25,7 @@ import {
   formatPercentage,
   getColorForValue,
 } from "../utils/format";
-
-const COLORS = [
-  "#2563eb",
-  "#10b981",
-  "#f59e0b",
-  "#ef4444",
-  "#8b5cf6",
-  "#06b6d4",
-];
+import { useChartPalette, chartTooltipStyle } from "../hooks/useChartPalette";
 
 const LABEL = ({
   cx,
@@ -80,19 +72,20 @@ export const Portfolio: React.FC = () => {
   const { data: performance, isLoading: perfLoading } =
     usePortfolioPerformance(timeframe);
   const closePosition = useClosePosition();
+  const palette = useChartPalette();
 
   if (portfolioLoading || positionsLoading || perfLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand" />
       </div>
     );
   }
 
   if (!portfolio) {
     return (
-      <div className="rounded-md bg-red-50 p-4">
-        <p className="text-sm text-red-700">
+      <div className="rounded-md bg-neg-soft p-4">
+        <p className="text-sm text-neg">
           Unable to load portfolio. Check that the backend is running.
         </p>
       </div>
@@ -122,8 +115,8 @@ export const Portfolio: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Portfolio</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <h1 className="text-3xl font-bold text-ink">Portfolio</h1>
+        <p className="mt-1 text-sm text-ink-muted">
           Holdings, allocation, and attribution
         </p>
       </div>
@@ -134,12 +127,12 @@ export const Portfolio: React.FC = () => {
           {
             label: "Total Value",
             value: formatCurrency(portfolio.totalValue),
-            color: "text-gray-900",
+            color: "text-ink",
           },
           {
             label: "Cash",
             value: formatCurrency(portfolio.cash),
-            color: "text-gray-900",
+            color: "text-ink",
           },
           {
             label: "Daily P&L",
@@ -152,8 +145,8 @@ export const Portfolio: React.FC = () => {
             color: getColorForValue(portfolio.totalPnL),
           },
         ].map(({ label, value, color }) => (
-          <div key={label} className="bg-white shadow rounded-lg p-4">
-            <p className="text-xs text-gray-500">{label}</p>
+          <div key={label} className="am-card p-4">
+            <p className="text-xs text-ink-muted">{label}</p>
             <p className={`text-xl font-bold mt-1 ${color}`}>{value}</p>
           </div>
         ))}
@@ -177,9 +170,9 @@ export const Portfolio: React.FC = () => {
               value: formatPercentage(metrics.volatility),
             },
           ].map(({ label, value }) => (
-            <div key={label} className="bg-white shadow rounded-lg p-4">
-              <p className="text-xs text-gray-500">{label}</p>
-              <p className="text-xl font-bold text-blue-700 mt-1">{value}</p>
+            <div key={label} className="am-card p-4">
+              <p className="text-xs text-ink-muted">{label}</p>
+              <p className="text-xl font-bold text-brand mt-1">{value}</p>
             </div>
           ))}
         </div>
@@ -188,8 +181,8 @@ export const Portfolio: React.FC = () => {
       {/* Charts row */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Allocation pie */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-4">
+        <div className="am-card p-6">
+          <h2 className="text-base font-semibold text-ink mb-4">
             Allocation by Asset
           </h2>
           {allocation.length > 0 ? (
@@ -206,54 +199,68 @@ export const Portfolio: React.FC = () => {
                   label={LABEL}
                 >
                   {allocation.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                    <Cell
+                      key={i}
+                      fill={palette.series[i % palette.series.length]}
+                    />
                   ))}
                 </Pie>
                 <Tooltip
                   formatter={(v) => [formatCurrency(Number(v)), "Value"]}
+                  contentStyle={chartTooltipStyle(palette)}
                 />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-sm text-gray-400 text-center py-12">
+            <p className="text-sm text-ink-faint text-center py-12">
               No allocation data.
             </p>
           )}
         </div>
 
         {/* Sector bar */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-4">
+        <div className="am-card p-6">
+          <h2 className="text-base font-semibold text-ink mb-4">
             Allocation by Sector
           </h2>
           {sectorChartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={sectorChartData} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  horizontal={false}
+                  stroke={palette.grid}
+                />
                 <XAxis
                   type="number"
                   tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
-                  tick={{ fontSize: 11 }}
+                  tick={{ fontSize: 11, fill: palette.axis }}
+                  stroke={palette.grid}
                 />
                 <YAxis
                   dataKey="name"
                   type="category"
                   width={120}
-                  tick={{ fontSize: 11 }}
+                  tick={{ fontSize: 11, fill: palette.axis }}
+                  stroke={palette.grid}
                 />
                 <Tooltip
                   formatter={(v) => [formatCurrency(Number(v)), "Value"]}
+                  contentStyle={chartTooltipStyle(palette)}
                 />
                 <Bar dataKey="value" radius={[0, 4, 4, 0]}>
                   {sectorChartData.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                    <Cell
+                      key={i}
+                      fill={palette.series[i % palette.series.length]}
+                    />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-sm text-gray-400 text-center py-12">
+            <p className="text-sm text-ink-faint text-center py-12">
               No sector data.
             </p>
           )}
@@ -262,12 +269,12 @@ export const Portfolio: React.FC = () => {
 
       {/* Timeframe selector */}
       <div className="flex items-center space-x-2">
-        <span className="text-sm text-gray-500">Timeframe:</span>
+        <span className="text-sm text-ink-muted">Timeframe:</span>
         {["1W", "1M", "3M", "6M", "1Y"].map((t) => (
           <button
             key={t}
             onClick={() => setTimeframe(t)}
-            className={`px-3 py-1 text-xs rounded-md font-medium transition-colors ${timeframe === t ? "bg-blue-600 text-white" : "border border-gray-300 text-gray-600 hover:bg-gray-50"}`}
+            className={`px-3 py-1 text-xs rounded-md font-medium transition-colors ${timeframe === t ? "bg-brand text-white" : "border border-line text-ink-muted hover:bg-surface-2"}`}
           >
             {t}
           </button>
@@ -275,18 +282,18 @@ export const Portfolio: React.FC = () => {
       </div>
 
       {/* Positions table */}
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-base font-semibold text-gray-900">
+      <div className="am-card overflow-hidden">
+        <div className="px-6 py-4 border-b border-line">
+          <h2 className="text-base font-semibold text-ink">
             Open Positions ({openPositions.length})
           </h2>
         </div>
         {openPositions.length === 0 ? (
-          <p className="px-6 py-8 text-sm text-gray-400">No open positions.</p>
+          <p className="px-6 py-8 text-sm text-ink-faint">No open positions.</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 text-sm">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-line text-sm">
+              <thead className="bg-surface-2">
                 <tr>
                   {[
                     "Ticker",
@@ -302,14 +309,14 @@ export const Portfolio: React.FC = () => {
                   ].map((h) => (
                     <th
                       key={h}
-                      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider last:text-right"
+                      className="px-4 py-3 text-left text-xs font-medium text-ink-muted uppercase tracking-wider last:text-right"
                     >
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-line">
                 {openPositions.map((pos) => {
                   const p = pos as typeof pos & {
                     sector?: string;
@@ -318,20 +325,20 @@ export const Portfolio: React.FC = () => {
                     var95?: number;
                   };
                   return (
-                    <tr key={pos.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 font-medium text-gray-900">
+                    <tr key={pos.id} className="hover:bg-surface-2">
+                      <td className="px-4 py-3 font-medium text-ink">
                         {pos.ticker}
                       </td>
-                      <td className="px-4 py-3 text-gray-500">
+                      <td className="px-4 py-3 text-ink-muted">
                         {p.sector ?? "—"}
                       </td>
-                      <td className="px-4 py-3 text-gray-500">
+                      <td className="px-4 py-3 text-ink-muted">
                         {pos.quantity}
                       </td>
-                      <td className="px-4 py-3 text-gray-500">
+                      <td className="px-4 py-3 text-ink-muted">
                         {formatCurrency(pos.entryPrice)}
                       </td>
-                      <td className="px-4 py-3 text-gray-500">
+                      <td className="px-4 py-3 text-ink-muted">
                         {formatCurrency(pos.currentPrice)}
                       </td>
                       <td
@@ -339,20 +346,20 @@ export const Portfolio: React.FC = () => {
                       >
                         {formatCurrency(pos.unrealizedPnL)}
                       </td>
-                      <td className="px-4 py-3 text-gray-500">
+                      <td className="px-4 py-3 text-ink-muted">
                         {p.weight ? `${(p.weight * 100).toFixed(1)}%` : "—"}
                       </td>
-                      <td className="px-4 py-3 text-gray-500">
+                      <td className="px-4 py-3 text-ink-muted">
                         {p.beta?.toFixed(2) ?? "—"}
                       </td>
-                      <td className="px-4 py-3 text-gray-500">
+                      <td className="px-4 py-3 text-ink-muted">
                         {p.var95 ? formatCurrency(p.var95) : "—"}
                       </td>
                       <td className="px-4 py-3 text-right">
                         <button
                           onClick={() => closePosition.mutate(pos.id)}
                           disabled={closePosition.isPending}
-                          className="text-red-600 hover:text-red-900 text-xs focus:outline-none disabled:opacity-40"
+                          className="text-neg hover:text-neg text-xs focus:outline-none disabled:opacity-40"
                         >
                           Close
                         </button>

@@ -73,13 +73,13 @@ export const truncateString = (str: string, maxLength: number): string => {
 };
 
 export const getColorForValue = (value: number): string => {
-  if (value > 0) return "text-green-600";
-  if (value < 0) return "text-red-600";
-  return "text-gray-600";
+  if (value > 0) return "text-pos";
+  if (value < 0) return "text-neg";
+  return "text-ink-muted";
 };
 
 export const getBackgroundColorForValue = (value: number): string => {
-  if (value > 0) return "bg-green-100";
-  if (value < 0) return "bg-red-100";
-  return "bg-gray-100";
+  if (value > 0) return "bg-pos-soft";
+  if (value < 0) return "bg-neg-soft";
+  return "bg-surface-2";
 };

@@ -1,11 +1,323 @@
 @import "tailwindcss";
 
-body {
-  font-family: "Inter", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* ============================================================================
+   AlphaMind Design System — "Quant Terminal"
+   A dark-first, terminal-inspired identity refined for institutional finance.
+   Signal accent (indigo -> cyan), tabular monospace numerals for market data,
+   disciplined surfaces and hairline structure. Light mode is a first-class peer.
+   ========================================================================== */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Surfaces */
+  --canvas: #f5f7fb;
+  --surface: #ffffff;
+  --surface-2: #eef1f7;
+  --surface-3: #e6eaf3;
+
+  /* Ink */
+  --ink: #0e1729;
+  --ink-muted: #56657f;
+  --ink-faint: #8593ad;
+
+  /* Structure */
+  --line: #e1e7f0;
+  --line-strong: #cbd4e2;
+
+  /* Brand signal */
+  --brand: #4f46e5;
+  --brand-strong: #4338ca;
+  --brand-soft: #eceaff;
+  --accent: #0891b2;
+
+  /* Semantics */
+  --pos: #047857;
+  --pos-soft: #d9f3e8;
+  --neg: #e11d48;
+  --neg-soft: #fcdfe6;
+  --warn: #b45309;
+  --warn-soft: #fbedd3;
+
+  --shadow-color: 220 40% 20%;
+  --ring: var(--brand);
 }
 
-code {
-  font-family: "Fira Code", monospace;
+.dark {
+  --canvas: #080d18;
+  --surface: #101a2e;
+  --surface-2: #16223a;
+  --surface-3: #1d2b47;
+
+  --ink: #e9eef8;
+  --ink-muted: #94a2bb;
+  --ink-faint: #61708b;
+
+  --line: #21304a;
+  --line-strong: #314463;
+
+  --brand: #6366f1;
+  --brand-strong: #818cf8;
+  --brand-soft: #1a2348;
+  --accent: #22d3ee;
+
+  --pos: #34d399;
+  --pos-soft: #0e2f2a;
+  --neg: #fb7185;
+  --neg-soft: #3a1622;
+  --warn: #fbbf24;
+  --warn-soft: #3a2c0f;
+
+  --shadow-color: 220 60% 2%;
+}
+
+/* Expose tokens to Tailwind utilities (bg-surface, text-ink, border-line, ...) */
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-accent: var(--accent);
+  --color-pos: var(--pos);
+  --color-pos-soft: var(--pos-soft);
+  --color-neg: var(--neg);
+  --color-neg-soft: var(--neg-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+
+  --font-display: "Space Grotesk", "Inter", sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --radius-card: 14px;
+}
+
+/* ------------------------------------------------------------------ base -- */
+* {
+  border-color: var(--line);
+}
+
+html {
+  background-color: var(--canvas);
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--canvas);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv05", "ss01";
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+code,
+pre,
+.font-mono,
+.tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--brand);
+  color: #fff;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 99px;
+  border: 2px solid var(--canvas);
+}
+
+/* --------------------------------------------------------- components ----- */
+@layer components {
+  .am-card {
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    box-shadow: 0 1px 2px hsl(var(--shadow-color) / 0.04);
+  }
+
+  .am-panel {
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+  }
+
+  .am-input {
+    width: 100%;
+    background-color: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    padding: 0.625rem 0.875rem;
+    color: var(--ink);
+    font-size: 0.9rem;
+    transition:
+      border-color 0.15s,
+      box-shadow 0.15s;
+  }
+  .am-input::placeholder {
+    color: var(--ink-faint);
+  }
+  .am-input:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand) 22%, transparent);
+  }
+
+  .am-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 10px;
+    padding: 0.625rem 1.1rem;
+    transition:
+      transform 0.08s,
+      filter 0.15s,
+      background-color 0.15s,
+      border-color 0.15s;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .am-btn:active {
+    transform: translateY(1px);
+  }
+  .am-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .am-btn-primary {
+    color: #fff;
+    background-image: linear-gradient(
+      135deg,
+      var(--brand),
+      color-mix(in oklab, var(--accent) 55%, var(--brand))
+    );
+    box-shadow: 0 6px 18px -8px
+      color-mix(in oklab, var(--brand) 70%, transparent);
+  }
+  .am-btn-primary:hover {
+    filter: brightness(1.07);
+  }
+
+  .am-btn-ghost {
+    color: var(--ink);
+    background-color: transparent;
+    border: 1px solid var(--line-strong);
+  }
+  .am-btn-ghost:hover {
+    background-color: var(--surface-2);
+  }
+
+  .am-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 0.15rem 0.55rem;
+    border-radius: 99px;
+    text-transform: uppercase;
+  }
+
+  .am-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--brand);
+  }
+
+  .am-grid-bg {
+    background-image:
+      linear-gradient(
+        to right,
+        color-mix(in oklab, var(--line) 60%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in oklab, var(--line) 60%, transparent) 1px,
+        transparent 1px
+      );
+    background-size: 44px 44px;
+  }
+}
+
+/* ------------------------------------------------------------ animation --- */
+@keyframes am-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.am-rise {
+  animation: am-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes am-pulse-line {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.am-pulse {
+  animation: am-pulse-line 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .am-rise,
+  .am-pulse {
+    animation: none;
+  }
+  * {
+    scroll-behavior: auto !important;
+  }
 }

@@ -2,13 +2,19 @@ import axios, { type AxiosError, type AxiosInstance } from "axios";
 import type {
   AlternativeDataSource,
   ApiError,
+  AuthResponse,
   BacktestResult,
+  LoginCredentials,
   MarketData,
+  OHLCV,
   Order,
   Portfolio,
   Position,
+  RegisterPayload,
+  ResearchPaper,
   RiskMetrics,
   Strategy,
+  User,
 } from "../types";
 
 // Base URL: in development Vite proxies /api -> backend; in production the
@@ -62,6 +68,32 @@ class ApiService {
   // ── Health ───────────────────────────────────────────────────────────────
   async healthCheck(): Promise<{ status: string }> {
     const response = await this.api.get("/health");
+    return response.data;
+  }
+
+  // ── Authentication ───────────────────────────────────────────────────────
+  async login(credentials: LoginCredentials): Promise<AuthResponse> {
+    const response = await this.api.post<AuthResponse>(
+      "/api/auth/login",
+      credentials,
+    );
+    return response.data;
+  }
+
+  async register(payload: RegisterPayload): Promise<AuthResponse> {
+    const response = await this.api.post<AuthResponse>(
+      "/api/auth/register",
+      payload,
+    );
+    return response.data;
+  }
+
+  async logout(): Promise<void> {
+    await this.api.post("/api/auth/logout");
+  }
+
+  async getProfile(): Promise<User> {
+    const response = await this.api.get<User>("/api/auth/profile");
     return response.data;
   }
 
@@ -123,13 +155,10 @@ class ApiService {
   }
 
   // ── Market Data ──────────────────────────────────────────────────────────
-  async getMarketData(
-    ticker: string,
-    interval?: string,
-  ): Promise<MarketData[]> {
-    const response = await this.api.get<MarketData[]>("/api/v1/market-data/", {
-      params: { ticker, interval },
-    });
+  async getMarketData(): Promise<MarketData[]> {
+    const response = await this.api.get<MarketData[]>(
+      "/api/v1/market-data/quotes",
+    );
     return response.data;
   }
 
@@ -144,8 +173,8 @@ class ApiService {
     symbol: string,
     days = 30,
     interval = "1d",
-  ): Promise<MarketData[]> {
-    const response = await this.api.get<MarketData[]>(
+  ): Promise<OHLCV[]> {
+    const response = await this.api.get<OHLCV[]>(
       `/api/v1/market-data/historical/${symbol}`,
       { params: { days, interval } },
     );
@@ -279,6 +308,15 @@ class ApiService {
     const response = await this.api.get(
       `/api/v1/alternative-data/${sourceId}`,
       { params },
+    );
+    return response.data;
+  }
+
+  // ── Research ─────────────────────────────────────────────────────────────
+  async getResearchPapers(category?: string): Promise<ResearchPaper[]> {
+    const response = await this.api.get<ResearchPaper[]>(
+      "/api/v1/research/papers",
+      { params: category ? { category } : undefined },
     );
     return response.data;
   }

@@ -3,53 +3,37 @@ import { BrowserRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 import { Home } from "./Home";
 
+const renderHome = () =>
+  render(
+    <BrowserRouter>
+      <Home />
+    </BrowserRouter>,
+  );
+
 describe("Home Page", () => {
   it("renders hero section", () => {
-    render(
-      <BrowserRouter>
-        <Home />
-      </BrowserRouter>,
-    );
-
-    expect(screen.getByText(/Next-Gen/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(/Quantitative AI Trading System/i),
-    ).toBeInTheDocument();
+    renderHome();
+    expect(screen.getByText(/Where alternative data/i)).toBeInTheDocument();
+    expect(screen.getByText(/durable alpha/i)).toBeInTheDocument();
   });
 
-  it("renders features section", () => {
-    render(
-      <BrowserRouter>
-        <Home />
-      </BrowserRouter>,
-    );
-
-    expect(screen.getByText("Key Features")).toBeInTheDocument();
-    expect(
-      screen.getByText("Alternative Data Integration"),
-    ).toBeInTheDocument();
-    expect(screen.getByText("Quantitative Research")).toBeInTheDocument();
+  it("renders capabilities section", () => {
+    renderHome();
+    expect(screen.getByText("Four engines, one edge")).toBeInTheDocument();
+    expect(screen.getByText("Alternative Data")).toBeInTheDocument();
+    expect(screen.getByText("Quant Research")).toBeInTheDocument();
+    expect(screen.getByText("Execution Engine")).toBeInTheDocument();
   });
 
-  it("renders performance metrics table", () => {
-    render(
-      <BrowserRouter>
-        <Home />
-      </BrowserRouter>,
-    );
-
-    expect(screen.getByText("Performance Metrics")).toBeInTheDocument();
-    expect(screen.getByText("Sharpe Ratio")).toBeInTheDocument();
+  it("renders backtested performance table", () => {
+    renderHome();
+    expect(screen.getByText("Backtested performance")).toBeInTheDocument();
+    expect(screen.getByText("Sharpe")).toBeInTheDocument();
     expect(screen.getByText("Win Rate")).toBeInTheDocument();
   });
 
-  it("renders getting started section", () => {
-    render(
-      <BrowserRouter>
-        <Home />
-      </BrowserRouter>,
-    );
-
-    expect(screen.getByText("Getting Started")).toBeInTheDocument();
+  it("renders a primary call to action", () => {
+    renderHome();
+    expect(screen.getByText(/Get started free/i)).toBeInTheDocument();
   });
 });

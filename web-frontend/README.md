@@ -26,6 +26,26 @@ The web-frontend is a modern React/TypeScript application providing a comprehens
 - **Responsive Design**: Optimized for desktop, tablet, and mobile
 - **Type Safety**: Full TypeScript support throughout the application
 
+## Design System and App Flow
+
+The web and mobile frontends share a single "Quant Terminal" design language: an
+indigo brand with a cyan accent, monospace tabular numerals for financial
+figures, color-coded positive and negative deltas, and a first-class light and
+dark mode. The theme preference is persisted locally and can be toggled from the
+top navigation or the Settings page.
+
+Navigation flow:
+
+1. The app opens on a public marketing Home page.
+2. From there a visitor can Sign in or Create an account. If the backend auth
+   endpoints are unreachable, the forms fall back to a scoped local demo session
+   so the dashboard remains fully navigable.
+3. Authenticated users land in the application shell (sidebar plus topbar) with
+   Dashboard, Strategies, Portfolio, Backtest, Risk, and Settings.
+
+Public routes: `/` (Home), `/documentation`, `/about`. Authenticated routes are
+protected and redirect to `/signin` when no session is present.
+
 ## Getting Started
 
 ### Prerequisites

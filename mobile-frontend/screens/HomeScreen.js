@@ -59,32 +59,33 @@ export default function HomeScreen() {
   }, [dispatch]);
 
   const kpiData = useMemo(() => {
+    const zero = "$0.00";
     if (!data) {
       return [
         {
           title: "Portfolio Value",
-          value: "$0.00",
-          change: "0.0%",
+          value: zero,
+          change: "",
           changeColor: theme.colors.onSurfaceVariant,
           icon: "chart-line",
         },
         {
           title: "Daily P&L",
-          value: "+$0.00",
+          value: `+${zero}`,
           change: "0.0%",
           changeColor: theme.colors.onSurfaceVariant,
           icon: "trending-up",
         },
         {
-          title: "Sharpe Ratio",
-          value: "0.00",
-          change: "",
-          changeColor: theme.colors.primary,
+          title: "Total P&L",
+          value: `+${zero}`,
+          change: "0.0%",
+          changeColor: theme.colors.onSurfaceVariant,
           icon: "chart-bell-curve-cumulative",
         },
         {
-          title: "Active Strategies",
-          value: "0",
+          title: "Cash",
+          value: zero,
           change: "",
           changeColor: theme.colors.primary,
           icon: "robot",
@@ -92,39 +93,58 @@ export default function HomeScreen() {
       ];
     }
 
-    const portfolioValue = `$${(data.value ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    // The backend portfolio response returns totalValue/cash/dailyPnL/totalPnL.
+    // Older shapes used `value`; fall back so both contracts render correctly.
+    const totalValue = data.totalValue ?? data.value ?? 0;
+    const cash = data.cash ?? 0;
     const dailyPnLNum = data.dailyPnL ?? 0;
-    const dailyPnL = `${dailyPnLNum >= 0 ? "+" : ""}$${Math.abs(dailyPnLNum).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    const dailyPnLPercent = data.dailyPnLPercent ?? 0;
-    const dailyPnLChange = `${dailyPnLPercent >= 0 ? "+" : ""}${dailyPnLPercent.toFixed(2)}%`;
-    const changeColor =
-      dailyPnLPercent >= 0 ? theme.colors.success : theme.colors.error;
+    const totalPnLNum = data.totalPnL ?? 0;
+
+    // Daily percent: derive from the prior-day base when not supplied.
+    const priorBase = totalValue - dailyPnLNum;
+    const dailyPnLPercent =
+      data.dailyPnLPercent ?? (priorBase ? (dailyPnLNum / priorBase) * 100 : 0);
+    const totalPnLPercent = totalValue
+      ? (totalPnLNum / (totalValue - totalPnLNum || 1)) * 100
+      : 0;
+
+    const money = (n) =>
+      `$${Math.abs(n).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`;
+    const signed = (n) => `${n >= 0 ? "+" : "-"}${money(n)}`;
+    const pct = (n) => `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`;
+    const dailyColor =
+      dailyPnLNum >= 0 ? theme.colors.success : theme.colors.error;
+    const totalColor =
+      totalPnLNum >= 0 ? theme.colors.success : theme.colors.error;
 
     return [
       {
         title: "Portfolio Value",
-        value: portfolioValue,
-        change: dailyPnLChange,
-        changeColor,
+        value: `$${totalValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        change: pct(dailyPnLPercent),
+        changeColor: dailyColor,
         icon: "chart-line",
       },
       {
         title: "Daily P&L",
-        value: dailyPnL,
-        change: dailyPnLChange,
-        changeColor,
+        value: signed(dailyPnLNum),
+        change: pct(dailyPnLPercent),
+        changeColor: dailyColor,
         icon: "trending-up",
       },
       {
-        title: "Sharpe Ratio",
-        value: (data.sharpeRatio ?? 0).toFixed(2),
-        change: "",
-        changeColor: theme.colors.primary,
+        title: "Total P&L",
+        value: signed(totalPnLNum),
+        change: pct(totalPnLPercent),
+        changeColor: totalColor,
         icon: "chart-bell-curve-cumulative",
       },
       {
-        title: "Active Strategies",
-        value: String(data.activeStrategies ?? 0),
+        title: "Cash",
+        value: `$${cash.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
         change: "",
         changeColor: theme.colors.primary,
         icon: "robot",
@@ -142,30 +162,30 @@ export default function HomeScreen() {
         // Hero section matching web: gradient hero with blue accent
         heroSection: {
           backgroundColor: theme.colors.surface,
+          borderBottomColor: theme.colors.outlineVariant,
+          borderBottomWidth: 1,
+          paddingBottom: 20,
           paddingHorizontal: 16,
           paddingTop: 24,
-          paddingBottom: 20,
-          borderBottomWidth: 1,
-          borderBottomColor: theme.colors.outlineVariant,
         },
         greetingText: {
-          fontSize: 13,
           color: theme.colors.onSurfaceVariant,
+          fontSize: 13,
           marginBottom: 4,
         },
         titleText: {
+          color: theme.colors.onBackground,
           fontSize: 28,
           fontWeight: "800",
-          color: theme.colors.onBackground,
-          marginBottom: 4,
           letterSpacing: -0.5,
+          marginBottom: 4,
         },
         titleAccent: {
           color: theme.colors.primary,
         },
         subtitleText: {
-          fontSize: 14,
           color: theme.colors.onSurfaceVariant,
+          fontSize: 14,
           lineHeight: 20,
         },
         // Section containers
@@ -174,22 +194,22 @@ export default function HomeScreen() {
           paddingVertical: 20,
         },
         sectionAlt: {
+          backgroundColor: theme.colors.surfaceVariant,
           paddingHorizontal: 16,
           paddingVertical: 20,
-          backgroundColor: theme.colors.surfaceVariant,
         },
         sectionHeader: {
           marginBottom: 16,
         },
         sectionTitle: {
+          color: theme.colors.onBackground,
           fontSize: 20,
           fontWeight: "700",
-          color: theme.colors.onBackground,
           marginBottom: 4,
         },
         sectionSubtitle: {
-          fontSize: 13,
           color: theme.colors.onSurfaceVariant,
+          fontSize: 13,
         },
         // KPI grid matching web: grid-cols-2
         kpiContainer: {
@@ -200,50 +220,50 @@ export default function HomeScreen() {
         // Performance table matching web table design
         tableContainer: {
           backgroundColor: theme.colors.surface,
+          borderColor: theme.colors.outlineVariant,
           borderRadius: 8,
           borderWidth: 1,
-          borderColor: theme.colors.outlineVariant,
+          elevation: 2,
           overflow: "hidden",
           shadowColor: "#000",
           shadowOffset: { width: 0, height: 1 },
           shadowOpacity: 0.05,
           shadowRadius: 3,
-          elevation: 2,
         },
         tableHeader: {
-          flexDirection: "row",
           backgroundColor: theme.colors.surfaceVariant,
+          borderBottomColor: theme.colors.outlineVariant,
+          borderBottomWidth: 1,
+          flexDirection: "row",
           paddingHorizontal: 12,
           paddingVertical: 10,
-          borderBottomWidth: 1,
-          borderBottomColor: theme.colors.outlineVariant,
         },
         tableHeaderCell: {
+          color: theme.colors.onSurfaceVariant,
           fontSize: 10,
           fontWeight: "600",
-          color: theme.colors.onSurfaceVariant,
-          textTransform: "uppercase",
           letterSpacing: 0.5,
+          textTransform: "uppercase",
         },
         tableRow: {
+          alignItems: "center",
+          borderBottomColor: theme.colors.outlineVariant,
+          borderBottomWidth: 1,
           flexDirection: "row",
           paddingHorizontal: 12,
           paddingVertical: 12,
-          borderBottomWidth: 1,
-          borderBottomColor: theme.colors.outlineVariant,
-          alignItems: "center",
         },
         tableRowLast: {
           borderBottomWidth: 0,
         },
         tableCellStrategy: {
+          color: theme.colors.onSurface,
           fontSize: 13,
           fontWeight: "600",
-          color: theme.colors.onSurface,
         },
         tableCell: {
-          fontSize: 13,
           color: theme.colors.onSurfaceVariant,
+          fontSize: 13,
         },
         col1: { flex: 2.2 },
         col2: { flex: 1.2 },
@@ -253,17 +273,17 @@ export default function HomeScreen() {
         // Info hint card
         hintCard: {
           backgroundColor: theme.colors.surface,
+          borderColor: theme.colors.outlineVariant,
           borderRadius: 8,
           borderWidth: 1,
-          borderColor: theme.colors.outlineVariant,
-          padding: 14,
           marginTop: 4,
+          padding: 14,
         },
         hintText: {
           color: theme.colors.onSurfaceVariant,
           fontSize: 12,
-          textAlign: "center",
           lineHeight: 18,
+          textAlign: "center",
         },
       }),
     [theme],

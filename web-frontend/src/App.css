@@ -1,9 +1,4 @@
-* {
-  box-sizing: border-box;
-}
-
+/* Application-level styles live in index.css design system. */
 #root {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
 }

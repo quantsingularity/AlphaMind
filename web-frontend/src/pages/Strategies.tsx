@@ -20,6 +20,7 @@ import {
   useDeactivateStrategy,
 } from "../hooks/useStrategies";
 import { useStrategyEquityCurve } from "../hooks/useStrategies";
+import { useChartPalette, chartTooltipStyle } from "../hooks/useChartPalette";
 
 // ── Rolling metrics derived deterministically from equity curve ────────────
 function buildRollingMetrics(
@@ -47,6 +48,7 @@ const StrategyDetail: React.FC<{
   );
   const [paramEdits, setParamEdits] = useState<Record<string, string>>({});
   const { data: curveData } = useStrategyEquityCurve(strategy.id);
+  const palette = useChartPalette();
 
   const equityCurve =
     (curveData?.equityCurve as
@@ -60,17 +62,19 @@ const StrategyDetail: React.FC<{
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-screen overflow-y-auto"
+        className="am-card w-full max-w-3xl max-h-screen overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex justify-between items-start p-6 border-b border-gray-200">
+        <div className="flex justify-between items-start p-6 border-b border-line">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">{strategy.name}</h2>
-            <p className="text-sm text-gray-500 mt-1">{strategy.description}</p>
+            <h2 className="text-xl font-bold text-ink">{strategy.name}</h2>
+            <p className="text-sm text-ink-muted mt-1">
+              {strategy.description}
+            </p>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 ml-4"
+            className="text-ink-faint hover:text-ink-muted ml-4"
           >
             <svg
               className="h-6 w-6"
@@ -87,13 +91,13 @@ const StrategyDetail: React.FC<{
             </svg>
           </button>
         </div>
-        <div className="border-b border-gray-200 px-6">
+        <div className="border-b border-line px-6">
           <nav className="flex space-x-6">
             {(["equity", "rolling", "params"] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setDetailTab(t)}
-                className={`py-3 text-sm font-medium border-b-2 capitalize transition-colors ${detailTab === t ? "border-blue-600 text-blue-600" : "border-transparent text-gray-500 hover:text-gray-700"}`}
+                className={`py-3 text-sm font-medium border-b-2 capitalize transition-colors ${detailTab === t ? "border-brand text-brand" : "border-transparent text-ink-muted hover:text-ink-muted"}`}
               >
                 {t === "equity"
                   ? "Equity Curve"
@@ -112,17 +116,17 @@ const StrategyDetail: React.FC<{
                   {
                     label: "Total Return",
                     value: formatPercentage(strategy.performance.totalReturn),
-                    color: "text-green-700",
+                    color: "text-pos",
                   },
                   {
                     label: "Sharpe",
                     value: strategy.performance.sharpeRatio.toFixed(2),
-                    color: "text-blue-700",
+                    color: "text-brand",
                   },
                   {
                     label: "Max DD",
                     value: `-${formatPercentage(Math.abs(strategy.performance.maxDrawdown))}`,
-                    color: "text-red-600",
+                    color: "text-neg",
                   },
                   {
                     label: "Alpha",
@@ -132,9 +136,9 @@ const StrategyDetail: React.FC<{
                 ].map((m) => (
                   <div
                     key={m.label}
-                    className="bg-gray-50 rounded-lg p-3 text-center"
+                    className="bg-surface-2 rounded-lg p-3 text-center"
                   >
-                    <p className="text-xs text-gray-500">{m.label}</p>
+                    <p className="text-xs text-ink-muted">{m.label}</p>
                     <p className={`text-lg font-bold ${m.color}`}>{m.value}</p>
                   </div>
                 ))}
@@ -142,10 +146,20 @@ const StrategyDetail: React.FC<{
               {equityCurve.length > 0 ? (
                 <ResponsiveContainer width="100%" height={280}>
                   <AreaChart data={equityCurve.filter((_, i) => i % 2 === 0)}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="day" tick={{ fontSize: 10 }} />
-                    <YAxis tick={{ fontSize: 11 }} domain={["auto", "auto"]} />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke={palette.grid}
+                    />
+                    <XAxis
+                      dataKey="day"
+                      tick={{ fontSize: 10, fill: palette.axis }}
+                    />
+                    <YAxis
+                      tick={{ fontSize: 11, fill: palette.axis }}
+                      domain={["auto", "auto"]}
+                    />
                     <Tooltip
+                      contentStyle={chartTooltipStyle(palette)}
                       formatter={(v, n) => [
                         Number(v).toFixed(2),
                         n === "value" ? "Strategy" : "Benchmark",
@@ -156,24 +170,24 @@ const StrategyDetail: React.FC<{
                       type="monotone"
                       dataKey="benchmark"
                       name="S&P 500"
-                      stroke="#9ca3af"
-                      fill="#f3f4f6"
-                      fillOpacity={0.4}
+                      stroke={palette.axis}
+                      fill={palette.grid}
+                      fillOpacity={0.14}
                       dot={false}
                     />
                     <Area
                       type="monotone"
                       dataKey="value"
                       name="Strategy"
-                      stroke="#2563eb"
-                      fill="#eff6ff"
-                      fillOpacity={0.6}
+                      stroke={palette.brand}
+                      fill={palette.brand}
+                      fillOpacity={0.2}
                       dot={false}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
               ) : (
-                <p className="text-sm text-gray-400 text-center py-12">
+                <p className="text-sm text-ink-faint text-center py-12">
                   Loading equity curve…
                 </p>
               )}
@@ -182,21 +196,27 @@ const StrategyDetail: React.FC<{
           {detailTab === "rolling" && (
             <div className="space-y-6">
               <div>
-                <p className="text-xs text-gray-500 mb-2">
+                <p className="text-xs text-ink-muted mb-2">
                   Rolling 30-day Sharpe Ratio
                 </p>
                 <ResponsiveContainer width="100%" height={180}>
                   <LineChart
                     data={rollingMetrics.filter((_, i) => i % 3 === 0)}
                   >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="day" tick={{ fontSize: 10 }} />
-                    <YAxis tick={{ fontSize: 11 }} />
-                    <Tooltip />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke={palette.grid}
+                    />
+                    <XAxis
+                      dataKey="day"
+                      tick={{ fontSize: 10, fill: palette.axis }}
+                    />
+                    <YAxis tick={{ fontSize: 11, fill: palette.axis }} />
+                    <Tooltip contentStyle={chartTooltipStyle(palette)} />
                     <Line
                       type="monotone"
                       dataKey="sharpe"
-                      stroke="#2563eb"
+                      stroke={palette.brand}
                       dot={false}
                       strokeWidth={2}
                     />
@@ -204,21 +224,28 @@ const StrategyDetail: React.FC<{
                 </ResponsiveContainer>
               </div>
               <div>
-                <p className="text-xs text-gray-500 mb-2">
+                <p className="text-xs text-ink-muted mb-2">
                   Rolling Drawdown (%)
                 </p>
                 <ResponsiveContainer width="100%" height={180}>
                   <AreaChart
                     data={rollingMetrics.filter((_, i) => i % 3 === 0)}
                   >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="day" tick={{ fontSize: 10 }} />
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke={palette.grid}
+                    />
+                    <XAxis
+                      dataKey="day"
+                      tick={{ fontSize: 10, fill: palette.axis }}
+                    />
                     <YAxis
                       tickFormatter={(v) => `${v}%`}
-                      tick={{ fontSize: 11 }}
+                      tick={{ fontSize: 11, fill: palette.axis }}
                       domain={["auto", 0]}
                     />
                     <Tooltip
+                      contentStyle={chartTooltipStyle(palette)}
                       formatter={(v) => [
                         `${Number(v).toFixed(2)}%`,
                         "Drawdown",
@@ -227,9 +254,9 @@ const StrategyDetail: React.FC<{
                     <Area
                       type="monotone"
                       dataKey="drawdown"
-                      stroke="#ef4444"
-                      fill="#fee2e2"
-                      fillOpacity={0.7}
+                      stroke={palette.neg}
+                      fill={palette.neg}
+                      fillOpacity={0.22}
                       dot={false}
                     />
                   </AreaChart>
@@ -239,16 +266,16 @@ const StrategyDetail: React.FC<{
           )}
           {detailTab === "params" && (
             <div>
-              <p className="text-xs text-gray-500 mb-4">
+              <p className="text-xs text-ink-muted mb-4">
                 Edit strategy hyperparameters and save to trigger re-training.
               </p>
               <div className="space-y-3">
                 {Object.entries(strategy.parameters).map(([key, value]) => (
                   <div
                     key={key}
-                    className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-3"
+                    className="flex items-center justify-between bg-surface-2 rounded-lg px-4 py-3"
                   >
-                    <span className="text-sm font-mono text-gray-700">
+                    <span className="text-sm font-mono text-ink-muted">
                       {key}
                     </span>
                     <input
@@ -260,7 +287,7 @@ const StrategyDetail: React.FC<{
                           [key]: e.target.value,
                         }))
                       }
-                      className="w-32 text-sm text-right border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-32 text-sm text-right border border-line rounded-md px-2 py-1 focus:outline-none focus:ring-1 focus:ring-brand"
                     />
                   </div>
                 ))}
@@ -268,11 +295,11 @@ const StrategyDetail: React.FC<{
               <div className="mt-4 flex justify-end space-x-3">
                 <button
                   onClick={() => setParamEdits({})}
-                  className="px-4 py-2 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                  className="px-4 py-2 text-sm border border-line rounded-md text-ink-muted hover:bg-surface-2"
                 >
                   Reset
                 </button>
-                <button className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                <button className="px-4 py-2 text-sm bg-brand text-white rounded-md hover:bg-brand-strong">
                   Save & Retrain
                 </button>
               </div>
@@ -306,15 +333,15 @@ export const Strategies: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-md bg-red-50 p-4">
-        <p className="text-sm text-red-700">
+      <div className="rounded-md bg-neg-soft p-4">
+        <p className="text-sm text-neg">
           Unable to load strategies. Check that the backend is running.
         </p>
       </div>
@@ -327,10 +354,8 @@ export const Strategies: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Trading Strategies
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-3xl font-bold text-ink">Trading Strategies</h1>
+          <p className="mt-1 text-sm text-ink-muted">
             {strategyList.filter((s) => s.status === "active").length} active of{" "}
             {strategyList.length} strategies
           </p>
@@ -340,7 +365,7 @@ export const Strategies: React.FC = () => {
             <button
               key={v}
               onClick={() => setView(v)}
-              className={`px-3 py-1.5 text-sm rounded-md font-medium transition-colors capitalize ${view === v ? "bg-blue-600 text-white" : "border border-gray-300 text-gray-700 hover:bg-gray-50"}`}
+              className={`px-3 py-1.5 text-sm rounded-md font-medium transition-colors capitalize ${view === v ? "bg-brand text-white" : "border border-line text-ink-muted hover:bg-surface-2"}`}
             >
               {v}
             </button>
@@ -349,10 +374,10 @@ export const Strategies: React.FC = () => {
       </div>
 
       {view === "table" ? (
-        <div className="bg-white shadow rounded-lg overflow-hidden">
+        <div className="am-card overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-line">
+              <thead className="bg-surface-2">
                 <tr>
                   {[
                     "Strategy",
@@ -366,26 +391,24 @@ export const Strategies: React.FC = () => {
                   ].map((h) => (
                     <th
                       key={h}
-                      className="px-4 py-2 text-xs font-medium text-gray-500 uppercase text-left"
+                      className="px-4 py-2 text-xs font-medium text-ink-muted uppercase text-left"
                     >
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-line">
                 {strategyList.map((s) => (
-                  <tr key={s.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-900">
-                      {s.name}
-                    </td>
-                    <td className="px-4 py-3 text-blue-700 font-semibold">
+                  <tr key={s.id} className="hover:bg-surface-2">
+                    <td className="px-4 py-3 font-medium text-ink">{s.name}</td>
+                    <td className="px-4 py-3 text-brand font-semibold">
                       {s.performance.sharpeRatio.toFixed(2)}
                     </td>
-                    <td className="px-4 py-3 text-green-700">
+                    <td className="px-4 py-3 text-pos">
                       {formatPercentage(s.performance.totalReturn)}
                     </td>
-                    <td className="px-4 py-3 text-red-600">
+                    <td className="px-4 py-3 text-neg">
                       -{formatPercentage(Math.abs(s.performance.maxDrawdown))}
                     </td>
                     <td className="px-4 py-3">
@@ -399,7 +422,7 @@ export const Strategies: React.FC = () => {
                     </td>
                     <td className="px-4 py-3">
                       <span
-                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${s.status === "active" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-600"}`}
+                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${s.status === "active" ? "bg-pos-soft text-pos" : "bg-surface-2 text-ink-muted"}`}
                       >
                         {s.status}
                       </span>
@@ -440,27 +463,28 @@ const StrategyCard: React.FC<{
   onToggle: () => void;
 }> = ({ strategy, onView, onToggle }) => {
   const { data: curveData } = useStrategyEquityCurve(strategy.id);
+  const palette = useChartPalette();
   const equityCurve =
     (curveData?.equityCurve as { day: number; value: number }[] | undefined) ??
     [];
 
   return (
-    <div className="bg-white shadow rounded-lg overflow-hidden">
+    <div className="am-card overflow-hidden">
       <div className="p-5">
         <div className="flex items-start justify-between mb-2">
           <div>
-            <h3 className="text-base font-semibold text-gray-900">
+            <h3 className="text-base font-semibold text-ink">
               {strategy.name}
             </h3>
-            <span className="text-xs text-gray-400">{strategy.type}</span>
+            <span className="text-xs text-ink-faint">{strategy.type}</span>
           </div>
           <span
-            className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${strategy.status === "active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600"}`}
+            className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${strategy.status === "active" ? "bg-pos-soft text-pos" : "bg-surface-2 text-ink-muted"}`}
           >
             {strategy.status}
           </span>
         </div>
-        <p className="text-xs text-gray-500 mb-4">{strategy.description}</p>
+        <p className="text-xs text-ink-muted mb-4">{strategy.description}</p>
 
         {/* Mini equity curve — live from API */}
         <div className="h-24 mb-4">
@@ -470,8 +494,8 @@ const StrategyCard: React.FC<{
                 <Area
                   type="monotone"
                   dataKey="value"
-                  stroke="#2563eb"
-                  fill="#eff6ff"
+                  stroke={palette.brand}
+                  fill={palette.brand}
                   strokeWidth={1.5}
                   dot={false}
                 />
@@ -479,7 +503,7 @@ const StrategyCard: React.FC<{
             </ResponsiveContainer>
           ) : (
             <div className="h-full flex items-center justify-center">
-              <div className="animate-pulse h-2 w-full bg-blue-100 rounded" />
+              <div className="animate-pulse h-2 w-full bg-brand-soft rounded" />
             </div>
           )}
         </div>
@@ -503,9 +527,9 @@ const StrategyCard: React.FC<{
               value: formatPercentage(strategy.performance.winRate),
             },
           ].map((m) => (
-            <div key={m.label} className="bg-gray-50 rounded p-2">
-              <p className="text-xs text-gray-400">{m.label}</p>
-              <p className="text-sm font-semibold text-gray-900">{m.value}</p>
+            <div key={m.label} className="bg-surface-2 rounded p-2">
+              <p className="text-xs text-ink-faint">{m.label}</p>
+              <p className="text-sm font-semibold text-ink">{m.value}</p>
             </div>
           ))}
         </div>
@@ -513,13 +537,13 @@ const StrategyCard: React.FC<{
         <div className="flex space-x-2">
           <button
             onClick={onView}
-            className="flex-1 py-1.5 text-xs font-medium border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            className="flex-1 py-1.5 text-xs font-medium border border-line rounded-md text-ink-muted hover:bg-surface-2"
           >
             View Details
           </button>
           <button
             onClick={onToggle}
-            className={`flex-1 py-1.5 text-xs font-medium rounded-md text-white ${strategy.status === "active" ? "bg-red-500 hover:bg-red-600" : "bg-green-600 hover:bg-green-700"}`}
+            className={`flex-1 py-1.5 text-xs font-medium rounded-md text-white ${strategy.status === "active" ? "bg-neg hover:bg-neg" : "bg-pos hover:bg-pos"}`}
           >
             {strategy.status === "active" ? "Deactivate" : "Activate"}
           </button>

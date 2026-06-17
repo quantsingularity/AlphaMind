@@ -38,6 +38,16 @@ export interface MarketData {
   low: number;
   open: number;
   close: number;
+  source?: string;
+}
+
+export interface OHLCV {
+  timestamp: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
 }
 
 export interface Position {
@@ -58,6 +68,7 @@ export interface Order {
   quantity: number;
   orderType: "MARKET" | "LIMIT" | "STOP";
   price?: number;
+  filledPrice?: number;
   status: "pending" | "filled" | "cancelled" | "rejected";
   timestamp: string;
   filledAt?: string;
@@ -99,10 +110,28 @@ export interface BacktestResult {
   initialCapital: number;
   finalCapital: number;
   totalReturn: number;
-  performance: StrategyPerformance;
-  trades: Trade[];
-  equityCurve: EquityPoint[];
-  metrics: RiskMetrics;
+  annualisedReturn: number;
+  sharpeRatio: number;
+  sortinoRatio: number;
+  calmarRatio: number;
+  maxDrawdown: number;
+  maxDrawdownDuration?: number;
+  winRate: number;
+  profitFactor: number;
+  totalTrades: number;
+  avgWin: number;
+  avgLoss: number;
+  bestMonth: number;
+  worstMonth: number;
+  // Optional series the UI renders when the backend supplies them.
+  equityCurve?: BacktestEquityPoint[];
+}
+
+export interface BacktestEquityPoint {
+  date: string;
+  equity: number;
+  benchmark: number;
+  drawdown: number;
 }
 
 export interface Trade {
@@ -127,6 +156,8 @@ export interface AlternativeDataSource {
   status: "active" | "inactive";
   lastUpdate: string;
   dataPoints: number;
+  description?: string;
+  latency?: string;
 }
 
 export interface ApiResponse<T> {
@@ -146,7 +177,23 @@ export interface User {
   email: string;
   name: string;
   role: "admin" | "trader" | "analyst";
-  preferences: UserPreferences;
+  preferences?: UserPreferences;
+}
+
+export interface AuthResponse {
+  token: string;
+  user: User;
+}
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterPayload {
+  name: string;
+  email: string;
+  password: string;
 }
 
 export interface UserPreferences {
@@ -165,4 +212,14 @@ export interface ChartDataset {
   data: number[];
   borderColor?: string;
   backgroundColor?: string;
+}
+
+export interface ResearchPaper {
+  id: string;
+  title: string;
+  authors: string[];
+  abstract: string;
+  category: string;
+  year: number;
+  url?: string;
 }

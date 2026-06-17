@@ -154,7 +154,17 @@ _auth_system: Optional[AuthenticationSystem] = None
 def get_auth_system() -> AuthenticationSystem:
     global _auth_system
     if _auth_system is None:
-        secret_key = os.getenv("SECRET_KEY", "change-this-secret-key-in-production")
+        default_secret = "change-this-secret-key-in-production"
+        secret_key = os.getenv("SECRET_KEY", default_secret)
+        environment = os.getenv("ENVIRONMENT", os.getenv("APP_ENV", "development"))
+        # Fail closed: never run a real deployment on the placeholder secret.
+        if environment.lower() in {"production", "prod", "staging"} and (
+            secret_key == default_secret or len(secret_key) < 32
+        ):
+            raise RuntimeError(
+                "SECRET_KEY must be set to a strong (>=32 char) value outside "
+                "development. Refusing to start the auth system with an insecure key."
+            )
         token_expiration = int(os.getenv("JWT_EXPIRATION_HOURS", "24"))
         _auth_system = AuthenticationSystem(
             secret_key=secret_key,

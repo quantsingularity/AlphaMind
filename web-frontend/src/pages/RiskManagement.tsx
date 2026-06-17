@@ -22,14 +22,15 @@ import {
   useCorrelationMatrix,
   useRiskRadar,
 } from "../hooks/usePortfolioPerformance";
+import { useChartPalette, chartTooltipStyle } from "../hooks/useChartPalette";
 
 const CELL_COLORS = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#3b82f6"];
 
 const heatColor = (v: number) => {
-  if (v >= 0.8) return "bg-red-200 text-red-900";
-  if (v >= 0.6) return "bg-orange-100 text-orange-900";
-  if (v >= 0.4) return "bg-yellow-50 text-yellow-900";
-  return "bg-green-50 text-green-900";
+  if (v >= 0.8) return "bg-neg-soft text-neg";
+  if (v >= 0.6) return "bg-warn-soft text-warn";
+  if (v >= 0.4) return "bg-surface-2 text-ink-muted";
+  return "bg-pos-soft text-pos";
 };
 
 export const RiskManagement: React.FC = () => {
@@ -38,6 +39,7 @@ export const RiskManagement: React.FC = () => {
   >("overview");
 
   const { data: riskMetrics, isLoading: rmLoading } = useRiskMetrics();
+  const palette = useChartPalette();
   const { data: stressScenarios, isLoading: stressLoading } =
     useStressScenarios();
   const { data: correlationMatrix, isLoading: corrLoading } =
@@ -49,7 +51,7 @@ export const RiskManagement: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand" />
       </div>
     );
   }
@@ -72,20 +74,20 @@ export const RiskManagement: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Risk Management</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <h1 className="text-3xl font-bold text-ink">Risk Management</h1>
+        <p className="mt-1 text-sm text-ink-muted">
           Portfolio risk analytics and stress testing
         </p>
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-line">
         <nav className="flex space-x-6">
           {(["overview", "stress", "correlation"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setActiveTab(t)}
-              className={`py-3 text-sm font-medium border-b-2 capitalize transition-colors ${activeTab === t ? "border-blue-600 text-blue-600" : "border-transparent text-gray-500 hover:text-gray-700"}`}
+              className={`py-3 text-sm font-medium border-b-2 capitalize transition-colors ${activeTab === t ? "border-brand text-brand" : "border-transparent text-ink-muted hover:text-ink-muted"}`}
             >
               {t === "stress"
                 ? "Stress Tests"
@@ -141,20 +143,18 @@ export const RiskManagement: React.FC = () => {
                 desc: "realised",
               },
             ].map((m) => (
-              <div key={m.label} className="bg-white shadow rounded-lg p-4">
-                <p className="text-xs text-gray-500">{m.label}</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">
-                  {m.value}
-                </p>
-                <p className="text-xs text-gray-400 mt-0.5">{m.desc}</p>
+              <div key={m.label} className="am-card p-4">
+                <p className="text-xs text-ink-muted">{m.label}</p>
+                <p className="text-2xl font-bold text-ink mt-1">{m.value}</p>
+                <p className="text-xs text-ink-faint mt-0.5">{m.desc}</p>
               </div>
             ))}
           </div>
 
           {/* Risk Radar */}
           {radarData.length > 0 && (
-            <div className="bg-white shadow rounded-lg p-6">
-              <h2 className="text-base font-semibold text-gray-900 mb-4">
+            <div className="am-card p-6">
+              <h2 className="text-base font-semibold text-ink mb-4">
                 Risk Profile Radar
               </h2>
               <ResponsiveContainer width="100%" height={320}>
@@ -164,21 +164,28 @@ export const RiskManagement: React.FC = () => {
                   outerRadius="80%"
                   data={radarData}
                 >
-                  <PolarGrid />
-                  <PolarAngleAxis dataKey="metric" tick={{ fontSize: 12 }} />
+                  <PolarGrid stroke={palette.grid} />
+                  <PolarAngleAxis
+                    dataKey="metric"
+                    tick={{ fontSize: 12, fill: palette.axis }}
+                  />
                   <PolarRadiusAxis
                     angle={30}
                     domain={[0, 100]}
-                    tick={{ fontSize: 10 }}
+                    tick={{ fontSize: 10, fill: palette.axis }}
+                    stroke={palette.grid}
                   />
                   <Radar
                     name="Risk Score"
                     dataKey="value"
-                    stroke="#ef4444"
-                    fill="#ef4444"
+                    stroke={palette.neg}
+                    fill={palette.neg}
                     fillOpacity={0.3}
                   />
-                  <Tooltip formatter={(v) => [`${v} / 100`, "Risk Score"]} />
+                  <Tooltip
+                    formatter={(v) => [`${v} / 100`, "Risk Score"]}
+                    contentStyle={chartTooltipStyle(palette)}
+                  />
                 </RadarChart>
               </ResponsiveContainer>
             </div>
@@ -190,22 +197,20 @@ export const RiskManagement: React.FC = () => {
         <div className="space-y-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {scenarios.map((s) => (
-              <div key={s.name} className="bg-white shadow rounded-lg p-5">
-                <h3 className="text-sm font-semibold text-gray-900">
-                  {s.name}
-                </h3>
+              <div key={s.name} className="am-card p-5">
+                <h3 className="text-sm font-semibold text-ink">{s.name}</h3>
                 <p
-                  className={`text-2xl font-bold mt-2 ${s.pnl < 0 ? "text-red-600" : "text-green-600"}`}
+                  className={`text-2xl font-bold mt-2 ${s.pnl < 0 ? "text-neg" : "text-pos"}`}
                 >
                   {formatCurrency(s.pnl)}
                 </p>
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-ink-faint mt-1">
                   Portfolio impact:{" "}
-                  <span className="font-medium text-red-500">
+                  <span className="font-medium text-neg">
                     {s.portfolioImpact.toFixed(1)}%
                   </span>
                 </p>
-                <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-500">
+                <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-ink-muted">
                   <span>Duration: {s.duration}</span>
                   <span>Recovery: {s.recovery}</span>
                 </div>
@@ -214,25 +219,30 @@ export const RiskManagement: React.FC = () => {
           </div>
 
           {scenarios.length > 0 && (
-            <div className="bg-white shadow rounded-lg p-6">
-              <h2 className="text-base font-semibold text-gray-900 mb-4">
+            <div className="am-card p-6">
+              <h2 className="text-base font-semibold text-ink mb-4">
                 Scenario P&L Impact
               </h2>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={scenarios} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    horizontal={false}
+                    stroke={palette.grid}
+                  />
                   <XAxis
                     type="number"
                     tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
-                    tick={{ fontSize: 11 }}
+                    tick={{ fontSize: 11, fill: palette.axis }}
                   />
                   <YAxis
                     dataKey="name"
                     type="category"
                     width={140}
-                    tick={{ fontSize: 11 }}
+                    tick={{ fontSize: 11, fill: palette.axis }}
                   />
                   <Tooltip
+                    contentStyle={chartTooltipStyle(palette)}
                     formatter={(v) => [formatCurrency(Number(v)), "P&L"]}
                   />
                   <Bar dataKey="pnl" radius={[0, 4, 4, 0]}>
@@ -251,21 +261,21 @@ export const RiskManagement: React.FC = () => {
       )}
 
       {activeTab === "correlation" && corrData.length > 0 && (
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-base font-semibold text-gray-900 mb-4">
+        <div className="am-card p-6">
+          <h2 className="text-base font-semibold text-ink mb-4">
             Asset Correlation Matrix
           </h2>
           <div className="overflow-x-auto">
             <table className="text-sm w-full">
               <thead>
                 <tr>
-                  <th className="px-3 py-2 text-left text-xs text-gray-500 uppercase">
+                  <th className="px-3 py-2 text-left text-xs text-ink-muted uppercase">
                     Asset
                   </th>
                   {assets.map((a) => (
                     <th
                       key={a}
-                      className="px-3 py-2 text-left text-xs text-gray-500 uppercase"
+                      className="px-3 py-2 text-left text-xs text-ink-muted uppercase"
                     >
                       {a}
                     </th>
@@ -275,7 +285,7 @@ export const RiskManagement: React.FC = () => {
               <tbody>
                 {corrData.map((row) => (
                   <tr key={String(row.asset)}>
-                    <td className="px-3 py-2 font-semibold text-gray-900">
+                    <td className="px-3 py-2 font-semibold text-ink">
                       {String(row.asset)}
                     </td>
                     {assets.map((a) => {

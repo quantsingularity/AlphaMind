@@ -17,6 +17,21 @@ The mobile application provides the following key features:
 - **Offline Support**: Mock data mode for development without backend
 - **API Integration**: Axios-based API client with interceptors for authentication
 
+## Design System and Navigation
+
+The mobile app shares the web frontend's "Quant Terminal" design language: an
+indigo brand with a cyan accent, color-coded positive and negative deltas, and a
+first-class light and dark mode driven by the in-app theme preference (System,
+Light, or Dark) from Settings.
+
+Navigation flow:
+
+1. Unauthenticated users start on a Landing screen, then proceed to Sign In or
+   Create an Account.
+2. Authenticated users see a bottom tab bar: Home (dashboard), Strategies,
+   Portfolio, Risk, and More. The More tab links to Research, Documentation,
+   About, and Settings.
+
 ## Technology Stack
 
 - **Framework**: React Native (Expo)

@@ -9,19 +9,56 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useAuth } from "../contexts/AuthContext";
 import {
   usePortfolio,
   usePositions,
   useClosePosition,
 } from "../hooks/usePortfolio";
 import { usePortfolioPerformance } from "../hooks/usePortfolioPerformance";
-import { formatCurrency, getColorForValue } from "../utils/format";
+import { useChartPalette, chartTooltipStyle } from "../hooks/useChartPalette";
+import {
+  Badge,
+  EmptyState,
+  ErrorState,
+  Spinner,
+  StatCard,
+} from "../components/ui";
+import {
+  formatCurrency,
+  formatPercentage,
+  getColorForValue,
+} from "../utils/format";
+
+const ICONS = {
+  value:
+    "M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0z",
+  pnl: "M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941",
+  total:
+    "M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z",
+  cash: "M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z",
+};
+
+const Icon: React.FC<{ d: string }> = ({ d }) => (
+  <svg
+    className="h-4 w-4"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.7}
+    stroke="currentColor"
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" d={d} />
+  </svg>
+);
 
 export const Dashboard: React.FC = () => {
+  const { user } = useAuth();
+  const palette = useChartPalette();
   const {
     data: portfolio,
     isLoading: portfolioLoading,
     error: portfolioError,
+    refetch,
   } = usePortfolio();
   const { data: positions, isLoading: positionsLoading } = usePositions();
   const { data: performance, isLoading: perfLoading } =
@@ -30,164 +67,158 @@ export const Dashboard: React.FC = () => {
 
   const handleClose = useCallback(
     (id: string) => {
-      if (confirm("Close this position?")) {
-        closePosition.mutate(id);
-      }
+      if (confirm("Close this position?")) closePosition.mutate(id);
     },
     [closePosition],
   );
 
   if (portfolioLoading || positionsLoading || perfLoading) {
+    return <Spinner label="Loading portfolio" />;
+  }
+
+  if (portfolioError || !portfolio) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
-      </div>
+      <ErrorState
+        message="Unable to load portfolio data. Check that the backend is running, or continue in demo mode."
+        onRetry={() => refetch()}
+      />
     );
   }
 
-  if (portfolioError) {
-    return (
-      <div className="rounded-md bg-red-50 p-4">
-        <p className="text-sm text-red-700">
-          Unable to load portfolio data. Check that the backend is running.
-        </p>
-      </div>
-    );
-  }
-
-  // Use real API data — no hardcoded fallbacks
-  const port = portfolio!;
   const openPositions = positions ?? [];
-  const equityCurve: { timestamp: string; value: number }[] =
-    (
-      performance as
-        | { equityCurve: { timestamp: string; value: number }[] }
-        | undefined
-    )?.equityCurve ?? [];
+  const equityCurve =
+    (performance as { equityCurve?: { timestamp: string; value: number }[] })
+      ?.equityCurve ?? [];
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Trading Dashboard</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Real-time portfolio monitoring and analytics
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-sm text-ink-muted">
+            Welcome back{user?.name ? `, ${user.name.split(" ")[0]}` : ""}
+          </p>
+          <h1 className="font-display text-3xl font-bold text-ink">
+            Trading dashboard
+          </h1>
+        </div>
+        <Badge tone="pos">
+          <span className="h-1.5 w-1.5 rounded-full bg-pos" /> Markets open
+        </Badge>
       </div>
 
-      {/* Portfolio Overview Cards */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          {
-            label: "Total Value",
-            value: formatCurrency(port.totalValue),
-            icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
-            colorClass: "text-gray-900",
-          },
-          {
-            label: "Daily P&L",
-            value: formatCurrency(port.dailyPnL),
-            icon: "M13 7h8m0 0v8m0-8l-8 8-4-4-6 6",
-            colorClass: getColorForValue(port.dailyPnL),
-          },
-          {
-            label: "Total P&L",
-            value: formatCurrency(port.totalPnL),
-            icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
-            colorClass: getColorForValue(port.totalPnL),
-          },
-          {
-            label: "Cash",
-            value: formatCurrency(port.cash),
-            icon: "M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z",
-            colorClass: "text-gray-900",
-          },
-        ].map(({ label, value, icon, colorClass }) => (
-          <div
-            key={label}
-            className="bg-white overflow-hidden shadow rounded-lg"
-          >
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <svg
-                    className="h-6 w-6 text-gray-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d={icon}
-                    />
-                  </svg>
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      {label}
-                    </dt>
-                    <dd className={`text-lg font-semibold ${colorClass}`}>
-                      {value}
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
+      {/* KPI cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          label="Total Value"
+          value={formatCurrency(portfolio.totalValue)}
+          icon={<Icon d={ICONS.value} />}
+        />
+        <StatCard
+          label="Daily P&L"
+          value={formatCurrency(portfolio.dailyPnL)}
+          trend={portfolio.dailyPnL >= 0 ? "up" : "down"}
+          hint={
+            portfolio.totalValue
+              ? formatPercentage(portfolio.dailyPnL / portfolio.totalValue)
+              : undefined
+          }
+          icon={<Icon d={ICONS.pnl} />}
+        />
+        <StatCard
+          label="Total P&L"
+          value={formatCurrency(portfolio.totalPnL)}
+          trend={portfolio.totalPnL >= 0 ? "up" : "down"}
+          icon={<Icon d={ICONS.total} />}
+        />
+        <StatCard
+          label="Cash"
+          value={formatCurrency(portfolio.cash)}
+          icon={<Icon d={ICONS.cash} />}
+        />
+      </div>
+
+      {/* Equity curve */}
+      <div className="am-card p-6">
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-ink">Equity curve</h2>
+            <p className="text-sm text-ink-muted">Trailing 30 days</p>
           </div>
-        ))}
-      </div>
-
-      {/* Equity Curve — live from API */}
-      <div className="bg-white shadow rounded-lg p-6">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">
-          Equity Curve (30d)
-        </h2>
+          <Badge tone="brand">30D</Badge>
+        </div>
         {equityCurve.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={equityCurve}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="timestamp" tick={{ fontSize: 11 }} />
+              <defs>
+                <linearGradient id="eqGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop
+                    offset="0%"
+                    stopColor={palette.brand}
+                    stopOpacity={0.35}
+                  />
+                  <stop
+                    offset="100%"
+                    stopColor={palette.brand}
+                    stopOpacity={0}
+                  />
+                </linearGradient>
+              </defs>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke={palette.grid}
+                vertical={false}
+              />
+              <XAxis
+                dataKey="timestamp"
+                tick={{ fontSize: 11, fill: palette.axis }}
+                stroke={palette.grid}
+              />
               <YAxis
+                tick={{ fontSize: 11, fill: palette.axis }}
+                stroke={palette.grid}
                 tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`}
               />
               <Tooltip
-                formatter={(value: number) => [
-                  `$${value.toLocaleString()}`,
-                  "Equity",
-                ]}
+                contentStyle={chartTooltipStyle(palette)}
+                formatter={(v: number) => [`$${v.toLocaleString()}`, "Equity"]}
               />
               <Area
                 type="monotone"
                 dataKey="value"
-                stroke="#2563eb"
-                fill="#3b82f6"
-                fillOpacity={0.3}
+                stroke={palette.brand}
+                strokeWidth={2}
+                fill="url(#eqGrad)"
               />
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <p className="text-sm text-gray-400 text-center py-12">
-            No performance data available.
-          </p>
+          <EmptyState
+            title="No performance data yet"
+            hint="Equity history appears once trades settle."
+          />
         )}
       </div>
 
-      {/* Current Positions — live from API */}
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-medium text-gray-900">
-            Open Positions ({openPositions.length})
+      {/* Positions */}
+      <div className="am-card overflow-hidden">
+        <div className="flex items-center justify-between border-b border-line px-6 py-4">
+          <h2 className="text-lg font-semibold text-ink">
+            Open positions{" "}
+            <span className="font-mono text-sm text-ink-muted">
+              ({openPositions.length})
+            </span>
           </h2>
         </div>
         {openPositions.length === 0 ? (
-          <p className="px-6 py-8 text-sm text-gray-400">No open positions.</p>
+          <EmptyState
+            title="No open positions"
+            hint="Activate a strategy to start trading."
+          />
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-line">
+              <thead className="bg-surface-2">
                 <tr>
                   {[
                     "Ticker",
@@ -199,44 +230,41 @@ export const Dashboard: React.FC = () => {
                   ].map((h) => (
                     <th
                       key={h}
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider last:text-right"
+                      className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-ink-muted last:text-right"
                     >
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-line">
                 {openPositions.map((pos) => (
                   <tr
                     key={pos.id}
-                    className="hover:bg-gray-50 transition-colors"
+                    className="transition-colors hover:bg-surface-2"
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-6 py-4 text-sm font-semibold text-ink">
                       {pos.ticker}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 font-mono text-sm text-ink-muted">
                       {pos.quantity}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 font-mono text-sm text-ink-muted">
                       {formatCurrency(pos.entryPrice)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 font-mono text-sm text-ink-muted">
                       {formatCurrency(pos.currentPrice)}
                     </td>
                     <td
-                      className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${getColorForValue(pos.unrealizedPnL)}`}
+                      className={`px-6 py-4 font-mono text-sm font-medium ${getColorForValue(pos.unrealizedPnL)}`}
                     >
                       {formatCurrency(pos.unrealizedPnL)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button className="text-blue-600 hover:text-blue-900 mr-4 focus:outline-none focus:underline">
-                        View
-                      </button>
+                    <td className="px-6 py-4 text-right text-sm">
                       <button
                         onClick={() => handleClose(pos.id)}
                         disabled={closePosition.isPending}
-                        className="text-red-600 hover:text-red-900 focus:outline-none focus:underline disabled:opacity-40"
+                        className="font-medium text-neg hover:underline disabled:opacity-40"
                       >
                         Close
                       </button>

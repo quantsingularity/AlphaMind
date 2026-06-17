@@ -1,5 +1,5 @@
 import { StyleSheet, View } from "react-native";
-import { Button, Text, useTheme } from "react-native-paper";
+import { Button, Icon, Text, useTheme } from "react-native-paper";
 
 export default function ErrorMessage({
   title = "Something went wrong",
@@ -10,58 +10,63 @@ export default function ErrorMessage({
 
   const styles = StyleSheet.create({
     container: {
-      flex: 1,
       alignItems: "center",
-      justifyContent: "center",
       backgroundColor: theme.colors.background,
+      flex: 1,
+      justifyContent: "center",
       padding: 24,
     },
     errorBox: {
+      alignItems: "center",
       backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.error,
       borderRadius: 8,
       borderWidth: 1,
-      borderColor: "#FCA5A5",
-      padding: 20,
+      elevation: 2,
       maxWidth: 360,
-      width: "100%",
-      alignItems: "center",
+      padding: 20,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.05,
       shadowRadius: 3,
-      elevation: 2,
+      width: "100%",
     },
     icon: {
-      fontSize: 28,
       marginBottom: 12,
     },
-    title: {
-      fontSize: 16,
-      fontWeight: "700",
-      color: "#DC2626",
-      marginBottom: 8,
-      textAlign: "center",
-    },
     message: {
-      fontSize: 13,
       color: theme.colors.onSurfaceVariant,
-      textAlign: "center",
+      fontSize: 13,
       lineHeight: 20,
       marginBottom: 16,
+      textAlign: "center",
     },
     retryButton: {
       borderRadius: 6,
     },
     retryButtonContent: {
-      paddingVertical: 2,
       paddingHorizontal: 8,
+      paddingVertical: 2,
+    },
+    title: {
+      color: theme.colors.error,
+      fontSize: 16,
+      fontWeight: "700",
+      marginBottom: 8,
+      textAlign: "center",
     },
   });
 
   return (
     <View style={styles.container} accessible={true} accessibilityRole="alert">
       <View style={styles.errorBox}>
-        <Text style={styles.icon}>⚠️</Text>
+        <View style={styles.icon}>
+          <Icon
+            source="alert-circle-outline"
+            size={30}
+            color={theme.colors.error}
+          />
+        </View>
         <Text style={styles.title}>{title}</Text>
         {message && <Text style={styles.message}>{message}</Text>}
         {onRetry && (

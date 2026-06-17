@@ -104,27 +104,30 @@ export const Documentation: React.FC = () => {
   const current = sections.find((s) => s.id === activeSection) ?? sections[0];
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-6xl space-y-8 px-6 py-12">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Documentation</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Complete reference for the AlphaMind platform
+        <p className="am-eyebrow text-brand">Reference</p>
+        <h1 className="mt-2 font-display text-3xl font-semibold text-ink">
+          Documentation
+        </h1>
+        <p className="mt-1 text-sm text-ink-muted">
+          Complete reference for the AlphaMind platform.
         </p>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Sidebar */}
-        <nav className="lg:w-56 flex-shrink-0">
-          <div className="bg-white shadow rounded-lg p-4">
+      <div className="flex flex-col gap-6 lg:flex-row">
+        <nav className="shrink-0 lg:w-56">
+          <div className="am-card p-4 lg:sticky lg:top-24">
             <ul className="space-y-1">
               {sections.map((section) => (
                 <li key={section.id}>
                   <button
+                    type="button"
                     onClick={() => setActiveSection(section.id)}
-                    className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    className={`w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
                       activeSection === section.id
-                        ? "bg-blue-50 text-blue-700"
-                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                        ? "bg-brand-soft text-brand"
+                        : "text-ink-muted hover:bg-surface-2 hover:text-ink"
                     }`}
                   >
                     {section.title}
@@ -135,23 +138,22 @@ export const Documentation: React.FC = () => {
           </div>
         </nav>
 
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          <div className="bg-white shadow rounded-lg p-6 space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">
+        <div className="min-w-0 flex-1">
+          <div className="am-card space-y-6 p-6">
+            <h2 className="font-display text-2xl font-semibold text-ink">
               {current.title}
             </h2>
             {current.content.map((item) => (
               <div key={item.heading}>
-                <h3 className="text-base font-semibold text-gray-900 mb-2">
+                <h3 className="mb-2 text-base font-semibold text-ink">
                   {item.heading}
                 </h3>
                 {item.isCode ? (
-                  <pre className="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto whitespace-pre">
+                  <pre className="overflow-x-auto whitespace-pre rounded-lg border border-line bg-surface-2 p-4 font-mono text-sm text-ink">
                     <code>{item.body}</code>
                   </pre>
                 ) : (
-                  <p className="text-sm text-gray-600 leading-relaxed">
+                  <p className="text-sm leading-relaxed text-ink-muted">
                     {item.body}
                   </p>
                 )}
@@ -163,3 +165,5 @@ export const Documentation: React.FC = () => {
     </div>
   );
 };
+
+export default Documentation;
