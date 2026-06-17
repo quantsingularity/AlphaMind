@@ -206,7 +206,15 @@ The backend suite includes contract tests (`tests/test_frontend_contracts.py`) t
 
 ## CI/CD Pipeline
 
-GitHub Actions (`.github/workflows/cicd.yml`) runs four jobs: backend tests (with a dedicated contract-test step), backend Docker image build, web-frontend test and build, and mobile-frontend test and web export.
+GitHub Actions (`.github/workflows/cicd.yml`) runs five jobs on push, pull request, and manual dispatch:
+
+| Job                          | Depends on          | What it does                                                                                          |
+| :--------------------------- | :------------------ | :---------------------------------------------------------------------------------------------------- |
+| Code Quality Checks          | -                   | Python formatter checks and a repository-wide Prettier check                                          |
+| Backend Tests                | Code Quality Checks | Runs the pytest suite, a dedicated frontend/backend contract-test step, and uploads a coverage report |
+| Backend Build                | Backend Tests       | Builds the backend Docker image with Buildx and uploads it as an artifact                             |
+| Web-Frontend Test & Build    | Code Quality Checks | Runs the Vitest suite and produces the production web build                                           |
+| Mobile-Frontend Test & Build | Code Quality Checks | Runs the Jest suite and produces the Expo web export                                                  |
 
 ## Documentation
 
