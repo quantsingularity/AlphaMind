@@ -1,25 +1,28 @@
 # AlphaMind
 
-![CI/CD Status](https://img.shields.io/github/actions/workflow/status/quantsingularity/AlphaMind/cicd.yml?branch=main&label=CI/CD&logo=github)
-[![Test Coverage](https://img.shields.io/badge/coverage-85%25-green)](https://github.com/quantsingularity/AlphaMind/tree/main/tests)
-[![License](https://img.shields.io/github/license/quantsingularity/AlphaMind)](https://github.com/quantsingularity/AlphaMind/blob/main/LICENSE)
+![CI/CD Status](https://img.shields.io/github/actions/workflow/status/quantsingularity/AlphaMind/cicd.yml?branch=main&label=CI%2FCD&logo=github)
+[![License](https://github.com/quantsingularity/AlphaMind/blob/main/LICENSE)](https://github.com/quantsingularity/AlphaMind/blob/main/LICENSE)
 
-## Institutional-Grade Quantitative AI Trading System
+## Quantitative AI Trading Platform
 
-AlphaMind is an advanced quantitative trading system that combines alternative data sources, machine learning algorithms, and high-frequency execution strategies to deliver institutional-grade trading performance.
+AlphaMind is a full-stack quantitative trading platform: a FastAPI backend that serves portfolio, strategy, risk, backtest, market-data, trading, research, and alternative-data APIs, a React web dashboard, and a React Native (Expo) mobile app, all sharing one "Quant Terminal" design language. Alongside the application is a research codebase of machine-learning and quantitative modules (forecasting transformers, reinforcement-learning agents, generative models, Bayesian risk, and execution analytics).
 
 <div align="center">
   <img src="docs/images/alphamind_dashboard.bmp" alt="AlphaMind Dashboard" width="80%">
 </div>
 
+> Status and scope. AlphaMind is a portfolio and research-grade system, not a connected production trading desk. By default the backend serves deterministic seeded and synthetic data so the whole stack runs end to end with no external accounts. A real market-data path is wired through Yahoo Finance (and an optional Polygon connector) and is used automatically when reachable. There is no live broker integration; order placement is simulated in-process.
+
 ## Table of Contents
 
 - [Overview](#overview)
-- [Key Features](#key-features)
 - [Project Structure](#project-structure)
+- [What Is Actually Implemented](#what-is-actually-implemented)
 - [Technology Stack](#technology-stack)
 - [Architecture](#architecture)
 - [Installation and Setup](#installation-and-setup)
+- [Running the Stack](#running-the-stack)
+- [API Surface](#api-surface)
 - [Testing](#testing)
 - [CI/CD Pipeline](#cicd-pipeline)
 - [Documentation](#documentation)
@@ -28,291 +31,204 @@ AlphaMind is an advanced quantitative trading system that combines alternative d
 
 ## Overview
 
-AlphaMind represents the cutting edge of quantitative trading technology, designed to process vast amounts of market and alternative data through sophisticated machine learning models to generate alpha. The system combines advanced AI techniques with high-performance execution strategies to capitalize on market inefficiencies across multiple asset classes and timeframes.
+AlphaMind demonstrates an institutional-style quant workflow across a real, runnable codebase. The application tier (backend plus two clients) is fully wired and covered by tests. The research tier is a library of ML and quant modules that the application can draw on and that can be used independently for experimentation.
 
 ## Project Structure
 
-The project is organized into several main components:
-
 ```
 AlphaMind/
-├── code/                   # Core backend logic, services, and shared utilities
-├── docs/                   # Project documentation
-├── infrastructure/         # DevOps, deployment, and infra-related code
-├── mobile-frontend/        # Mobile application
-├── web-frontend/           # Web dashboard
-├── scripts/                # Automation, setup, and utility scripts
-├── LICENSE                 # License information
-└── README.md               # Project overview and instructions
+├── code/
+│   ├── backend/            # FastAPI service: API, auth, services, DB, infra
+│   │   ├── app/            # FastAPI app, routers (v1 API), services
+│   │   ├── analytics/      # Alpha research, A/B testing, model validation, viz
+│   │   ├── core/           # Config and exceptions
+│   │   ├── data_processing/# Caching, monitoring, parallel, pipeline, streaming
+│   │   ├── db/             # SQLAlchemy models, repositories, session
+│   │   ├── execution/      # Liquidity forecasting, market impact, routing, OMS
+│   │   ├── infrastructure/ # Auth system (bcrypt + JWT)
+│   │   ├── market_data/    # Connectors, live feed, backtesting, exchange API
+│   │   ├── risk/           # Bayesian VaR, stress testing, controls, counterparty
+│   │   ├── tests/          # Backend test suite
+│   │   ├── alembic/        # Database migrations
+│   │   ├── docker-compose.yml
+│   │   └── requirements.txt
+│   └── ai_models/          # Research ML library
+│       ├── agents/         # DDPG, PPO, replay buffer
+│       ├── environments/   # Trading and portfolio Gym environments
+│       ├── forecasting/    # Transformer, attention, multi-horizon models
+│       └── generative/     # GAN, generator, discriminator, regime models
+├── web-frontend/           # React + TypeScript + Vite dashboard
+├── mobile-frontend/        # React Native + Expo app
+├── infrastructure/         # Docker, Kubernetes, Terraform, Ansible
+├── scripts/                # Build, test, deploy, and dev helper scripts
+├── docs/                   # Documentation (this directory)
+└── README.md
 ```
 
-## Key Features
+## What Is Actually Implemented
 
-| Category                        | Feature                       | Description                                               |
-| :------------------------------ | :---------------------------- | :-------------------------------------------------------- |
-| **Advanced AI Models**          | Temporal Fusion Transformers  | Multi-horizon forecasting with attention mechanisms       |
-|                                 | Deep Reinforcement Learning   | Adaptive trading strategies using DDPG and SAC algorithms |
-|                                 | Generative Models             | Synthetic data generation for robust backtesting          |
-|                                 | Ensemble Methods              | Model combination for improved prediction stability       |
-|                                 | Bayesian Optimization         | Hyperparameter tuning for model performance               |
-| **Alternative Data Processing** | SEC Filings Analysis          | NLP processing of corporate disclosures                   |
-|                                 | Sentiment Analysis            | Real-time news and social media sentiment extraction      |
-|                                 | Satellite Imagery             | Geospatial intelligence for commodity markets             |
-|                                 | Web Scraping Pipeline         | Structured data extraction from unstructured sources      |
-|                                 | Alternative Data Fusion       | Integration of diverse data sources for signal generation |
-| **Risk Management System**      | Bayesian Value at Risk        | Probabilistic risk assessment                             |
-|                                 | Stress Testing Framework      | Scenario-based risk evaluation                            |
-|                                 | Counterparty Risk Modeling    | Network analysis of trading counterparties                |
-|                                 | Position Sizing Optimization  | Kelly criterion and risk parity approaches                |
-|                                 | Tail Risk Hedging             | Automated protection against extreme market events        |
-| **Execution Engine**            | Smart Order Routing           | Optimal execution across multiple venues                  |
-|                                 | Liquidity Forecasting         | Predictive models for market liquidity                    |
-|                                 | Market Impact Modeling        | Transaction cost analysis and minimization                |
-|                                 | Adaptive Execution Algorithms | TWAP, VWAP, and ML-enhanced variants                      |
-|                                 | High-Frequency Capabilities   | Sub-millisecond order management                          |
+### Application tier (wired and tested)
+
+- FastAPI backend exposing versioned endpoints under `/api/v1` (with non-versioned `/api/*` aliases) for portfolio, strategies, risk, backtest, market data, trading, research, and alternative data, plus authentication under `/api/auth` and health checks.
+- Authentication using bcrypt password hashing and HS256 JSON Web Tokens with expiry. The signing key is read from `SECRET_KEY` and the app refuses to start in production or staging if it is unset, the placeholder, or shorter than 32 characters.
+- Market-data service with a live connector waterfall (Yahoo Finance, then an optional Polygon connector) and a deterministic synthetic fallback so quotes and history are always available.
+- SQLAlchemy data layer. Development uses SQLite (`alphamind.db`); MySQL and PostgreSQL async drivers are included for other environments. Alembic manages migrations.
+- React web dashboard: Home, Dashboard, Strategies, Portfolio, Backtest, Risk, Market Data, Trading, Research, Alternative Data, Documentation, About, Settings, and authentication screens.
+- React Native (Expo) app with the same feature set across bottom-tab and stacked navigation, Redux Toolkit state, and a light/dark theme.
+- Graceful degradation in both clients: if the backend is unreachable, account creation and sign-in fall back to a local demo session and data screens render empty or placeholder states instead of failing hard.
+
+### Research tier (library modules)
+
+- Forecasting: transformer, attention, and multi-horizon model implementations (PyTorch / TensorFlow).
+- Reinforcement learning: DDPG and PPO agents with replay buffers and custom trading and portfolio Gym environments.
+- Generative models: GAN components for synthetic series and a regime model.
+- Risk: Bayesian Value at Risk (PyMC), stress testing, counterparty and aggregation modules.
+- Execution: liquidity forecasting, market-impact, order management, and routing modules.
+
+These modules are part of the codebase and can be imported and run; they are not all connected to the live API responses, which by default are seeded.
 
 ## Technology Stack
 
-| Category     | Component           | Technology                             | Detail                                                                   |
-| :----------- | :------------------ | :------------------------------------- | :----------------------------------------------------------------------- |
-| **Backend**  | Languages           | Python, C++                            | Python 3.10 for core logic, C++ for performance-critical components      |
-|              | ML Frameworks       | PyTorch, TensorFlow, scikit-learn, Ray | For model training, deployment, and distributed computing                |
-|              | Data Processing     | Pandas, NumPy, Dask, Apache Spark      | For data manipulation, numerical computation, and large-scale processing |
-|              | Financial Libraries | QuantLib, zipline, PyMC3               | For quantitative finance, backtesting, and probabilistic programming     |
-|              | Streaming           | Kafka, Redis Streams                   | For real-time data ingestion and inter-service communication             |
-|              | Databases           | InfluxDB, PostgreSQL                   | InfluxDB for time series data, PostgreSQL for relational data            |
-| **Frontend** | Web                 | React, TypeScript, D3.js, TradingView  | For the main web dashboard and visualization                             |
-|              | Mobile              | React Native, Redux                    | For cross-platform mobile application development                        |
-|              | API                 | FastAPI, GraphQL                       | For high-performance backend API and flexible data querying              |
-|              | Authentication      | OAuth2, JWT                            | For secure user authentication and authorization                         |
-|              | Styling             | Tailwind CSS, Styled Components        | For modern, utility-first and component-based styling                    |
-| **DevOps**   | Containerization    | Docker, Kubernetes                     | For service packaging and container orchestration                        |
-|              | CI/CD               | GitHub Actions                         | For automated build, test, and deployment pipelines                      |
-|              | Cloud               | Google Cloud Platform, AWS             | Multi-cloud deployment support                                           |
-|              | Monitoring          | Prometheus, Grafana                    | For metrics collection, visualization, and alerting                      |
-|              | Logging             | ELK Stack                              | Elasticsearch, Logstash, Kibana for centralized logging and analysis     |
+| Area            | Technology                                                                                           |
+| :-------------- | :--------------------------------------------------------------------------------------------------- |
+| Backend API     | Python 3.10+, FastAPI, Uvicorn, Pydantic v2                                                          |
+| Auth            | bcrypt, PyJWT / python-jose, passlib                                                                 |
+| Data layer      | SQLAlchemy 2, Alembic, SQLite (dev), MySQL / PostgreSQL (async drivers), Redis                       |
+| ML / Quant      | PyTorch, TensorFlow, scikit-learn, Gymnasium, Stable-Baselines3, PyMC, QuantLib, NumPy, Pandas, Dask |
+| Market data     | yfinance (Yahoo Finance), optional Polygon connector                                                 |
+| Web frontend    | React 19, TypeScript, Vite 7, Tailwind CSS, React Router, TanStack Query, axios, Recharts, D3        |
+| Mobile frontend | React Native, Expo, React Navigation, Redux Toolkit, React Native Paper, axios                       |
+| Infrastructure  | Docker, Docker Compose, Kubernetes, Terraform, Ansible                                               |
+| CI/CD           | GitHub Actions                                                                                       |
+| Testing         | pytest (backend), Vitest (web), Jest (mobile)                                                        |
+
+Not part of this project, despite being common in this space: C++ components, Apache Kafka/Spark as runtime dependencies of the app (the Compose file provisions Kafka and Redis for a fuller local stack, but the API runs without them), GraphQL, InfluxDB, and live broker connectivity.
 
 ## Architecture
 
-AlphaMind follows a microservices architecture with the following components:
+AlphaMind is organized in tiers rather than a sprawl of microservices:
 
 ```
-AlphaMind/
-├── Data Ingestion Layer
-│   ├── Market Data Collectors
-│   ├── Alternative Data Processors
-│   ├── Data Cleaning Pipeline
-│   └── Feature Engineering
-├── AI Engine
-│   ├── Model Training
-│   ├── Prediction Service
-│   ├── Feature Store
-│   └── Model Registry
-├── Strategy Layer
-│   ├── Signal Generation
-│   ├── Portfolio Construction
-│   ├── Risk Management
-│   └── Backtesting Engine
-├── Execution Layer
-│   ├── Order Management
-│   ├── Execution Algorithms
-│   ├── Market Connectivity
-│   └── Post-Trade Analysis
-├── API Gateway
-│   ├── REST Endpoints
-│   ├── GraphQL Interface
-│   ├── WebSocket Server
-│   └── Authentication
-└── Frontend Applications
-    ├── Web Dashboard
-    ├── Mobile App
-    ├── Admin Interface
-    └── Documentation Portal
+Clients
+  ├── web-frontend (React/TS)            ── HTTP/JSON ──┐
+  └── mobile-frontend (React Native)     ── HTTP/JSON ──┤
+                                                        ▼
+Backend (FastAPI)
+  ├── Routers (/api/v1/*)  auth, portfolio, strategies, risk,
+  │                        backtest, market-data, trading,
+  │                        research, alternative-data, health
+  ├── Services            portfolio, strategy, risk, market-data, trading
+  ├── Auth                bcrypt + JWT (HS256), fail-closed secret
+  └── Data layer          SQLAlchemy + Alembic (SQLite / MySQL / PostgreSQL)
+                                                        ▼
+Research library (code/ai_models, code/backend/{analytics,risk,execution})
+  forecasting · reinforcement learning · generative · Bayesian risk · execution
 ```
+
+The frontends are the source of presentation; the backend is the source of truth for data contracts. A dedicated contract test suite pins every response field the clients read so the tiers cannot drift apart silently.
+
+See [docs/architecture.md](docs/architecture.md) for detail.
 
 ## Installation and Setup
 
-### Prerequisites
-
-| Requirement      | Detail                                            |
-| :--------------- | :------------------------------------------------ |
-| Python           | 3.10+                                             |
-| Node.js          | 16+                                               |
-| Containerization | Docker and Docker Compose                         |
-| Compilation      | C++ compiler (required for QuantLib)              |
-| Hardware         | CUDA-compatible GPU (recommended for ML training) |
-
-### Quick Start with Setup Script
+Prerequisites: Python 3.10+ and Node.js 18+. Docker is optional.
 
 ```bash
-# Clone the repository
 git clone https://github.com/quantsingularity/AlphaMind.git
 cd AlphaMind
 
-# Run the setup script
-./setup_environment.sh
+# Backend
+cd code/backend
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
 
-# Start the application
-./run_alphamind.sh
+# Web frontend
+cd ../../web-frontend
+npm install
+
+# Mobile frontend
+cd ../mobile-frontend
+npm install
 ```
 
-### Manual Setup
+Full, environment-specific instructions are in [docs/INSTALLATION.md](docs/INSTALLATION.md).
 
-1. Clone the repository:
+## Running the Stack
 
-   ```bash
-   git clone https://github.com/quantsingularity/AlphaMind.git
-   cd AlphaMind
-   ```
+```bash
+# 1) Backend (from code/backend, venv active)
+python -m main                # serves http://0.0.0.0:8000, docs at /docs
 
-2. Set up the backend:
+# 2) Web dashboard (from web-frontend)
+npm run dev                   # http://localhost:3000, proxies /api to :8000
 
-   ```bash
-   cd backend
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   python setup.py develop
-   ```
+# 3) Mobile app (from mobile-frontend)
+npm start                     # press w for web, a for Android, i for iOS
+```
 
-3. Set up the web frontend:
+The web dashboard proxies API calls to port 8000. The mobile app resolves the API base URL automatically: on web it uses the host the app was opened from (so opening it via a LAN IP reaches a backend on the same machine), on the Android emulator it uses `10.0.2.2:8000`, and otherwise `localhost:8000`. Override with `EXPO_PUBLIC_API_BASE_URL`.
 
-   ```bash
-   cd ../web-frontend
-   npm install
-   ```
+See [docs/USAGE.md](docs/USAGE.md) and [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
 
-4. Set up the mobile frontend:
+## API Surface
 
-   ```bash
-   cd ../mobile-frontend
-   npm install
-   ```
+Base URL `http://localhost:8000`. Interactive docs at `/docs` (Swagger) and `/redoc`.
 
-5. Configure environment variables:
+| Group            | Prefix                     | Highlights                                        |
+| :--------------- | :------------------------- | :------------------------------------------------ |
+| Health           | `/health`, `/`             | Liveness check                                    |
+| Auth             | `/api/auth`                | `register`, `login`, `refresh`, `profile`         |
+| Portfolio        | `/api/v1/portfolio`        | summary, `positions`, `holdings`, `performance`   |
+| Strategies       | `/api/v1/strategies`       | list, detail, `{id}/equity-curve`                 |
+| Risk             | `/api/v1/risk`             | `metrics`, `stress-scenarios`, `radar`            |
+| Backtest         | `/api/v1/backtest`         | run a backtest (POST)                             |
+| Market data      | `/api/v1/market-data`      | `quotes`, `quote/{ticker}`, `historical/{ticker}` |
+| Trading          | `/api/v1/trading`          | `orders` (GET/POST/DELETE)                        |
+| Research         | `/api/v1/research`         | `papers`                                          |
+| Alternative data | `/api/v1/alternative-data` | `sources`                                         |
 
-   ```bash
-   cp config/.env.example config/.env
-   # Edit .env with your API keys and configuration
-   ```
-
-6. Start the services:
-
-   ```bash
-   # Start backend services
-   cd backend
-   python -m alphamind.server
-
-   # Start web frontend
-   cd ../web-frontend
-   npm start
-
-   # In a separate terminal, start the development server
-   cd backend
-   uvicorn api:app --reload
-   ```
-
-7. Access the web interface at http://localhost:3000
+Non-versioned `/api/*` aliases exist for backward compatibility. Full request and response shapes are in [docs/API.md](docs/API.md).
 
 ## Testing
 
-The project currently has approximately 78% test coverage. We use a comprehensive testing strategy to ensure reliability and performance:
-
-| Component                  | Test Type                | Detail                                                |
-| :------------------------- | :----------------------- | :---------------------------------------------------- |
-| **Backend Testing**        | Unit tests               | With `pytest` for individual functions and modules    |
-|                            | Integration tests        | For system components and inter-service communication |
-|                            | Performance benchmarks   | To measure and optimize execution speed               |
-|                            | Data pipeline validation | To ensure data integrity and flow                     |
-|                            | Model validation         | Backtesting and cross-validation for AI models        |
-| **Frontend Testing**       | Component tests          | With Jest and React Testing Library for UI elements   |
-|                            | End-to-end tests         | With Cypress for full user workflows                  |
-|                            | Visual regression tests  | To catch unintended UI changes                        |
-|                            | Accessibility testing    | To ensure compliance with accessibility standards     |
-|                            | Mobile testing           | With Detox for native mobile components               |
-| **Infrastructure Testing** | Deployment validation    | To ensure successful and consistent deployments       |
-|                            | Load testing             | With Locust to test system capacity and resilience    |
-|                            | Failover testing         | To verify high availability and disaster recovery     |
-|                            | Security scanning        | For vulnerabilities in code and dependencies          |
-
-To run tests locally:
-
 ```bash
-# Run all tests
-./run_all_tests.sh
-
-# Backend tests only
-cd tests
+# Backend (from code/backend)
 pytest
 
-# Web frontend tests
-cd web-frontend
+# Web (from web-frontend)
 npm test
 
-# Mobile frontend tests
-cd mobile-frontend
-yarn test
-
-# Component-specific tests
-./test_components.sh --component risk_engine
+# Mobile (from mobile-frontend)
+npm test
 ```
+
+The backend suite includes contract tests (`tests/test_frontend_contracts.py`) that pin the API shapes the clients consume, security tests (`tests/test_security.py`) covering password hashing and secret hardening, and market-data tests (`tests/test_market_data_service.py`) covering the live and synthetic paths. Some model tests require TensorFlow and are skipped if it is not installed.
 
 ## CI/CD Pipeline
 
-AlphaMind uses GitHub Actions for continuous integration and deployment:
-
-| Stage                | Control Area                    | Institutional-Grade Detail                                                              |
-| :------------------- | :------------------------------ | :-------------------------------------------------------------------------------------- |
-| **Formatting Check** | Change Triggers                 | Enforced on all `push` and `pull_request` events to `main` and `develop`                |
-|                      | Manual Oversight                | On-demand execution via controlled `workflow_dispatch`                                  |
-|                      | Source Integrity                | Full repository checkout with complete Git history for auditability                     |
-|                      | Python Runtime Standardization  | Python 3.10 with deterministic dependency caching                                       |
-|                      | Backend Code Hygiene            | `autoflake` to detect unused imports/variables using non-mutating diff-based validation |
-|                      | Backend Style Compliance        | `black --check` to enforce institutional formatting standards                           |
-|                      | Non-Intrusive Validation        | Temporary workspace comparison to prevent unauthorized source modification              |
-|                      | Node.js Runtime Control         | Node.js 18 with locked dependency installation via `npm ci`                             |
-|                      | Web Frontend Formatting Control | Prettier checks for web-facing assets                                                   |
-|                      | Mobile Frontend Formatting      | Prettier enforcement for mobile application codebases                                   |
-|                      | Documentation Governance        | Repository-wide Markdown formatting enforcement                                         |
-|                      | Infrastructure Configuration    | Prettier validation for YAML/YML infrastructure definitions                             |
-|                      | Compliance Gate                 | Any formatting deviation fails the pipeline and blocks merge                            |
-
-## Performance Results
-
-See **[BACKTEST_RESULTS.md](docs/BACKTEST_RESULTS.md)** for full empirical backtest tearsheets:
-
-- TFT Alpha Strategy: **Sharpe 2.31**, **+38.4% ann.** (2019–2023 OOS)
-- Hybrid ML Ensemble: **Sharpe 2.71**, **+43.2% ann.** (2020–2023 OOS)
-- All strategies statistically significant at p < 0.001
+GitHub Actions (`.github/workflows/cicd.yml`) runs four jobs: backend tests (with a dedicated contract-test step), backend Docker image build, web-frontend test and build, and mobile-frontend test and web export.
 
 ## Documentation
 
-For detailed documentation, please refer to the following resources:
+| Document                                             | Contents                                |
+| :--------------------------------------------------- | :-------------------------------------- |
+| [docs/README.md](docs/README.md)                     | Documentation index                     |
+| [docs/architecture.md](docs/architecture.md)         | System architecture                     |
+| [docs/API.md](docs/API.md)                           | REST API reference                      |
+| [docs/INSTALLATION.md](docs/INSTALLATION.md)         | Setup for all components                |
+| [docs/CONFIGURATION.md](docs/CONFIGURATION.md)       | Environment variables and config        |
+| [docs/USAGE.md](docs/USAGE.md)                       | Running and using the platform          |
+| [docs/CLI.md](docs/CLI.md)                           | Helper scripts reference                |
+| [docs/FEATURE_MATRIX.md](docs/FEATURE_MATRIX.md)     | Feature status, implemented vs planned  |
+| [docs/BACKTEST_RESULTS.md](docs/BACKTEST_RESULTS.md) | How backtests work and how to read them |
+| [docs/troubleshooting.md](docs/troubleshooting.md)   | Common issues and fixes                 |
+| [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)         | Contribution guide                      |
+| [docs/examples/](docs/examples/)                     | Worked examples                         |
 
-| Document                    | Path                 | Description                                                 |
-| :-------------------------- | :------------------- | :---------------------------------------------------------- |
-| **README**                  | `README.md`          | High-level overview, project scope, and quickstart          |
-| **API Reference**           | `API.md`             | Detailed documentation for all API endpoints                |
-| **CLI Reference**           | `CLI.md`             | Command-line interface usage, commands, and examples        |
-| **Installation Guide**      | `INSTALLATION.md`    | Step-by-step installation and environment setup             |
-| **User Guide**              | `USAGE.md`           | Comprehensive guide for end-users, workflows, and examples  |
-| **Contributing Guidelines** | `CONTRIBUTING.md`    | Contribution process, coding standards, and PR requirements |
-| **Architecture Overview**   | `ARCHITECTURE.md`    | System architecture, components, and design rationale       |
-| **Configuration Guide**     | `CONFIGURATION.md`   | Configuration options, environment variables, and tuning    |
-| **Feature Matrix**          | `FEATURE_MATRIX.md`  | Feature capabilities, coverage, and roadmap alignment       |
-| **Troubleshooting**         | `TROUBLESHOOTING.md` | Common issues, diagnostics, and remediation steps           |
+## Contributing
 
-### Development Guidelines
-
-| Guideline               | Detail                                                |
-| :---------------------- | :---------------------------------------------------- |
-| **Code Style (Python)** | Follow PEP 8 style guide                              |
-| **Code Style (JS/TS)**  | Use ESLint and Prettier for formatting and linting    |
-| **Testing**             | Write unit tests for all new features                 |
-| **Documentation**       | Update documentation for any code changes             |
-| **Pull Requests**       | Ensure all tests pass before submitting               |
-| **Commit Hygiene**      | Keep pull requests focused on a single feature or fix |
+See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+See [LICENSE](LICENSE).

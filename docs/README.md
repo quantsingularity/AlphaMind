@@ -1,108 +1,32 @@
 # AlphaMind Documentation
 
-**AlphaMind** is an institutional-grade quantitative AI trading system that combines alternative data sources, machine learning algorithms, and high-frequency execution strategies to deliver superior trading performance.
+This directory documents AlphaMind as it actually exists in this repository. Where a capability is scaffolding or research-only rather than wired into the live API, the docs say so.
 
-## Table of Contents
+## Start here
 
-### Getting Started
+- [Installation](INSTALLATION.md) - set up the backend and both frontends.
+- [Usage](USAGE.md) - run the stack and use each surface.
+- [Configuration](CONFIGURATION.md) - environment variables and settings.
 
-- [Installation Guide](INSTALLATION.md) - System requirements and installation options
-- [Usage Guide](USAGE.md) - Common usage patterns and workflows
-- [Configuration](CONFIGURATION.md) - Configuration options and environment variables
+## Reference
 
-### API & CLI Reference
+- [Architecture](architecture.md) - how the tiers fit together.
+- [API Reference](API.md) - every REST endpoint with request and response shapes.
+- [CLI / Scripts](CLI.md) - the helper scripts in `scripts/`.
+- [Feature Matrix](FEATURE_MATRIX.md) - what is implemented, what is scaffolding, what is planned.
+- [Backtest Results](BACKTEST_RESULTS.md) - how backtests are produced and how to read them.
+- [Troubleshooting](troubleshooting.md) - common problems and fixes.
 
-- [API Reference](API.md) - REST API endpoints and schemas
-- [CLI Reference](CLI.md) - Command-line interface documentation
+## Examples
 
-### Performance & Validation
+- [API usage](examples/api_usage.md) - call the API from the shell and Python.
+- [DDPG trading](examples/ddpg_trading.md) - use the reinforcement-learning agent and trading environment.
+- [Sentiment / alternative data](examples/sentiment_analysis.md) - work with the alternative-data surface.
 
-- [Backtest Results](BACKTEST_RESULTS.md) - Empirical tearsheets, Sharpe ratios, and walk-forward analysis for all strategies
+## Contributing
 
-### Features & Architecture
+- [Contributing guide](CONTRIBUTING.md)
 
-- [Feature Matrix](FEATURE_MATRIX.md) - Complete feature overview
-- [Architecture](ARCHITECTURE.md) - System design and components
-- [Examples](EXAMPLES/) - Working code examples
+## A note on data
 
-### Development & Contributing
-
-- [Contributing Guide](CONTRIBUTING.md) - How to contribute to the project
-- [Troubleshooting](TROUBLESHOOTING.md) - Common issues and solutions
-
-### Internal
-
-- [Deliverable Checklist](DELIVERABLE_CHECKLIST.md) - Documentation completeness verification
-
-## Quickstart (3 Steps)
-
-AlphaMind is a comprehensive quantitative trading platform designed for institutional-grade performance. Get up and running in minutes:
-
-### 1. Clone and Install
-
-```bash
-git clone https://github.com/quantsingularity/AlphaMind.git
-cd AlphaMind
-./scripts/setup_environment.sh
-```
-
-### 2. Configure
-
-```bash
-cp backend/.env.example backend/.env
-# Edit backend/.env with your API keys and configuration
-```
-
-### 3. Run
-
-```bash
-./scripts/run_alphamind.sh
-# Access web interface at http://localhost:3000
-# Access API docs at http://localhost:8000/docs
-```
-
-## System Overview
-
-AlphaMind provides:
-
-- **Advanced AI Models**: Temporal Fusion Transformers, Deep RL (DDPG/SAC), Generative Models
-- **Alternative Data**: SEC filings, sentiment analysis, satellite imagery, web scraping
-- **Risk Management**: Bayesian VaR, stress testing, counterparty risk, position sizing
-- **Execution Engine**: Smart order routing, liquidity forecasting, HFT capabilities
-- **Multi-Platform**: Web dashboard, mobile app, REST/GraphQL/WebSocket APIs
-
-## Documentation Standards
-
-All documentation follows:
-
-- **Markdown format** with GitHub-flavored syntax
-- **Runnable examples** with clear expected outputs
-- **Beautiful tables** for structured information
-- **Relative links** for cross-references
-- **Version-specific notes** where applicable
-
-## Quick Links
-
-| Purpose          | Document                                 | Description                               |
-| ---------------- | ---------------------------------------- | ----------------------------------------- |
-| **Install**      | [INSTALLATION.md](INSTALLATION.md)       | Get AlphaMind running on your system      |
-| **Use**          | [USAGE.md](USAGE.md)                     | Learn common workflows and patterns       |
-| **Configure**    | [CONFIGURATION.md](CONFIGURATION.md)     | Understand all configuration options      |
-| **API**          | [API.md](API.md)                         | Integrate with AlphaMind programmatically |
-| **Develop**      | [CONTRIBUTING.md](CONTRIBUTING.md)       | Contribute code or documentation          |
-| **Troubleshoot** | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Resolve common issues                     |
-
-## Support and Community
-
-- **GitHub Issues**: Report bugs and request features at [GitHub Issues](https://github.com/quantsingularity/AlphaMind/issues)
-- **Documentation**: Full documentation at [docs/](https://github.com/quantsingularity/AlphaMind/tree/main/docs)
-- **License**: MIT License - see [LICENSE](../LICENSE) file
-
-## Version Information
-
-- **Current Version**: 1.0.0
-- **Python**: 3.10+
-- **Node.js**: 16+
-- **Test Coverage**: 78%
-
-For detailed version history and changelog, see the main [README.md](../README.md).
+By default the backend returns deterministic seeded and synthetic data so the platform runs with no external accounts. Market data uses Yahoo Finance automatically when reachable, with a synthetic fallback. There is no live broker; trading is simulated in-process. Keep this in mind when reading any performance figures in these docs: they illustrate the mechanics, not a real track record.
